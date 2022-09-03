@@ -37,3 +37,4 @@ obj/
 .qsys_edit/
 platform/
 platform.sopcinfo
+hps_isw_handoff/

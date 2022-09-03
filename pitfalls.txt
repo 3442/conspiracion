@@ -1,0 +1,18 @@
+	===
+	[I] Setup del HPS y SDRAM
+	===
+
+Luego de agregar el HPS a Platform Designer hay que ejecutar un script Tcl para
+que Quartus agarre la config correcta de impedancias y más magia. Si se
+sintetiza sin más acción entonces pasa esto:
+
+	Error (174068): Output buffer atom "platform:plat|platform_hps_0:hps_0|platform_hps_0_hps_io:hps_io|platform_hps_0_hps_io_border:border|hps_sdram:hps_sdram_inst|hps_sdram_p0:p0|hps_sdram_p0_acv_hard_memphy:umemphy|hps_sdram_p0_acv_hard_io_pads:uio_pads|hps_sdram_p0_altdqdqs:dq_ddio[0].ubidir_dq_dqs|altdq_dqs2_acv_connect_to_hard_phy_cyclonev:altdq_dqs2_inst|obuf_os_bar_0" has port "PARALLELTERMINATIONCONTROL[8]" connected, but does not use calibrated on-chip termination
+
+Foro: <https://community.intel.com/t5/Programmable-Devices/Build-HPS-Hardware/td-p/219711>
+
+Tools > Tcl Scripts. There navigate through your QSys project, synthesis >
+submodules folders, and there you should find a script whose name ends with
+pin_assignments.tcl . Select that script, run it and try and compile the
+project again
+
+Nota: es *_pin_assignments.tcl y no ningún otro
