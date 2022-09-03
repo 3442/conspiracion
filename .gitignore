@@ -31,5 +31,9 @@ obj
 *.a
 nios_workspace
 
+hps_sdram_p0_summary.csv
 vcd/
 obj/
+.qsys_edit/
+platform/
+platform.sopcinfo
