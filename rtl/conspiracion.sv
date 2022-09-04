@@ -20,6 +20,21 @@ module conspiracion
 	input  wire        reset_reset_n       //  reset.reset_n
 );
 
-	platform plat(.*);
+	logic[29:0] addr;
+	logic[31:0] data_rd, data_rw;
+	logic ready, write, start;
+
+	platform plat
+	(
+		.master_0_core_addr(addr),
+		.master_0_core_data_rd(data_rd),
+		.master_0_core_data_rw(data_rw),
+		.master_0_core_ready(ready),
+		.master_0_core_write(write),
+		.master_0_core_start(start),
+		.*
+	);
+
+	initial start <= 0;
 
 endmodule
