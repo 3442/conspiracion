@@ -190,4 +190,26 @@ set_global_assignment -name USE_DLL_FREQUENCY_FOR_DQS_DELAY_CHAIN ON
 set_global_assignment -name UNIPHY_SEQUENCER_DQS_CONFIG_ENABLE ON
 set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING ON
 set_global_assignment -name ECO_REGENERATE_REPORT ON
+
+
+set_location_assignment PIN_AF14 -to clk_clk
+
+set_location_assignment PIN_AB12 -to dir
+
+set_location_assignment PIN_AA14 -to clr
+set_location_assignment PIN_AA15 -to mov
+set_location_assignment PIN_W15 -to add
+set_location_assignment PIN_Y16 -to io
+
+set_location_assignment PIN_V16 -to out[0]
+set_location_assignment PIN_W16 -to out[1]
+set_location_assignment PIN_V17 -to out[2]
+set_location_assignment PIN_V18 -to out[3]
+set_location_assignment PIN_W17 -to out[4]
+set_location_assignment PIN_W19 -to out[5]
+set_location_assignment PIN_Y19 -to out[6]
+set_location_assignment PIN_W20 -to out[7]
+set_location_assignment PIN_Y21 -to done
+
+
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
