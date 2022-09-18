@@ -26,6 +26,7 @@ module bus_master
 	} state;
 
 	assign data_rd = avl_readdata;
+	assign avl_byteenable = 4'b1111;
 
 	always_ff @(posedge clk) unique case(state)
 		REQUEST: if(start) begin
@@ -33,6 +34,7 @@ module bus_master
 			avl_read <= ~write;
 			avl_write <= write;
 			avl_writedata <= data_rw;
+			state <= WAIT;
 		end
 
 		WAIT: if(~avl_waitrequest) begin
