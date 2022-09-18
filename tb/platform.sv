@@ -28,9 +28,9 @@ module platform (
 	logic[31:0] avl_address /*verilator public*/;
 	logic       avl_read /*verilator public*/;
 	logic       avl_write /*verilator public*/;
-	logic[31:0] avl_readdata /*verilator public*/;
+	logic[31:0] avl_readdata /*verilator public_flat_rw @(negedge clk_clk)*/;
 	logic[31:0] avl_writedata /*verilator public*/;
-	logic       avl_waitrequest /*verilator public*/;
+	logic       avl_waitrequest /*verilator public_flat_rw @(negedge clk_clk)*/;
 	logic[3:0]  avl_byteenable /*verilator public*/;
 
 	bus_master master_0

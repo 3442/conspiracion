@@ -16,3 +16,15 @@ pin_assignments.tcl . Select that script, run it and try and compile the
 project again
 
 Nota: es *_pin_assignments.tcl y no ningún otro
+
+	===
+	[II] Emulación de Avalon
+	===
+
+Para las señales fuera del top que C++ escribe, por ejemplo en tb/platform.sv,
+se necesita /*verilator public_flat_rw @(negedge clk_clk)*/ en vez de
+/*verilator public*/ (la última igual se usa para señales que C++ lee). Poner
+lo segundo en una señal `s` hace que `assign a = s;` no tenga ningún efecto,
+lo cual es difícil de depurar.
+
+https://github.com/verilator/verilator/issues/2262
