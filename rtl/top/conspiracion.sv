@@ -48,10 +48,10 @@ module conspiracion
 	);
 
 	initial begin
-		addr <= 0;
-		start <= 0;
-		state <= IDLE;
-		done <= 0;
+		addr = 0;
+		start = 0;
+		state = IDLE;
+		done = 0;
 	end
 
 	assign data_rw[7:0] = out;
