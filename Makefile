@@ -5,24 +5,36 @@ RTL_DIR   := rtl
 TB_DIR    := tb
 VERILATOR := verilator
 
+RTL_FILES  = $(shell find $(RTL_DIR)/ ! -path '$(RTL_DIR)/top/*' -type f -name '*.sv')
+RTL_FILES += $(shell find $(TB_DIR)/ ! -path '$(TB_DIR)/top/*' -type f -name '*.sv')
+TB_FILES   = $(shell find $(TB_DIR)/ ! -path '$(TB_DIR)/top/*' -type f -name '*.cpp')
+
 all: trace
 
 clean:
 	rm -rf $(OBJ_DIR) $(VCD_DIR)
 
-trace: exe vcd
-	cd $(VCD_DIR) && ../$(OBJ_DIR)/V$(TOP)
+trace: trace/$(TOP)
 
-$(VCD_DIR):
-	@mkdir $(VCD_DIR)
+trace/%: exe/% $(VCD_DIR)/%
+	cd $(VCD_DIR)/$* && ../../$(OBJ_DIR)/$*/V$*
 
-exe: $(OBJ_DIR)/V$(TOP)
+$(VCD_DIR)/%:
+	mkdir -p $@
 
-$(OBJ_DIR)/V$(TOP): $(OBJ_DIR)/V$(TOP).mk
-	$(MAKE) -C $(OBJ_DIR) -f V$(TOP).mk $(MAKEFLAGS)
+exe: exe/$(TOP)
 
-$(OBJ_DIR)/V$(TOP).mk: $(wildcard $(RTL_DIR)/*.sv) $(wildcard $(TB_DIR)/*.cpp)
-	$(VERILATOR) \
-		--cc --exe --trace \
-		-y $(RTL_DIR) --Mdir $(OBJ_DIR) \
-		rtl/$(TOP).sv $(wildcard $(TB_DIR)/*.cpp)
+exe/%: $(OBJ_DIR)/%/V%.mk
+	$(MAKE) -C $(OBJ_DIR)/$* -f V$*.mk
+
+.SECONDEXPANSION:
+
+$(OBJ_DIR)/%.mk: \
+  $(RTL_DIR)/top/$$(word 1,$$(subst /, ,$$*)).sv \
+  $$(shell find $(RTL_DIR)/top/$$(dir $$*) -type f -name '*.sv' 2>/dev/null) \
+  $$(shell find $(TB_DIR)/top/$$(dir $$*) -type f -name '*.sv' 2>/dev/null) \
+  $(RTL_FILES) $(TB_FILES) $(TB_DIR)/top/$$(word 1,$$(subst /, ,$$*)).cpp \
+  $$(shell find $(TB_DIR)/top/$$(dir $$*) -type f -name '*.cpp' 2>/dev/null)
+
+	mkdir -p $(dir $@)
+	$(VERILATOR) --cc --exe --trace -y $(RTL_DIR) --Mdir $(dir $@) --top $(word 1,$(subst /, ,$*)) $(patsubst tb/%,../tb/%,$^)

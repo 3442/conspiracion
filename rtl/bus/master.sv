@@ -49,10 +49,10 @@ module bus_master
 	endcase
 
 	initial begin
-		ready <= 0;
-		avl_read <= 0;
-		avl_write <= 0;
-		state <= REQUEST;
+		ready = 0;
+		avl_read = 0;
+		avl_write = 0;
+		state = REQUEST;
 	end
 
 endmodule
