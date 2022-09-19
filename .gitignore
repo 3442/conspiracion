@@ -38,3 +38,4 @@ obj/
 platform/
 platform.sopcinfo
 hps_isw_handoff/
+*~

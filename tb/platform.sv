@@ -2,7 +2,7 @@ module platform (
 		input  wire        clk_clk,               //           clk.clk
 		input  wire [29:0] master_0_core_addr    /*verilator public*/,// master_0_core.addr
 		output wire [31:0] master_0_core_data_rd /*verilator public*/,//              .data_rd
-		input  wire [31:0] master_0_core_data_rw /*verilator public*/,//              .data_rw
+		input  wire [31:0] master_0_core_data_wr /*verilator public*/,//              .data_wr
 		output wire        master_0_core_ready   /*verilator public*/,//              .ready
 		input  wire        master_0_core_write   /*verilator public*/,//              .write
 		input  wire        master_0_core_start   /*verilator public*/,//              .start
@@ -42,7 +42,7 @@ module platform (
 		.write(master_0_core_write),
 		.ready(master_0_core_ready),
 		.data_rd(master_0_core_data_rd),
-		.data_rw(master_0_core_data_rw),
+		.data_wr(master_0_core_data_wr),
 		.*
 	);
 

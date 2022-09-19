@@ -31,7 +31,7 @@ module conspiracion
 	} state;
 
 	logic[29:0] addr;
-	logic[31:0] data_rd, data_rw;
+	logic[31:0] data_rd, data_wr;
 	logic ready, write, start;
 
 	logic [7:0] leds;
@@ -40,7 +40,7 @@ module conspiracion
 	(
 		.master_0_core_addr(addr),
 		.master_0_core_data_rd(data_rd),
-		.master_0_core_data_rw(data_rw),
+		.master_0_core_data_wr(data_wr),
 		.master_0_core_ready(ready),
 		.master_0_core_write(write),
 		.master_0_core_start(start),
@@ -54,7 +54,7 @@ module conspiracion
 		done = 0;
 	end
 
-	assign data_rw[7:0] = out;
+	assign data_wr[7:0] = out;
 	assign write = dir;
 
 	always @(posedge clk_clk) unique case(state)

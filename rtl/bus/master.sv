@@ -8,7 +8,7 @@ module bus_master
 	                   write,
 	output logic       ready,
 	output logic[31:0] data_rd,
-	input  logic[31:0] data_rw,
+	input  logic[31:0] data_wr,
 
 	output logic[31:0] avl_address,
 	output logic       avl_read,
@@ -33,7 +33,7 @@ module bus_master
 			avl_address <= {addr, 2'b00};
 			avl_read <= ~write;
 			avl_write <= write;
-			avl_writedata <= data_rw;
+			avl_writedata <= data_wr;
 			state <= WAIT;
 		end
 
