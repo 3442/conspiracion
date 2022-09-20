@@ -1,0 +1,79 @@
+#!/usr/bin/kermit
+
+# Serial port setup.  These settings will likely need to be
+# changed to match the configuration of your workstation
+# and the ARM board you're working with.
+set line /dev/ttyUSB0
+set speed 115200
+set serial 8n1
+
+# General C-Kermit settings.  These probably don't need to change.
+set flow-control none
+set file type bin
+set carrier-watch off
+set prefixing all
+set modem none
+
+input 60 "Hit any key to stop autoboot:  5"
+output " "
+#lineout "loadb ${fpgadata}"
+#send ./bitstream.rbf
+
+# sdram_staticcfg_applycfg:
+#     dmb
+#     dsb
+#     isb
+#     mov  r0, #0x505c
+#     movt r0, #0xffc2
+#     mov  r1, #0xa
+#     str  r1, [r0]
+#     dmb
+#     dsb
+#     mov  r0, #0
+#     bx   lr
+input 1 "SOCFPGA_CYCLONE5 #"
+lineout "mw 0xffff0000 0xf57ff05f"
+input 1 "SOCFPGA_CYCLONE5 #"
+lineout "mw 0xffff0004 0xf57ff04f"
+input 1 "SOCFPGA_CYCLONE5 #"
+lineout "mw 0xffff0008 0xf57ff06f"
+input 1 "SOCFPGA_CYCLONE5 #"
+lineout "mw 0xffff000c 0xe305005c"
+input 1 "SOCFPGA_CYCLONE5 #"
+lineout "mw 0xffff0010 0xe34f0fc2"
+input 1 "SOCFPGA_CYCLONE5 #"
+lineout "mw 0xffff0014 0xe3a0100a"
+input 1 "SOCFPGA_CYCLONE5 #"
+lineout "mw 0xffff0018 0xe5801000"
+input 1 "SOCFPGA_CYCLONE5 #"
+lineout "mw 0xffff001c 0xf57ff05f"
+input 1 "SOCFPGA_CYCLONE5 #"
+lineout "mw 0xffff0020 0xf57ff04f"
+input 1 "SOCFPGA_CYCLONE5 #"
+lineout "mw 0xffff0024 0xe3a00000"
+input 1 "SOCFPGA_CYCLONE5 #"
+lineout "mw 0xffff0028 0xe12fff1e"
+
+input 1 "SOCFPGA_CYCLONE5 #"
+lineout "run bridge_enable_handoff"
+input 1 "SOCFPGA_CYCLONE5 #"
+lineout "mw 0xFFC25080 0"
+input 1 "SOCFPGA_CYCLONE5 #"
+lineout "fatload mmc 0:1 0x2000000 soc_system.rbf"
+input 1 "SOCFPGA_CYCLONE5 #"
+lineout "fpga load 0 0x2000000 0x700000"
+# Falla con mw 0xFFC2505C 0xA
+input 1 "SOCFPGA_CYCLONE5 #"
+lineout "go 0xffff0000"
+input 1 "SOCFPGA_CYCLONE5 #"
+lineout "mw 0xFFC25080 0xFFFF"
+input 1 "SOCFPGA_CYCLONE5 #"
+lineout "run mmcload"
+input 1 "SOCFPGA_CYCLONE5 #"
+lineout "setenv bootargs console=ttyS0,115200 root=${mmcroot} rw rootwait mem=512M"
+input 1 "SOCFPGA_CYCLONE5 #"
+lineout "bootz ${loadaddr} - ${fdtaddr}"
+
+# This command drops you into a console where you can interact
+# with the kernel.
+connect
