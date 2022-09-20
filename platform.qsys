@@ -13,7 +13,7 @@
    {
       datum _sortIndex
       {
-         value = "0";
+         value = "1";
          type = "int";
       }
    }
@@ -21,7 +21,7 @@
    {
       datum _sortIndex
       {
-         value = "1";
+         value = "2";
          type = "int";
       }
    }
@@ -29,7 +29,7 @@
    {
       datum _sortIndex
       {
-         value = "2";
+         value = "0";
          type = "int";
       }
    }
@@ -204,7 +204,7 @@
   <parameter name="F2SCLK_SDRAMCLK_FREQ" value="0" />
   <parameter name="F2SCLK_WARMRST_Enable" value="false" />
   <parameter name="F2SDRAM_Type">Avalon-MM Bidirectional</parameter>
-  <parameter name="F2SDRAM_Width" value="64" />
+  <parameter name="F2SDRAM_Width" value="256" />
   <parameter name="F2SINTERRUPT_Enable" value="false" />
   <parameter name="F2S_Width" value="0" />
   <parameter name="FIX_READ_LATENCY" value="8" />
@@ -328,7 +328,7 @@
   <parameter name="MEM_VERBOSE" value="true" />
   <parameter name="MEM_VOLTAGE" value="1.5V DDR3" />
   <parameter name="MEM_WTCL" value="6" />
-  <parameter name="MPU_EVENTS_Enable" value="true" />
+  <parameter name="MPU_EVENTS_Enable" value="false" />
   <parameter name="MRS_MIRROR_PING_PONG_ATSO" value="false" />
   <parameter name="MULTICAST_EN" value="false" />
   <parameter name="NAND_Mode" value="N/A" />

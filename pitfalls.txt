@@ -17,6 +17,7 @@ project again
 
 Nota: es *_pin_assignments.tcl y no ningún otro
 
+
 	===
 	[II] Emulación de Avalon
 	===
@@ -28,3 +29,78 @@ lo segundo en una señal `s` hace que `assign a = s;` no tenga ningún efecto,
 lo cual es difícil de depurar.
 
 https://github.com/verilator/verilator/issues/2262
+
+
+	===
+	[III] MSEL, uboot y fpga2sdram
+	===
+
+Solamente cambiar MSEL a 01010, convertir a rbf en Quartus y tratar de programar
+desde uboot resulta en esto:
+
+	SOCFPGA_CYCLONE5 # fpga load 0 ${fpgadata} ${fpgadatasize}
+	altera_load: Failed with error code -4
+
+Hay que setear un modo en opciones de Quartus para que esto sirva. También puse
+el MSEL en 00000 por si acaso.
+
+El manual dice que 00000 corresponde a FPPx16
+
+https://community.intel.com/t5/FPGA-SoC-And-CPLD-Boards-And/Altera-Cyclone-V-development-board-FPGA-problem-error-code-4/m-p/103855
+
+Ahora pasa una de cuatro cosas con `mw 0xFFC2505C 0xA` (apply en registro staticcfg):
+
+	1. Hard-lock
+	2. Data abort
+	3. Prefetch abort
+	4. Como 1/10 veces parece servir
+
+Sin apply la flag de done se queda levantada por siempre al tocar memoria.
+
+Hice de cero varias partes del Platform en Platform Designer, también desactivé
+MPU events en hps_0 y cambié el data width de fpga2sdram de 64 a 256 bits. Todo
+sigue igual.
+
+Si omito la instrucción que toca applycfg algo sirve. Escribir ya sirve
+(confirmado con dd if=/dev/mem en HPS). Leer crashea el HPS tal como predice
+zangman.
+
+Shintel al rescate:
+
+https://www.intel.com/content/www/us/en/programmable/support/support-resources/knowledge-base/embedded/2016/how-and-when-can-i-enable-the-fpga2sdram-bridge-on-cyclone-v-soc.html?utm_source=Altera&utm_medium=newsletter&utm_campaign=FACTS&utm_content=NA_how_can_i_enable_KI_15_08_2016
+
+Bug exacto:
+https://forum.rocketboards.org/t/fpga-to-sdram-cyclone-v-can-write-but-cannot-read/2796
+
+Errata:
+https://support.criticallink.com/redmine/projects/mityarm-5cs/wiki/Important_Note_about_FPGAHPS_SDRAM_Bridge
+
+El problema parece ser uno de dos:
+- Me faltan las señales de burst
+- uboot está en RAM cuando se toca applycfg
+
+Para lo segundo, errata dice que:
+
+Altera has provided the capability to set the configuration bit in step three
+with a macro command in their (and Critical Link's) u-Boot port. This is
+accomplished by copying a small routine to on-chip RAM that disables caches and
+asserts the APPLYCFG bit and then returns operation to the typical DDR space.
+
+No sé donde putas está esa macro, así que voy a escribir mi propia:Ñ
+
+Info sobre OCRAM (on-chip RAM): https://www.intel.com/content/www/us/en/programmable/hps/cyclone-v/hps.html#sfo1410068453374.html#sfo1410068453374
+
+sdram_staticcfg_applycfg:
+    dmb
+    dsb
+    isb
+    mov  r0, #0x505c
+    movt r0, #0xffc2
+    mov  r1, #0xa
+    str  r1, [r0]
+    dmb
+    dsb
+    mov  r0, #0
+    bx   lr
+
+Esto solucionó todo

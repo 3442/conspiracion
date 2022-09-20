@@ -17,12 +17,15 @@ module conspiracion
 	output wire        memory_mem_odt,
 	output wire        memory_mem_dm,
 	input  wire        memory_oct_rzqin,
-	input  wire        reset_reset_n,
+	/*input  wire        reset_reset_n,*/
 
 	input logic dir, clr, mov, add, io,
 	output logic[7:0] out,
 	output logic done
 );
+
+	wire reset_reset_n;
+	assign reset_reset_n = 1'b1;
 
 	enum {
 		IDLE,
