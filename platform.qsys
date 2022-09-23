@@ -9,6 +9,14 @@
    categories="System" />
  <parameter name="bonusData"><![CDATA[bonusData 
 {
+   element address_span_extender_0
+   {
+      datum _sortIndex
+      {
+         value = "3";
+         type = "int";
+      }
+   }
    element clk_0
    {
       datum _sortIndex
@@ -87,6 +95,20 @@
    dir="end" />
  <interface name="memory" internal="hps_0.memory" type="conduit" dir="end" />
  <interface name="reset" internal="clk_0.clk_in_reset" type="reset" dir="end" />
+ <module
+   name="address_span_extender_0"
+   kind="altera_address_span_extender"
+   version="20.1"
+   enabled="1">
+  <parameter name="BURSTCOUNT_WIDTH" value="1" />
+  <parameter name="DATA_WIDTH" value="32" />
+  <parameter name="ENABLE_SLAVE_PORT" value="false" />
+  <parameter name="MASTER_ADDRESS_DEF" value="536870912" />
+  <parameter name="MASTER_ADDRESS_WIDTH" value="32" />
+  <parameter name="MAX_PENDING_READS" value="1" />
+  <parameter name="SLAVE_ADDRESS_WIDTH" value="27" />
+  <parameter name="SUB_WINDOW_COUNT" value="1" />
+ </module>
  <module name="clk_0" kind="clock_source" version="20.1" enabled="1">
   <parameter name="clockFrequency" value="50000000" />
   <parameter name="clockFrequencyKnown" value="true" />
@@ -632,6 +654,15 @@
    kind="avalon"
    version="20.1"
    start="master_0.avalon_master"
+   end="address_span_extender_0.windowed_slave">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="20.1"
+   start="address_span_extender_0.expanded_master"
    end="hps_0.f2h_sdram0_data">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x0000" />
@@ -642,7 +673,17 @@
    kind="clock"
    version="20.1"
    start="clk_0.clk"
+   end="address_span_extender_0.clock" />
+ <connection
+   kind="clock"
+   version="20.1"
+   start="clk_0.clk"
    end="hps_0.f2h_sdram0_clock" />
+ <connection
+   kind="reset"
+   version="20.1"
+   start="clk_0.clk_reset"
+   end="address_span_extender_0.reset" />
  <connection
    kind="reset"
    version="20.1"
