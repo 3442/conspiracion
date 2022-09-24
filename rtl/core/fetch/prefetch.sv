@@ -47,7 +47,7 @@ module core_prefetch
 
 	genvar i;
 	generate
-		for(i = 0; i < SIZE - 1; ++i) begin
+		for(i = 0; i < SIZE - 1; ++i) begin: prefetch_slots
 			always_ff @(posedge clk)
 				if(flush)
 					prefetch[i] <= `NOP;
