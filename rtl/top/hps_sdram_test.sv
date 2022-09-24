@@ -1,4 +1,4 @@
-module conspiracion
+module hps_sdram_test
 (
 	input  wire        clk_clk,
 	output wire [12:0] memory_mem_a,
