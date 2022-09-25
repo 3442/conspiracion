@@ -64,23 +64,6 @@ typedef logic[3:0] reg_num;
 `define FIELD_DATA_RD      [15:12]
 `define FIELD_DATA_SHIFTER [11:0]
 
-`define DATA_AND 4'b0000
-`define DATA_EOR 4'b0001
-`define DATA_SUB 4'b0010
-`define DATA_RSB 4'b0011
-`define DATA_ADD 4'b0100
-`define DATA_ADC 4'b0101
-`define DATA_SBC 4'b0110
-`define DATA_RSC 4'b0111
-`define DATA_TST 4'b1000
-`define DATA_TEQ 4'b1001
-`define DATA_CMP 4'b1010
-`define DATA_CMN 4'b1011
-`define DATA_ORR 4'b1100
-`define DATA_MOV 4'b1101
-`define DATA_BIC 4'b1110
-`define DATA_MVN 4'b1111
-
 // Instrucciones de multiplicación
 
 `define INSN_MUL   28'b0000000_?_????_0000_????_1001_????
