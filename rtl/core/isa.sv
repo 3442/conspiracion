@@ -6,6 +6,7 @@
 
 typedef logic[3:0] reg_num;
 
+`define R14 4'b1110
 `define R15 4'b1111
 
 `define COND_EQ 4'b0000
