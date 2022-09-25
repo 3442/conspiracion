@@ -1,3 +1,5 @@
+`include "core/uarch.sv"
+
 module arm810
 (
 	input  logic       clk,
@@ -14,6 +16,9 @@ module arm810
 	logic[31:0] insn;
 	logic[29:0] insn_pc;
 
+	psr_flags flags;
+	assign flags = 4'b1010;
+
 	core_fetch #(.PREFETCH_ORDER(2)) fetch
 	(
 		.flush(prefetch_flush),
@@ -21,6 +26,13 @@ module arm810
 		.fetched(bus_ready),
 		.fetch_data(bus_data_rd),
 		.fetch(bus_start),
+		.*
+	);
+
+	//TODO
+	logic execute, undefined;
+	core_decode decode
+	(
 		.*
 	);
 
