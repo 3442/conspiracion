@@ -4,17 +4,22 @@
 
 module core_decode
 (
-	input  logic[31:0] insn,
-	input  psr_flags   flags,
-	output logic       execute,
-	                   undefined
+	input  word      insn,
+	input  psr_flags flags,
+
+	output logic     execute,
+	                 undefined,
+	                 writeback,
+	                 branch,
+	output ptr       branch_offset,
+	output reg_num   rd
 );
 
 	logic cond_undefined;
 
 	//TODO
 	logic link;
-	logic[29:0] offset;
+	ptr offset;
 	core_decode_conds conds
 	(
 		.cond(insn `FIELD_COND),
@@ -22,30 +27,48 @@ module core_decode
 		.*
 	);
 
-	logic branch_link;
-	logic[29:0] branch_offset;
+	logic branch_link; //TODO
 
-	core_decode_branch branch
+	core_decode_branch group_branch
 	(
 		.*
 	);
 
 	//TODO
 	alu_op op;
-	reg_num rn, rd;
-	logic writeback, update_flags, restore_spsr, zero_fst, negate_fst, negate_snd, carry_in;
-	core_decode_data data
+	reg_num rn;
+	logic update_flags, restore_spsr, zero_fst, negate_fst, negate_snd, carry_in;
+
+	logic data_writeback;
+	reg_num data_rd;
+
+	core_decode_data group_data
 	(
+		.rd(data_rd),
+		.writeback(data_writeback),
 		.*
 	);
 
 	always_comb begin
 		undefined = cond_undefined;
 
+		branch = 0;
+		writeback = 0;
+		rd = 4'bxxxx;
+
 		priority case(insn `FIELD_OP) inside
-			`GROUP_B: ;
+			`GROUP_B: begin
+				branch = 1;
+				if(branch_link) begin
+					rd = `R14;
+					writeback = 1;
+					//TODO: Valor de LR
+				end
+			end
 
 			`GROUP_ALU: begin
+				rd = data_rd;
+				writeback = data_writeback;
 			end
 
 			`INSN_MUL: ;
@@ -58,7 +81,11 @@ module core_decode
 			`GROUP_MSR: ;
 			`INSN_SWI: ;
 
-			default: undefined = 1;
+			default: begin
+				undefined = 1;
+				branch = 1'bx;
+				writeback = 1'bx;
+			end
 		endcase
 	end
 
