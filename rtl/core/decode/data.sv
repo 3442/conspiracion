@@ -4,19 +4,19 @@
 
 module core_decode_data
 (
-	input  logic[31:0] insn,
-	input  psr_flags   flags,
+	input  word      insn,
+	input  psr_flags flags,
 
-	output alu_op      op,
-	output reg_num     rn,
-	                   rd,
-	output logic       writeback,
-	                   update_flags,
-	                   restore_spsr,
-	                   zero_fst,
-	                   negate_fst,
-	                   negate_snd,
-	                   carry_in
+	output alu_op    op,
+	output reg_num   rn,
+	                 rd,
+	output logic     writeback,
+	                 update_flags,
+	                 restore_spsr,
+	                 zero_fst,
+	                 negate_fst,
+	                 negate_snd,
+	                 carry_in
 );
 
 	assign rn = insn `FIELD_DATA_RN;

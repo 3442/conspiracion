@@ -1,10 +1,12 @@
 `include "core/isa.sv"
+`include "core/uarch.sv"
 
 module core_decode_branch
 (
-	input  logic[31:0] insn,
-	output logic       link,
-	output logic[29:0] offset
+	input  word  insn,
+
+	output logic link,
+	output ptr   offset
 );
 
 	logic[23:0] immediate;
