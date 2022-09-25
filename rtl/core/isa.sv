@@ -2,7 +2,11 @@
 `define CORE_ISA_SV
 
 `define FIELD_COND [31:28]
-`define FIELD_OP   [31:28]
+`define FIELD_OP   [27:0]
+
+typedef logic[3:0] reg_num;
+
+`define R15 4'b1111
 
 `define COND_EQ 4'b0000
 `define COND_NE 4'b0001
@@ -28,8 +32,8 @@
 
 `define GROUP_B 28'b101_?_????????????????????????
 
-`define FIELD_B_L   [24]
-`define FIELD_B_OFF [23:0]
+`define FIELD_B_L      [24]
+`define FIELD_B_OFFSET [23:0]
 
 // Instrucciones de procesamiento de datos (aritmético-lógicas y MOV)
 
@@ -50,16 +54,31 @@
 `define INSN_BIC 28'b00_?_1110_?_????_????_????????????
 `define INSN_MVN 28'b00_?_1111_?_0000_????_????????????
 
-`define GROUP_CMP 28'b00_?_10??_1_????_0000_????????????
-`define GROUP_MOV 28'b00_?_11?1_?_0000_????_????????????
-`define GROUP_AL  28'b00_?_????_?_????_????_????????????
+`define GROUP_ALU 28'b00_?_????_?_????_????_????????????
 
-`define FIELD_DATA_IMM       [25]
-`define FIELD_DATA_OPCODE    [24:21]
-`define FIELD_DATA_SET_FLAGS [20]
-`define FIELD_DATA_RN        [19:16]
-`define FIELD_DATA_RD        [15:12]
-`define FIELD_DATA_SHIFTER   [11:0]
+`define FIELD_DATA_IMM     [25]
+`define FIELD_DATA_OPCODE  [24:21]
+`define FIELD_DATA_S       [20]
+`define FIELD_DATA_RN      [19:16]
+`define FIELD_DATA_RD      [15:12]
+`define FIELD_DATA_SHIFTER [11:0]
+
+`define DATA_AND 4'b0000
+`define DATA_EOR 4'b0001
+`define DATA_SUB 4'b0010
+`define DATA_RSB 4'b0011
+`define DATA_ADD 4'b0100
+`define DATA_ADC 4'b0101
+`define DATA_SBC 4'b0110
+`define DATA_RSC 4'b0111
+`define DATA_TST 4'b1000
+`define DATA_TEQ 4'b1001
+`define DATA_CMP 4'b1010
+`define DATA_CMN 4'b1011
+`define DATA_ORR 4'b1100
+`define DATA_MOV 4'b1101
+`define DATA_BIC 4'b1110
+`define DATA_MVN 4'b1111
 
 // Instrucciones de multiplicación
 
@@ -176,6 +195,6 @@
 
 `define INSN_SWI 28'b1111_????????????????????????
 
-`defin FIELD_SWI_IMM [23:0]
+`define FIELD_SWI_IMM [23:0]
 
 `endif
