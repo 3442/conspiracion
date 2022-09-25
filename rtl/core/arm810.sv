@@ -17,9 +17,6 @@ module arm810
 	word insn;
 	ptr fetch_insn_pc, pc, pc_visible;
 
-	psr_flags flags;
-	assign flags = 4'b1010; //TODO
-
 	core_fetch #(.PREFETCH_ORDER(2)) fetch
 	(
 		.flush(explicit_branch | wr_pc),
@@ -35,15 +32,18 @@ module arm810
 	logic decode_execute, decode_undefined, decode_writeback, decode_branch;
 	ptr decode_branch_offset;
 	reg_num decode_rd;
+	alu_op decode_data_op;
 
 	core_decode decode
 	(
+		.flags(next_flags),
 		.execute(decode_execute),
 		.undefined(decode_undefined),
 		.writeback(decode_writeback),
 		.rd(decode_rd),
 		.branch(decode_branch),
 		.branch_offset(decode_branch_offset),
+		.data_op(decode_data_op),
 		.*
 	);
 
@@ -51,6 +51,8 @@ module arm810
 	logic explicit_branch, writeback;
 	ptr branch_target;
 	psr_mode reg_mode;
+	alu_op data_op;
+	psr_flags flags, next_flags;
 
 	core_cycles cycles
 	(
@@ -59,20 +61,31 @@ module arm810
 	);
 
 	logic wr_pc;
-	word wr_value;
+	word wr_value, rd_value_a, rd_value_b;
 
 	core_regs regs
 	(
 		.rd_r_a(0), //TODO
 		.rd_r_b(0), //TODO
-		.rd_value_a(), //TODO
-		.rd_value_b(), //TODO
 		.rd_mode(reg_mode),
 		.wr_mode(reg_mode),
 		.wr_r(rd),
 		.wr_enable(writeback),
 		.branch(wr_pc),
 		.*
+	);
+
+	psr_flags alu_flags;
+
+	core_alu #(.W(32)) alu
+	(
+		.op(data_op),
+		.a(rd_value_a),
+		.b(rd_value_b),
+		.c_in(flags.c),
+		.q(wr_value),
+		.nzcv(alu_flags),
+		.v_valid() //TODO
 	);
 
 endmodule
