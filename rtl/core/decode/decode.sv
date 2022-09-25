@@ -12,7 +12,8 @@ module core_decode
 	                 writeback,
 	                 branch,
 	output ptr       branch_offset,
-	output reg_num   rd
+	output reg_num   rd,
+	output alu_op    data_op
 );
 
 	logic cond_undefined;
@@ -35,15 +36,16 @@ module core_decode
 	);
 
 	//TODO
-	alu_op op;
 	reg_num rn;
 	logic update_flags, restore_spsr, zero_fst, negate_fst, negate_snd, carry_in;
 
 	logic data_writeback;
 	reg_num data_rd;
+	alu_op data_group_op;
 
 	core_decode_data group_data
 	(
+		.op(data_group_op),
 		.rd(data_rd),
 		.writeback(data_writeback),
 		.*
@@ -55,6 +57,7 @@ module core_decode
 		branch = 0;
 		writeback = 0;
 		rd = 4'bxxxx;
+		data_op = 4'bxxxx;
 
 		priority case(insn `FIELD_OP) inside
 			`GROUP_B: begin
@@ -69,6 +72,7 @@ module core_decode
 			`GROUP_ALU: begin
 				rd = data_rd;
 				writeback = data_writeback;
+				data_op = data_group_op;
 			end
 
 			`INSN_MUL: ;
