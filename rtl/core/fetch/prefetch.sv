@@ -20,7 +20,7 @@ module core_prefetch
 	logic[31:0] prefetch[SIZE];
 	logic[ORDER - 1:0] valid;
 
-	assign insn = prefetch[0];
+	assign insn = ~flush ? prefetch[0] : `NOP;
 	assign next_pc = ~stall & |valid ? insn_pc + 1 : insn_pc;
 
 	always_comb
