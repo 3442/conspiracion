@@ -39,7 +39,7 @@ module core_prefetch
 
 		if(flush)
 			valid <= 0;
-		else if(stall & fetched & ~&valid)
+		else if(fetched & ((stall & ~&valid) | ~|valid))
 			valid <= valid + 1;
 		else if(~stall & ~fetched & |valid)
 			valid <= valid - 1;
