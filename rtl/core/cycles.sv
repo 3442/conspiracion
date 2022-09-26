@@ -72,13 +72,13 @@ module core_cycles
 		unique case(next_cycle)
 			EXECUTE: begin
 				branch <= 0;
-				writeback <= 0;
 				update_flags <= 0;
 				branch_target <= 30'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+				final_writeback <= 0;
 
 				if(dec_execute) begin
 					branch <= dec_branch;
-					writeback <= dec_writeback & ~dec_alu.snd_shift_by_reg;
+					final_writeback <= dec_writeback;
 					update_flags <= dec_update_flags;
 					branch_target <= pc_visible + dec_branch_offset;
 
@@ -98,10 +98,9 @@ module core_cycles
 					ra <= dec_alu.rn;
 					rb <= dec_alu.r_snd;
 					r_shift <= dec_alu.r_shift;
-
-					final_writeback <= dec_writeback;
 				end
 
+				writeback <= final_writeback;
 				pc <= fetch_insn_pc;
 			end
 
@@ -109,7 +108,7 @@ module core_cycles
 				rb <= r_shift;
 				data_snd_shift_by_reg <= 0;
 				saved_base <= rd_value_b;
-				writeback <= final_writeback;
+				writeback <= 0;
 			end
 		endcase
 	end
