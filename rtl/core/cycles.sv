@@ -3,13 +3,13 @@
 module core_cycles
 (
 	input  logic     clk,
-	                 decode_execute,
-	                 decode_branch,
-	                 decode_writeback,
-	                 decode_update_flags,
-	input  reg_num   decode_rd,
-	input  ptr       decode_branch_offset,
-	input  alu_op    decode_data_op,
+	                 dec_execute,
+	                 dec_branch,
+	                 dec_writeback,
+	                 dec_update_flags,
+	input  reg_num   dec_rd,
+	input  ptr       dec_branch_offset,
+	input  alu_op    dec_data_op,
 	input  ptr       fetch_insn_pc,
 
 	output logic     stall,
@@ -43,16 +43,16 @@ module core_cycles
 			update_flags <= 0;
 			branch_target <= 30'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
 
-			if(decode_execute) begin
-				branch <= decode_branch;
-				writeback <= decode_writeback;
-				branch_target <= pc_visible + decode_branch_offset;
+			if(dec_execute) begin
+				branch <= dec_branch;
+				writeback <= dec_writeback;
+				branch_target <= pc_visible + dec_branch_offset;
 			end
 
 			pc <= fetch_insn_pc;
-			rd <= decode_rd;
-			data_op <= decode_data_op;
-			update_flags <= decode_update_flags;
+			rd <= dec_rd;
+			data_op <= dec_data_op;
+			update_flags <= dec_update_flags;
 		end
 	end
 

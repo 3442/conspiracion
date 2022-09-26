@@ -28,22 +28,22 @@ module arm810
 		.*
 	);
 
-	logic decode_execute, decode_undefined, decode_writeback, decode_branch, decode_update_flags;
-	ptr decode_branch_offset;
-	reg_num decode_rd;
-	alu_op decode_data_op;
+	logic dec_execute, dec_undefined, dec_writeback, dec_branch, dec_update_flags;
+	ptr dec_branch_offset;
+	reg_num dec_rd;
+	alu_op dec_data_op;
 
 	core_decode decode
 	(
 		.flags(next_flags),
-		.execute(decode_execute),
-		.undefined(decode_undefined),
-		.writeback(decode_writeback),
-		.branch(decode_branch),
-		.update_flags(decode_update_flags),
-		.rd(decode_rd),
-		.branch_offset(decode_branch_offset),
-		.data_op(decode_data_op),
+		.execute(dec_execute),
+		.undefined(dec_undefined),
+		.writeback(dec_writeback),
+		.branch(dec_branch),
+		.update_flags(dec_update_flags),
+		.rd(dec_rd),
+		.branch_offset(dec_branch_offset),
+		.data_op(dec_data_op),
 		.*
 	);
 
