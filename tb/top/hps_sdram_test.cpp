@@ -3,9 +3,9 @@
 #include <verilated.h>
 #include <verilated_vcd_c.h>
 
-#include "Vconspiracion.h"
-#include "Vconspiracion_conspiracion.h"
-#include "Vconspiracion_platform.h"
+#include "Vhps_sdram_test.h"
+#include "Vhps_sdram_test_hps_sdram_test.h"
+#include "Vhps_sdram_test_platform.h"
 
 #include "../avalon.hpp"
 #include "../mem.hpp"
@@ -16,7 +16,7 @@ int main(int argc, char **argv)
 
     Verilated::commandArgs(argc, argv);
 
-	Vconspiracion top;
+	Vhps_sdram_test top;
 
 #ifdef TRACE
 	Verilated::traceEverOn(true);
@@ -26,7 +26,7 @@ int main(int argc, char **argv)
 	trace.open("trace.vcd");
 #endif
 
-	interconnect<Vconspiracion_platform> avl(*top.conspiracion->plat);
+	interconnect<Vhps_sdram_test_platform> avl(*top.hps_sdram_test->plat);
 	mem hps_ddr3(0x0000'0000, 512 << 20);
 
 	avl.attach(hps_ddr3);
