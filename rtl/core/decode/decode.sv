@@ -59,7 +59,7 @@ module core_decode
 		rd = 4'bxxxx;
 		data_op = 4'bxxxx;
 
-		priority case(insn `FIELD_OP) inside
+		priority casez(insn `FIELD_OP)
 			`GROUP_B: begin
 				branch = 1;
 				if(branch_link) begin

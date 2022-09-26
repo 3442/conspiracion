@@ -39,7 +39,6 @@ module core_cycles
 
 	always_ff @(posedge clk) begin
 		cycle <= next_cycle;
-		stall <= next_cycle != EXECUTE;
 		flags <= next_flags;
 
 		if(next_cycle == EXECUTE) begin
