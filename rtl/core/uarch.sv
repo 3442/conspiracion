@@ -56,4 +56,22 @@ typedef logic[4:0] psr_mode;
 `define MODE_UND 5'b11011
 `define MODE_SYS 5'b11111
 
+typedef struct packed
+{
+	alu_op     op;
+	reg_num    rn,
+	           rd,
+	           r_snd,
+	           r_shift;
+	logic      snd_shift_by_reg,
+	           snd_is_imm,
+	           shl,
+	           shr,
+	           ror,
+	           put_carry,
+	           sign_extend;
+	logic[7:0] imm;
+	logic[5:0] shift_imm;
+} alu_decode;
+
 `endif

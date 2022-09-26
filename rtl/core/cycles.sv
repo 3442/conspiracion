@@ -2,26 +2,25 @@
 
 module core_cycles
 (
-	input  logic     clk,
-	                 dec_execute,
-	                 dec_branch,
-	                 dec_writeback,
-	                 dec_update_flags,
-	input  reg_num   dec_rd,
-	input  ptr       dec_branch_offset,
-	input  alu_op    dec_data_op,
-	input  ptr       fetch_insn_pc,
+	input  logic      clk,
+	                  dec_execute,
+	                  dec_branch,
+	                  dec_writeback,
+	                  dec_update_flags,
+	input  ptr        dec_branch_offset,
+	input  alu_decode dec_alu,
+	input  ptr        fetch_insn_pc,
 
-	output logic     stall,
-	                 branch,
-	                 writeback,
-	                 update_flags,
-	output reg_num   rd,
-	output ptr       branch_target,
-	                 pc,
-	                 pc_visible,
-	output psr_mode  reg_mode,
-	output alu_op    data_op
+	output logic      stall,
+	                  branch,
+	                  writeback,
+	                  update_flags,
+	output reg_num    rd,
+	output ptr        branch_target,
+	                  pc,
+	                  pc_visible,
+	output psr_mode   reg_mode,
+	output alu_op     data_op
 );
 
 	enum
@@ -50,8 +49,8 @@ module core_cycles
 			end
 
 			pc <= fetch_insn_pc;
-			rd <= dec_rd;
-			data_op <= dec_data_op;
+			rd <= dec_alu.rd;
+			data_op <= dec_alu.op;
 			update_flags <= dec_update_flags;
 		end
 	end
