@@ -15,11 +15,11 @@ module core_alu
 );
 
 	logic c, v, swap, sub, and_not, c_shifter, c_add, v_add;
-	logic[W - 1:0] b, swap_a, swap_b, neg_b, c_in_add, q_add, q_and, q_orr, q_xor;
+	logic[W - 1:0] b, swap_a, swap_b, not_b, c_in_add, q_add, q_and, q_orr, q_xor;
 
 	assign swap_a = swap ? b : a;
 	assign swap_b = swap ? a : b;
-	assign neg_b = -swap_b;
+	assign not_b = ~b;
 
 	core_alu_shifter #(.W(W)) shifter
 	(
@@ -33,7 +33,7 @@ module core_alu
 	core_alu_add #(.W(W)) op_add
 	(
 		.a(swap_a),
-		.b(sub ? neg_b : swap_b),
+		.b(sub ? -swap_b : swap_b),
 		.c_in(c_in_add),
 		.q(q_add),
 		.c(c_add),
@@ -43,7 +43,7 @@ module core_alu
 
 	core_alu_and #(.W(W)) op_and
 	(
-		.b(and_not ? ~b : b),
+		.b(and_not ? not_b : b),
 		.q(q_and),
 		.*
 	);
@@ -125,7 +125,7 @@ module core_alu
 				q = b;
 
 			`ALU_MVN:
-				q = neg_b;
+				q = not_b;
 		endcase
 
 		unique case(ctrl.op)
