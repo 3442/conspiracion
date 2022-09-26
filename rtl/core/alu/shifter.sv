@@ -12,24 +12,31 @@ module core_alu_shifter
 	output logic          c
 );
 
-	logic [W - 1:0] b_no_c, b_shl, b_shr, b_ror;
-	logic [W:0] sign_mask;
-	logic c_shl, c_shr;
+	localparam LOG = $clog2(W);
+
+	logic[W - 1:0] b_no_c, b_shl, b_shr, b_ror;
+	logic[W:0] sign_mask;
+	logic c_shl, c_shr, c_ror;
 
 	assign sign_mask = {(W + 1){ctrl.sign_extend & base[W - 1]}};
 	assign {c_shl, b_shl} = {c_in, base} << shift;
 	assign {b_shr, c_shr} = {base, c_in} >> shift | ~(sign_mask >> shift);
-	assign b_ror = b_shr | base << (W - shift);
 
-	assign b = {b_no_c[W - 1] | (ctrl.put_carry & c_in), b_no_c[W - 2:0]};
-	assign c = ctrl.shr | ctrl.ror ? c_shr : c_shl;
+	logic ror_cycle;
+	logic[LOG - 1:0] ror_shift;
+	logic[2 * W:0] ror_out;
+
+	assign ror_shift = shift[LOG - 1:0];
+	assign ror_cycle = |shift[7:LOG] & ~|ror_shift;
+	assign ror_out = {base, base, c_in} >> {ror_cycle, ror_shift};
+	assign {b_ror, c_ror} = ror_out[W:0];
 
 	always_comb
 		if(ctrl.ror)
-			b = b_ror;
+			{c, b} = {c_ror, b_ror};
 		else if(ctrl.shr)
-			b = {b_shr[W - 1] | (ctrl.put_carry & c_in), b_shr[W - 2:0]};
+			{c, b} = {c_shr, b_shr[W - 1] | (ctrl.put_carry & c_in), b_shr[W - 2:0]};
 		else
-			b = b_shl;
+			{c, b} = {c_shl, b_shl};
 
 endmodule

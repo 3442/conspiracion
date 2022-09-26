@@ -30,6 +30,8 @@ module core_decode_data
 	assign decode.ror = ror;
 	assign decode.put_carry = put_carry;
 	assign decode.sign_extend = sign_extend;
+	assign decode.imm = imm;
+	assign decode.shift_imm = shift_imm;
 
 	assign rn = insn `FIELD_DATA_RN;
 	assign rd = insn `FIELD_DATA_RD;
