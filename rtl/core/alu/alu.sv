@@ -5,7 +5,8 @@ module core_alu
 (
 	input  alu_control    ctrl,
 	input  logic[W - 1:0] a,
-	                      b,
+	                      base,
+	input  logic[7:0]     shift,
 	input  logic          c_in,
 
 	output logic[W - 1:0] q,
@@ -14,11 +15,20 @@ module core_alu
 );
 
 	logic c, v, swap, sub, and_not, c_shifter, c_add, v_add;
-	logic[W - 1:0] swap_a, swap_b, neg_b, c_in_add, q_add, q_and, q_orr, q_xor;
+	logic[W - 1:0] b, swap_a, swap_b, neg_b, c_in_add, q_add, q_and, q_orr, q_xor;
 
 	assign swap_a = swap ? b : a;
 	assign swap_b = swap ? a : b;
 	assign neg_b = -swap_b;
+
+	core_alu_shifter #(.W(W)) shifter
+	(
+		.base(base),
+		.shift(shift),
+		.b(b),
+		.c(c_shifter),
+		.*
+	);
 
 	core_alu_add #(.W(W)) op_add
 	(

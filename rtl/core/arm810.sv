@@ -45,11 +45,13 @@ module arm810
 		.*
 	);
 
-	reg_num rd;
+	reg_num rd, ra, rb;
 	logic explicit_branch, writeback, update_flags;
 	ptr branch_target;
 	psr_mode reg_mode;
 	alu_control alu_ctrl;
+	word alu_base;
+	logic[7:0] alu_shift;
 
 	core_cycles cycles
 	(
@@ -70,8 +72,8 @@ module arm810
 
 	core_regs regs
 	(
-		.rd_r_a(0), //TODO
-		.rd_r_b(0), //TODO
+		.rd_r_a(ra),
+		.rd_r_b(rb),
 		.rd_mode(reg_mode),
 		.wr_mode(reg_mode),
 		.wr_r(rd),
@@ -87,7 +89,8 @@ module arm810
 	(
 		.ctrl(alu_ctrl),
 		.a(rd_value_a),
-		.b(rd_value_b),
+		.base(alu_base),
+		.shift(alu_shift),
 		.c_in(flags.c),
 		.q(wr_value),
 		.nzcv(alu_flags),
