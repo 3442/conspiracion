@@ -49,11 +49,12 @@ module arm810
 	logic explicit_branch, writeback, update_flags;
 	ptr branch_target;
 	psr_mode reg_mode;
-	alu_op data_op;
+	alu_control alu_ctrl;
 
 	core_cycles cycles
 	(
 		.branch(explicit_branch),
+		.alu(alu_ctrl),
 		.*
 	);
 
@@ -84,7 +85,7 @@ module arm810
 
 	core_alu #(.W(32)) alu
 	(
-		.op(data_op),
+		.ctrl(alu_ctrl),
 		.a(rd_value_a),
 		.b(rd_value_b),
 		.c_in(flags.c),

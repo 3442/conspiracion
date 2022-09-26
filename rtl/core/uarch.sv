@@ -74,4 +74,14 @@ typedef struct packed
 	logic[5:0] shift_imm;
 } alu_decode;
 
+typedef struct packed
+{
+	alu_op op;
+	logic  shl,
+	       shr,
+	       ror,
+	       put_carry,
+	       sign_extend;
+} alu_control;
+
 `endif

@@ -3,7 +3,7 @@
 module core_alu
 #(parameter W=16)
 (
-	input  alu_op         op,
+	input  alu_control    ctrl,
 	input  logic[W - 1:0] a,
 	                      b,
 	input  logic          c_in,
@@ -51,7 +51,7 @@ module core_alu
 	);
 
 	always_comb begin
-		unique case(op)
+		unique case(ctrl.op)
 			`ALU_ADD, `ALU_ADC, `ALU_CMN, `ALU_CMP, `ALU_SUB, `ALU_SBC:
 				swap = 0;
 
@@ -62,7 +62,7 @@ module core_alu
 				swap = 1'bx;
 		endcase
 
-		unique case(op)
+		unique case(ctrl.op)
 			`ALU_ADD, `ALU_CMN, `ALU_ADC:
 				sub = 0;
 
@@ -73,7 +73,7 @@ module core_alu
 				sub = 1'bx;
 		endcase
 
-		unique case(op)
+		unique case(ctrl.op)
 			`ALU_ADD, `ALU_CMN, `ALU_CMP, `ALU_SUB, `ALU_RSB:
 				c_in_add = 0;
 
@@ -87,7 +87,7 @@ module core_alu
 				c_in_add = {W{1'bx}};
 		endcase
 
-		unique case(op)
+		unique case(ctrl.op)
 			`ALU_AND, `ALU_TST:
 				and_not = 0;
 
@@ -98,7 +98,7 @@ module core_alu
 				and_not = 1'bx;
 		endcase
 
-		unique case(op)
+		unique case(ctrl.op)
 			`ALU_SUB, `ALU_RSB, `ALU_ADD, `ALU_ADC, `ALU_SBC, `ALU_RSC, `ALU_CMP, `ALU_CMN:
 				q = q_add;
 
@@ -118,7 +118,7 @@ module core_alu
 				q = neg_b;
 		endcase
 
-		unique case(op)
+		unique case(ctrl.op)
 			`ALU_AND, `ALU_EOR, `ALU_TST, `ALU_TEQ, `ALU_ORR, `ALU_MOV, `ALU_BIC, `ALU_MVN: begin
 				c = c_shifter;
 				v = 1'bx;

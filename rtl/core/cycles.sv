@@ -11,16 +11,16 @@ module core_cycles
 	input  alu_decode dec_alu,
 	input  ptr        fetch_insn_pc,
 
-	output logic      stall,
-	                  branch,
-	                  writeback,
-	                  update_flags,
-	output reg_num    rd,
-	output ptr        branch_target,
-	                  pc,
-	                  pc_visible,
-	output psr_mode   reg_mode,
-	output alu_op     data_op
+	output logic       stall,
+	                   branch,
+	                   writeback,
+	                   update_flags,
+	output reg_num     rd,
+	output ptr         branch_target,
+	                   pc,
+	                   pc_visible,
+	output psr_mode    reg_mode,
+	output alu_control alu
 );
 
 	enum
@@ -48,9 +48,15 @@ module core_cycles
 				branch_target <= pc_visible + dec_branch_offset;
 			end
 
+			alu.op <= dec_alu.op;
+			alu.shl <= dec_alu.shl;
+			alu.shr <= dec_alu.shr;
+			alu.ror <= dec_alu.ror;
+			alu.put_carry <= dec_alu.put_carry;
+			alu.sign_extend <= dec_alu.sign_extend;
+
 			pc <= fetch_insn_pc;
 			rd <= dec_alu.rd;
-			data_op <= dec_alu.op;
 			update_flags <= dec_update_flags;
 		end
 	end
