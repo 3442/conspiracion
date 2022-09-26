@@ -1,4 +1,3 @@
-`include "core/psr.sv"
 `include "core/uarch.sv"
 
 module core_alu

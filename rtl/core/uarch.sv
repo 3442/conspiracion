@@ -4,8 +4,12 @@
 // Decodifica como andeq r0, r0, r0
 `define NOP 32'd0
 
+typedef logic[3:0]  reg_num;
 typedef logic[31:0] word;
 typedef logic[29:0] ptr;
+
+`define R14 4'b1110
+`define R15 4'b1111
 
 /* Se necesitan 30 GPRs. De A2.3:
  *
@@ -36,5 +40,20 @@ typedef logic[3:0] alu_op;
 `define ALU_MOV 4'b1101
 `define ALU_BIC 4'b1110
 `define ALU_MVN 4'b1111
+
+typedef struct packed
+{
+	logic n, z, c, v;
+} psr_flags;
+
+typedef logic[4:0] psr_mode;
+
+`define MODE_USR 5'b10000
+`define MODE_FIQ 5'b10001
+`define MODE_IRQ 5'b10010
+`define MODE_SVC 5'b10011
+`define MODE_ABT 5'b10111
+`define MODE_UND 5'b11011
+`define MODE_SYS 5'b11111
 
 `endif

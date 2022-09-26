@@ -4,11 +4,6 @@
 `define FIELD_COND [31:28]
 `define FIELD_OP   [27:0]
 
-typedef logic[3:0] reg_num;
-
-`define R14 4'b1110
-`define R15 4'b1111
-
 `define COND_EQ 4'b0000
 `define COND_NE 4'b0001
 `define COND_HS 4'b0010

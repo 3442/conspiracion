@@ -1,5 +1,5 @@
 `include "core/isa.sv"
-`include "core/psr.sv"
+`include "core/uarch.sv"
 
 module core_decode_conds
 (

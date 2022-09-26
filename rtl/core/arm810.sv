@@ -1,4 +1,3 @@
-`include "core/psr.sv"
 `include "core/uarch.sv"
 
 module arm810
@@ -52,11 +51,17 @@ module arm810
 	ptr branch_target;
 	psr_mode reg_mode;
 	alu_op data_op;
-	psr_flags flags, next_flags;
 
 	core_cycles cycles
 	(
 		.branch(explicit_branch),
+		.*
+	);
+
+	psr_flags flags, next_flags;
+
+	core_psr psr
+	(
 		.*
 	);
 

@@ -1,19 +1,19 @@
-`ifndef CORE_PSR_SV
-`define CORE_PSR_SV
+`include "core/uarch.sv"
 
-typedef struct packed
-{
-	logic n, z, c, v;
-} psr_flags;
+module core_psr
+(
+	input  logic     clk,
+	input  psr_flags alu_flags,
 
-typedef logic[4:0] psr_mode;
+	output psr_flags flags,
+	                 next_flags
+);
 
-`define MODE_USR 5'b10000
-`define MODE_FIQ 5'b10001
-`define MODE_IRQ 5'b10010
-`define MODE_SVC 5'b10011
-`define MODE_ABT 5'b10111
-`define MODE_UND 5'b11011
-`define MODE_SYS 5'b11111
+	assign next_flags = alu_flags; //TODO
 
-`endif
+	always_ff @(posedge clk)
+		flags <= next_flags;
+
+	initial flags = 4'b0000;
+
+endmodule
