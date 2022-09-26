@@ -28,7 +28,7 @@ module arm810
 		.*
 	);
 
-	logic decode_execute, decode_undefined, decode_writeback, decode_branch;
+	logic decode_execute, decode_undefined, decode_writeback, decode_branch, decode_update_flags;
 	ptr decode_branch_offset;
 	reg_num decode_rd;
 	alu_op decode_data_op;
@@ -39,15 +39,16 @@ module arm810
 		.execute(decode_execute),
 		.undefined(decode_undefined),
 		.writeback(decode_writeback),
-		.rd(decode_rd),
 		.branch(decode_branch),
+		.update_flags(decode_update_flags),
+		.rd(decode_rd),
 		.branch_offset(decode_branch_offset),
 		.data_op(decode_data_op),
 		.*
 	);
 
 	reg_num rd;
-	logic explicit_branch, writeback;
+	logic explicit_branch, writeback, update_flags;
 	ptr branch_target;
 	psr_mode reg_mode;
 	alu_op data_op;
@@ -81,6 +82,7 @@ module arm810
 	);
 
 	psr_flags alu_flags;
+	logic alu_v_valid;
 
 	core_alu #(.W(32)) alu
 	(
@@ -90,7 +92,7 @@ module arm810
 		.c_in(flags.c),
 		.q(wr_value),
 		.nzcv(alu_flags),
-		.v_valid() //TODO
+		.v_valid(alu_v_valid)
 	);
 
 endmodule

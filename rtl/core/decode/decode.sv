@@ -9,6 +9,7 @@ module core_decode
 	output logic     execute,
 	                 undefined,
 	                 writeback,
+	                 update_flags,
 	                 branch,
 	output ptr       branch_offset,
 	output reg_num   rd,
@@ -36,9 +37,9 @@ module core_decode
 
 	//TODO
 	reg_num rn;
-	logic update_flags, restore_spsr, zero_fst, negate_fst, negate_snd, carry_in;
+	logic restore_spsr;
 
-	logic data_writeback;
+	logic data_writeback, data_update_flags;
 	reg_num data_rd;
 	alu_op data_group_op;
 
@@ -47,6 +48,7 @@ module core_decode
 		.op(data_group_op),
 		.rd(data_rd),
 		.writeback(data_writeback),
+		.update_flags(data_update_flags),
 		.*
 	);
 
@@ -55,6 +57,7 @@ module core_decode
 
 		branch = 0;
 		writeback = 0;
+		update_flags = 0;
 		rd = 4'bxxxx;
 		data_op = 4'bxxxx;
 
@@ -72,6 +75,7 @@ module core_decode
 				rd = data_rd;
 				writeback = data_writeback;
 				data_op = data_group_op;
+				update_flags = data_update_flags;
 			end
 
 			`INSN_MUL: ;

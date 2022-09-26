@@ -3,13 +3,23 @@
 module core_psr
 (
 	input  logic     clk,
+	                 update_flags,
+	                 alu_v_valid,
 	input  psr_flags alu_flags,
 
 	output psr_flags flags,
 	                 next_flags
 );
 
-	assign next_flags = alu_flags; //TODO
+	always_comb begin
+		next_flags = flags;
+
+		if(update_flags) begin
+			next_flags = alu_flags;
+			if(~alu_v_valid)
+				next_flags.v = flags.v;
+		end
+	end
 
 	always_ff @(posedge clk)
 		flags <= next_flags;
