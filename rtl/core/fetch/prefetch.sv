@@ -3,16 +3,17 @@
 module core_prefetch
 #(parameter ORDER=2)
 (
-	input  logic       clk,
-	                   stall,
-	                   flush,
-	                   fetched,
-	input  logic[31:0] fetch_data,
+	input  logic clk,
+	             stall,
+	             flush,
+	             fetched,
+	input  word  fetch_data,
+	input  ptr   head,
 
-	output logic[31:0] insn,
-	output logic[29:0] insn_pc,
-	                   next_pc,
-	output logic       fetch
+	output word  insn,
+	output ptr   insn_pc,
+	             next_pc,
+	output logic fetch
 );
 
 	localparam SIZE = (1 << ORDER) - 1;
@@ -20,7 +21,7 @@ module core_prefetch
 	logic[31:0] prefetch[SIZE];
 	logic[ORDER - 1:0] valid;
 
-	assign insn = ~flush ? prefetch[0] : `NOP;
+	assign insn = flush ? `NOP : prefetch[0];
 	assign next_pc = ~stall & |valid ? insn_pc + 1 : insn_pc;
 
 	always_comb
@@ -30,7 +31,7 @@ module core_prefetch
 			fetch = ~&valid;
 
 	always_ff @(posedge clk) begin
-		insn_pc <= next_pc;
+		insn_pc <= flush ? head : next_pc;
 
 		if(~flush & fetched & (valid == SIZE - 1))
 			prefetch[SIZE - 1] <= fetch_data;
