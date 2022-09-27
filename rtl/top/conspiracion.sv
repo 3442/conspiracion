@@ -16,11 +16,7 @@ module conspiracion
 	inout  wire        memory_mem_dqs_n,
 	output wire        memory_mem_odt,
 	output wire        memory_mem_dm,
-	input  wire        memory_oct_rzqin,
-
-	input logic dir, clr, mov, add, io,
-	output logic[7:0] out,
-	output logic done
+	input  wire        memory_oct_rzqin
 );
 
 	//TODO

@@ -23,8 +23,8 @@ namespace taller::avalon
 				return mask;
 			}
 
-			virtual bool read(std::uint32_t addr, std::uint32_t &data);
-			virtual bool write(std::uint32_t addr, std::uint32_t data, unsigned byte_enable);
+			virtual bool read(std::uint32_t addr, std::uint32_t &data) final override;
+			virtual bool write(std::uint32_t addr, std::uint32_t data, unsigned byte_enable = 0b1111) final override;
 
 		private:
 			std::unique_ptr<std::uint32_t[]> block;
