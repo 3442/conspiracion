@@ -18,9 +18,9 @@ module core_reg_file
 
 	assign rd_value = overwrite_hold ? wr_value_hold : q;
 
-	always @(posedge clk) begin
+	always @(negedge clk) begin
 		if(wr_enable) begin
-			file[rd_index] <= wr_value;
+			file[wr_index] <= wr_value;
 			wr_value_hold <= wr_value;
 		end
 

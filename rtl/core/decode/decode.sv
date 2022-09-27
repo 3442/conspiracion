@@ -18,8 +18,6 @@ module core_decode
 	logic cond_undefined;
 
 	//TODO
-	logic link;
-	ptr offset;
 	core_decode_conds conds
 	(
 		.cond(insn `FIELD_COND),
@@ -27,17 +25,19 @@ module core_decode
 		.*
 	);
 
-	logic branch_link; //TODO
+	logic branch_link;
 
 	core_decode_branch group_branch
 	(
+		.link(branch_link),
+		.offset(branch_offset),
 		.*
 	);
 
 	//TODO
 	logic restore_spsr;
 
-	logic data_writeback, data_update_flags;
+	logic data_writeback, data_update_flags, data_undefined;
 	alu_decode data_alu;
 
 	core_decode_data group_data
@@ -45,6 +45,7 @@ module core_decode
 		.decode(data_alu),
 		.writeback(data_writeback),
 		.update_flags(data_update_flags),
+		.undefined(data_undefined),
 		.*
 	);
 
@@ -70,6 +71,7 @@ module core_decode
 				alu = data_alu;
 				writeback = data_writeback;
 				update_flags = data_update_flags;
+				undefined = undefined | data_undefined;
 			end
 
 			`INSN_MUL: ;
