@@ -37,10 +37,11 @@ module core_cycles
 	logic final_writeback, data_snd_is_imm, data_snd_shift_by_reg;
 	logic[5:0] data_shift_imm;
 	logic[7:0] data_imm;
+	logic bubble;
 	word saved_base;
 	reg_num r_shift;
 
-	assign stall = next_cycle != EXECUTE;
+	assign stall = (next_cycle != EXECUTE) | bubble;
 	assign pc_visible = pc + 2;
 	assign reg_mode = `MODE_SVC; //TODO
 
@@ -48,6 +49,9 @@ module core_cycles
 		next_cycle = EXECUTE;
 		if((cycle == EXECUTE) & data_snd_shift_by_reg)
 			next_cycle = RD_SHIFT;
+
+		if(bubble)
+			next_cycle = EXECUTE;
 
 		unique case(cycle)
 			RD_SHIFT:
@@ -68,15 +72,20 @@ module core_cycles
 
 	always_ff @(posedge clk) begin
 		cycle <= next_cycle;
+		bubble <= 0;
 
 		unique case(next_cycle)
 			EXECUTE: begin
 				branch <= 0;
 				update_flags <= 0;
-				branch_target <= 30'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+				branch_target <= {30{1'bx}};
 				final_writeback <= 0;
 
-				if(dec_execute) begin
+				if(dec_execute & ~bubble) begin
+					bubble <=
+						  (dec_update_flags & update_flags)
+						| (final_writeback & ((rd == dec_alu.rn) | (rd == dec_alu.r_snd)));
+
 					branch <= dec_branch;
 					final_writeback <= dec_writeback;
 					update_flags <= dec_update_flags;
@@ -115,12 +124,13 @@ module core_cycles
 
 	initial begin
 		cycle = EXECUTE;
+		bubble = 0;
 
+		pc = 0;
 		branch = 1;
 		writeback = 0;
 		data_snd_shift_by_reg = 0;
 		branch_target = 30'd0;
-		pc = 0;
 	end
 
 endmodule

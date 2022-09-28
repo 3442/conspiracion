@@ -35,7 +35,6 @@ module arm810
 
 	core_decode decode
 	(
-		.flags(next_flags),
 		.execute(dec_execute),
 		.undefined(dec_undefined),
 		.writeback(dec_writeback),
@@ -61,7 +60,7 @@ module arm810
 		.*
 	);
 
-	psr_flags flags, next_flags;
+	psr_flags flags;
 
 	core_psr psr
 	(

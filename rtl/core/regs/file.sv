@@ -13,19 +13,12 @@ module core_reg_file
 
 	// Ver comentario en uarch.sv
 	word file[30];
-	word q, wr_value_hold;
-	logic overwrite_hold;
-
-	assign rd_value = overwrite_hold ? wr_value_hold : q;
 
 	always @(negedge clk) begin
-		if(wr_enable) begin
+		if(wr_enable)
 			file[wr_index] <= wr_value;
-			wr_value_hold <= wr_value;
-		end
 
-		q <= file[rd_index];
-		overwrite_hold <= wr_enable & (rd_index == wr_index);
+		rd_value <= file[rd_index];
 	end
 
 endmodule
