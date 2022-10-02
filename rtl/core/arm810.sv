@@ -12,19 +12,19 @@ module arm810
 	output word  bus_data_wr
 );
 
-	logic stall, prefetch_flush;
+	logic stall, prefetch_flush, insn_start;
 	word insn;
-	ptr fetch_insn_pc;
+	ptr fetch_insn_pc, insn_addr;
 
 	core_fetch #(.PREFETCH_ORDER(2)) fetch
 	(
 		.branch(explicit_branch | wr_pc),
 		.flush(0), //TODO
 		.target(wr_pc ? wr_value[29:0] : branch_target),
-		.addr(bus_addr),
-		.fetched(bus_ready),
-		.fetch_data(bus_data_rd),
-		.fetch(bus_start),
+		.addr(insn_addr),
+		.fetched(insn_ready),
+		.fetch_data(insn_data_rd),
+		.fetch(insn_start),
 		.insn_pc(fetch_insn_pc),
 		.*
 	);
@@ -110,6 +110,19 @@ module arm810
 		.c_in(flags.c),
 		.q(q_shifter),
 		.c(c_shifter)
+	);
+
+	//TODO
+	ptr data_addr;
+	logic data_start, data_write, data_ready;
+	word data_data_rd, data_data_wr;
+
+	logic insn_ready;
+	word insn_data_rd;
+
+	core_mmu mmu
+	(
+		.*
 	);
 
 endmodule
