@@ -8,6 +8,7 @@ module core_cycles
 	                       dec_writeback,
 	                       dec_update_flags,
 	input  ptr             dec_branch_offset,
+	input  snd_decode      dec_snd,
 	input  data_decode     dec_data,
 	input  ptr             fetch_insn_pc,
 	input  psr_flags       next_flags,
@@ -109,27 +110,28 @@ module core_cycles
 				if(dec_execute & ~bubble) begin
 					bubble <=
 						  (dec_update_flags & update_flags)
-						| (final_writeback & ((rd == dec_data.rn) | (rd == dec_data.r_snd)));
+						| (final_writeback & ((rd == dec_data.rn) | (rd == dec_snd.r)));
 
 					branch <= dec_branch;
 					update_flags <= dec_update_flags;
 					branch_target <= pc_visible + dec_branch_offset;
 
-					data_snd_is_imm <= dec_data.snd_is_imm;
-					data_snd_shift_by_reg <= dec_data.snd_shift_by_reg;
-					data_imm <= dec_data.imm;
-					data_shift_imm <= dec_data.shift_imm;
-
 					alu <= dec_data.op;
-					shifter.shl <= dec_data.shl;
-					shifter.shr <= dec_data.shr;
-					shifter.ror <= dec_data.ror;
-					shifter.put_carry <= dec_data.put_carry;
-					shifter.sign_extend <= dec_data.sign_extend;
-
 					ra <= dec_data.rn;
-					rb <= dec_data.r_snd;
-					r_shift <= dec_data.r_shift;
+
+					data_snd_is_imm <= dec_snd.is_imm;
+					data_snd_shift_by_reg <= dec_snd.shift_by_reg;
+					data_imm <= dec_snd.imm;
+					data_shift_imm <= dec_snd.shift_imm;
+
+					shifter.shl <= dec_snd.shl;
+					shifter.shr <= dec_snd.shr;
+					shifter.ror <= dec_snd.ror;
+					shifter.put_carry <= dec_snd.put_carry;
+					shifter.sign_extend <= dec_snd.sign_extend;
+
+					rb <= dec_snd.r;
+					r_shift <= dec_snd.r_shift;
 					c_in <= next_flags.c;
 
 					final_rd <= dec_data.rd;

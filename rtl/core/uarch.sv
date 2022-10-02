@@ -58,13 +58,17 @@ typedef logic[4:0] psr_mode;
 
 typedef struct packed
 {
-	alu_op     op;
-	reg_num    rn,
-	           rd,
-	           r_snd,
+	alu_op  op;
+	reg_num rn,
+	        rd;
+} data_decode;
+
+typedef struct packed
+{
+	reg_num    r,
 	           r_shift;
-	logic      snd_shift_by_reg,
-	           snd_is_imm,
+	logic      shift_by_reg,
+	           is_imm,
 	           shl,
 	           shr,
 	           ror,
@@ -72,7 +76,7 @@ typedef struct packed
 	           sign_extend;
 	logic[7:0] imm;
 	logic[5:0] shift_imm;
-} data_decode;
+} snd_decode;
 
 typedef struct packed
 {

@@ -31,6 +31,7 @@ module arm810
 
 	logic dec_execute, dec_undefined, dec_writeback, dec_branch, dec_update_flags;
 	ptr dec_branch_offset;
+	snd_decode dec_snd;
 	data_decode dec_data;
 
 	core_decode decode
@@ -41,6 +42,7 @@ module arm810
 		.branch(dec_branch),
 		.update_flags(dec_update_flags),
 		.branch_offset(dec_branch_offset),
+		.snd_ctrl(dec_snd),
 		.data_ctrl(dec_data),
 		.*
 	);

@@ -21,6 +21,21 @@
 `define COND_AL 4'b1110
 `define COND_UD 4'b1111 // Indefnido antes de ARMv5
 
+// Segundo operando de varios grupos de instrucciones
+
+`define FIELD_SND_ROR8      [11:8]
+`define FIELD_SND_IMM8      [7:0]
+`define FIELD_SND_SHIFTIMM  [11:7]
+`define FIELD_SND_RS        [11:8]
+`define FIELD_SND_ZEROIFREG [7]
+`define FIELD_SND_SHIFT     [6:5]
+`define FIELD_SND_RM        [3:0]
+
+`define SHIFT_LSL 2'b00
+`define SHIFT_LSR 2'b01
+`define SHIFT_ASR 2'b10
+`define SHIFT_ROR 2'b11
+
 // Instrucciones de salto
 
 `define INSN_B  28'b101_0_????????????????????????
@@ -52,24 +67,12 @@
 
 `define GROUP_ALU 28'b00_?_????_?_????_????_????????????
 
-`define FIELD_DATA_IMM       [25]
-`define FIELD_DATA_OPCODE    [24:21]
-`define FIELD_DATA_S         [20]
-`define FIELD_DATA_RN        [19:16]
-`define FIELD_DATA_RD        [15:12]
-`define FIELD_DATA_ROR8      [11:8]
-`define FIELD_DATA_IMM8      [7:0]
-`define FIELD_DATA_SHIFTIMM  [11:7]
-`define FIELD_DATA_RS        [11:8]
-`define FIELD_DATA_ZEROIFREG [7]
-`define FIELD_DATA_SHIFT     [6:5]
-`define FIELD_DATA_REGSHIFT  [4]
-`define FIELD_DATA_RM        [3:0]
-
-`define SHIFT_LSL 2'b00
-`define SHIFT_LSR 2'b01
-`define SHIFT_ASR 2'b10
-`define SHIFT_ROR 2'b11
+`define FIELD_DATA_IMM      [25]
+`define FIELD_DATA_OPCODE   [24:21]
+`define FIELD_DATA_S        [20]
+`define FIELD_DATA_RN       [19:16]
+`define FIELD_DATA_RD       [15:12]
+`define FIELD_DATA_REGSHIFT [4]
 
 // Instrucciones de multiplicación
 
