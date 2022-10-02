@@ -60,7 +60,7 @@ module hps_sdram_test
 	assign data_wr[7:0] = out;
 	assign write = dir;
 
-	always @(posedge clk_clk) unique case(state)
+	always_ff @(posedge clk_clk) unique case(state)
 		IDLE: begin
 			state <= RELEASE;
 

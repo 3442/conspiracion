@@ -14,7 +14,7 @@ module core_reg_file
 	// Ver comentario en uarch.sv
 	word file[30];
 
-	always @(negedge clk) begin
+	always_ff @(posedge clk) begin
 		if(wr_enable)
 			file[wr_index] <= wr_value;
 

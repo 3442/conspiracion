@@ -86,7 +86,7 @@ with a macro command in their (and Critical Link's) u-Boot port. This is
 accomplished by copying a small routine to on-chip RAM that disables caches and
 asserts the APPLYCFG bit and then returns operation to the typical DDR space.
 
-No sé donde putas está esa macro, así que voy a escribir mi propia:Ñ
+No sé donde putas está esa macro, así que voy a escribir mi propia:
 
 Info sobre OCRAM (on-chip RAM): https://www.intel.com/content/www/us/en/programmable/hps/cyclone-v/hps.html#sfo1410068453374.html#sfo1410068453374
 
@@ -103,4 +103,52 @@ sdram_staticcfg_applycfg:
     mov  r0, #0
     bx   lr
 
-Esto solucionó todo
+Trivial. Esto solucionó todo.
+
+
+	===
+	[IV] Minimizando ciclos y evitando una Fmax asquerosa
+	===
+
+Para este punto ya tengo semi-pipeline ((pre)fetch, decode, exec con máquina de
+estados multiciclo en exec), register file (duplicado para tener dos read
+ports), ALU, shifter, branches, condiciones y todas las instrucciones de
+procesamiento de datos. También simuladores de Avalon y VGA.
+
+En este momento necesitamos block memory real (no construida con lógica) para el
+archivo de registros. El problema es que al ser memoria síncrona existe un ciclo
+intermedio entre leer y recibir la lectura. Esto es absolutamente inaceptable. Hay
+dos grandes dilemas:
+
+	- La altsyncram no está calzando con el diseño
+	- La Fmax se está yendo directo al caño (antes iba por como 120MHz, hoy tocó
+	  piso con ~30MHz), principalmente por culpa de esa memoria y también que el
+	  shifter está en serie con la ALU.
+
+Traté de hacer un workaround con @(negedge clk) para operaciones de register
+file. Esto arregla las cosas en Verilator pero reduce la Fmax a la mitad (!!!!)
+en la cuarta esencia. Algunas Fmax:
+
+	- ~30MHz con @(negedge clk)
+	- ~60MHz con @(posedge clk) (claramente no sirve pero da una idea)
+	- 75.57MHz si quito el shifter del todo
+
+También sospecho que es buena idea ponerle su propioo reloj a platform para que no
+estorbe, pero para eso necesito un clock crossing bridge y una PLL.
+
+El operand forwarding también está destruyendo todo, luego del cambio del
+shifter todos los top failling paths se nota que vienen de eso. Lo voy a
+cambiar por stalls artificiales. Subió a 105MHz con esto.
+
+La limitante ahora parecen ser los bloques M10K de register file. Luego de
+reacomodar la relación shifter-ALU (rediseño grande) hay Fmax = 102.99MHz con
+el Slow 1100mV 0C Model. Reemplazando el register file con un registro dummy
+obtengo 108.52MHz. Hay una ruta crítica entre cycles.pc y psr.flags.
+
+Principales causas identificadas:
+
+	- Los M10K limitan a no más de 110MHz por alguna razón
+	- Lógica combinacional para seleccionar entre PC y file_rd_value
+	- Entradas combinacionales de ALU en cycles, esto llega hasta psr.flags
+
+Voy a seguir con esto después.
