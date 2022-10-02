@@ -7,10 +7,9 @@ module core_psr
 	                 alu_v_valid,
 	input  psr_flags alu_flags,
 
-	output psr_flags flags
+	output psr_flags flags,
+	                 next_flags
 );
-
-	psr_flags next_flags;
 
 	always_comb begin
 		next_flags = flags;

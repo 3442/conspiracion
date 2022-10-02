@@ -14,7 +14,7 @@ module arm810
 
 	logic stall, prefetch_flush;
 	word insn;
-	ptr fetch_insn_pc, pc, pc_visible;
+	ptr fetch_insn_pc;
 
 	core_fetch #(.PREFETCH_ORDER(2)) fetch
 	(
@@ -31,7 +31,7 @@ module arm810
 
 	logic dec_execute, dec_undefined, dec_writeback, dec_branch, dec_update_flags;
 	ptr dec_branch_offset;
-	alu_decode dec_alu;
+	data_decode dec_data;
 
 	core_decode decode
 	(
@@ -41,26 +41,28 @@ module arm810
 		.branch(dec_branch),
 		.update_flags(dec_update_flags),
 		.branch_offset(dec_branch_offset),
-		.alu(dec_alu),
+		.data_ctrl(dec_data),
 		.*
 	);
 
 	reg_num rd, ra, rb;
-	logic explicit_branch, writeback, update_flags;
-	ptr branch_target;
+	logic explicit_branch, writeback, update_flags, c_in;
+	ptr branch_target, pc_visible;
 	psr_mode reg_mode;
-	alu_control alu_ctrl;
-	word alu_base;
-	logic[7:0] alu_shift;
+	alu_op alu_ctrl;
+	shifter_control shifter_ctrl;
+	word alu_b, wr_value;
+	logic[7:0] shifter_shift;
 
 	core_cycles cycles
 	(
 		.branch(explicit_branch),
 		.alu(alu_ctrl),
+		.shifter(shifter_ctrl),
 		.*
 	);
 
-	psr_flags flags;
+	psr_flags flags, next_flags;
 
 	core_psr psr
 	(
@@ -68,7 +70,7 @@ module arm810
 	);
 
 	logic wr_pc;
-	word wr_value, rd_value_a, rd_value_b;
+	word rd_value_a, rd_value_b;
 
 	core_regs regs
 	(
@@ -84,17 +86,30 @@ module arm810
 
 	psr_flags alu_flags;
 	logic alu_v_valid;
+	word q_alu;
 
 	core_alu #(.W(32)) alu
 	(
-		.ctrl(alu_ctrl),
+		.op(alu_ctrl),
 		.a(rd_value_a),
-		.base(alu_base),
-		.shift(alu_shift),
-		.c_in(flags.c),
-		.q(wr_value),
+		.b(alu_b),
+		.q(q_alu),
 		.nzcv(alu_flags),
-		.v_valid(alu_v_valid)
+		.v_valid(alu_v_valid),
+		.*
+	);
+
+	word q_shifter;
+	logic c_shifter;
+
+	core_shifter #(.W(32)) shifter
+	(
+		.ctrl(shifter_ctrl),
+		.base(alu_b),
+		.shift(shifter_shift),
+		.c_in(flags.c),
+		.q(q_shifter),
+		.c(c_shifter)
 	);
 
 endmodule

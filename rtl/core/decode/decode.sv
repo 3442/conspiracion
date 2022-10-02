@@ -6,13 +6,13 @@ module core_decode
 	input  word       insn,
 	input  psr_flags  flags,
 
-	output logic      execute,
-	                  undefined,
-	                  writeback,
-	                  update_flags,
-	                  branch,
-	output ptr        branch_offset,
-	output alu_decode alu
+	output logic       execute,
+	                   undefined,
+	                   writeback,
+	                   update_flags,
+	                   branch,
+	output ptr         branch_offset,
+	output data_decode data_ctrl
 );
 
 	logic cond_undefined;
@@ -38,11 +38,11 @@ module core_decode
 	logic restore_spsr;
 
 	logic data_writeback, data_update_flags, data_undefined;
-	alu_decode data_alu;
+	data_decode data;
 
 	core_decode_data group_data
 	(
-		.decode(data_alu),
+		.decode(data),
 		.writeback(data_writeback),
 		.update_flags(data_update_flags),
 		.undefined(data_undefined),
@@ -55,20 +55,20 @@ module core_decode
 		branch = 0;
 		writeback = 0;
 		update_flags = 0;
-		alu = {($bits(alu)){1'bx}};
+		data_ctrl = {($bits(data_ctrl)){1'bx}};
 
 		priority casez(insn `FIELD_OP)
 			`GROUP_B: begin
 				branch = 1;
 				if(branch_link) begin
-					alu.rd = `R14;
+					data_ctrl.rd = `R14;
 					writeback = 1;
 					//TODO: Valor de LR
 				end
 			end
 
 			`GROUP_ALU: begin
-				alu = data_alu;
+				data_ctrl = data;
 				writeback = data_writeback;
 				update_flags = data_update_flags;
 				undefined = undefined | data_undefined;

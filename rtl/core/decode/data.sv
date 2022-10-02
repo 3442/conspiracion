@@ -3,13 +3,13 @@
 
 module core_decode_data
 (
-	input  word       insn,
+	input  word        insn,
 
-	output alu_decode decode,
-	output logic      writeback,
-	                  update_flags,
-	                  restore_spsr,
-	                  undefined
+	output data_decode decode,
+	output logic       writeback,
+	                   update_flags,
+	                   restore_spsr,
+	                   undefined
 );
 
 	alu_op op;

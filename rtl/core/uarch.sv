@@ -72,16 +72,15 @@ typedef struct packed
 	           sign_extend;
 	logic[7:0] imm;
 	logic[5:0] shift_imm;
-} alu_decode;
+} data_decode;
 
 typedef struct packed
 {
-	alu_op op;
-	logic  shl,
-	       shr,
-	       ror,
-	       put_carry,
-	       sign_extend;
-} alu_control;
+	logic shl,
+	      shr,
+	      ror,
+	      put_carry,
+	      sign_extend;
+} shifter_control;
 
 `endif
