@@ -64,7 +64,7 @@ module arm810
 		.*
 	);
 
-	psr_flags flags, next_flags;
+	psr_flags flags;
 
 	core_psr psr
 	(

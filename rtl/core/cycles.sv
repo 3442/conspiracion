@@ -11,7 +11,7 @@ module core_cycles
 	input  snd_decode      dec_snd,
 	input  data_decode     dec_data,
 	input  ptr             fetch_insn_pc,
-	input  psr_flags       next_flags,
+	input  psr_flags       flags,
 	input  word            rd_value_b,
 	                       q_alu,
 	                       q_shifter,
@@ -42,7 +42,9 @@ module core_cycles
 		WITH_SHIFT
 	} cycle, next_cycle;
 
-	logic bubble, final_writeback, data_snd_is_imm, data_snd_shift_by_reg, trivial_shift;
+	logic bubble, final_writeback, final_update_flags,
+	      data_snd_is_imm, data_snd_shift_by_reg, trivial_shift;
+
 	logic[5:0] data_shift_imm;
 	logic[7:0] data_imm;
 	word saved_base;
@@ -103,9 +105,9 @@ module core_cycles
 		unique case(next_cycle)
 			EXECUTE: begin
 				branch <= 0;
-				update_flags <= 0;
 				branch_target <= {30{1'bx}};
 				final_writeback <= 0;
+				final_update_flags <= 0;
 
 				if(dec_execute & ~bubble) begin
 					bubble <=
@@ -113,7 +115,6 @@ module core_cycles
 						| (final_writeback & ((rd == dec_data.rn) | (rd == dec_snd.r)));
 
 					branch <= dec_branch;
-					update_flags <= dec_update_flags;
 					branch_target <= pc_visible + dec_branch_offset;
 
 					alu <= dec_data.op;
@@ -132,12 +133,14 @@ module core_cycles
 
 					rb <= dec_snd.r;
 					r_shift <= dec_snd.r_shift;
-					c_in <= next_flags.c;
+					c_in <= flags.c;
 
 					final_rd <= dec_data.rd;
 					final_writeback <= dec_writeback;
+					final_update_flags <= dec_update_flags;
 				end
 
+				update_flags <= final_update_flags;
 				writeback <= final_writeback;
 				rd <= final_rd;
 				pc <= fetch_insn_pc;
