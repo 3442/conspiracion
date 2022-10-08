@@ -46,7 +46,7 @@ module core_cycles
 	      data_snd_is_imm, data_snd_shift_by_reg, trivial_shift;
 
 	logic[5:0] data_shift_imm;
-	logic[7:0] data_imm;
+	logic[11:0] data_imm;
 	word saved_base;
 	reg_num r_shift, final_rd;
 	ptr pc;
@@ -87,7 +87,7 @@ module core_cycles
 		unique case(cycle)
 			ISSUE:
 				if(data_snd_is_imm)
-					alu_b = {{24{1'b0}}, data_imm};
+					alu_b = {{20{1'b0}}, data_imm};
 				else
 					alu_b = rd_value_b;
 

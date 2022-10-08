@@ -65,18 +65,47 @@ typedef struct packed
 
 typedef struct packed
 {
-	reg_num    r,
-	           r_shift;
-	logic      shift_by_reg,
-	           is_imm,
-	           shl,
-	           shr,
-	           ror,
-	           put_carry,
-	           sign_extend;
-	logic[7:0] imm;
-	logic[5:0] shift_imm;
+	reg_num     r,
+	            r_shift;
+	logic       shift_by_reg,
+	            is_imm,
+	            shl,
+	            shr,
+	            ror,
+	            put_carry,
+	            sign_extend;
+	logic[11:0] imm;
+	logic[5:0]  shift_imm;
 } snd_decode;
+
+typedef enum logic[1:0]
+{
+	LDST_WORD,
+	LDST_BYTE,
+	LDST_HALF
+} ldst_size;
+
+typedef struct packed
+{
+	reg_num     rn,
+	            rd;
+
+	logic       enable,
+	            load,
+	            increment,
+	            writeback,
+	            sign_extend,
+	            pre_indexed,
+	            unprivileged,
+	            user_regs;
+
+	ldst_size   size;
+
+	/* P. 482: "If no bits are set, the result is UNPREDICTABLE."
+	 * Esto permite diferenciar entre ldst múltiple y simple.
+	 */
+	logic[15:0] reg_list;
+} ldst_decode;
 
 typedef struct packed
 {

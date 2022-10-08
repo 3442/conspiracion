@@ -5,6 +5,7 @@ module core_decode_snd
 (
 	input  word       insn,
 	input  logic      is_imm,
+	                  ror_if_imm,
 	                  shift_by_reg_if_reg,
 
 	output snd_decode decode,
@@ -13,7 +14,7 @@ module core_decode_snd
 
 	reg_num r, r_shift;
 	logic shift_by_reg, shl, shr, ror, put_carry, sign_extend;
-	logic[7:0] imm;
+	logic[11:0] imm;
 	logic[5:0] shift_imm;
 
 	assign decode.r = r;
@@ -30,7 +31,7 @@ module core_decode_snd
 
 	assign r = insn `FIELD_SND_RM;
 	assign r_shift = insn `FIELD_SND_RS;
-	assign imm = insn `FIELD_SND_IMM8;
+	assign imm = ror_if_imm ? {4'b0, insn `FIELD_SND_IMM8} : insn `FIELD_SND_IMM12;
 	assign shift_by_reg = ~is_imm & shift_by_reg_if_reg;
 	assign undefined = shift_by_reg & insn `FIELD_SND_ZEROIFREG;
 
@@ -43,7 +44,9 @@ module core_decode_snd
 		put_carry = 0;
 		sign_extend = 1'bx;
 
-		if(is_imm)
+		if(is_imm && !ror_if_imm)
+			shift_imm = 6'b0;
+		else if(is_imm && !ror_if_imm)
 			shift_imm = {1'b0, insn `FIELD_SND_ROR8, 1'b0};
 		else begin
 			shift_imm = {1'b0, insn `FIELD_SND_SHIFTIMM};
