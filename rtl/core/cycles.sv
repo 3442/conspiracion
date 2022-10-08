@@ -37,7 +37,7 @@ module core_cycles
 
 	enum
 	{
-		EXECUTE,
+		ISSUE,
 		RD_INDIRECT_SHIFT,
 		WITH_SHIFT
 	} cycle, next_cycle;
@@ -51,7 +51,7 @@ module core_cycles
 	reg_num r_shift, final_rd;
 	ptr pc;
 
-	assign stall = (next_cycle != EXECUTE) | bubble;
+	assign stall = (next_cycle != ISSUE) | bubble;
 	assign pc_visible = pc + 2;
 	assign reg_mode = `MODE_SVC; //TODO
 
@@ -65,10 +65,10 @@ module core_cycles
 		if(final_writeback & (shifter.shl | shifter.shr | shifter.ror))
 			trivial_shift = shifter_shift == 0;
 
-		next_cycle = EXECUTE;
+		next_cycle = ISSUE;
 
 		unique case(cycle)
-			EXECUTE:
+			ISSUE:
 				if(data_snd_shift_by_reg)
 					next_cycle = RD_INDIRECT_SHIFT;
 				else if(~trivial_shift)
@@ -82,10 +82,10 @@ module core_cycles
 		endcase
 
 		if(bubble)
-			next_cycle = EXECUTE;
+			next_cycle = ISSUE;
 
 		unique case(cycle)
-			EXECUTE:
+			ISSUE:
 				if(data_snd_is_imm)
 					alu_b = {{24{1'b0}}, data_imm};
 				else
@@ -103,7 +103,7 @@ module core_cycles
 		wr_value <= q_alu;
 
 		unique case(next_cycle)
-			EXECUTE: begin
+			ISSUE: begin
 				branch <= 0;
 				branch_target <= {30{1'bx}};
 				final_writeback <= 0;
@@ -160,7 +160,7 @@ module core_cycles
 	end
 
 	initial begin
-		cycle = EXECUTE;
+		cycle = ISSUE;
 		bubble = 0;
 
 		pc = 0;
