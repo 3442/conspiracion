@@ -29,7 +29,7 @@ module core_regs
 
 	assign pc_word = {pc_visible, 2'b00};
 	assign rd_value_a = rd_pc_a ? pc_word : (wr_enable && rd_index_a == wr_index) ? wr_value : file_rd_value_a;
-	assign rd_value_b = rd_pc_b ? pc_word : (wr_enable && rd_index_a == wr_index) ? wr_value : file_rd_value_b;
+	assign rd_value_b = rd_pc_b ? pc_word : (wr_enable && rd_index_b == wr_index) ? wr_value : file_rd_value_b;
 	assign file_wr_enable = wr_enable & ~wr_pc;
 	assign branch = wr_enable & wr_pc;
 
