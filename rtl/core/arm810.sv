@@ -20,7 +20,7 @@ module arm810
 	(
 		.branch(explicit_branch | wr_pc),
 		.flush(0), //TODO
-		.target(wr_pc ? wr_value[29:0] : branch_target),
+		.target(wr_pc ? wr_value[31:2] : branch_target),
 		.addr(insn_addr),
 		.fetched(insn_ready),
 		.fetch_data(insn_data_rd),
