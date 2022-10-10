@@ -5,6 +5,7 @@
 `define NOP 32'd0
 
 typedef logic[3:0]  reg_num;
+typedef logic[15:0] reg_list;
 typedef logic[31:0] word;
 typedef logic[29:0] ptr;
 
@@ -104,7 +105,7 @@ typedef struct packed
 	/* P. 482: "If no bits are set, the result is UNPREDICTABLE."
 	 * Esto permite diferenciar entre ldst múltiple y simple.
 	 */
-	logic[15:0] reg_list;
+	reg_list    regs;
 } ldst_decode;
 
 typedef struct packed

@@ -5,7 +5,10 @@ module core_decode_ldst_misc
 (
 	input  word        insn,
 
-	output ldst_decode decode
+	output ldst_decode decode,
+	output logic       off_is_reg,
+	output logic[7:0]  off_imm,
+	output reg_num     off_reg
 );
 
 	logic p, w;
@@ -17,10 +20,14 @@ module core_decode_ldst_misc
 	assign decode.increment = insn `FIELD_LDST_MISC_U;
 	assign decode.writeback = !p || w;
 	assign decode.sign_extend = insn `FIELD_LDST_MISC_S;
-	assign decode.pre_indexed = p && w;
+	assign decode.pre_indexed = p;
 	assign decode.unprivileged = 0;
 	assign decode.user_regs = 0;
-	assign decode.reg_list = 16'b0;
+	assign decode.regs = 16'b0;
+
+	assign off_imm = {insn `FIELD_LDST_MISC_IMM_HI, insn `FIELD_LDST_MISC_IMM_LO};
+	assign off_reg = insn `FIELD_LDST_MISC_RM;
+	assign off_is_reg = insn `FIELD_LDST_MISC_REG;
 
 	assign p = insn `FIELD_LDST_MISC_P;
 	assign w = insn `FIELD_LDST_MISC_W;

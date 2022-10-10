@@ -33,6 +33,7 @@ module arm810
 	ptr dec_branch_offset;
 	snd_decode dec_snd;
 	data_decode dec_data;
+	ldst_decode dec_ldst;
 
 	core_decode decode
 	(
@@ -44,6 +45,7 @@ module arm810
 		.branch_offset(dec_branch_offset),
 		.snd_ctrl(dec_snd),
 		.data_ctrl(dec_data),
+		.ldst_ctrl(dec_ldst),
 		.*
 	);
 
@@ -53,7 +55,7 @@ module arm810
 	psr_mode reg_mode;
 	alu_op alu_ctrl;
 	shifter_control shifter_ctrl;
-	word alu_b, wr_value;
+	word alu_a, alu_b, wr_value;
 	logic[7:0] shifter_shift;
 
 	core_cycles cycles
@@ -61,6 +63,12 @@ module arm810
 		.branch(explicit_branch),
 		.alu(alu_ctrl),
 		.shifter(shifter_ctrl),
+		.mem_addr(data_addr),
+		.mem_start(data_start),
+		.mem_write(data_write),
+		.mem_ready(data_ready),
+		.mem_data_rd(data_data_rd),
+		.mem_data_wr(data_data_wr),
 		.*
 	);
 
@@ -93,7 +101,7 @@ module arm810
 	core_alu #(.W(32)) alu
 	(
 		.op(alu_ctrl),
-		.a(rd_value_a),
+		.a(alu_a),
 		.b(alu_b),
 		.q(q_alu),
 		.nzcv(alu_flags),
@@ -114,13 +122,9 @@ module arm810
 		.c(c_shifter)
 	);
 
-	//TODO
 	ptr data_addr;
-	logic data_start, data_write, data_ready;
-	word data_data_rd, data_data_wr;
-
-	logic insn_ready;
-	word insn_data_rd;
+	logic data_start, data_write, data_ready, insn_ready;
+	word data_data_rd, data_data_wr, insn_data_rd;
 
 	core_mmu mmu
 	(

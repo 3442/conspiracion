@@ -13,12 +13,12 @@ module core_decode
 	                   branch,
 	output ptr         branch_offset,
 	output snd_decode  snd_ctrl,
-	output data_decode data_ctrl
+	output data_decode data_ctrl,
+	output ldst_decode ldst_ctrl
 );
 
 	//TODO
 	logic restore_spsr;
-	ldst_decode ldst_ctrl;
 
 	logic cond_undefined;
 
@@ -77,10 +77,16 @@ module core_decode
 	);
 
 	ldst_decode ldst_misc;
+	logic ldst_misc_off_is_reg;
+	reg_num ldst_misc_off_reg;
+	logic[7:0] ldst_misc_off_imm;
 
 	core_decode_ldst_misc group_ldst_misc
 	(
 		.decode(ldst_misc),
+		.off_imm(ldst_misc_off_imm),
+		.off_reg(ldst_misc_off_reg),
+		.off_is_reg(ldst_misc_off_is_reg),
 		.*
 	);
 
@@ -94,6 +100,15 @@ module core_decode
 		.*
 	);
 
+	ldst_decode ldst_addr;
+	data_decode data_ldst;
+
+	core_decode_ldst_addr ldst2data
+	(
+		.ldst(ldst_addr),
+		.alu(data_ldst)
+	);
+
 	always_comb begin
 		undefined = cond_undefined;
 
@@ -102,10 +117,14 @@ module core_decode
 		update_flags = 0;
 		data_ctrl = {($bits(data_ctrl)){1'bx}};
 
-		snd_ctrl = {($bits(snd_ctrl)){1'bx}};
-		snd_ctrl.shl = 0;
+		snd_ctrl = {$bits(snd_ctrl){1'bx}};
+		snd_ctrl.shl = 1;
 		snd_ctrl.shr = 0;
 		snd_ctrl.ror = 0;
+		snd_ctrl.is_imm = 1;
+		snd_ctrl.shift_imm = {$bits(snd_ctrl.shift_imm){1'b0}};
+		snd_ctrl.shift_by_reg = 0;
+
 		snd_is_imm = 1'bx;
 		snd_ror_if_imm = 1'bx;
 		snd_shift_by_reg_if_reg = 1'bx;
@@ -148,7 +167,7 @@ module core_decode
 
 				snd_ctrl = snd;
 				ldst_ctrl = ldst_single;
-				ldst_ctrl.enable = 1;
+				ldst_addr = ldst_single;
 
 				undefined = undefined | snd_undefined;
 			end
@@ -157,15 +176,22 @@ module core_decode
 				priority casez(insn `FIELD_OP)
 					`INSN_LDRB, `INSN_LDRSB, `INSN_LDRSH, `INSN_STRH: begin
 						ldst_ctrl = ldst_misc;
-						ldst_ctrl.enable = 1;
+						ldst_addr = ldst_misc;
+
+						snd_ctrl.r = ldst_misc_off_reg;
+						snd_ctrl.imm = {4'b0, ldst_misc_off_imm};
+						snd_ctrl.is_imm = !ldst_misc_off_is_reg;
 					end
 
-					default: undefined = 1;
+					default:
+						undefined = 1;
 				endcase
 
 			`GROUP_LDST_MULT: begin
 				ldst_ctrl = ldst_multiple;
-				ldst_ctrl.enable = 1;
+				ldst_addr = ldst_multiple;
+				snd_ctrl.imm = 12'd4;
+
 				restore_spsr = ldst_mult_restore_spsr;
 			end
 
@@ -176,6 +202,16 @@ module core_decode
 			`INSN_SWI: ;
 
 			default: undefined = 1;
+		endcase
+
+		unique casez(insn `FIELD_OP)
+			`GROUP_LDST_SINGLE, `GROUP_LDST_MISC, `GROUP_LDST_MULT: begin
+				ldst_ctrl.enable = 1;
+				data_ctrl = data_ldst;
+				writeback = ldst_ctrl.writeback || ldst_ctrl.load;
+			end
+
+			default: ;
 		endcase
 
 		if(undefined) begin

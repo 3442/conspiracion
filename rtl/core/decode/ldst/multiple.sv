@@ -10,7 +10,7 @@ module core_decode_ldst_multiple
 );
 
 	logic s, l;
-	logic[15:0] reg_list;
+	reg_list regs;
 
 	assign decode.rn = insn `FIELD_LDST_MULT_RN;
 	assign decode.size = LDST_WORD;
@@ -20,13 +20,13 @@ module core_decode_ldst_multiple
 	assign decode.sign_extend = 0;
 	assign decode.pre_indexed = insn `FIELD_LDST_MULT_P;
 	assign decode.unprivileged = 0;
-	assign decode.user_regs = s && (!l || !reg_list[`R15]);
-	assign decode.reg_list = reg_list;
+	assign decode.user_regs = s && !(l && regs[`R15]);
+	assign decode.regs = regs;
 
 	assign s = insn `FIELD_LDST_MULT_S;
 	assign l = insn `FIELD_LDST_LD;
 
-	assign reg_list = insn `FIELD_LDST_MULT_LIST;
-	assign restore_spsr = s && l && reg_list[`R15];
+	assign regs = insn `FIELD_LDST_MULT_LIST;
+	assign restore_spsr = s && l && regs[`R15];
 
 endmodule
