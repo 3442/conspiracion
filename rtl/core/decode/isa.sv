@@ -1,5 +1,5 @@
-`ifndef CORE_ISA_SV
-`define CORE_ISA_SV
+`ifndef CORE_DECODE_ISA_SV
+`define CORE_DECODE_ISA_SV
 
 `define FIELD_COND [31:28]
 `define FIELD_OP   [27:0]

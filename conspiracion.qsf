@@ -142,6 +142,7 @@ set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/branch.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/conds.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/data.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/decode.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/isa.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/ldst/addr.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/ldst/misc.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/ldst/multiple.sv
@@ -149,7 +150,6 @@ set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/ldst/single.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/snd.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/fetch/fetch.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/fetch/prefetch.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/isa.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/mmu/mmu.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/psr.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/regs/file.sv
