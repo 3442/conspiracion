@@ -1,6 +1,6 @@
 `include "core/uarch.sv"
 
-module core_cycles
+module core_control
 (
 	input  logic           clk,
 	                       dec_execute,
@@ -76,7 +76,7 @@ module core_cycles
 		   ((dec_update_flags || dec_conditional) && (final_update_flags || update_flags))
 		|| (final_writeback && (final_rd == dec_data.rn || final_rd == dec_snd.r));
 
-	core_cycles_ldst_pop ldst_pop
+	core_control_ldst_pop ldst_pop
 	(
 		.regs(mem_regs),
 		.valid(pop_valid),
@@ -171,7 +171,6 @@ module core_cycles
 					data_imm <= dec_snd.imm;
 					data_shift_imm <= dec_snd.shift_imm;
 
-					shifter.shl <= dec_snd.shl;
 					shifter.shr <= dec_snd.shr;
 					shifter.ror <= dec_snd.ror;
 					shifter.put_carry <= dec_snd.put_carry;

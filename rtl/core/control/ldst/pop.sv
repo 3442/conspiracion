@@ -1,6 +1,6 @@
 `include "core/uarch.sv"
 
-module core_cycles_ldst_pop
+module core_control_ldst_pop
 (
 	input  reg_list regs,
 

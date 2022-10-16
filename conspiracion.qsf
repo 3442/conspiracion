@@ -136,8 +136,8 @@ set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/alu/alu.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/alu/orr.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/alu/xor.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/arm810.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cycles.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cycles/ldst/pop.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/control.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/ldst/pop.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/branch.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/conds.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/data.sv

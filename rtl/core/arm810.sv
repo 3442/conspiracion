@@ -59,7 +59,7 @@ module arm810
 	word alu_a, alu_b, wr_value;
 	logic[7:0] shifter_shift;
 
-	core_cycles cycles
+	core_control control
 	(
 		.branch(explicit_branch),
 		.alu(alu_ctrl),
