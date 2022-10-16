@@ -5,12 +5,15 @@ module core_decode_conds
 (
 	input  logic[3:0] cond,
 	input  psr_flags  flags,
+
 	output logic      execute,
+	                  conditional,
 	                  undefined
 );
 
 	always_comb begin
 		undefined = 0;
+		conditional = 1;
 
 		unique case(cond)
 			`COND_EQ: execute =  flags.z;
@@ -27,10 +30,15 @@ module core_decode_conds
 			`COND_LT: execute =  flags.n  ^  flags.v;
 			`COND_GT: execute = ~flags.z  & (flags.n ~^ flags.v);
 			`COND_LE: execute =  flags.z  | (flags.n  ^ flags.v);
-			`COND_AL: execute = 1;
+
+			`COND_AL: begin
+				execute = 1;
+				conditional = 0;
+			end
 
 			`COND_UD: begin
 				execute = 1'bx;
+				conditional = 1'bx;
 				undefined = 1;
 			end
 		endcase

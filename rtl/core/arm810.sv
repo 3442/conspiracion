@@ -29,7 +29,7 @@ module arm810
 		.*
 	);
 
-	logic dec_execute, dec_undefined, dec_writeback, dec_branch, dec_update_flags;
+	logic dec_execute, dec_conditional, dec_undefined, dec_writeback, dec_branch, dec_update_flags;
 	ptr dec_branch_offset;
 	snd_decode dec_snd;
 	data_decode dec_data;
@@ -38,6 +38,7 @@ module arm810
 	core_decode decode
 	(
 		.execute(dec_execute),
+		.conditional(dec_conditional),
 		.undefined(dec_undefined),
 		.writeback(dec_writeback),
 		.branch(dec_branch),

@@ -7,6 +7,7 @@ module core_decode
 	input  psr_flags   flags,
 
 	output logic       execute,
+	                   conditional,
 	                   undefined,
 	                   writeback,
 	                   update_flags,

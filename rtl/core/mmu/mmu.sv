@@ -80,7 +80,7 @@ module core_mmu
 		end
 	end
 
-	always @(posedge clk) begin
+	always_ff @(posedge clk) begin
 		master <= next_master;
 		active <= bus_start || (active && !bus_ready);
 

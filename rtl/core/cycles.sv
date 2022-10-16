@@ -4,6 +4,7 @@ module core_cycles
 (
 	input  logic           clk,
 	                       dec_execute,
+	                       dec_conditional,
 	                       dec_branch,
 	                       dec_writeback,
 	                       dec_update_flags,
@@ -53,7 +54,7 @@ module core_cycles
 		BASE_WRITEBACK
 	} cycle, next_cycle;
 
-	logic bubble, final_writeback, final_update_flags,
+	logic bubble, next_bubble, final_writeback, final_update_flags,
 	      ldst, ldst_pre, ldst_increment, ldst_writeback, pop_valid,
 	      data_snd_is_imm, data_snd_shift_by_reg, trivial_shift;
 
@@ -64,12 +65,16 @@ module core_cycles
 	reg_list mem_regs, next_regs_upper, next_regs_lower;
 	ptr pc, next_pc_visible;
 
-	assign stall = (next_cycle != ISSUE) | bubble;
+	assign stall = next_cycle != ISSUE || next_bubble;
 	assign reg_mode = `MODE_SVC; //TODO
 	assign trivial_shift = shifter_shift == 0;
 	assign mem_data_wr = rd_value_b;
 	assign popped = ldst_increment ? popped_lower : popped_upper;
 	assign next_pc_visible = fetch_insn_pc + 2;
+
+	assign next_bubble =
+		   ((dec_update_flags || dec_conditional) && (final_update_flags || update_flags))
+		|| (final_writeback && (final_rd == dec_data.rn || final_rd == dec_snd.r));
 
 	core_cycles_ldst_pop ldst_pop
 	(
@@ -139,6 +144,7 @@ module core_cycles
 		bubble <= 0;
 		branch <= 0;
 		writeback <= 0;
+		update_flags <= 0;
 
 		unique case(cycle)
 			TRANSFER:       wr_value <= mem_data_rd;
@@ -151,11 +157,9 @@ module core_cycles
 				final_writeback <= 0;
 				final_update_flags <= 0;
 
-				if(dec_execute & ~bubble) begin
-					bubble <=
-						  (dec_update_flags & update_flags)
-						| (final_writeback & ((rd == dec_data.rn) | (rd == dec_snd.r)));
+				bubble <= next_bubble;
 
+				if(dec_execute & ~next_bubble) begin
 					branch <= dec_branch;
 					branch_target <= next_pc_visible + dec_branch_offset;
 
