@@ -62,14 +62,14 @@ module core_cycles
 	word saved_base, mem_offset;
 	reg_num r_shift, final_rd, popped_upper, popped_lower, popped;
 	reg_list mem_regs, next_regs_upper, next_regs_lower;
-	ptr pc;
+	ptr pc, next_pc_visible;
 
 	assign stall = (next_cycle != ISSUE) | bubble;
-	assign pc_visible = pc + 2;
 	assign reg_mode = `MODE_SVC; //TODO
 	assign trivial_shift = shifter_shift == 0;
 	assign mem_data_wr = rd_value_b;
 	assign popped = ldst_increment ? popped_lower : popped_upper;
+	assign next_pc_visible = fetch_insn_pc + 2;
 
 	core_cycles_ldst_pop ldst_pop
 	(
@@ -157,7 +157,7 @@ module core_cycles
 						| (final_writeback & ((rd == dec_data.rn) | (rd == dec_snd.r)));
 
 					branch <= dec_branch;
-					branch_target <= pc_visible + dec_branch_offset;
+					branch_target <= next_pc_visible + dec_branch_offset;
 
 					alu <= dec_data.op;
 					ra <= dec_data.rn;
@@ -196,6 +196,7 @@ module core_cycles
 				writeback <= final_writeback;
 				rd <= final_rd;
 				pc <= fetch_insn_pc;
+				pc_visible <= next_pc_visible;
 			end
 
 			RD_INDIRECT_SHIFT: begin
@@ -249,6 +250,8 @@ module core_cycles
 		bubble = 0;
 
 		pc = 0;
+		pc_visible = 2;
+
 		c_in = 0;
 		branch = 1;
 		writeback = 0;
