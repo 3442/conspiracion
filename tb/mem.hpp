@@ -24,13 +24,35 @@ namespace taller::avalon
 			}
 
 			virtual bool read(std::uint32_t addr, std::uint32_t &data) final override;
-			virtual bool write(std::uint32_t addr, std::uint32_t data, unsigned byte_enable = 0b1111) final override;
+			virtual bool write
+			(
+				std::uint32_t addr, std::uint32_t data, unsigned byte_enable = 0b1111
+			) final override;
+
+			template<typename F>
+			void load(F loader, std::size_t addr = 0);
 
 		private:
 			std::unique_ptr<std::uint32_t[]> block;
 			std::uint32_t                    base;
 			std::uint32_t                    mask;
 	};
+
+	template<typename F>
+	void mem::load(F loader, std::size_t addr)
+	{
+		std::size_t size = mask + 1;
+		while(addr < size)
+		{
+			std::size_t read = loader(&block[base + addr], size - addr);
+			if(read == 0)
+			{
+				break;
+			}
+
+			addr += read;
+		}
+	}
 }
 
 #endif

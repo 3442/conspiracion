@@ -30,6 +30,7 @@ obj
 *.swp
 *.a
 nios_workspace
+__pycache__
 
 hps_sdram_p0_summary.csv
 vcd/
@@ -39,3 +40,4 @@ platform/
 platform.sopcinfo
 hps_isw_handoff/
 *~
+*.vcd

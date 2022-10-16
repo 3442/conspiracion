@@ -84,6 +84,32 @@ namespace taller::avalon
 			plat.avl_waitrequest = !active->write(pos, avl_writedata, avl_byteenable);
 		}
 	}
+
+	template<class Platform>
+	std::uint32_t interconnect<Platform>::dump(std::uint32_t addr)
+	{
+		std::uint32_t avl_address = addr << 2;
+
+		for(auto &binding : devices)
+		{
+			if((avl_address & binding.mask) == binding.base)
+			{
+				auto &dev = binding.dev;
+				auto pos = (avl_address & ~dev.address_mask()) >> 2;
+
+				std::uint32_t readdata;
+				while(!dev.read(pos, readdata))
+				{
+					continue;
+				}
+
+				return readdata;
+			}
+		}
+
+		fprintf(stderr, "[avl] attempt to dump memory hole at 0x%08x\n", addr);
+		assert(false);
+	}
 }
 
 #endif

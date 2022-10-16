@@ -25,6 +25,8 @@ namespace taller::avalon
 			void tick(bool clk);
 			void attach(slave &dev);
 
+			std::uint32_t dump(std::uint32_t addr);
+
 		private:
 			struct binding
 			{
