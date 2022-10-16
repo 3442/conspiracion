@@ -20,41 +20,44 @@ module bus_master
 );
 
 	enum {
-		REQUEST,
-		WAIT,
-		RESPONSE
+		IDLE,
+		WAIT
 	} state;
 
 	assign data_rd = avl_readdata;
-	assign avl_byteenable = 4'b1111;
+	assign avl_byteenable = 4'b1111; //TODO
 
-	always_ff @(posedge clk) unique case(state)
-		REQUEST: if(start) begin
+	always_comb
+		unique case(state)
+			IDLE: ready = 0;
+			WAIT: ready = !avl_waitrequest;
+		endcase
+
+	always_ff @(posedge clk) begin
+		unique case(state)
+			IDLE: begin
+				avl_read <= 0;
+				avl_write <= 0;
+			end
+
+			WAIT:
+				if(!start)
+					state <= IDLE;
+		endcase
+
+		if(!avl_waitrequest && start) begin
 			avl_address <= {addr, 2'b00};
 			avl_read <= ~write;
 			avl_write <= write;
 			avl_writedata <= data_wr;
 			state <= WAIT;
 		end
-
-		WAIT: if(~avl_waitrequest) begin
-			ready <= 1;
-			state <= RESPONSE;
-		end
-
-		RESPONSE: begin
-			ready <= 0;
-			avl_read <= 0;
-			avl_write <= 0;
-			state <= REQUEST;
-		end
-	endcase
+	end
 
 	initial begin
-		ready = 0;
+		state = IDLE;
 		avl_read = 0;
 		avl_write = 0;
-		state = REQUEST;
 	end
 
 endmodule

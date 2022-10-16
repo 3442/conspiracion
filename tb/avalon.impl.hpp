@@ -24,18 +24,33 @@ namespace taller::avalon
 	template<class Platform>
 	void interconnect<Platform>::tick(bool clk)
 	{
+		if(active)
+		{
+			assert(avl_address == plat.avl_address);
+			assert(avl_read == plat.avl_read);
+			assert(avl_write == plat.avl_write);
+			assert(avl_writedata == plat.avl_writedata);
+			assert(avl_byteenable == plat.avl_byteenable);
+		}
+
 		if(!clk)
+		{
+			if(!plat.avl_waitrequest)
+			{
+				active = nullptr;
+			}
+
+			return;
+		} else if(!active)
 		{
 			avl_address = plat.avl_address;
 			avl_read = plat.avl_read;
 			avl_write = plat.avl_write;
 			avl_writedata = plat.avl_writedata;
 			avl_byteenable = plat.avl_byteenable;
-			return;
-		}
 
-		if(!active)
-		{
+			assert(!avl_read || !avl_write);
+
 			if(avl_address & 0b11)
 			{
 				fprintf(stderr, "[avl] unaligned address: 0x%08x\n", avl_address);
@@ -59,7 +74,6 @@ namespace taller::avalon
 			}
 		}
 
-		assert(!avl_read || !avl_write);
 		auto pos = (avl_address & ~active->address_mask()) >> 2;
 
 		if(avl_read)
@@ -68,11 +82,6 @@ namespace taller::avalon
 		} else if(avl_write)
 		{
 			plat.avl_waitrequest = !active->write(pos, avl_writedata, avl_byteenable);
-		}
-
-		if(!plat.avl_waitrequest)
-		{
-			active = nullptr;
 		}
 	}
 }

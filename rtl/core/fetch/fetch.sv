@@ -17,7 +17,7 @@ module core_fetch
 	             addr
 );
 
-	ptr next_pc, head;
+	ptr next_pc, head, hold_addr;
 	logic fetched_valid, do_flush, discard;
 
 	assign do_flush = branch | flush;
@@ -30,7 +30,7 @@ module core_fetch
 		.*
 	);
 
-	always_comb
+	always_comb begin
 		if(branch)
 			head = target;
 		else if(flush)
@@ -38,17 +38,21 @@ module core_fetch
 		else
 			head = {30{1'bx}};
 
-	always_ff @(posedge clk) begin
 		if(do_flush)
-			addr <= head;
+			addr = head;
 		else if(fetched_valid)
-			addr <= addr + 1;
+			addr = hold_addr + 1;
+		else
+			addr = hold_addr;
+	end
 
+	always_ff @(posedge clk) begin
 		discard <= discard ? ~fetched : do_flush & fetch;
+		hold_addr <= addr;
 	end
 
 	initial begin
-		addr = 0;
+		hold_addr = 0;
 		discard = 0;
 	end
 

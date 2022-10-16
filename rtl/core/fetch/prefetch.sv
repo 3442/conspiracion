@@ -23,19 +23,16 @@ module core_prefetch
 
 	assign insn = flush ? `NOP : prefetch[0];
 	assign next_pc = ~stall & |valid ? insn_pc + 1 : insn_pc;
-
-	always_comb
-		if((valid == SIZE - 2) & fetched)
-			fetch = 0;
-		else
-			fetch = ~&valid;
+	assign fetch = !stall || ~&valid;
 
 	always_ff @(posedge clk) begin
 		insn_pc <= flush ? head : next_pc;
 
-		if(~flush & fetched & (valid == SIZE - 1))
+		if(flush)
+			prefetch[SIZE - 1] <= `NOP;
+		else if(fetched && valid == SIZE - 1 + {{(ORDER - 1){1'b0}}, !stall})
 			prefetch[SIZE - 1] <= fetch_data;
-		else
+		else if(!stall)
 			prefetch[SIZE - 1] <= `NOP;
 
 		if(flush)
