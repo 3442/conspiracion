@@ -14,6 +14,7 @@ module core_control
 	input  ldst_decode     dec_ldst,
 	input  ptr             fetch_insn_pc,
 	input  psr_flags       flags,
+	                       alu_flags,
 	input  word            rd_value_a,
 	                       rd_value_b,
 	                       q_alu,
@@ -33,6 +34,7 @@ module core_control
 	output ptr             branch_target,
 	                       pc_visible,
 	output psr_mode        reg_mode,
+	output psr_flags       wb_alu_flags,
 	output alu_op          alu,
 	output word            alu_a,
 	                       alu_b,
@@ -195,6 +197,7 @@ module core_control
 					final_update_flags <= dec_update_flags;
 				end
 
+				wb_alu_flags <= alu_flags;
 				update_flags <= final_update_flags;
 				writeback <= final_writeback;
 				rd <= final_rd;
@@ -260,6 +263,8 @@ module core_control
 		writeback = 0;
 		branch_target = 30'd0;
 		data_snd_shift_by_reg = 0;
+
+		wb_alu_flags = 4'b0000;
 
 		ldst = 0;
 		ldst_pre = 0;

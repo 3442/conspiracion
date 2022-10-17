@@ -20,8 +20,8 @@ module core_fetch
 	ptr next_pc, head, hold_addr;
 	logic fetched_valid, do_flush, discard;
 
-	assign do_flush = branch | flush;
-	assign fetched_valid = fetched & ~discard;
+	assign do_flush = branch || flush;
+	assign fetched_valid = fetched && !discard;
 
 	core_prefetch #(.ORDER(PREFETCH_ORDER)) prefetch
 	(
@@ -40,7 +40,7 @@ module core_fetch
 
 		if(do_flush)
 			addr = head;
-		else if(fetched_valid)
+		else if(fetch && fetched_valid)
 			addr = hold_addr + 1;
 		else
 			addr = hold_addr;
