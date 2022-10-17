@@ -10,7 +10,8 @@ module core_decode_data
 	                   snd_shift_by_reg_if_reg,
 	                   writeback,
 	                   update_flags,
-	                   restore_spsr
+	                   restore_spsr,
+	                   uses_rn
 );
 
 	alu_op op;
@@ -33,6 +34,14 @@ module core_decode_data
 
 			default:
 				writeback = 1;
+		endcase
+
+		unique case(op)
+			`ALU_MOV, `ALU_MVN:
+				uses_rn = 0;
+
+			default:
+				uses_rn = 1;
 		endcase
 
 		update_flags = insn `FIELD_DATA_S;

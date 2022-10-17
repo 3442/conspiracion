@@ -11,6 +11,7 @@ module core_decode
 	                   undefined,
 	                   writeback,
 	                   update_flags,
+	                   uses_rn,
 	                   branch,
 	output ptr         branch_offset,
 	output snd_decode  snd_ctrl,
@@ -54,7 +55,7 @@ module core_decode
 
 	data_decode data;
 	logic data_writeback, data_update_flags, data_restore_spsr,
-	      data_is_imm, data_shift_by_reg_if_reg;
+	      data_is_imm, data_shift_by_reg_if_reg, data_uses_rn;
 
 	core_decode_data group_data
 	(
@@ -64,6 +65,7 @@ module core_decode
 		.restore_spsr(data_restore_spsr),
 		.snd_is_imm(data_is_imm),
 		.snd_shift_by_reg_if_reg(data_shift_by_reg_if_reg),
+		.uses_rn(data_uses_rn),
 		.*
 	);
 
@@ -111,11 +113,12 @@ module core_decode
 	);
 
 	always_comb begin
-		undefined = cond_undefined;
-
 		branch = 0;
 		writeback = 0;
 		update_flags = 0;
+		uses_rn = 1;
+		undefined = cond_undefined;
+
 		data_ctrl = {($bits(data_ctrl)){1'bx}};
 
 		snd_ctrl = {$bits(snd_ctrl){1'bx}};
@@ -145,6 +148,7 @@ module core_decode
 			end
 
 			`GROUP_ALU: begin
+				uses_rn = data_uses_rn;
 				snd_is_imm = data_is_imm;
 				snd_ror_if_imm = 1;
 				snd_shift_by_reg_if_reg = data_shift_by_reg_if_reg;
