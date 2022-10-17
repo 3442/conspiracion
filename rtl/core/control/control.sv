@@ -148,6 +148,7 @@ module core_control
 		branch <= 0;
 		writeback <= 0;
 		update_flags <= 0;
+		wb_alu_flags <= alu_flags;
 
 		unique case(cycle)
 			TRANSFER:       wr_value <= mem_data_rd;
@@ -198,7 +199,6 @@ module core_control
 					final_update_flags <= dec_update_flags;
 				end
 
-				wb_alu_flags <= alu_flags;
 				update_flags <= final_update_flags;
 				writeback <= final_writeback;
 				rd <= final_rd;
