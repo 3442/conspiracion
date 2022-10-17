@@ -8,67 +8,67 @@ test_name = pathlib.Path(module).stem
 spec = importlib.util.spec_from_file_location('sim', module)
 module = importlib.util.module_from_spec(spec)
 
-all_regs = {
-    'r0': 'r0',
-    'r1': 'r1',
-    'r2': 'r2',
-    'r3': 'r3',
-    'r4': 'r4',
-    'r5': 'r5',
-    'r6': 'r6',
-    'r7': 'r7',
-    'r8': 'r8_usr',
-    'r8_usr': 'r8_usr',
-    'r8_fiq': 'r8_fiq',
-    'r9': 'r9_usr',
-    'r9_usr': 'r9_usr',
-    'r9_fiq': 'r9_fiq',
-    'r10': 'r10_usr',
-    'r10_usr': 'r10_usr',
-    'r10_fiq': 'r10_fiq',
-    'r11': 'r11_usr',
-    'r11_usr': 'r11_usr',
-    'r11_fiq': 'r11_fiq',
-    'r12': 'r12_usr',
-    'r12_usr': 'r12_usr',
-    'r12_fiq': 'r12_fiq',
-    'sp': 'r13_usr',
-    'sp_usr': 'r13_usr',
-    'sp_svc': 'r13_svc',
-    'sp_abt': 'r13_abt',
-    'sp_und': 'r13_und',
-    'sp_irq': 'r13_irq',
-    'sp_fiq': 'r13_fiq',
-    'r13': 'r13_usr',
-    'r13_usr': 'r13_usr',
-    'r13_svc': 'r13_svc',
-    'r13_abt': 'r13_abt',
-    'r13_und': 'r13_und',
-    'r13_irq': 'r13_irq',
-    'r13_fiq': 'r13_fiq',
-    'lr': 'r14_usr',
-    'lr_usr': 'r14_usr',
-    'lr_svc': 'r14_svc',
-    'lr_abt': 'r14_abt',
-    'lr_und': 'r14_und',
-    'lr_irq': 'r14_irq',
-    'lr_fiq': 'r14_fiq',
-    'r14': 'r14_usr',
-    'r14_usr': 'r14_usr',
-    'r14_svc': 'r14_svc',
-    'r14_abt': 'r14_abt',
-    'r14_und': 'r14_und',
-    'r14_irq': 'r14_irq',
-    'r14_fiq': 'r14_fiq',
-    'pc': 'pc',
-    'r15': 'pc',
-    'cpsr': 'cpsr',
-    'spsr_svc': 'spsr_svc',
-    'spsr_abt': 'spsr_abt',
-    'spsr_und': 'spsr_und',
-    'spsr_irq': 'spsr_irq',
-    'spsr_fiq': 'spsr_fiq',
-    }
+all_regs = [
+    ('r0', 'r0'),
+    ('r1', 'r1'),
+    ('r2', 'r2'),
+    ('r3', 'r3'),
+    ('r4', 'r4'),
+    ('r5', 'r5'),
+    ('r6', 'r6'),
+    ('r7', 'r7'),
+    ('r8', 'r8_usr'),
+    ('r8_usr', 'r8_usr'),
+    ('r8_fiq', 'r8_fiq'),
+    ('r9', 'r9_usr'),
+    ('r9_usr', 'r9_usr'),
+    ('r9_fiq', 'r9_fiq'),
+    ('r10', 'r10_usr'),
+    ('r10_usr', 'r10_usr'),
+    ('r10_fiq', 'r10_fiq'),
+    ('r11', 'r11_usr'),
+    ('r11_usr', 'r11_usr'),
+    ('r11_fiq', 'r11_fiq'),
+    ('r12', 'r12_usr'),
+    ('r12_usr', 'r12_usr'),
+    ('r12_fiq', 'r12_fiq'),
+    ('sp', 'r13_usr'),
+    ('sp_usr', 'r13_usr'),
+    ('sp_svc', 'r13_svc'),
+    ('sp_abt', 'r13_abt'),
+    ('sp_und', 'r13_und'),
+    ('sp_irq', 'r13_irq'),
+    ('sp_fiq', 'r13_fiq'),
+    ('r13', 'r13_usr'),
+    ('r13_usr', 'r13_usr'),
+    ('r13_svc', 'r13_svc'),
+    ('r13_abt', 'r13_abt'),
+    ('r13_und', 'r13_und'),
+    ('r13_irq', 'r13_irq'),
+    ('r13_fiq', 'r13_fiq'),
+    ('lr', 'r14_usr'),
+    ('lr_usr', 'r14_usr'),
+    ('lr_svc', 'r14_svc'),
+    ('lr_abt', 'r14_abt'),
+    ('lr_und', 'r14_und'),
+    ('lr_irq', 'r14_irq'),
+    ('lr_fiq', 'r14_fiq'),
+    ('r14', 'r14_usr'),
+    ('r14_usr', 'r14_usr'),
+    ('r14_svc', 'r14_svc'),
+    ('r14_abt', 'r14_abt'),
+    ('r14_und', 'r14_und'),
+    ('r14_irq', 'r14_irq'),
+    ('r14_fiq', 'r14_fiq'),
+    ('pc', 'pc'),
+    ('r15', 'pc'),
+    ('cpsr', 'cpsr'),
+    ('spsr_svc', 'spsr_svc'),
+    ('spsr_abt', 'spsr_abt'),
+    ('spsr_und', 'spsr_und'),
+    ('spsr_irq', 'spsr_irq'),
+    ('spsr_fiq', 'spsr_fiq'),
+    ]
 
 regs = {}
 read_reg = lambda r: regs.setdefault(r, 0)
@@ -115,9 +115,49 @@ def hexdump(base, memory):
 
     return '\n'.join(lines)
 
+COLOR_RESET  = '\033[0m'
+COLOR_RED    = '\033[31;1m'
+COLOR_GREEN  = '\033[32m'
+COLOR_YELLOW = '\033[33;1m'
+
+def exit(*, success):
+    status, color = ('passed', COLOR_GREEN) if success else ('failed', COLOR_RED)
+    print( \
+        f'{color}Test \'{COLOR_YELLOW}{test_name}{COLOR_RESET}{color}\' ' +
+        f'{status}{COLOR_RESET}', file=sys.stderr)
+
+    sys.exit(0 if success else 1)
+
+def test_assert(condition, message):
+    if not condition:
+        print( \
+            f'{COLOR_RED}While running test \'{COLOR_YELLOW}{test_name}' + \
+            f'{COLOR_RESET}{COLOR_RED}\'\n{message()}{COLOR_RESET}', file=sys.stderr)
+
+        order = {item[0]: i for i, item in enumerate(all_regs)}
+        next_col = 0
+
+        for reg, value in sorted(regs.items(), key=lambda item: order[item[0]]):
+            if next_col > 0:
+                print('   ', end='', file=sys.stderr)
+
+            print(f'{reg:<8} = 0x{value:08x}', end='', file=sys.stderr)
+            if next_col == 3:
+                print(file=sys.stderr)
+                next_col = 0
+            else:
+                next_col += 1
+
+        if next_col != 0:
+            print(file=sys.stderr)
+
+        exit(success=False)
+
 def assert_reg(r, expected):
     actual = read_reg(r)
-    assert actual == expected, f'register {r} = 0x{actual:08x}, expected 0x{expected:08x}'
+    test_assert( \
+        actual == expected, \
+        lambda: f'register {r} = 0x{actual:08x}, expected 0x{expected:08x}')
 
 def assert_mem(base, value):
     if type(value) is int:
@@ -126,9 +166,11 @@ def assert_mem(base, value):
         value = b''.join(w.to_bytes(4, 'little') if type(w) is int else w for w in value)
 
     actual = read_mem(base, len(value))
-    assert actual == value, \
-        f'memory at 0x{base:08x} holds:\n{hexdump(base, actual)}\n' + \
-        f'But this was expected instead:\n{hexdump(base, value)}'
+    test_assert( \
+        actual == value, \
+        lambda: \
+        f'Memory at 0x{base:08x} holds:\n{hexdump(base, actual)}\n' + \
+        f'But this was expected instead:\n{hexdump(base, value)}')
 
 prelude = {
     'read_reg':   read_reg,
@@ -137,7 +179,7 @@ prelude = {
     'assert_mem': assert_mem,
     }
 
-prelude.update(all_regs)
+prelude.update({k: v for k, v in all_regs})
 module.__dict__.update(prelude)
 spec.loader.exec_module(module)
 
@@ -156,7 +198,10 @@ for rng in mem_dumps:
     exec_args.extend(['--dump-mem', f'{rng.start >> 2},{length >> 2}'])
 
 exec_args.append(image)
-output = subprocess.run(exec_args, stdout=subprocess.PIPE, check=True, text=True)
+
+output = subprocess.run(exec_args, stdout=subprocess.PIPE, text=True)
+if output.returncode != 0:
+    exit(success=False)
 
 in_regs = False
 in_mem = False
@@ -178,4 +223,4 @@ for line in output.stdout.split('\n'):
 if final := module_get('final'):
     final()
 
-print(f'\033[32mTest \'\033[33;1m{test_name}\033[0m\033[32m\' passed\033[0m', file=sys.stderr)
+exit(success=True)
