@@ -33,6 +33,12 @@ all_regs = {
     'r12_usr': 'r12_usr',
     'r12_fiq': 'r12_fiq',
     'sp': 'r13_usr',
+    'sp_usr': 'r13_usr',
+    'sp_svc': 'r13_svc',
+    'sp_abt': 'r13_abt',
+    'sp_und': 'r13_und',
+    'sp_irq': 'r13_irq',
+    'sp_fiq': 'r13_fiq',
     'r13': 'r13_usr',
     'r13_usr': 'r13_usr',
     'r13_svc': 'r13_svc',
@@ -41,6 +47,12 @@ all_regs = {
     'r13_irq': 'r13_irq',
     'r13_fiq': 'r13_fiq',
     'lr': 'r14_usr',
+    'lr_usr': 'r14_usr',
+    'lr_svc': 'r14_svc',
+    'lr_abt': 'r14_abt',
+    'lr_und': 'r14_und',
+    'lr_irq': 'r14_irq',
+    'lr_fiq': 'r14_fiq',
     'r14': 'r14_usr',
     'r14_usr': 'r14_usr',
     'r14_svc': 'r14_svc',
@@ -166,4 +178,4 @@ for line in output.stdout.split('\n'):
 if final := module_get('final'):
     final()
 
-print(f'Test \'{test_name}\' passed', file=sys.stderr)
+print(f'\033[32mTest \'\033[33;1m{test_name}\033[0m\033[32m\' passed\033[0m', file=sys.stderr)

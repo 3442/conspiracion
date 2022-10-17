@@ -31,7 +31,7 @@ $(VCD_DIR)/%:
 sim: $(patsubst $(SIM_DIR)/%.py,sim/%,$(filter-out $(SIM_DIR)/sim.py,$(wildcard $(SIM_DIR)/*.py)))
 
 sim/%: $(SIM_DIR)/sim.py $(SIM_DIR)/%.py exe/$(TOP) $(SIM_OBJ_DIR)/%.bin
-	$< $(SIM_DIR)/$*.py $(OBJ_DIR)/$(TOP)/V$(TOP) $(SIM_OBJ_DIR)/$*.bin
+	@$< $(SIM_DIR)/$*.py $(OBJ_DIR)/$(TOP)/V$(TOP) $(SIM_OBJ_DIR)/$*.bin
 
 $(SIM_OBJ_DIR)/%.bin: $(SIM_OBJ_DIR)/%
 	$(CROSS_OBJCOPY) -O binary --only-section=._img $< $@

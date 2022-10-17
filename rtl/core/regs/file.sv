@@ -12,7 +12,7 @@ module core_reg_file
 );
 
 	// Ver comentario en uarch.sv
-	word file[30];
+	word file[30] /*verilator public*/;
 
 	always_ff @(posedge clk) begin
 		if(wr_enable)

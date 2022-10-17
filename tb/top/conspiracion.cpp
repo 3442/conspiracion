@@ -8,27 +8,67 @@
 #include <verilated_vcd_c.h>
 
 #include "Vconspiracion.h"
+#include "Vconspiracion_arm810.h"
 #include "Vconspiracion_conspiracion.h"
 #include "Vconspiracion_platform.h"
+#include "Vconspiracion_core_regs.h"
+#include "Vconspiracion_core_reg_file.h"
 
 #include "../args.hxx"
 
 #include "../avalon.hpp"
 #include "../mem.hpp"
 
-struct mem_region
+namespace
 {
-	std::size_t start;
-	std::size_t length;
-};
+	struct mem_region
+	{
+		std::size_t start;
+		std::size_t length;
+	};
 
 
-std::istream &operator>>(std::istream &stream, mem_region &region)
-{
-	stream >> region.start;
-	stream.get();
-	stream >> region.length;
-	return stream;
+	std::istream &operator>>(std::istream &stream, mem_region &region)
+	{
+		stream >> region.start;
+		stream.get();
+		stream >> region.length;
+		return stream;
+	}
+
+	constexpr const char *gp_regs[30] =
+	{
+		[0] = "0",
+		[1] = "1",
+		[2] = "2",
+		[3] = "3",
+		[4] = "4",
+		[5] = "5",
+		[6] = "6",
+		[7] = "7",
+		[8] = "8_usr",
+		[9] = "9_usr",
+		[10] = "10_usr",
+		[11] = "11_usr",
+		[12] = "12_usr",
+		[13] = "13_usr",
+		[14] = "14_usr",
+		[15] = "8_fiq",
+		[16] = "9_fiq",
+		[17] = "10_fiq",
+		[18] = "11_fiq",
+		[19] = "12_fiq",
+		[20] = "13_fiq",
+		[21] = "14_fiq",
+		[22] = "13_irq",
+		[23] = "14_irq",
+		[24] = "13_und",
+		[25] = "14_und",
+		[26] = "13_abt",
+		[27] = "14_abt",
+		[28] = "13_svc",
+		[29] = "14_svc",
+	};
 }
 
 int main(int argc, char **argv)
@@ -142,6 +182,14 @@ int main(int argc, char **argv)
 	if(dump_regs)
 	{
 		std::puts("=== dump-regs ===");
+
+		const auto &regfile = top.conspiracion->core->regs->a->file;
+
+		int i = 0;
+		for(const auto *name : gp_regs)
+		{
+			std::printf("%08x r%s\n", regfile[i++], name);
+		}
 	}
 
 	const auto &dumps = *dump_mem;
@@ -152,7 +200,7 @@ int main(int argc, char **argv)
 
 	for(const auto &dump : dumps)
 	{
-		std::printf("%08x ", dump.start);
+		std::printf("%08x ", static_cast<std::uint32_t>(dump.start));
 		for(std::size_t i = 0; i < dump.length; ++i)
 		{
 			auto word = avl.dump(dump.start + i);
