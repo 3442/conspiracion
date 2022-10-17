@@ -14,7 +14,12 @@ module core_reg_file
 	// Ver comentario en uarch.sv
 	word file[30] /*verilator public*/;
 
+	//FIXME: Esto claramente no sirve
+`ifdef VERILATOR
+	always_ff @(negedge clk) begin
+`else
 	always_ff @(posedge clk) begin
+`endif
 		if(wr_enable)
 			file[wr_index] <= wr_value;
 
