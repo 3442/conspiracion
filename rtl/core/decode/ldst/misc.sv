@@ -13,6 +13,7 @@ module core_decode_ldst_misc
 
 	logic p, w;
 
+	assign decode.enable = 1'bx;
 	assign decode.rn = insn `FIELD_LDST_MISC_RN;
 	assign decode.rd = insn `FIELD_LDST_MISC_RD;
 	assign decode.size = insn `FIELD_LDST_MISC_H ? LDST_HALF : LDST_BYTE;

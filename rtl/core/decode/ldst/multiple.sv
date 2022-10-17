@@ -12,7 +12,9 @@ module core_decode_ldst_multiple
 	logic s, l;
 	reg_list regs;
 
+	assign decode.enable = 1'bx;
 	assign decode.rn = insn `FIELD_LDST_MULT_RN;
+	assign decode.rd = 4'bxxxx;
 	assign decode.size = LDST_WORD;
 	assign decode.load = l;
 	assign decode.increment = insn `FIELD_LDST_MULT_U;

@@ -13,7 +13,7 @@ module core_decode_snd
 );
 
 	reg_num r, r_shift;
-	logic shift_by_reg, shl, shr, ror, put_carry, sign_extend;
+	logic shift_by_reg, shr, ror, put_carry, sign_extend;
 	logic[11:0] imm;
 	logic[5:0] shift_imm;
 
@@ -21,7 +21,6 @@ module core_decode_snd
 	assign decode.r_shift = r_shift;
 	assign decode.shift_by_reg = shift_by_reg;
 	assign decode.is_imm = is_imm;
-	assign decode.shl = shl;
 	assign decode.shr = shr;
 	assign decode.ror = ror;
 	assign decode.put_carry = put_carry;

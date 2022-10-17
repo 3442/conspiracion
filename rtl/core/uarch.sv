@@ -70,7 +70,6 @@ typedef struct packed
 	            r_shift;
 	logic       shift_by_reg,
 	            is_imm,
-	            shl,
 	            shr,
 	            ror,
 	            put_carry,
@@ -110,8 +109,7 @@ typedef struct packed
 
 typedef struct packed
 {
-	logic shl,
-	      shr,
+	logic shr,
 	      ror,
 	      put_carry,
 	      sign_extend;

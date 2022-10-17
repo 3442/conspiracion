@@ -119,7 +119,6 @@ module core_decode
 		data_ctrl = {($bits(data_ctrl)){1'bx}};
 
 		snd_ctrl = {$bits(snd_ctrl){1'bx}};
-		snd_ctrl.shl = 1;
 		snd_ctrl.shr = 0;
 		snd_ctrl.ror = 0;
 		snd_ctrl.is_imm = 1;
@@ -130,6 +129,7 @@ module core_decode
 		snd_ror_if_imm = 1'bx;
 		snd_shift_by_reg_if_reg = 1'bx;
 
+		ldst_addr = {($bits(ldst_addr)){1'bx}};
 		ldst_ctrl = {($bits(ldst_ctrl)){1'bx}};
 		ldst_ctrl.enable = 0;
 
