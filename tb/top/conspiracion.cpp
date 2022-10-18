@@ -12,6 +12,7 @@
 #include "Vconspiracion_arm810.h"
 #include "Vconspiracion_conspiracion.h"
 #include "Vconspiracion_platform.h"
+#include "Vconspiracion_core_control.h"
 #include "Vconspiracion_core_regs.h"
 #include "Vconspiracion_core_reg_file.h"
 
@@ -232,13 +233,16 @@ int main(int argc, char **argv)
 	{
 		std::puts("=== dump-regs ===");
 
-		const auto &regfile = top.conspiracion->core->regs->a->file;
+		const auto &core = *top.conspiracion->core;
+		const auto &regfile = core.regs->a->file;
 
 		int i = 0;
 		for(const auto *name : gp_regs)
 		{
 			std::printf("%08x %s\n", regfile[i++], name);
 		}
+
+		std::printf("%08x pc\n", core.control->pc << 2);
 	}
 
 	const auto &dumps = *dump_mem;

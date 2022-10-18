@@ -70,7 +70,7 @@ module core_control
 	word saved_base, mem_offset, vector;
 	reg_num r_shift, final_rd, popped_upper, popped_lower, popped;
 	reg_list mem_regs, next_regs_upper, next_regs_lower;
-	ptr pc, next_pc_visible;
+	ptr pc /*verilator public*/, next_pc_visible;
 
 	assign stall = next_cycle != ISSUE || next_bubble;
 	assign reg_mode = `MODE_SVC; //TODO
