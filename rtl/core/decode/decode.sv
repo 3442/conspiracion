@@ -143,9 +143,11 @@ module core_decode
 			`GROUP_B: begin
 				branch = 1;
 				if(branch_link) begin
+					data_ctrl.op = `ALU_SUB;
 					data_ctrl.rd = `R14;
+					data_ctrl.rn = `R15;
+					snd_ctrl.imm = 12'd4;
 					writeback = 1;
-					//TODO: Valor de LR
 				end
 			end
 
