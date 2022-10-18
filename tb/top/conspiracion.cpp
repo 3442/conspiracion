@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <cstdint>
 #include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <string>
 
@@ -21,54 +22,90 @@
 
 namespace
 {
+	constexpr const char *gp_regs[30] =
+	{
+		[0] = "r0",
+		[1] = "r1",
+		[2] = "r2",
+		[3] = "r3",
+		[4] = "r4",
+		[5] = "r5",
+		[6] = "r6",
+		[7] = "r7",
+		[8] = "r8_usr",
+		[9] = "r9_usr",
+		[10] = "r10_usr",
+		[11] = "r11_usr",
+		[12] = "r12_usr",
+		[13] = "r13_usr",
+		[14] = "r14_usr",
+		[15] = "r8_fiq",
+		[16] = "r9_fiq",
+		[17] = "r10_fiq",
+		[18] = "r11_fiq",
+		[19] = "r12_fiq",
+		[20] = "r13_fiq",
+		[21] = "r14_fiq",
+		[22] = "r13_irq",
+		[23] = "r14_irq",
+		[24] = "r13_und",
+		[25] = "r14_und",
+		[26] = "r13_abt",
+		[27] = "r14_abt",
+		[28] = "r13_svc",
+		[29] = "r14_svc",
+	};
+
 	struct mem_region
 	{
 		std::size_t start;
 		std::size_t length;
 	};
 
+	struct reg_init
+	{
+		std::size_t   index;
+		std::uint32_t value;
+	};
 
 	std::istream &operator>>(std::istream &stream, mem_region &region)
 	{
 		stream >> region.start;
-		stream.get();
-		stream >> region.length;
+		if(stream.get() == ',')
+		{
+			stream >> region.length;
+		} else
+		{
+			stream.setstate(std::istream::failbit);
+		}
+
 		return stream;
 	}
 
-	constexpr const char *gp_regs[30] =
+	std::istream &operator>>(std::istream &stream, reg_init &init)
 	{
-		[0] = "0",
-		[1] = "1",
-		[2] = "2",
-		[3] = "3",
-		[4] = "4",
-		[5] = "5",
-		[6] = "6",
-		[7] = "7",
-		[8] = "8_usr",
-		[9] = "9_usr",
-		[10] = "10_usr",
-		[11] = "11_usr",
-		[12] = "12_usr",
-		[13] = "13_usr",
-		[14] = "14_usr",
-		[15] = "8_fiq",
-		[16] = "9_fiq",
-		[17] = "10_fiq",
-		[18] = "11_fiq",
-		[19] = "12_fiq",
-		[20] = "13_fiq",
-		[21] = "14_fiq",
-		[22] = "13_irq",
-		[23] = "14_irq",
-		[24] = "13_und",
-		[25] = "14_und",
-		[26] = "13_abt",
-		[27] = "14_abt",
-		[28] = "13_svc",
-		[29] = "14_svc",
-	};
+		char name[16];
+		stream.getline(name, sizeof name, '=');
+
+		std::size_t index = 0;
+		constexpr auto total_gp_regs = sizeof gp_regs / sizeof gp_regs[0];
+
+		while(index < total_gp_regs && std::strcmp(name, gp_regs[index]))
+		{
+			++index;
+		}
+
+		if(stream && !stream.eof() && index < total_gp_regs)
+		{
+			init.index = index;
+			stream >> init.value;
+		} else
+		{
+			stream.setstate(std::istream::failbit);
+		}
+
+		return stream;
+	}
 }
 
 int main(int argc, char **argv)
@@ -78,6 +115,11 @@ int main(int argc, char **argv)
 	Verilated::commandArgs(argc, argv);
 
 	args::ArgumentParser parser("Simulador proyecto final CE3201");
+
+	args::ValueFlagList<reg_init> init_regs
+	(
+		parser, "reg=val", "Initialize a register", {"init-reg"}
+	);
 
 	args::Flag dump_regs
 	(
@@ -91,7 +133,7 @@ int main(int argc, char **argv)
 
 	args::ValueFlagList<mem_region> dump_mem
 	(
-		parser, "region", "Dump a memory region", {"dump-mem"}
+		parser, "addr,length", "Dump a memory region", {"dump-mem"}
 	);
 
 	args::Positional<std::string> image
@@ -148,6 +190,13 @@ int main(int argc, char **argv)
 
 	std::fclose(img_file);
 
+	for(const auto &init : init_regs)
+	{
+		auto &regs = *top.conspiracion->core->regs;
+		regs.a->file[init.index] = init.value;
+		regs.b->file[init.index] = init.value;
+	}
+
 	int time = 0;
 	top.clk_clk = 1;
 
@@ -188,7 +237,7 @@ int main(int argc, char **argv)
 		int i = 0;
 		for(const auto *name : gp_regs)
 		{
-			std::printf("%08x r%s\n", regfile[i++], name);
+			std::printf("%08x %s\n", regfile[i++], name);
 		}
 	}
 

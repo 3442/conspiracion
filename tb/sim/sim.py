@@ -153,17 +153,26 @@ def test_assert(condition, message):
 
         exit(success=False)
 
+def unsigned(n):
+    assert -0x8000_0000 <= n <= 0xffff_ffff
+    return n + 0x1_0000_0000 if n < 0 else n
+
+def int_bytes(n):
+    return n.to_bytes(4, 'little', signed=n < 0) if type(n) is int else n
+
 def assert_reg(r, expected):
     actual = read_reg(r)
+    expected = unsigned(expected)
+
     test_assert( \
         actual == expected, \
         lambda: f'register {r} = 0x{actual:08x}, expected 0x{expected:08x}')
 
 def assert_mem(base, value):
-    if type(value) is int:
-        value = value.to_bytes(4, 'little')
-    elif type(value) is list:
-        value = b''.join(w.to_bytes(4, 'little') if type(w) is int else w for w in value)
+    if type(value) is list:
+        value = b''.join(int_bytes(w) for w in value)
+    else:
+        value = int_bytes(value)
 
     actual = read_mem(base, len(value))
     test_assert( \
@@ -172,11 +181,19 @@ def assert_mem(base, value):
         f'Memory at 0x{base:08x} holds:\n{hexdump(base, actual)}\n' + \
         f'But this was expected instead:\n{hexdump(base, value)}')
 
+init_regs = {}
+
+def init_reg(r, value):
+    global init_regs 
+    assert init_regs is not None
+    init_regs[r] = unsigned(value)
+
 prelude = {
     'read_reg':   read_reg,
     'read_mem':   read_mem,
     'assert_reg': assert_reg,
     'assert_mem': assert_mem,
+    'init_reg':   init_reg
     }
 
 prelude.update({k: v for k, v in all_regs})
@@ -188,6 +205,9 @@ module_get = lambda attr, default=None: getattr(module, attr, default)
 cycles = module_get('cycles', 1024)
 mem_dumps = module_get('mem_dumps', [])
 
+if init := module_get('init'):
+    init()
+
 exec_args = [verilated, '--cycles', str(cycles), '--dump-regs']
 
 for rng in mem_dumps:
@@ -197,6 +217,10 @@ for rng in mem_dumps:
 
     exec_args.extend(['--dump-mem', f'{rng.start >> 2},{length >> 2}'])
 
+for r, value in init_regs.items():
+    exec_args.extend(['--init-reg', f'{r}={value}'])
+
+init_regs = None
 exec_args.append(image)
 
 output = subprocess.run(exec_args, stdout=subprocess.PIPE, text=True)
