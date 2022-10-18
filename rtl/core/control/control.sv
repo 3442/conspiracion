@@ -4,6 +4,7 @@ module core_control
 (
 	input  logic           clk,
 	                       dec_execute,
+	                       dec_undefined,
 	                       dec_conditional,
 	                       dec_uses_rn,
 	                       dec_branch,
@@ -54,16 +55,19 @@ module core_control
 		RD_INDIRECT_SHIFT,
 		WITH_SHIFT,
 		TRANSFER,
-		BASE_WRITEBACK
+		BASE_WRITEBACK,
+		EXCEPTION
 	} cycle, next_cycle;
 
 	logic bubble, next_bubble, final_writeback, final_update_flags,
 	      ldst, ldst_pre, ldst_increment, ldst_writeback, pop_valid,
-	      data_snd_is_imm, data_snd_shift_by_reg, trivial_shift;
+	      data_snd_is_imm, data_snd_shift_by_reg, trivial_shift,
+	      undefined, exception, high_vectors;
 
+	logic[2:0] vector_offset;
 	logic[5:0] data_shift_imm;
 	logic[11:0] data_imm;
-	word saved_base, mem_offset;
+	word saved_base, mem_offset, vector;
 	reg_num r_shift, final_rd, popped_upper, popped_lower, popped;
 	reg_list mem_regs, next_regs_upper, next_regs_lower;
 	ptr pc, next_pc_visible;
@@ -73,6 +77,9 @@ module core_control
 	assign trivial_shift = shifter_shift == 0;
 	assign mem_data_wr = rd_value_b;
 	assign popped = ldst_increment ? popped_lower : popped_upper;
+	assign exception = undefined; //TODO
+	assign high_vectors = 0; //TODO
+	assign vector = {{16{high_vectors}}, 11'b0, vector_offset, 2'b00};
 	assign next_pc_visible = fetch_insn_pc + 2;
 
 	assign next_bubble =
@@ -99,7 +106,9 @@ module core_control
 
 		unique case(cycle)
 			ISSUE:
-				if(data_snd_shift_by_reg)
+				if(exception)
+					next_cycle = EXCEPTION;
+				else if(data_snd_shift_by_reg)
 					next_cycle = RD_INDIRECT_SHIFT;
 				else if(~trivial_shift)
 					next_cycle = WITH_SHIFT;
@@ -123,8 +132,9 @@ module core_control
 			next_cycle = TRANSFER;
 
 		unique case(cycle)
-			TRANSFER: alu_a = saved_base;
-			default:  alu_a = rd_value_a;
+			TRANSFER:  alu_a = saved_base;
+			EXCEPTION: alu_a = {pc, 2'b00};
+			default:   alu_a = rd_value_a;
 		endcase
 
 		unique case(cycle)
@@ -140,6 +150,8 @@ module core_control
 				else
 					alu_b = rd_value_b;
 		endcase
+
+		vector_offset = 3'b001; //TODO
 	end
 
 	always_ff @(posedge clk) begin
@@ -201,6 +213,8 @@ module core_control
 
 				update_flags <= final_update_flags;
 				writeback <= final_writeback;
+				undefined <= dec_undefined;
+
 				rd <= final_rd;
 				pc <= fetch_insn_pc;
 				pc_visible <= next_pc_visible;
@@ -249,6 +263,24 @@ module core_control
 				writeback <= !mem_write;
 				final_rd <= ra;
 			end
+
+			EXCEPTION: begin
+				//TODO: spsr_<mode> = cpsr
+				//TODO: actualizar modo
+				//TODO: deshabilitar IRQs/FIQs dependiendo de modo
+				//TODO: Considerar que data abort usa + 8, no + 4
+				rd <= `R15;
+				wr_value <= vector;
+				writeback <= 1;
+
+				alu <= `ALU_ADD;
+				data_imm <= 12'd4;
+				data_snd_is_imm <= 1;
+
+				final_rd <= `R14;
+				final_writeback <= 1;
+				final_update_flags <= 0;
+			end
 		endcase
 	end
 
@@ -264,6 +296,8 @@ module core_control
 		writeback = 0;
 		branch_target = 30'd0;
 		data_snd_shift_by_reg = 0;
+
+		undefined = 0;
 
 		wb_alu_flags = 4'b0000;
 

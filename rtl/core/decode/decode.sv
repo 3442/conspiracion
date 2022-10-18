@@ -22,11 +22,12 @@ module core_decode
 	//TODO
 	logic restore_spsr;
 
-	logic cond_undefined;
+	logic cond_undefined, cond_execute;
 
 	core_decode_conds conds
 	(
 		.cond(insn `FIELD_COND),
+		.execute(cond_execute),
 		.undefined(cond_undefined),
 		.*
 	);
@@ -117,6 +118,7 @@ module core_decode
 		writeback = 0;
 		update_flags = 0;
 		uses_rn = 1;
+		execute = cond_execute;
 		undefined = cond_undefined;
 
 		data_ctrl = {($bits(data_ctrl)){1'bx}};
@@ -162,8 +164,8 @@ module core_decode
 				undefined = undefined | snd_undefined;
 			end
 
-			`INSN_MUL: ;
-			`GROUP_BIGMUL: ;
+			/*`INSN_MUL: ;
+			`GROUP_BIGMUL: ;*/
 
 			`GROUP_LDST_SINGLE_IMM, `GROUP_LDST_SINGLE_REG: begin
 				snd_is_imm = ldst_single_is_imm;
@@ -200,11 +202,11 @@ module core_decode
 				restore_spsr = ldst_mult_restore_spsr;
 			end
 
-			`GROUP_SWP: ;
+			/*`GROUP_SWP: ;
 			`GROUP_CP: ;
 			`INSN_MRS: ;
 			`GROUP_MSR: ;
-			`INSN_SWI: ;
+			`INSN_SWI: ;*/
 
 			default: undefined = 1;
 		endcase
@@ -220,8 +222,14 @@ module core_decode
 		endcase
 
 		if(undefined) begin
+			execute = 0;
+
 			branch = 1'bx;
+			uses_rn = 1'bx;
 			writeback = 1'bx;
+			conditional = 1'bx;
+			update_flags = 1'bx;
+
 			snd_ctrl = {($bits(snd_ctrl)){1'bx}};
 			data_ctrl = {($bits(data_ctrl)){1'bx}};
 			ldst_ctrl = {($bits(ldst_ctrl)){1'bx}};
