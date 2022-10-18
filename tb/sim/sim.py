@@ -130,28 +130,35 @@ def exit(*, success):
 
     sys.exit(0 if success else 1)
 
+def dump_regs():
+    order = {item[0]: i for i, item in enumerate(all_regs)}
+    next_col = 0
+
+    for reg, value in sorted(regs.items(), key=lambda item: order[item[0]]):
+        if next_col > 0:
+            print('   ', end='', file=sys.stderr)
+
+        print(f'{reg:<8} = 0x{value:08x}', end='', file=sys.stderr)
+        if next_col == 3:
+            print(file=sys.stderr)
+            next_col = 0
+        else:
+            next_col += 1
+
+    if next_col != 0:
+        print(file=sys.stderr)
+
 def test_assert(condition, message):
     if not condition:
         print( \
             f'{COLOR_RED}While running test \'{COLOR_YELLOW}{test_name}' + \
             f'{COLOR_RESET}{COLOR_RED}\'\n{message()}{COLOR_RESET}', file=sys.stderr)
 
-        order = {item[0]: i for i, item in enumerate(all_regs)}
-        next_col = 0
+        if exec_args:
+            print('cmdline:', subprocess.list2cmdline(exec_args), file=sys.stderr)
 
-        for reg, value in sorted(regs.items(), key=lambda item: order[item[0]]):
-            if next_col > 0:
-                print('   ', end='', file=sys.stderr)
-
-            print(f'{reg:<8} = 0x{value:08x}', end='', file=sys.stderr)
-            if next_col == 3:
-                print(file=sys.stderr)
-                next_col = 0
-            else:
-                next_col += 1
-
-        if next_col != 0:
-            print(file=sys.stderr)
+        if regs:
+            dump_regs()
 
         exit(success=False)
 
