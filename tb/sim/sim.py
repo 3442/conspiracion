@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 
-import importlib.util, pathlib, subprocess, sys
+import importlib.util, os, pathlib, subprocess, sys
 
-module, verilated, image = sys.argv[1:]
-test_name = pathlib.Path(module).stem
-
-spec = importlib.util.spec_from_file_location('sim', module)
-module = importlib.util.module_from_spec(spec)
+module_path, verilated, image = sys.argv[1:]
+test_name = pathlib.Path(module_path).stem
+module = None
 
 all_regs = [
     ('r0', 'r0'),
@@ -115,10 +113,14 @@ def hexdump(base, memory):
 
     return '\n'.join(lines)
 
+def module_get(attr, default=None):
+    return getattr(module, attr, default) if module else None
+
 COLOR_RESET  = '\033[0m'
 COLOR_RED    = '\033[31;1m'
 COLOR_GREEN  = '\033[32m'
 COLOR_YELLOW = '\033[33;1m'
+COLOR_BLUE   = '\033[34;1m'
 
 def exit(*, success):
     status, color = ('passed', COLOR_GREEN) if success else ('failed', COLOR_RED)
@@ -166,7 +168,7 @@ def assert_reg(r, expected):
 
     test_assert( \
         actual == expected, \
-        lambda: f'register {r} = 0x{actual:08x}, expected 0x{expected:08x}')
+        lambda: f'Register {r} = 0x{actual:08x}, expected 0x{expected:08x}')
 
 def assert_mem(base, value):
     if type(value) is list:
@@ -188,6 +190,16 @@ def init_reg(r, value):
     assert init_regs is not None
     init_regs[r] = unsigned(value)
 
+if test_name in os.getenv('SIM_SKIP', '').split(','):
+    print( \
+        f'{COLOR_BLUE}Test \'{COLOR_YELLOW}{test_name}{COLOR_RESET}' +
+        f'{COLOR_BLUE}\' skipped{COLOR_RESET}', file=sys.stderr)
+
+    exit(success=True)
+
+spec = importlib.util.spec_from_file_location('sim', module_path)
+module = importlib.util.module_from_spec(spec)
+
 prelude = {
     'read_reg':   read_reg,
     'read_mem':   read_mem,
@@ -199,8 +211,6 @@ prelude = {
 prelude.update({k: v for k, v in all_regs})
 module.__dict__.update(prelude)
 spec.loader.exec_module(module)
-
-module_get = lambda attr, default=None: getattr(module, attr, default)
 
 cycles = module_get('cycles', 1024)
 mem_dumps = module_get('mem_dumps', [])
