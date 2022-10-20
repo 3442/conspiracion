@@ -40,7 +40,7 @@ always@(posedge clk or negedge rst_n) begin
                 booth[(W*2):W] = A + B;
                 
 
-            2'b10:
+            2'b10: 
                 booth[(W*2):W] = A - B;    
             
             // 2'b11 o 2'b00:
