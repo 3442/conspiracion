@@ -20,7 +20,7 @@ module core_shifter
 
 	assign sign_mask = {(W + 1){ctrl.sign_extend & base[W - 1]}};
 	assign {c_shl, q_shl} = {c_in, base} << shift;
-	assign {q_shr, c_shr} = {base, c_in} >> shift | ~(sign_mask >> shift);
+	assign {q_shr, c_shr} = {base, c_in} >> shift | (sign_mask & ~(sign_mask >> shift));
 
 	logic ror_cycle;
 	logic[LOG - 1:0] ror_shift;

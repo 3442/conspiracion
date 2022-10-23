@@ -41,7 +41,7 @@ module core_decode_snd
 		ror = is_imm;
 		shr = ~is_imm;
 		put_carry = 0;
-		sign_extend = 1'bx;
+		sign_extend = 0;
 
 		if(is_imm)
 			shift_imm = ror_if_imm ? {1'b0, insn `FIELD_SND_ROR8, 1'b0} : 6'b0;
@@ -50,12 +50,12 @@ module core_decode_snd
 
 			case(shift_op)
 				`SHIFT_LSL: shr = 0;
-				`SHIFT_LSR: sign_extend = 0;
+				`SHIFT_LSR: ;
 				`SHIFT_ASR: sign_extend = 1;
-				`SHIFT_ROR: ;
+				`SHIFT_ROR: ror = 1;
 			endcase
 
-			if(~shift_by_reg & (shift_imm == 0))
+			if(!shift_by_reg && shift_imm == 0)
 				case(shift_op)
 					`SHIFT_LSL: ;
 
@@ -64,13 +64,11 @@ module core_decode_snd
 
 					`SHIFT_ROR: begin
 						// RRX
+						ror = 0;
 						shift_imm = 6'd1;
 						put_carry = 1;
-						sign_extend = 0;
 					end
 				endcase
-			else if(shift_op == `SHIFT_ROR)
-				ror = 1;
 		end
 	end
 
