@@ -43,10 +43,8 @@ module core_decode_snd
 		put_carry = 0;
 		sign_extend = 1'bx;
 
-		if(is_imm && !ror_if_imm)
-			shift_imm = 6'b0;
-		else if(is_imm && !ror_if_imm)
-			shift_imm = {1'b0, insn `FIELD_SND_ROR8, 1'b0};
+		if(is_imm)
+			shift_imm = ror_if_imm ? {1'b0, insn `FIELD_SND_ROR8, 1'b0} : 6'b0;
 		else begin
 			shift_imm = {1'b0, insn `FIELD_SND_SHIFTIMM};
 
