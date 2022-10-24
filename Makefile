@@ -37,15 +37,15 @@ $(SIM_OBJ_DIR)/%.bin: $(SIM_OBJ_DIR)/%
 	$(CROSS_OBJCOPY) -O binary --only-section=._img $< $@
 
 $(SIM_OBJ_DIR)/%: $(SIM_OBJ_DIR)/%.o $(SIM_OBJ_DIR)/start.o
-	$(CROSS_CC) $(CROSS_LDFLAGS) -o $@ -T $(SIM_DIR)/link.ld -nostartfiles -nostdlib $^
+	$(CROSS_CC) $(CROSS_LDFLAGS) -o $@ -g -T $(SIM_DIR)/link.ld -nostartfiles -nostdlib $^
 
 $(SIM_OBJ_DIR)/%.o: $(SIM_DIR)/%.c
 	@mkdir -p $(SIM_OBJ_DIR)
-	$(CROSS_CC) $(CROSS_CFLAGS) -o $@ -c $< -mcpu=arm810
+	$(CROSS_CC) $(CROSS_CFLAGS) -o $@ -g -c $< -mcpu=arm810
 
 $(SIM_OBJ_DIR)/%.o: $(SIM_DIR)/%.S
 	@mkdir -p $(SIM_OBJ_DIR)
-	$(CROSS_CC) $(CROSS_CFLAGS) -o $@ -c $<
+	$(CROSS_CC) $(CROSS_CFLAGS) -o $@ -g -c $<
 
 exe: exe/$(TOP)
 
