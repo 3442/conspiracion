@@ -152,3 +152,10 @@ Principales causas identificadas:
 	- Entradas combinacionales de ALU en cycles, esto llega hasta psr.flags
 
 Voy a seguir con esto después.
+
+
+	===
+	[V] Port de U-Boot
+	===
+
+Lo útil empieza en l[ineas 2108 y 3086 del README.
