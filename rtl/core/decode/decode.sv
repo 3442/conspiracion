@@ -3,20 +3,19 @@
 
 module core_decode
 (
-	input  word        insn,
-	input  psr_flags   flags,
+	input  word          insn,
+	input  psr_flags     flags,
 
-	output logic       execute,
-	                   conditional,
-	                   undefined,
-	                   writeback,
-	                   update_flags,
-	                   uses_rn,
-	                   branch,
-	output ptr         branch_offset,
-	output snd_decode  snd_ctrl,
-	output data_decode data_ctrl,
-	output ldst_decode ldst_ctrl
+	output logic         execute,
+	                     conditional,
+	                     undefined,
+	                     writeback,
+	                     update_flags,
+	                     uses_rn,
+	output branch_decode branch_ctrl,
+	output snd_decode    snd_ctrl,
+	output data_decode   data_ctrl,
+	output ldst_decode   ldst_ctrl
 );
 
 	//TODO
@@ -45,12 +44,13 @@ module core_decode
 		.*
 	);
 
-	logic branch_link;
+	logic branch, branch_link;
+	assign branch_ctrl.branch = branch;
 
 	core_decode_branch group_branch
 	(
 		.link(branch_link),
-		.offset(branch_offset),
+		.offset(branch_ctrl.offset),
 		.*
 	);
 

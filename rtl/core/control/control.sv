@@ -7,12 +7,11 @@ module core_control
 	                       dec_undefined,
 	                       dec_conditional,
 	                       dec_uses_rn,
-	                       dec_branch,
 	                       dec_writeback,
 	                       dec_update_flags,
-	input  ptr             dec_branch_offset,
-	input  snd_decode      dec_snd,
+	input  branch_decode   dec_branch,
 	input  data_decode     dec_data,
+	input  snd_decode      dec_snd,
 	input  ldst_decode     dec_ldst,
 	input  ptr             fetch_insn_pc,
 	input  psr_flags       flags,
@@ -178,8 +177,8 @@ module core_control
 				bubble <= next_bubble;
 
 				if(dec_execute & ~next_bubble) begin
-					branch <= dec_branch;
-					branch_target <= next_pc_visible + dec_branch_offset;
+					branch <= dec_branch.branch;
+					branch_target <= next_pc_visible + dec_branch.offset;
 
 					alu <= dec_data.op;
 					ra <= dec_data.rn;

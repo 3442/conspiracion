@@ -66,6 +66,12 @@ typedef struct packed
 
 typedef struct packed
 {
+	logic branch;
+	ptr   offset;
+} branch_decode;
+
+typedef struct packed
+{
 	reg_num     r,
 	            r_shift;
 	logic       shift_by_reg,

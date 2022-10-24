@@ -29,12 +29,12 @@ module arm810
 		.*
 	);
 
-	ptr dec_branch_offset;
+	branch_decode dec_branch;
 	snd_decode dec_snd;
 	data_decode dec_data;
 	ldst_decode dec_ldst;
 	logic dec_execute, dec_conditional, dec_undefined, dec_writeback,
-	      dec_branch, dec_update_flags, dec_uses_rn;
+	      dec_update_flags, dec_uses_rn;
 
 	core_decode decode
 	(
@@ -43,9 +43,8 @@ module arm810
 		.undefined(dec_undefined),
 		.writeback(dec_writeback),
 		.uses_rn(dec_uses_rn),
-		.branch(dec_branch),
 		.update_flags(dec_update_flags),
-		.branch_offset(dec_branch_offset),
+		.branch_ctrl(dec_branch),
 		.snd_ctrl(dec_snd),
 		.data_ctrl(dec_data),
 		.ldst_ctrl(dec_ldst),
