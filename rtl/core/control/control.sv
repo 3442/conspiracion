@@ -83,7 +83,8 @@ module core_control
 	assign next_pc_visible = fetch_insn_pc + 2;
 
 	assign next_bubble =
-		   ((dec_update_flags || dec_conditional) && (final_update_flags || update_flags))
+		   (final_writeback && final_rd == `R15)
+		|| ((dec_update_flags || dec_conditional) && (final_update_flags || update_flags))
 		|| (final_writeback && ((dec_uses_rn && (final_rd == dec_data.rn || dec_data.rn == `R15))
 		                      || final_rd == dec_snd.r || dec_snd.r == `R15));
 
