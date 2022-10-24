@@ -3,11 +3,7 @@
 module core_control
 (
 	input  logic           clk,
-	                       dec_execute,
-	                       dec_undefined,
-	                       dec_conditional,
-	                       dec_writeback,
-	                       dec_update_flags,
+	input  datapath_decode dec,
 	input  branch_decode   dec_branch,
 	input  data_decode     dec_data,
 	input  snd_decode      dec_snd,
@@ -82,7 +78,7 @@ module core_control
 
 	assign next_bubble =
 		   (final_writeback && final_rd == `R15)
-		|| ((dec_update_flags || dec_conditional) && (final_update_flags || update_flags))
+		|| ((dec.update_flags || dec.conditional) && (final_update_flags || update_flags))
 		|| (final_writeback && ((dec_data.uses_rn && (final_rd == dec_data.rn || dec_data.rn == `R15))
 		                      || final_rd == dec_snd.r || dec_snd.r == `R15));
 
@@ -175,7 +171,7 @@ module core_control
 
 				bubble <= next_bubble;
 
-				if(dec_execute & ~next_bubble) begin
+				if(dec.execute & ~next_bubble) begin
 					branch <= dec_branch.branch;
 					branch_target <= next_pc_visible + dec_branch.offset;
 
@@ -207,13 +203,13 @@ module core_control
 					mem_write <= !dec_ldst.load;
 
 					final_rd <= dec_data.rd;
-					final_writeback <= dec_writeback;
-					final_update_flags <= dec_update_flags;
+					final_writeback <= dec.writeback;
+					final_update_flags <= dec.update_flags;
 				end
 
 				update_flags <= final_update_flags;
 				writeback <= final_writeback;
-				undefined <= dec_undefined;
+				undefined <= dec.undefined;
 
 				rd <= final_rd;
 				pc <= fetch_insn_pc;

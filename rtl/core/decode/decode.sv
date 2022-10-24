@@ -3,19 +3,24 @@
 
 module core_decode
 (
-	input  word          insn,
-	input  psr_flags     flags,
+	input  word            insn,
+	input  psr_flags       flags,
 
-	output logic         execute,
-	                     conditional,
-	                     undefined,
-	                     writeback,
-	                     update_flags,
-	output branch_decode branch_ctrl,
-	output snd_decode    snd_ctrl,
-	output data_decode   data_ctrl,
-	output ldst_decode   ldst_ctrl
+	output datapath_decode ctrl,
+	output branch_decode   branch_ctrl,
+	output snd_decode      snd_ctrl,
+	output data_decode     data_ctrl,
+	output ldst_decode     ldst_ctrl
 );
+
+	logic execute, undefined, conditional, writeback, update_flags, branch;
+
+	assign ctrl.execute = execute;
+	assign ctrl.undefined = undefined;
+	assign ctrl.conditional = conditional;
+	assign ctrl.writeback = writeback;
+	assign ctrl.update_flags = update_flags;
+	assign branch_ctrl.branch = branch;
 
 	//TODO
 	logic restore_spsr;
@@ -43,8 +48,7 @@ module core_decode
 		.*
 	);
 
-	logic branch, branch_link;
-	assign branch_ctrl.branch = branch;
+	logic branch_link;
 
 	core_decode_branch group_branch
 	(

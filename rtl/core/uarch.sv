@@ -59,6 +59,15 @@ typedef logic[4:0] psr_mode;
 
 typedef struct packed
 {
+	logic execute,
+	      undefined,
+	      conditional,
+	      writeback,
+	      update_flags;
+} datapath_decode;
+
+typedef struct packed
+{
 	alu_op  op;
 	reg_num rn,
 	        rd;
