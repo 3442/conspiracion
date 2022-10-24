@@ -43,8 +43,6 @@ module core_control
 	                       mem_write
 );
 
-	ctrl_cycle cycle, next_cycle;
-
 	logic final_writeback, final_update_flags,
 	      ldst, ldst_pre, ldst_increment, ldst_writeback, pop_valid,
 	      data_snd_is_imm, data_snd_shift_by_reg, trivial_shift,
@@ -66,6 +64,13 @@ module core_control
 	assign high_vectors = 0; //TODO
 	assign vector = {{16{high_vectors}}, 11'b0, vector_offset, 2'b00};
 	assign next_pc_visible = fetch_insn_pc + 2;
+
+	ctrl_cycle cycle, next_cycle;
+
+	core_control_cycles cycles
+	(
+		.*
+	);
 
 	logic bubble, next_bubble;
 
@@ -89,35 +94,6 @@ module core_control
 			RD_INDIRECT_SHIFT: shifter_shift = rd_value_b[7:0];
 			default:           shifter_shift = {2'b00, data_shift_imm};
 		endcase
-
-		next_cycle = ISSUE;
-
-		unique case(cycle)
-			ISSUE:
-				if(exception)
-					next_cycle = EXCEPTION;
-				else if(data_snd_shift_by_reg)
-					next_cycle = RD_INDIRECT_SHIFT;
-				else if(~trivial_shift)
-					next_cycle = WITH_SHIFT;
-
-			RD_INDIRECT_SHIFT:
-				if(~trivial_shift)
-					next_cycle = WITH_SHIFT;
-
-			TRANSFER:
-				if(!mem_ready || pop_valid)
-					next_cycle = TRANSFER;
-				else if(ldst_writeback)
-					next_cycle = BASE_WRITEBACK;
-
-			default: ;
-		endcase
-
-		if(bubble)
-			next_cycle = ISSUE;
-		else if(next_cycle == ISSUE && ldst)
-			next_cycle = TRANSFER;
 
 		unique case(cycle)
 			TRANSFER:  alu_a = saved_base;
@@ -143,7 +119,6 @@ module core_control
 	end
 
 	always_ff @(posedge clk) begin
-		cycle <= next_cycle;
 		branch <= 0;
 		writeback <= 0;
 		update_flags <= 0;
@@ -271,8 +246,6 @@ module core_control
 	end
 
 	initial begin
-		cycle = ISSUE;
-
 		pc = 0;
 		pc_visible = 2;
 

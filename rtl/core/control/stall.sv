@@ -38,6 +38,7 @@ module core_control_stall
 	always_ff @(posedge clk)
 		bubble <= next_cycle == ISSUE ? next_bubble : 0;
 
-	initial bubble = 0;
+	initial
+		bubble = 0;
 
 endmodule
