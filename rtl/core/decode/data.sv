@@ -10,16 +10,18 @@ module core_decode_data
 	                   snd_shift_by_reg_if_reg,
 	                   writeback,
 	                   update_flags,
-	                   restore_spsr,
-	                   uses_rn
+	                   restore_spsr
 );
 
 	alu_op op;
 	reg_num rn, rd;
+	logic uses_rn;
 
 	assign decode.op = op;
 	assign decode.rn = rn;
 	assign decode.rd = rd;
+	assign decode.uses_rn = uses_rn;
+
 	assign rn = insn `FIELD_DATA_RN;
 	assign rd = insn `FIELD_DATA_RD;
 	assign op = insn `FIELD_DATA_OPCODE;

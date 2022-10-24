@@ -11,7 +11,6 @@ module core_decode
 	                     undefined,
 	                     writeback,
 	                     update_flags,
-	                     uses_rn,
 	output branch_decode branch_ctrl,
 	output snd_decode    snd_ctrl,
 	output data_decode   data_ctrl,
@@ -56,7 +55,7 @@ module core_decode
 
 	data_decode data;
 	logic data_writeback, data_update_flags, data_restore_spsr,
-	      data_is_imm, data_shift_by_reg_if_reg, data_uses_rn;
+	      data_is_imm, data_shift_by_reg_if_reg;
 
 	core_decode_data group_data
 	(
@@ -66,7 +65,6 @@ module core_decode
 		.restore_spsr(data_restore_spsr),
 		.snd_is_imm(data_is_imm),
 		.snd_shift_by_reg_if_reg(data_shift_by_reg_if_reg),
-		.uses_rn(data_uses_rn),
 		.*
 	);
 
@@ -117,11 +115,11 @@ module core_decode
 		branch = 0;
 		writeback = 0;
 		update_flags = 0;
-		uses_rn = 1;
 		execute = cond_execute;
 		undefined = cond_undefined;
 
 		data_ctrl = {($bits(data_ctrl)){1'bx}};
+		data_ctrl.uses_rn = 1;
 
 		snd_ctrl = {$bits(snd_ctrl){1'bx}};
 		snd_ctrl.shr = 0;
@@ -152,7 +150,6 @@ module core_decode
 			end
 
 			`GROUP_ALU: begin
-				uses_rn = data_uses_rn;
 				snd_is_imm = data_is_imm;
 				snd_ror_if_imm = 1;
 				snd_shift_by_reg_if_reg = data_shift_by_reg_if_reg;
@@ -227,7 +224,6 @@ module core_decode
 			execute = 0;
 
 			branch = 1'bx;
-			uses_rn = 1'bx;
 			writeback = 1'bx;
 			conditional = 1'bx;
 			update_flags = 1'bx;

@@ -6,7 +6,6 @@ module core_control
 	                       dec_execute,
 	                       dec_undefined,
 	                       dec_conditional,
-	                       dec_uses_rn,
 	                       dec_writeback,
 	                       dec_update_flags,
 	input  branch_decode   dec_branch,
@@ -84,7 +83,7 @@ module core_control
 	assign next_bubble =
 		   (final_writeback && final_rd == `R15)
 		|| ((dec_update_flags || dec_conditional) && (final_update_flags || update_flags))
-		|| (final_writeback && ((dec_uses_rn && (final_rd == dec_data.rn || dec_data.rn == `R15))
+		|| (final_writeback && ((dec_data.uses_rn && (final_rd == dec_data.rn || dec_data.rn == `R15))
 		                      || final_rd == dec_snd.r || dec_snd.r == `R15));
 
 	core_control_ldst_pop ldst_pop

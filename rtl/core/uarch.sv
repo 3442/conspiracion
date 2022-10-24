@@ -62,6 +62,7 @@ typedef struct packed
 	alu_op  op;
 	reg_num rn,
 	        rd;
+	logic   uses_rn;
 } data_decode;
 
 typedef struct packed
