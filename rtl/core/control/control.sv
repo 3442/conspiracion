@@ -89,34 +89,13 @@ module core_control
 		.pop_lower(popped_lower)
 	);
 
-	always_comb begin
-		unique case(cycle)
-			RD_INDIRECT_SHIFT: shifter_shift = rd_value_b[7:0];
-			default:           shifter_shift = {2'b00, data_shift_imm};
-		endcase
+	core_control_mux mux
+	(
+		.*
+	);
 
-		unique case(cycle)
-			TRANSFER:  alu_a = saved_base;
-			EXCEPTION: alu_a = {pc, 2'b00};
-			default:   alu_a = rd_value_a;
-		endcase
-
-		unique case(cycle)
-			RD_INDIRECT_SHIFT, WITH_SHIFT:
-				alu_b = saved_base;
-
-			TRANSFER:
-				alu_b = mem_offset;
-
-			default:
-				if(data_snd_is_imm)
-					alu_b = {{20{1'b0}}, data_imm};
-				else
-					alu_b = rd_value_b;
-		endcase
-
+	always_comb
 		vector_offset = 3'b001; //TODO
-	end
 
 	always_ff @(posedge clk) begin
 		branch <= 0;
