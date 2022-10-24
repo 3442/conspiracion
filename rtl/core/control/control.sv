@@ -238,9 +238,10 @@ module core_control
 					mem_offset <= alu_b;
 				end
 
+				writeback <= mem_ready && !mem_write;
 				if(mem_ready) begin
+					rd <= final_rd;
 					wr_value <= mem_data_rd;
-					writeback <= !mem_write;
 				end
 
 				if(cycle != TRANSFER || mem_ready) begin
@@ -249,8 +250,8 @@ module core_control
 					saved_base <= q_alu;
 
 					if(pop_valid) begin
-						rd <= popped;
 						rb <= popped;
+						final_rd <= popped;
 					end else
 						rb <= final_rd; // Viene de dec_ldst.rd
 				end
