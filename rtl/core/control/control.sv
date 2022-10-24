@@ -45,7 +45,7 @@ module core_control
 
 	ctrl_cycle cycle, next_cycle;
 
-	logic bubble, next_bubble, final_writeback, final_update_flags,
+	logic final_writeback, final_update_flags,
 	      ldst, ldst_pre, ldst_increment, ldst_writeback, pop_valid,
 	      data_snd_is_imm, data_snd_shift_by_reg, trivial_shift,
 	      undefined, exception, high_vectors;
@@ -58,7 +58,6 @@ module core_control
 	reg_list mem_regs, next_regs_upper, next_regs_lower;
 	ptr pc /*verilator public*/, next_pc_visible;
 
-	assign stall = next_cycle != ISSUE || next_bubble;
 	assign reg_mode = `MODE_SVC; //TODO
 	assign trivial_shift = shifter_shift == 0;
 	assign mem_data_wr = rd_value_b;
@@ -68,11 +67,12 @@ module core_control
 	assign vector = {{16{high_vectors}}, 11'b0, vector_offset, 2'b00};
 	assign next_pc_visible = fetch_insn_pc + 2;
 
-	assign next_bubble =
-		   (final_writeback && final_rd == `R15)
-		|| ((dec.update_flags || dec.conditional) && (final_update_flags || update_flags))
-		|| (final_writeback && ((dec_data.uses_rn && (final_rd == dec_data.rn || dec_data.rn == `R15))
-		                      || final_rd == dec_snd.r || dec_snd.r == `R15));
+	logic bubble, next_bubble;
+
+	core_control_stall ctrl_stall
+	(
+		.*
+	);
 
 	core_control_ldst_pop ldst_pop
 	(
@@ -144,7 +144,6 @@ module core_control
 
 	always_ff @(posedge clk) begin
 		cycle <= next_cycle;
-		bubble <= 0;
 		branch <= 0;
 		writeback <= 0;
 		update_flags <= 0;
@@ -160,8 +159,6 @@ module core_control
 			ISSUE: begin
 				final_writeback <= 0;
 				final_update_flags <= 0;
-
-				bubble <= next_bubble;
 
 				if(dec.execute & ~next_bubble) begin
 					branch <= dec_branch.branch;
@@ -275,7 +272,6 @@ module core_control
 
 	initial begin
 		cycle = ISSUE;
-		bubble = 0;
 
 		pc = 0;
 		pc_visible = 2;
