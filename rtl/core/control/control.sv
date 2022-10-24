@@ -43,15 +43,7 @@ module core_control
 	                       mem_write
 );
 
-	enum
-	{
-		ISSUE,
-		RD_INDIRECT_SHIFT,
-		WITH_SHIFT,
-		TRANSFER,
-		BASE_WRITEBACK,
-		EXCEPTION
-	} cycle, next_cycle;
+	ctrl_cycle cycle, next_cycle;
 
 	logic bubble, next_bubble, final_writeback, final_update_flags,
 	      ldst, ldst_pre, ldst_increment, ldst_writeback, pop_valid,

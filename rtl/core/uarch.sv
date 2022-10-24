@@ -94,7 +94,7 @@ typedef struct packed
 	logic[5:0]  shift_imm;
 } snd_decode;
 
-typedef enum logic[1:0]
+typedef enum
 {
 	LDST_WORD,
 	LDST_BYTE,
@@ -122,6 +122,16 @@ typedef struct packed
 	 */
 	reg_list    regs;
 } ldst_decode;
+
+typedef enum
+{
+	ISSUE,
+	RD_INDIRECT_SHIFT,
+	WITH_SHIFT,
+	TRANSFER,
+	BASE_WRITEBACK,
+	EXCEPTION
+} ctrl_cycle;
 
 typedef struct packed
 {
