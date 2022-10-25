@@ -11,11 +11,11 @@ module core_mul
                             sig     // si la suma es signed o unisgned
                             q_size  // si es 1, q es de 2 words, si es 0, q es de 1 word
 
-    output  logic[31:0]    q_hi,    // parte más significa tiva del resultado
-    output  logic[31:0]    q_lo,    // parte menos significativa del resultado
-    output  logic           z,
-                            n,      // no hay C ni V, ya que se dejan unaffected
-                            rdy     // si es 1, la multiplicación está lista
+    output  word    q_hi,    // parte más significa tiva del resultado
+    output  word    q_lo,    // parte menos significativa del resultado
+    output  logic   z,
+                    n,      // no hay C ni V, ya que se dejan unaffected
+                    rdy     // si es 1, la multiplicación está lista
     
     //! TODO:
     //! hay que definit un protocolo de cómo se usa este módulo
