@@ -7,7 +7,7 @@ module core_mul
 							c_lo,	// parte menos significativa de c
 	input logic				c_size,	// 1 si c es de 2 words, cualquier otro valor si c es de 1 word
 							clk,	// clock, ya que es una máquina de estados
-							rst,	// reset
+							rst,
 							add		// 1 si c se suma
 							sig		// 1 si a y b son signed
 							q_size	// 1 si q es de 2 words, cualquier otro valor si es de 1 word
@@ -30,40 +30,74 @@ module core_mul
 
 	//! TODO:
 	//! Testear que el algoritmo sirva bien @julian
-	logic[(W*2):0] booth;
-	logic[1:0] Q; 
-	logic[W-1:0] A, B;
-	logic[W - 1:0] counter;
+	
+module BoothMul(clk,rst,start,a,b,rdy,p);
 
-	initial begin
-		booth = { W{1'b0}, b, 0 }
-		Q = booth[1:0];
-		A = booth[(W*2):W];
-		B = a;
-		counter = W;
-	end
+	input rst;
+	input signed [3:0]a,b;
+	output signed [7:0]p;
+	output rdy;
 
-always@(posedge clk) begin
-		A = booth[(W*2):W];
+	logic signed [7:0] p,next_p,p_temp;
+	logic next_state, pres_state;
+	logic [1:0] temp,next_temp;
+	logic [1:0] count,next_count;
+	logic rdy, next_rdy;
 
-		unique case(Q)
-			2'b01:
-				booth[(W*2):W] = A + B;
+	parameter IDLE = 1'b0;
+	parameter START = 1'b1;
 
-			2'b10: 
-				booth[(W*2):W] = A - B;
-			
-			// 2'b11 o 2'b00:
-			default: ;
-				
-		endcase
-
-		booth >>> 1;
-		counter = counter - 1;
-
-	always_comb
-		if(counter == 0) begin
-			q = booth[(W*2):1]
+	always @ (posedge clk or negedge rst) begin
+		if(!rst) begin
+			p          <= 8'd0;
+			rdy        <= 1'b0;
+			pres_state <= 1'b0;
+			temp       <= 2'd0;
+			count      <= 2'd0;
+		end
+		else begin
+			p          <= next_p;
+			rdy      <= next_rdy;
+			pres_state <= next_state;
+			temp       <= next_temp;
+			count      <= next_count;
 		end
 	end
+
+	always @ (*) begin
+		case(pres_state)
+			IDLE:
+			begin
+				next_count = 2'b0;
+				next_rdy = 1'b0;
+				if(start) begin
+					next_state = START;
+					next_temp  = {a[0],1'b0};
+					next_p     = {4'd0,a};
+				end
+				else begin
+					next_state = pres_state;
+					next_temp  = 2'd0;
+					next_p     = 8'd0;
+				end
+			end
+
+			START:
+			begin
+				case(temp)
+					2'b10:   p_temp = {p[7:4]-b,p[3:0]};
+					2'b01:   p_temp = {p[7:4]+b,p[3:0]};
+					default: p_temp = {p[7:4],p[3:0]};
+				endcase
+				next_temp  = {a[count+1],a[count]};
+				next_count = count + 1'b1;
+				next_p     = p_temp >>> 1;
+				next_rdy = (&count) ? 1'b1 : 1'b0; 
+				next_state = (&count) ? IDLE : pres_state;	
+			end
+		endcase
+	end
+endmodule
+
+
 endmodule
