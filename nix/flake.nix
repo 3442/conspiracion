@@ -1,14 +1,24 @@
 {
   outputs = { self, nixpkgs }: let
-    pkgs = nixpkgs.legacyPackages."x86_64-linux";
+    system = "x86_64-linux";
+    pkgs = import nixpkgs { inherit system; config.allowUnfree = true; };
   in {
-    devShells."x86_64-linux".default = pkgs.mkShell {
-      buildInputs = [ pkgs.SDL2 ];
-      nativeBuildInputs = [
-        pkgs.gcc-arm-embedded
-        pkgs.gdb
-        pkgs.pkg-config
-        (pkgs.python39.withPackages (py: [ py.numpy py.pillow ]))
+    devShells."${system}".default = pkgs.mkShell {
+      buildInputs = with pkgs; [
+        SDL2
+      ];
+
+      nativeBuildInputs = with pkgs; [
+        binutils
+        gcc
+        gcc-arm-embedded
+        gdb
+        gnumake
+        gtkwave
+        pkg-config
+        (python39.withPackages (py: [ py.numpy py.pillow ]))
+        (quartus-prime-lite.override { supportedDevices = [ "Cyclone V" ]; })
+        verilator
       ];
 
       shellHook = ''
