@@ -1,27 +1,23 @@
-module core_mul_mul // TODO: cambiar nombre a solo core_mul, ya que solo va a haber una operación para esto
+module core_mul
 #(parameter W=32)
-(
-	input   logic[W - 1:0]      a,
-                                b,
-    input   logic               clk,
+(   // realiza la operación a * b + c = q
+    input logic[W - 1:0]    a,      // primer sumando
+                            b,      // segundo sumando
+    input logic[W - 1:0]    c_hi,   // parte más significativa de c
+                            c_lo,   // parte menos significativa de c
+    input logic             c_size, // si es 1, c es de 2 words, si es 0, c es de 1 word
+                            clk,    // clock, ya que es una máquina de estados
+                            add     // si es 1, c se suma. si es 0, no se suma
+                            sig     // si la suma es signed o unisgned
+                            q_size  // si es 1, q es de 2 words, si es 0, q es de 1 word
 
-	output  logic[(W*2) - 1:0]  q,  // TODO: cambiar a dos salidas de tamaño de 1 word, independientemente de W. se les puede llamar q_hi y q_lo a las dos partes de la respuesta
-	output  logic               z,  // no hay C ni V, ya que se dejan unaffected
-                                n
+    output  logic[31:0]    q_hi,    // parte más significa tiva del resultado
+    output  logic[31:0]    q_lo,    // parte menos significativa del resultado
+    output  logic           z,
+                            n,      // no hay C ni V, ya que se dejan unaffected
+                            rdy     // si es 1, la multiplicación está lista
     
     //! TODO:
-    //! como es una máquina de estados, es necesario tener también:
-    //!     Entradas:
-    //!         logic[w-1:0] c_hi   // ya que puede ser a * b + c
-    //!         logic[w-1:0] c_lo   // ya que puede ser a * b + c   //  se necesitan un hi y un lo porque SMLAL lo requiere
-    //!         logic c_big         // ya que puede ser de 32bits o 64bits
-    //!         logic add           // ya que se tiene que avisar si se va a sumar c o no
-    //!         indicar cuando se inicia la multiplicación en la máquina de estados
-    //!         si la operación es signed o unsigned
-    //!         logic double_word   // si la salida es de tamaño word o double word
-    //!     Salidas:
-    //!         indicar en qué ciclo la multiplicación está lista       // ya que la multiplicación es de ciclos
-    //!                                                                 // variables
     //! hay que definit un protocolo de cómo se usa este módulo
     //!     Por ejemplo:
     //!         se levanta rdy en algún momento, pero qué pasa al ciclo siguiente? se mantiene o se baja? qué sucede?
@@ -52,7 +48,7 @@ always@(posedge clk) begin
                 
 
             2'b10: 
-                booth[(W*2):W] = A - B;    
+                booth[(W*2):W] = A - B;
             
             // 2'b11 o 2'b00:
             default: ;
