@@ -5,19 +5,19 @@ module core_mul
 							b,		// segundo sumando
 	input logic[W - 1:0]	c_hi,	// parte más significativa de c
 							c_lo,	// parte menos significativa de c
-	input logic				c_size,	// si es 1, c es de 2 words, si es 0, c es de 1 word
+	input logic				c_size,	// 1 si c es de 2 words, cualquier otro valor si c es de 1 word
 							clk,	// clock, ya que es una máquina de estados
-							add		// si es 1, c se suma. si es 0, no se suma
-							sig		// es 1 si a y b son signed, es 0 si son unisgned
-							q_size	// si es 1, q es de 2 words, si es 0, q es de 1 word
-							start	// si es 1, se inicia la multiplicacion
+							add		// 1 si c se suma
+							sig		// 1 si a y b son signed
+							q_size	// 1 si q es de 2 words, cualquier otro valor si es de 1 word
+							start	// 1 indica que se inicie la multiplicacion
 
 	output  word    q_hi,	// parte más significa tiva del resultado
 	output  word    q_lo,	// parte menos significativa del resultado
 	output  logic   z,
 					n,		// no hay C ni V, ya que se dejan unaffected
-					q_sig	// si es 1, 1 es signed, es 0 si es unsigned
-					rdy		// si es 1, la multiplicación está lista
+					q_sig	// 1 si q es signed, cualquier otr valor si es unsigned
+					rdy		// 1 cuando la multiplicación está lista
 	
 	//*Se asume lo siguiente:
 	//	- Las señales de entrada son constantes desde el instante en el que start es 1 hasta que rdy sea 1
