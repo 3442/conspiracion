@@ -264,4 +264,10 @@ for line in output.stdout.split('\n'):
 if final := module_get('final'):
     final()
 
+if os.getenv('SIM_DUMP', ''):
+    dump_regs()
+    for rng in mem_dumps:
+        print(f'Memory range 0x{rng.start:08x}..0x{rng.stop:08x}')
+        print(hexdump(rng.start, read_mem(rng.start, rng.stop - rng.start)))
+
 exit(success=True)
