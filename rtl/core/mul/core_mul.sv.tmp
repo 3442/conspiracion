@@ -1,0 +1,103 @@
+module core_mul
+#(parameter W=32)
+(   // realiza la operación a * b + c = q
+	input logic[W - 1:0]	a,		// primer sumando
+							b,		// segundo sumando
+	input logic[W - 1:0]	c_hi,	// parte más significativa de c
+							c_lo,	// parte menos significativa de c
+	input logic				c_size,	// 1 si c es de 2 words, cualquier otro valor si c es de 1 word
+							clk,	// clock, ya que es una máquina de estados
+							rst,
+							add		// 1 si c se suma
+							sig		// 1 si a y b son signed
+							q_size	// 1 si q es de 2 words, cualquier otro valor si es de 1 word
+							start	// 1 indica que se inicie la multiplicacion
+
+	output  word    q_hi,	// parte más significa tiva del resultado
+	output  word    q_lo,	// parte menos significativa del resultado
+	output  logic   z,
+					n,		// no hay C ni V, ya que se dejan unaffected
+					q_sig	// 1 si q es signed, cualquier otr valor si es unsigned
+					rdy		// 1 cuando la multiplicación está lista
+	
+	//*Se asume lo siguiente:
+	//	- Las señales de entrada son constantes desde el instante en el que start es 1 hasta que rdy sea 1
+	//	- El valor de start puede cambiar durante la multiplicación, pero va a ser ignorado hasta que rdy sea 1
+	//	- El valor de q es UNPREDICTABLE hasta que rdy sea 1
+	//	- Las condiciones para iniciar una multiplicación son que rdy sea 1 y start sea 1
+	//	- rdy solo no es 1 mientras la multiplicación se está realizando
+);
+
+	//! TODO:
+	//! Testear que el algoritmo sirva bien @julian
+	
+module BoothMul(clk,rst,start,a,b,rdy,p);
+
+	input rst;
+	input signed [3:0]a,b;
+	output signed [7:0]p;
+	output rdy;
+
+	logic signed [7:0] p,next_p,p_temp;
+	logic next_state, pres_state;
+	logic [1:0] temp,next_temp;
+	logic [1:0] count,next_count;
+	logic rdy, next_rdy;
+
+	parameter IDLE = 1'b0;
+	parameter START = 1'b1;
+
+	always @ (posedge clk or negedge rst) begin
+		if(!rst) begin
+			p          <= 8'd0;
+			rdy        <= 1'b0;
+			pres_state <= 1'b0;
+			temp       <= 2'd0;
+			count      <= 2'd0;
+		end
+		else begin
+			p          <= next_p;
+			rdy      <= next_rdy;
+			pres_state <= next_state;
+			temp       <= next_temp;
+			count      <= next_count;
+		end
+	end
+
+	always @ (*) begin
+		case(pres_state)
+			IDLE:
+			begin
+				next_count = 2'b0;
+				next_rdy = 1'b0;
+				if(start) begin
+					next_state = START;
+					next_temp  = {a[0],1'b0};
+					next_p     = {4'd0,a};
+				end
+				else begin
+					next_state = pres_state;
+					next_temp  = 2'd0;
+					next_p     = 8'd0;
+				end
+			end
+
+			START:
+			begin
+				case(temp)
+					2'b10:   p_temp = {p[7:4]-b,p[3:0]};
+					2'b01:   p_temp = {p[7:4]+b,p[3:0]};
+					default: p_temp = {p[7:4],p[3:0]};
+				endcase
+				next_temp  = {a[count+1],a[count]};
+				next_count = count + 1'b1;
+				next_p     = p_temp >>> 1;
+				next_rdy = (&count) ? 1'b1 : 1'b0; 
+				next_state = (&count) ? IDLE : pres_state;	
+			end
+		endcase
+	end
+endmodule
+
+
+endmodule
