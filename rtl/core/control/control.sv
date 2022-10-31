@@ -19,6 +19,10 @@ module core_control
 	                       mem_ready,
 	input  word            mem_data_rd,
 
+`ifdef VERILATOR
+	input  word            insn,
+`endif
+
 	output logic           stall,
 	                       branch,
 	                       writeback,
@@ -153,6 +157,11 @@ module core_control
 				update_flags <= final_update_flags;
 				writeback <= final_writeback;
 				undefined <= dec.undefined;
+
+`ifdef VERILATOR
+				if(dec.undefined)
+					$display("[core] undefined insn: [0x%08x] %08x", fetch_insn_pc << 2, insn);
+`endif
 
 				rd <= final_rd;
 				pc <= fetch_insn_pc;
