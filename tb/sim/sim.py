@@ -148,11 +148,21 @@ def dump_regs():
     if next_col != 0:
         print(file=sys.stderr)
 
+printed_while_running = False
+def while_running():
+    global printed_while_running
+
+    if not printed_while_running:
+        print(
+            f'{COLOR_BLUE}While running test \'{COLOR_YELLOW}{test_name}' + \
+            f'{COLOR_RESET}{COLOR_BLUE}\'{COLOR_RESET}')
+
+        printed_while_running = True
+
 def test_assert(condition, message):
     if not condition:
-        print( \
-            f'{COLOR_RED}While running test \'{COLOR_YELLOW}{test_name}' + \
-            f'{COLOR_RESET}{COLOR_RED}\'\n{message()}{COLOR_RESET}', file=sys.stderr)
+        while_running()
+        print(f'{COLOR_RED}{message()}{COLOR_RESET}', file=sys.stderr)
 
         if exec_args:
             print('cmdline:', subprocess.list2cmdline(exec_args), file=sys.stderr)
@@ -260,6 +270,9 @@ for line in output.stdout.split('\n'):
     elif in_regs:
         value, reg = line.split()
         regs[reg] = int(value, 16)
+    else:
+        while_running()
+        print(f'{COLOR_BLUE}{line}{COLOR_RESET}')
 
 if final := module_get('final'):
     final()
