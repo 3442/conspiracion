@@ -10,7 +10,8 @@ module core_decode
 	output branch_decode   branch_ctrl,
 	output snd_decode      snd_ctrl,
 	output data_decode     data_ctrl,
-	output ldst_decode     ldst_ctrl
+	output ldst_decode     ldst_ctrl,
+	output mul_decode      mul_ctrl
 );
 
 	logic execute, undefined, conditional, writeback, update_flags, branch;
@@ -115,6 +116,19 @@ module core_decode
 		.alu(data_ldst)
 	);
 
+	logic mul_update_flags;
+	reg_num mul_rd, mul_rs, mul_rm;
+
+	core_decode_mul group_mul
+	(
+		.decode(mul_ctrl),
+		.rd(mul_rd),
+		.rs(mul_rs),
+		.rm(mul_rm),
+		.update_flags(mul_update_flags),
+		.*
+	);
+
 	always_comb begin
 		branch = 0;
 		writeback = 0;
@@ -153,6 +167,20 @@ module core_decode
 				end
 			end
 
+			`GROUP_MUL: begin
+				mul_ctrl.enable = 1;
+
+				data_ctrl.rd = mul_rd;
+				data_ctrl.rn = mul_rs;
+
+				snd_ctrl.is_imm = 0;
+				snd_ctrl.r = mul_rm;
+				snd_ctrl.shift_by_reg = 0;
+
+				writeback = 1;
+				update_flags = mul_update_flags;
+			end
+
 			`GROUP_ALU: begin
 				snd_is_imm = data_is_imm;
 				snd_ror_if_imm = 1;
@@ -166,9 +194,6 @@ module core_decode
 				restore_spsr = data_restore_spsr;
 				undefined = undefined | snd_undefined;
 			end
-
-			/*`INSN_MUL: ;
-			`GROUP_BIGMUL: ;*/
 
 			`GROUP_LDST_SINGLE_IMM, `GROUP_LDST_SINGLE_REG: begin
 				snd_is_imm = ldst_single_is_imm;

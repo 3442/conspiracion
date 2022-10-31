@@ -86,17 +86,16 @@
 `define INSN_SMULL 28'b0000110_?_????_????_????_1001_????
 `define INSN_SMLAL 28'b0000111_?_????_????_????_1001_????
 
-// No incluye INSN_MUL por el SBZ del medio
-`define GROUP_BIGMUL 28'b0000???_?_????_????_????_1001_????
+`define GROUP_MUL `INSN_MUL, `INSN_MLA, `INSN_UMULL, `INSN_UMLAL, `INSN_SMULL, `INSN_SMLAL
 
-`define FIELD_MUL_LONG      [23]
-`define FIELD_MUL_SIGNED    [22]
-`define FIELD_MUL_ACC       [21]
-`define FIELD_MUL_SET_FLAGS [20]
-`define FIELD_MUL_RD        [19:16]
-`define FIELD_MUL_RN        [15:12]
-`define FIELD_MUL_RS        [11:8]
-`define FIELD_MUL_RM        [3:0]
+`define FIELD_MUL_LONG   [23]
+`define FIELD_MUL_SIGNED [22]
+`define FIELD_MUL_ACC    [21]
+`define FIELD_MUL_S      [20]
+`define FIELD_MUL_RD     [19:16]
+`define FIELD_MUL_RN     [15:12]
+`define FIELD_MUL_RS     [11:8]
+`define FIELD_MUL_RM     [3:0]
 
 // Instrucciones de load/store
 

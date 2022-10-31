@@ -123,6 +123,17 @@ typedef struct packed
 	reg_list    regs;
 } ldst_decode;
 
+typedef struct packed
+{
+	reg_num r_add_lo,
+	        r_add_hi; // También es destino cuando mul_decode.long
+
+	logic   enable,
+	        signed_mul,
+	        long_mul,
+	        add;
+} mul_decode;
+
 typedef enum
 {
 	ISSUE,
