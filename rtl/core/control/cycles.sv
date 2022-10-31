@@ -3,10 +3,12 @@
 module core_control_cycles
 (
 	input  logic      clk,
+	                  mul,
 	                  ldst,
 	                  bubble,
 	                  exception,
 	                  mem_ready,
+	                  mul_ready,
 	                  pop_valid,
 	                  trivial_shift,
 	                  ldst_writeback,
@@ -38,13 +40,21 @@ module core_control_cycles
 				else if(ldst_writeback)
 					next_cycle = BASE_WRITEBACK;
 
+			MUL:
+				if(!mul_ready)
+					next_cycle = MUL;
+
 			default: ;
 		endcase
 
 		if(bubble)
 			next_cycle = ISSUE;
-		else if(next_cycle == ISSUE && ldst)
-			next_cycle = TRANSFER;
+		else if(next_cycle == ISSUE) begin
+			if(ldst)
+				next_cycle = TRANSFER;
+			else if(mul)
+				next_cycle = MUL;
+		end
 	end
 
 	always_ff @(posedge clk)

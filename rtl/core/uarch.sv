@@ -141,7 +141,8 @@ typedef enum
 	WITH_SHIFT,
 	TRANSFER,
 	BASE_WRITEBACK,
-	EXCEPTION
+	EXCEPTION,
+	MUL
 } ctrl_cycle;
 
 typedef struct packed

@@ -122,6 +122,10 @@ module arm810
 		.c(c_shifter)
 	);
 
+	//TODO
+	logic mul, mul_add, mul_long, mul_signed, mul_ready;
+	assign mul_ready = 1;
+
 	ptr data_addr;
 	logic data_start, data_write, data_ready, insn_ready;
 	word data_data_rd, data_data_wr, insn_data_rd;

@@ -8,6 +8,7 @@ module core_control
 	input  data_decode     dec_data,
 	input  snd_decode      dec_snd,
 	input  ldst_decode     dec_ldst,
+	input  mul_decode      dec_mul,
 	input  ptr             fetch_insn_pc,
 	input  psr_flags       flags,
 	                       alu_flags,
@@ -18,6 +19,7 @@ module core_control
 	input  logic           c_shifter,
 	                       mem_ready,
 	input  word            mem_data_rd,
+	input  logic           mul_ready,
 
 `ifdef VERILATOR
 	input  word            insn,
@@ -44,13 +46,16 @@ module core_control
 	output ptr             mem_addr,
 	output word            mem_data_wr,
 	output logic           mem_start,
-	                       mem_write
+	                       mem_write,
+	                       mul,
+	                       mul_add,
+	                       mul_long,
+	                       mul_signed
 );
 
-	logic final_writeback, final_update_flags,
-	      ldst, ldst_pre, ldst_increment, ldst_writeback, pop_valid,
-	      data_snd_is_imm, data_snd_shift_by_reg, trivial_shift,
-	      undefined, exception, high_vectors;
+	logic final_writeback, final_update_flags, ldst, ldst_pre, ldst_increment,
+	      ldst_writeback, pop_valid, data_snd_is_imm, data_snd_shift_by_reg,
+	      trivial_shift, undefined, exception, high_vectors;
 
 	logic[2:0] vector_offset;
 	logic[5:0] data_shift_imm;
@@ -145,6 +150,11 @@ module core_control
 					ldst_pre <= dec_ldst.pre_indexed;
 					ldst_increment <= dec_ldst.increment;
 					ldst_writeback <= dec_ldst.writeback;
+
+					mul <= dec.mul;
+					mul_add <= dec_mul.add;
+					mul_long <= dec_mul.long_mul;
+					mul_signed <= dec_mul.signed_mul;
 
 					mem_regs <= dec_ldst.regs;
 					mem_write <= !dec_ldst.load;

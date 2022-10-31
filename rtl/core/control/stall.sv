@@ -36,7 +36,7 @@ module core_control_stall
 	assign updating_flags = final_update_flags || update_flags;
 
 	always_ff @(posedge clk)
-		bubble <= next_cycle == ISSUE ? next_bubble : 0;
+		bubble <= next_cycle == ISSUE && next_bubble;
 
 	initial
 		bubble = 0;
