@@ -119,7 +119,7 @@ module core_control
 				final_update_flags <= 0;
 
 				if(dec.execute & ~next_bubble) begin
-					branch <= dec_branch.branch;
+					branch <= dec.branch;
 					branch_target <= next_pc_visible + dec_branch.offset;
 
 					alu <= dec_data.op;
@@ -141,7 +141,7 @@ module core_control
 
 					// TODO: dec_ldst.unprivileged/user_regs
 					// TODO: byte/halfword sizes
-					ldst <= dec_ldst.enable;
+					ldst <= dec.ldst;
 					ldst_pre <= dec_ldst.pre_indexed;
 					ldst_increment <= dec_ldst.increment;
 					ldst_writeback <= dec_ldst.writeback;

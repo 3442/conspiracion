@@ -14,14 +14,16 @@ module core_decode
 	output mul_decode      mul_ctrl
 );
 
-	logic execute, undefined, conditional, writeback, update_flags, branch;
+	logic execute, undefined, conditional, writeback, update_flags, branch, ldst, mul;
 
 	assign ctrl.execute = execute;
 	assign ctrl.undefined = undefined;
 	assign ctrl.conditional = conditional;
 	assign ctrl.writeback = writeback;
 	assign ctrl.update_flags = update_flags;
-	assign branch_ctrl.branch = branch;
+	assign ctrl.branch = branch;
+	assign ctrl.ldst = ldst;
+	assign ctrl.mul = mul;
 
 	//TODO
 	logic restore_spsr;
@@ -130,11 +132,14 @@ module core_decode
 	);
 
 	always_comb begin
+		mul = 0;
+		ldst = 0;
 		branch = 0;
-		writeback = 0;
-		update_flags = 0;
+
 		execute = cond_execute;
 		undefined = cond_undefined;
+		writeback = 0;
+		update_flags = 0;
 
 		data_ctrl = {($bits(data_ctrl)){1'bx}};
 		data_ctrl.uses_rn = 1;
@@ -152,7 +157,6 @@ module core_decode
 
 		ldst_addr = {($bits(ldst_addr)){1'bx}};
 		ldst_ctrl = {($bits(ldst_ctrl)){1'bx}};
-		ldst_ctrl.enable = 0;
 
 		// El orden de los casos es importante, NO CAMBIAR
 		priority casez(insn `FIELD_OP)
@@ -168,7 +172,7 @@ module core_decode
 			end
 
 			`GROUP_MUL: begin
-				mul_ctrl.enable = 1;
+				mul = 1;
 
 				data_ctrl.rd = mul_rd;
 				data_ctrl.rn = mul_rs;
@@ -241,7 +245,7 @@ module core_decode
 
 		unique casez(insn `FIELD_OP)
 			`GROUP_LDST_SINGLE, `GROUP_LDST_MISC, `GROUP_LDST_MULT: begin
-				ldst_ctrl.enable = 1;
+				ldst = 1;
 				data_ctrl = data_ldst;
 				writeback = ldst_ctrl.writeback || ldst_ctrl.load;
 			end
@@ -252,6 +256,8 @@ module core_decode
 		if(undefined) begin
 			execute = 0;
 
+			mul = 1'bx;
+			ldst = 1'bx;
 			branch = 1'bx;
 			writeback = 1'bx;
 			conditional = 1'bx;

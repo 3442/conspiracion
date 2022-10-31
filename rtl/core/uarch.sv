@@ -63,7 +63,10 @@ typedef struct packed
 	      undefined,
 	      conditional,
 	      writeback,
-	      update_flags;
+	      update_flags,
+	      branch,
+	      ldst,
+	      mul;
 } datapath_decode;
 
 typedef struct packed
@@ -76,8 +79,7 @@ typedef struct packed
 
 typedef struct packed
 {
-	logic branch;
-	ptr   offset;
+	ptr offset;
 } branch_decode;
 
 typedef struct packed
@@ -106,8 +108,7 @@ typedef struct packed
 	reg_num     rn,
 	            rd;
 
-	logic       enable,
-	            load,
+	logic       load,
 	            increment,
 	            writeback,
 	            sign_extend,
@@ -128,8 +129,7 @@ typedef struct packed
 	reg_num r_add_lo,
 	        r_add_hi; // También es destino cuando mul_decode.long
 
-	logic   enable,
-	        signed_mul,
+	logic   signed_mul,
 	        long_mul,
 	        add;
 } mul_decode;

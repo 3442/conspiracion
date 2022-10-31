@@ -11,7 +11,6 @@ module core_decode_ldst_single
 
 	logic p, w;
 
-	assign decode.enable = 1'bx;
 	assign decode.rn = insn `FIELD_LDST_SINGLE_RN;
 	assign decode.rd = insn `FIELD_LDST_SINGLE_RD;
 	assign decode.size = insn `FIELD_LDST_SINGLE_B ? LDST_BYTE : LDST_WORD;

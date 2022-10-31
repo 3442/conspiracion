@@ -20,7 +20,6 @@ module core_decode_mul
 	assign rm = insn `FIELD_MUL_RM;
 	assign update_flags = insn `FIELD_MUL_S;
 
-	assign decode.enable = 0;
 	assign decode.add = insn `FIELD_MUL_ACC;
 	assign decode.long_mul = long_mul;
 	assign decode.signed_mul = insn `FIELD_MUL_SIGNED;
