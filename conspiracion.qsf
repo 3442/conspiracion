@@ -154,6 +154,7 @@ set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/snd.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/fetch/fetch.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/fetch/prefetch.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/mmu/mmu.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/mul.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/psr.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/regs/file.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/regs/regs.sv
