@@ -5,6 +5,7 @@
 `define NOP 32'd0
 
 typedef logic[3:0]  reg_num;
+typedef logic[2:0]  cp_opcode;
 typedef logic[15:0] reg_list;
 typedef logic[31:0] word;
 typedef logic[29:0] ptr;
@@ -137,9 +138,9 @@ typedef struct packed
 
 typedef struct packed
 {
-	logic      load;
-	logic[2:0] op1, op2;
-	reg_num    crn, crm;
+	logic     load;
+	cp_opcode op1, op2;
+	reg_num   crn, crm;
 } coproc_decode;
 
 typedef enum

@@ -142,6 +142,7 @@ set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/mux.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/ldst/pop.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/stall.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/cp15.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/map.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/branch.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/conds.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/coproc.sv
