@@ -137,4 +137,16 @@ module arm810
 		.*
 	);
 
+	logic coproc;
+	word coproc_read, coproc_write;
+
+	core_cp15 cp15
+	(
+		.transfer(coproc),
+		.dec(dec_coproc),
+		.read(coproc_read),
+		.write(coproc_write),
+		.*
+	);
+
 endmodule

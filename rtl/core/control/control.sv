@@ -50,7 +50,8 @@ module core_control
 	                       mul,
 	                       mul_add,
 	                       mul_long,
-	                       mul_signed
+	                       mul_signed,
+	                       coproc
 );
 
 	logic final_writeback, final_update_flags, ldst, ldst_pre, ldst_increment,
@@ -155,6 +156,8 @@ module core_control
 					mul_add <= dec_mul.add;
 					mul_long <= dec_mul.long_mul;
 					mul_signed <= dec_mul.signed_mul;
+
+					coproc <= dec.coproc;
 
 					mem_regs <= dec_ldst.regs;
 					mem_write <= !dec_ldst.load;
