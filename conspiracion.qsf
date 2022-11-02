@@ -143,6 +143,7 @@ set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/ldst/pop.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/stall.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/branch.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/conds.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/coproc.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/data.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/decode.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/isa.sv

@@ -11,10 +11,12 @@ module core_decode
 	output snd_decode      snd_ctrl,
 	output data_decode     data_ctrl,
 	output ldst_decode     ldst_ctrl,
-	output mul_decode      mul_ctrl
+	output mul_decode      mul_ctrl,
+	output coproc_decode   coproc_ctrl
 );
 
-	logic execute, undefined, conditional, writeback, update_flags, branch, ldst, mul;
+	logic execute, undefined, conditional, writeback,
+	      update_flags, branch, ldst, mul, coproc;
 
 	assign ctrl.execute = execute;
 	assign ctrl.undefined = undefined;
@@ -22,6 +24,7 @@ module core_decode
 	assign ctrl.writeback = writeback;
 	assign ctrl.update_flags = update_flags;
 	assign ctrl.branch = branch;
+	assign ctrl.coproc = coproc;
 	assign ctrl.ldst = ldst;
 	assign ctrl.mul = mul;
 
@@ -131,10 +134,23 @@ module core_decode
 		.*
 	);
 
+	logic coproc_writeback, coproc_update_flags;
+	reg_num coproc_rd;
+
+	core_decode_coproc group_coproc
+	(
+		.rd(coproc_rd),
+		.decode(coproc_ctrl),
+		.writeback(coproc_writeback),
+		.update_flags(coproc_update_flags),
+		.*
+	);
+
 	always_comb begin
 		mul = 0;
 		ldst = 0;
 		branch = 0;
+		coproc = 0;
 
 		execute = cond_execute;
 		undefined = cond_undefined;
@@ -234,8 +250,18 @@ module core_decode
 				restore_spsr = ldst_mult_restore_spsr;
 			end
 
+			`GROUP_CP: begin
+				coproc = 1;
+				writeback = coproc_writeback;
+				update_flags = coproc_update_flags;
+
+				data_ctrl.op = `ALU_MOV;
+				data_ctrl.rn = coproc_rd;
+				data_ctrl.rd = coproc_rd;
+				data_ctrl.uses_rn = coproc_ctrl.load;
+			end
+
 			/*`GROUP_SWP: ;
-			`GROUP_CP: ;
 			`INSN_MRS: ;
 			`GROUP_MSR: ;
 			`INSN_SWI: ;*/
@@ -259,6 +285,7 @@ module core_decode
 			mul = 1'bx;
 			ldst = 1'bx;
 			branch = 1'bx;
+			coproc = 1'bx;
 			writeback = 1'bx;
 			conditional = 1'bx;
 			update_flags = 1'bx;

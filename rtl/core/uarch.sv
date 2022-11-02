@@ -65,6 +65,7 @@ typedef struct packed
 	      writeback,
 	      update_flags,
 	      branch,
+	      coproc,
 	      ldst,
 	      mul;
 } datapath_decode;
@@ -133,6 +134,13 @@ typedef struct packed
 	        long_mul,
 	        add;
 } mul_decode;
+
+typedef struct packed
+{
+	logic      load;
+	logic[2:0] op1, op2;
+	reg_num    crn, crm;
+} coproc_decode;
 
 typedef enum
 {

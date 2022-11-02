@@ -35,6 +35,7 @@ module arm810
 	data_decode dec_data;
 	ldst_decode dec_ldst;
 	mul_decode dec_mul;
+	coproc_decode dec_coproc;
 
 	core_decode decode
 	(
@@ -44,6 +45,7 @@ module arm810
 		.data_ctrl(dec_data),
 		.ldst_ctrl(dec_ldst),
 		.mul_ctrl(dec_mul),
+		.coproc_ctrl(dec_coproc),
 		.*
 	);
 
