@@ -25,8 +25,15 @@ module conspiracion
 	inout  wire [15:0] vram_wire_dq,
 	output wire [1:0]  vram_wire_dqm,
 	output wire        vram_wire_ras_n,
-	output wire        vram_wire_we_n
-
+	output wire        vram_wire_we_n,
+	output wire        vga_controller_0_dac_clk,
+	output wire        vga_controller_0_dac_hsync,
+	output wire        vga_controller_0_dac_vsync,
+	output wire        vga_controller_0_dac_blank_n,
+	output wire        vga_controller_0_dac_sync_n,
+	output wire [7:0]  vga_controller_0_dac_r,
+	output wire [7:0]  vga_controller_0_dac_g,
+	output wire [7:0]  vga_controller_0_dac_b
 );
 
 	//TODO
