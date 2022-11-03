@@ -992,7 +992,7 @@
    start="master_0.avalon_master"
    end="jtag_uart_0.avalon_jtag_slave">
   <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="baseAddress" value="0x30000000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
@@ -1001,7 +1001,7 @@
    start="master_0.avalon_master"
    end="vram.s1">
   <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="baseAddress" value="0x38000000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
@@ -1010,7 +1010,7 @@
    start="master_0.avalon_master"
    end="timer_0.s1">
   <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="baseAddress" value="0x30020000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
@@ -1019,7 +1019,7 @@
    start="master_0.avalon_master"
    end="pio_0.s1">
   <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="baseAddress" value="0x30010000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
