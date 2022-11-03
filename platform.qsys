@@ -105,6 +105,14 @@
          type = "int";
       }
    }
+   element vga_controller_0
+   {
+      datum _sortIndex
+      {
+         value = "9";
+         type = "int";
+      }
+   }
    element vram
    {
       datum _sortIndex
@@ -153,6 +161,11 @@
    type="clock"
    dir="start" />
  <interface name="reset" internal="clk_0.clk_in_reset" type="reset" dir="end" />
+ <interface
+   name="vga_controller_0_dac"
+   internal="vga_controller_0.dac"
+   type="conduit"
+   dir="end" />
  <interface name="vram_wire" internal="vram.wire" type="conduit" dir="end" />
  <module
    name="address_span_extender_0"
@@ -727,7 +740,9 @@
    name="master_0"
    kind="conspiracion_bus_master"
    version="1.0"
-   enabled="1" />
+   enabled="1">
+  <parameter name="AUTO_IRQ_INTERRUPTS_USED" value="0" />
+ </module>
  <module name="pio_0" kind="altera_avalon_pio" version="20.1" enabled="1">
   <parameter name="bitClearingEdgeCapReg" value="false" />
   <parameter name="bitModifyingOutReg" value="true" />
@@ -958,6 +973,11 @@
   <parameter name="watchdogPulse" value="2" />
  </module>
  <module
+   name="vga_controller_0"
+   kind="vga_controller"
+   version="1.0"
+   enabled="1" />
+ <module
    name="vram"
    kind="altera_avalon_new_sdram_controller"
    version="20.1"
@@ -1025,6 +1045,15 @@
  <connection
    kind="avalon"
    version="20.1"
+   start="vga_controller_0.avalon_master"
+   end="vram.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="20.1"
    start="master_0.avalon_master"
    end="address_span_extender_0.windowed_slave">
   <parameter name="arbitrationPriority" value="1" />
@@ -1065,6 +1094,11 @@
    end="master_0.clock" />
  <connection kind="clock" version="20.1" start="pll_0.outclk2" end="vram.clk" />
  <connection
+   kind="clock"
+   version="20.1"
+   start="pll_0.outclk2"
+   end="vga_controller_0.clock_sink" />
+ <connection
    kind="reset"
    version="20.1"
    start="clk_0.clk_reset"
@@ -1087,6 +1121,11 @@
    version="20.1"
    start="clk_0.clk_reset"
    end="master_0.reset_sink" />
+ <connection
+   kind="reset"
+   version="20.1"
+   start="clk_0.clk_reset"
+   end="vga_controller_0.reset_sink" />
  <interconnectRequirement for="$system" name="qsys_mm.clockCrossingAdapter" value="HANDSHAKE" />
  <interconnectRequirement for="$system" name="qsys_mm.enableEccProtection" value="FALSE" />
  <interconnectRequirement for="$system" name="qsys_mm.insertDefaultSlave" value="FALSE" />
