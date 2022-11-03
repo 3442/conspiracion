@@ -39,13 +39,14 @@ module conspiracion
 
 	arm810 core
 	(
-		.clk(clk_clk),
+		.clk(cpu_clk),
 		.bus_addr(addr),
 		.bus_data_rd(data_rd),
 		.bus_data_wr(data_wr),
 		.bus_ready(ready),
 		.bus_write(write),
-		.bus_start(start)
+		.bus_start(start),
+		.*
 	);
 
 	//TODO: pio_0_external_connection_export,

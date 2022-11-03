@@ -3,6 +3,7 @@
 module arm810
 (
 	input  logic clk,
+	             irq,
 
 	output ptr   bus_addr,
 	output logic bus_start,
