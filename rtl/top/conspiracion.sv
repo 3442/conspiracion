@@ -35,7 +35,7 @@ module conspiracion
 
 	logic[29:0] addr;
 	logic[31:0] data_rd, data_wr;
-	logic clk_core, ready, write, start;
+	logic cpu_clk, ready, write, start, irq;
 
 	arm810 core
 	(
@@ -53,12 +53,14 @@ module conspiracion
 
 	platform plat
 	(
+		.master_0_core_cpu_clk(cpu_clk),
 		.master_0_core_addr(addr),
 		.master_0_core_data_rd(data_rd),
 		.master_0_core_data_wr(data_wr),
 		.master_0_core_ready(ready),
 		.master_0_core_write(write),
 		.master_0_core_start(start),
+		.master_0_core_irq(irq),
 		.pll_0_outclk3_clk(),
 		.pio_0_external_connection_export(),
 		.*

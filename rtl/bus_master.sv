@@ -9,6 +9,8 @@ module bus_master
 	output logic       ready,
 	output logic[31:0] data_rd,
 	input  logic[31:0] data_wr,
+	output logic       cpu_clk,
+	                   irq,
 
 	output logic[31:0] avl_address,
 	output logic       avl_read,
@@ -16,13 +18,17 @@ module bus_master
 	input  logic[31:0] avl_readdata,
 	output logic[31:0] avl_writedata,
 	input  logic       avl_waitrequest,
-	output logic[3:0]  avl_byteenable
+	output logic[3:0]  avl_byteenable,
+	input  logic       avl_irq
 );
 
 	enum {
 		IDLE,
 		WAIT
 	} state;
+
+	assign irq = avl_irq;
+	assign cpu_clk = clk;
 
 	assign data_rd = avl_readdata;
 	assign avl_byteenable = 4'b1111; //TODO

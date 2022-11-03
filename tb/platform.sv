@@ -9,6 +9,8 @@ module platform (
 		output wire        master_0_core_ready   /*verilator public*/,//              .ready
 		input  wire        master_0_core_write   /*verilator public*/,//              .write
 		input  wire        master_0_core_start   /*verilator public*/,//              .start
+		output wire        master_0_core_irq,                //                          .irq
+		output wire        master_0_core_cpu_clk,            //                          .cpu_clk
 		output wire [12:0] memory_mem_a,                     //                    memory.mem_a
 		output wire [2:0]  memory_mem_ba,                    //                          .mem_ba
 		output wire        memory_mem_ck,                    //                          .mem_ck
@@ -42,6 +44,7 @@ module platform (
 	logic[31:0] avl_address /*verilator public*/;
 	logic       avl_read /*verilator public*/;
 	logic       avl_write /*verilator public*/;
+	logic       avl_irq /*verilator public_flat_rw @(negedge clk_clk)*/;
 	logic[31:0] avl_readdata /*verilator public_flat_rw @(negedge clk_clk)*/;
 	logic[31:0] avl_writedata /*verilator public*/;
 	logic       avl_waitrequest /*verilator public_flat_rw @(negedge clk_clk)*/;
@@ -57,6 +60,8 @@ module platform (
 		.ready(master_0_core_ready),
 		.data_rd(master_0_core_data_rd),
 		.data_wr(master_0_core_data_wr),
+		.cpu_clk(master_0_core_cpu_clk),
+		.irq(master_0_core_irq),
 		.*
 	);
 
