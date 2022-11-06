@@ -143,6 +143,7 @@ set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/data.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/exception.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/issue.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/ldst/pop.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/select.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/stall.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/writeback.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/cp15.sv

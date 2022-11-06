@@ -56,7 +56,7 @@ module core_control
 
 	logic ldst, ldst_pre, ldst_increment, ldst_writeback, pop_valid;
 	word mem_offset;
-	reg_num r_shift, popped_upper, popped_lower, popped;
+	reg_num popped_upper, popped_lower, popped;
 	reg_list mem_regs, next_regs_upper, next_regs_lower;
 
 	assign reg_mode = `MODE_SVC; //TODO
@@ -81,6 +81,11 @@ module core_control
 	logic issue, undefined;
 
 	core_control_issue ctrl_issue
+	(
+		.*
+	);
+
+	core_control_select ctrl_select
 	(
 		.*
 	);
@@ -130,10 +135,6 @@ module core_control
 		unique case(next_cycle)
 			ISSUE:
 				if(issue) begin
-					ra <= dec_data.rn;
-					rb <= dec_snd.r;
-					r_shift <= dec_snd.r_shift;
-
 					// TODO: dec_ldst.unprivileged/user_regs
 					// TODO: byte/halfword sizes
 					ldst <= dec.ldst;
@@ -152,8 +153,7 @@ module core_control
 					mem_write <= !dec_ldst.load;
 				end
 
-			RD_INDIRECT_SHIFT:
-				rb <= r_shift;
+			RD_INDIRECT_SHIFT: ;
 
 			WITH_SHIFT: ;
 
@@ -166,11 +166,6 @@ module core_control
 				if(cycle != TRANSFER || mem_ready) begin
 					mem_regs <= ldst_increment ? next_regs_lower : next_regs_upper;
 					mem_addr <= ldst_pre ? q_alu[31:2] : alu_a[31:2];
-
-					if(pop_valid)
-						rb <= popped;
-					else
-						rb <= final_rd; // Viene de dec_ldst.rd
 				end
 
 				mem_start <= cycle != TRANSFER || (mem_ready && pop_valid);
