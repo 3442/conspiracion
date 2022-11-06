@@ -25,6 +25,10 @@
         export MAKEFLAGS="AR=gcc-ar"
         export CXXFLAGS="-O3 -flto $(pkg-config --cflags sdl2)"
         export LDFLAGS="-O3 -flto $(pkg-config --libs sdl2)"
+
+        # <https://discourse.nixos.org/t/fonts-in-nix-installed-packages-on-a-non-nixos-system/5871/7>
+        export LOCALE_ARCHIVE="${pkgs.glibcLocales}/lib/locale/locale-archive"
+        export FONTCONFIG_FILE="${pkgs.fontconfig.out}/etc/fonts/fonts.conf"
       '';
     };
   };

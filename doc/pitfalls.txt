@@ -159,3 +159,16 @@ Voy a seguir con esto después.
 	===
 
 Lo útil empieza en l[ineas 2108 y 3086 del README.
+
+
+	===
+	[VI] Ejecución de Qsys (Platform Designer) de manera OS-agnóstica
+	===
+
+EL problema de NullPointerExceptions de AWT al abrir QSys en sistemas non-NixOS,
+es por configuración de fonts. Ver este caso:
+	<https://discourse.nixos.org/t/fonts-in-nix-installed-packages-on-a-non-nixos-system/5871/7>
+
+	La soloución es usar home-manager o utilizar:
+		export LOCALE_ARCHIVE="${pkgs.glibcLocales}/lib/locale/locale-archive"
+		export FONTCONFIG_FILE="${pkgs.fontconfig.out}/etc/fonts/fonts.conf"
