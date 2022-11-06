@@ -106,6 +106,11 @@ module core_control
 		.pop_lower(popped_lower)
 	);
 
+	core_control_branch ctrl_branch
+	(
+		.*
+	);
+
 	core_control_mux ctrl_mux
 	(
 		.*
@@ -123,7 +128,6 @@ module core_control
 		vector_offset = 3'b001; //TODO
 
 	always_ff @(posedge clk) begin
-		branch <= 0;
 		update_flags <= 0;
 		wb_alu_flags <= alu_flags;
 
@@ -132,9 +136,6 @@ module core_control
 				final_update_flags <= 0;
 
 				if(issue) begin
-					branch <= dec.branch;
-					branch_target <= next_pc_visible + dec_branch.offset;
-
 					alu <= dec_data.op;
 					ra <= dec_data.rn;
 
@@ -224,8 +225,6 @@ module core_control
 
 	initial begin
 		c_in = 0;
-		branch = 1;
-		branch_target = 30'd0;
 		data_snd_shift_by_reg = 0;
 
 		wb_alu_flags = 4'b0000;
