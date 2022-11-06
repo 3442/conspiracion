@@ -105,6 +105,11 @@ module core_control
 		.*
 	);
 
+	core_control_data ctrl_mul
+	(
+		.*
+	);
+
 	logic final_writeback, final_update_flags;
 	reg_num final_rd;
 
@@ -126,14 +131,8 @@ module core_control
 
 		unique0 case(next_cycle)
 			ISSUE:
-				if(issue) begin
-					mul <= dec.mul;
-					mul_add <= dec_mul.add;
-					mul_long <= dec_mul.long_mul;
-					mul_signed <= dec_mul.signed_mul;
-
+				if(issue)
 					coproc <= dec.coproc;
-				end
 		endcase
 	end
 

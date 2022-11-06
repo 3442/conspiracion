@@ -142,6 +142,7 @@ set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/cycles.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/data.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/exception.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/issue.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/mul.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/ldst/ldst.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/ldst/pop.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/select.sv
