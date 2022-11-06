@@ -8,6 +8,7 @@ typedef logic[3:0]  reg_num;
 typedef logic[2:0]  cp_opcode;
 typedef logic[15:0] reg_list;
 typedef logic[31:0] word;
+typedef logic[63:0] dword;
 typedef logic[29:0] ptr;
 
 `define R14 4'b1110

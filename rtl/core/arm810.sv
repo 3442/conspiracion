@@ -125,9 +125,27 @@ module arm810
 		.c(c_shifter)
 	);
 
-	//TODO
 	logic mul, mul_add, mul_long, mul_signed, mul_ready;
-	assign mul_ready = 1;
+	word mul_a, mul_b, mul_c_hi, mul_c_lo, mul_q_hi, mul_q_lo;
+	psr_flags mul_flags;
+
+	core_mul mult
+	(
+		.a(mul_a),
+		.b(mul_b),
+		.c_hi(mul_c_hi),
+		.c_lo(mul_c_lo),
+		.long_mul(mul_long),
+		.add(mul_add),
+		.sig(mul_signed),
+		.start(mul),
+		.q_hi(mul_q_hi),
+		.q_lo(mul_q_lo),
+		.n(mul_flags.n),
+		.z(mul_flags.z),
+		.ready(mul_ready),
+		.*
+	);
 
 	ptr data_addr;
 	logic data_start, data_write, data_ready, insn_ready;
