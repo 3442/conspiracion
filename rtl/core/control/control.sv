@@ -64,7 +64,6 @@ module core_control
 	word saved_base, mem_offset, vector;
 	reg_num r_shift, final_rd, popped_upper, popped_lower, popped;
 	reg_list mem_regs, next_regs_upper, next_regs_lower;
-	ptr pc /*verilator public*/, next_pc_visible;
 
 	assign reg_mode = `MODE_SVC; //TODO
 	assign trivial_shift = shifter_shift == 0;
@@ -77,7 +76,7 @@ module core_control
 
 	ctrl_cycle cycle, next_cycle;
 
-	core_control_cycles cycles
+	core_control_cycles ctrl_cycles
 	(
 		.*
 	);
@@ -89,7 +88,15 @@ module core_control
 		.*
 	);
 
-	core_control_ldst_pop ldst_pop
+	ptr pc /*verilator public*/, next_pc_visible;
+	logic issue;
+
+	core_control_issue ctrl_issue
+	(
+		.*
+	);
+
+	core_control_ldst_pop ctrl_ldst_pop
 	(
 		.regs(mem_regs),
 		.valid(pop_valid),
@@ -99,7 +106,7 @@ module core_control
 		.pop_lower(popped_lower)
 	);
 
-	core_control_mux mux
+	core_control_mux ctrl_mux
 	(
 		.*
 	);
@@ -124,7 +131,7 @@ module core_control
 				final_writeback <= 0;
 				final_update_flags <= 0;
 
-				if(dec.execute & ~next_bubble) begin
+				if(issue) begin
 					branch <= dec.branch;
 					branch_target <= next_pc_visible + dec_branch.offset;
 
@@ -169,16 +176,8 @@ module core_control
 
 				update_flags <= final_update_flags;
 				writeback <= final_writeback;
-				undefined <= dec.undefined;
-
-`ifdef VERILATOR
-				if(dec.undefined)
-					$display("[core] undefined insn: [0x%08x] %08x", fetch_insn_pc << 2, insn);
-`endif
 
 				rd <= final_rd;
-				pc <= fetch_insn_pc;
-				pc_visible <= next_pc_visible;
 			end
 
 			RD_INDIRECT_SHIFT: begin
@@ -247,16 +246,11 @@ module core_control
 	end
 
 	initial begin
-		pc = 0;
-		pc_visible = 2;
-
 		c_in = 0;
 		branch = 1;
 		writeback = 0;
 		branch_target = 30'd0;
 		data_snd_shift_by_reg = 0;
-
-		undefined = 0;
 
 		wb_alu_flags = 4'b0000;
 
