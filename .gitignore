@@ -41,3 +41,4 @@ platform.sopcinfo
 hps_isw_handoff/
 *~
 *.vcd
+qmegawiz_errors_log.txt
