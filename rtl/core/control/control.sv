@@ -54,20 +54,14 @@ module core_control
 	                       coproc
 );
 
-	logic ldst, ldst_pre, ldst_increment,
-	      ldst_writeback, pop_valid, exception, high_vectors;
-
-	logic[2:0] vector_offset;
-	word mem_offset, vector;
+	logic ldst, ldst_pre, ldst_increment, ldst_writeback, pop_valid;
+	word mem_offset;
 	reg_num r_shift, popped_upper, popped_lower, popped;
 	reg_list mem_regs, next_regs_upper, next_regs_lower;
 
 	assign reg_mode = `MODE_SVC; //TODO
 	assign mem_data_wr = rd_value_b;
 	assign popped = ldst_increment ? popped_lower : popped_upper;
-	assign exception = undefined; //TODO
-	assign high_vectors = 0; //TODO
-	assign vector = {{16{high_vectors}}, 11'b0, vector_offset, 2'b00};
 
 	ctrl_cycle cycle, next_cycle;
 
@@ -122,8 +116,13 @@ module core_control
 		.*
 	);
 
-	always_comb
-		vector_offset = 3'b001; //TODO
+	word vector;
+	logic exception;
+
+	core_control_exception ctrl_exc
+	(
+		.*
+	);
 
 	always_ff @(posedge clk) begin
 		wb_alu_flags <= alu_flags;
