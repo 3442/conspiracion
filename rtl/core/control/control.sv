@@ -55,24 +55,19 @@ module core_control
 );
 
 	logic final_update_flags, ldst, ldst_pre, ldst_increment,
-	      ldst_writeback, pop_valid, data_snd_is_imm, data_snd_shift_by_reg,
-	      trivial_shift, undefined, exception, high_vectors;
+	      ldst_writeback, pop_valid, exception, high_vectors;
 
 	logic[2:0] vector_offset;
-	logic[5:0] data_shift_imm;
-	logic[11:0] data_imm;
-	word saved_base, mem_offset, vector;
+	word mem_offset, vector;
 	reg_num r_shift, popped_upper, popped_lower, popped;
 	reg_list mem_regs, next_regs_upper, next_regs_lower;
 
 	assign reg_mode = `MODE_SVC; //TODO
-	assign trivial_shift = shifter_shift == 0;
 	assign mem_data_wr = rd_value_b;
 	assign popped = ldst_increment ? popped_lower : popped_upper;
 	assign exception = undefined; //TODO
 	assign high_vectors = 0; //TODO
 	assign vector = {{16{high_vectors}}, 11'b0, vector_offset, 2'b00};
-	assign next_pc_visible = fetch_insn_pc + 2;
 
 	ctrl_cycle cycle, next_cycle;
 
@@ -89,7 +84,7 @@ module core_control
 	);
 
 	ptr pc /*verilator public*/, next_pc_visible;
-	logic issue;
+	logic issue, undefined;
 
 	core_control_issue ctrl_issue
 	(
@@ -111,7 +106,10 @@ module core_control
 		.*
 	);
 
-	core_control_mux ctrl_mux
+	word saved_base;
+	logic trivial_shift, data_snd_shift_by_reg;
+
+	core_control_data ctrl_data
 	(
 		.*
 	);
@@ -136,22 +134,9 @@ module core_control
 				final_update_flags <= 0;
 
 				if(issue) begin
-					alu <= dec_data.op;
 					ra <= dec_data.rn;
-
-					data_snd_is_imm <= dec_snd.is_imm;
-					data_snd_shift_by_reg <= dec_snd.shift_by_reg;
-					data_imm <= dec_snd.imm;
-					data_shift_imm <= dec_snd.shift_imm;
-
-					shifter.shr <= dec_snd.shr;
-					shifter.ror <= dec_snd.ror;
-					shifter.put_carry <= dec_snd.put_carry;
-					shifter.sign_extend <= dec_snd.sign_extend;
-
 					rb <= dec_snd.r;
 					r_shift <= dec_snd.r_shift;
-					c_in <= flags.c;
 
 					// TODO: dec_ldst.unprivileged/user_regs
 					// TODO: byte/halfword sizes
@@ -176,16 +161,10 @@ module core_control
 				update_flags <= final_update_flags;
 			end
 
-			RD_INDIRECT_SHIFT: begin
+			RD_INDIRECT_SHIFT:
 				rb <= r_shift;
-				data_snd_shift_by_reg <= 0;
-				saved_base <= rd_value_b;
-			end
 
-			WITH_SHIFT: begin
-				c_in <= c_shifter;
-				saved_base <= q_shifter;
-			end
+			WITH_SHIFT: ;
 
 			TRANSFER: begin
 				if(cycle != TRANSFER) begin
@@ -196,7 +175,6 @@ module core_control
 				if(cycle != TRANSFER || mem_ready) begin
 					mem_regs <= ldst_increment ? next_regs_lower : next_regs_upper;
 					mem_addr <= ldst_pre ? q_alu[31:2] : alu_a[31:2];
-					saved_base <= q_alu;
 
 					if(pop_valid)
 						rb <= popped;
@@ -209,24 +187,16 @@ module core_control
 
 			BASE_WRITEBACK: ;
 
-			EXCEPTION: begin
+			EXCEPTION:
 				//TODO: spsr_<mode> = cpsr
 				//TODO: actualizar modo
 				//TODO: deshabilitar IRQs/FIQs dependiendo de modo
 				//TODO: Considerar que data abort usa + 8, no + 4
-				alu <= `ALU_ADD;
-				data_imm <= 12'd4;
-				data_snd_is_imm <= 1;
-
 				final_update_flags <= 0;
-			end
 		endcase
 	end
 
 	initial begin
-		c_in = 0;
-		data_snd_shift_by_reg = 0;
-
 		wb_alu_flags = 4'b0000;
 
 		ldst = 0;

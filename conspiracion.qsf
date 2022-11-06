@@ -139,8 +139,8 @@ set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/arm810.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/branch.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/control.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/cycles.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/data.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/issue.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/mux.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/ldst/pop.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/stall.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/writeback.sv
