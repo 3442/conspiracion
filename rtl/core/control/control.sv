@@ -54,8 +54,6 @@ module core_control
 	                       coproc
 );
 
-	assign reg_mode = `MODE_SVC; //TODO
-
 	ctrl_cycle cycle, next_cycle;
 
 	core_control_cycles ctrl_cycles
@@ -130,11 +128,5 @@ module core_control
 	(
 		.*
 	);
-
-	always_ff @(posedge clk)
-		wb_alu_flags <= alu_flags;
-
-	initial
-		wb_alu_flags = 4'b0000;
 
 endmodule

@@ -13,6 +13,7 @@ module core_control_writeback
 	                       mem_data_rd,
 	                       vector,
 	                       q_alu,
+	input  psr_flags       alu_flags,
 	input  reg_num         ra,
 	                       popped,
 	input  logic           pop_valid,
@@ -26,10 +27,13 @@ module core_control_writeback
 	                       final_writeback,
 	                       update_flags,
 	                       final_update_flags,
-	output word            wr_value
+	output word            wr_value,
+	output psr_flags       wb_alu_flags
 );
 
-	always @(posedge clk) begin
+	always_ff @(posedge clk) begin
+		wb_alu_flags <= alu_flags;
+
 		unique0 case(next_cycle)
 			TRANSFER:
 				if(mem_ready)
@@ -128,6 +132,7 @@ module core_control_writeback
 		final_update_flags = 0;
 
 		wr_value = 0;
+		wb_alu_flags = {$bits(wb_alu_flags){1'b0}};
 	end
 
 endmodule

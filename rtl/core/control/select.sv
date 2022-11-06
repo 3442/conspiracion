@@ -16,10 +16,13 @@ module core_control_select
 	                   final_rd,
 
 	output reg_num     ra,
-	                   rb
+	                   rb,
+	output psr_mode    reg_mode
 );
 
 	reg_num r_shift;
+
+	assign reg_mode = `MODE_SVC; //TODO
 
 	always_ff @(posedge clk)
 		unique0 case(next_cycle)

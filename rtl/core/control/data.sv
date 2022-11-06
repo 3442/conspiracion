@@ -64,7 +64,7 @@ module core_control_data
 		endcase
 	end
 
-	always @(posedge clk)
+	always_ff @(posedge clk)
 		unique0 case(next_cycle)
 			ISSUE:
 				if(issue) begin
