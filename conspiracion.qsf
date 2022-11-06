@@ -138,9 +138,11 @@ set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/alu/xor.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/arm810.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/control.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/cycles.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/issue.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/mux.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/ldst/pop.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/stall.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/writeback.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/cp15.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/cpuid.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/map.sv

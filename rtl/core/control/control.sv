@@ -54,7 +54,7 @@ module core_control
 	                       coproc
 );
 
-	logic final_writeback, final_update_flags, ldst, ldst_pre, ldst_increment,
+	logic final_update_flags, ldst, ldst_pre, ldst_increment,
 	      ldst_writeback, pop_valid, data_snd_is_imm, data_snd_shift_by_reg,
 	      trivial_shift, undefined, exception, high_vectors;
 
@@ -62,7 +62,7 @@ module core_control
 	logic[5:0] data_shift_imm;
 	logic[11:0] data_imm;
 	word saved_base, mem_offset, vector;
-	reg_num r_shift, final_rd, popped_upper, popped_lower, popped;
+	reg_num r_shift, popped_upper, popped_lower, popped;
 	reg_list mem_regs, next_regs_upper, next_regs_lower;
 
 	assign reg_mode = `MODE_SVC; //TODO
@@ -111,24 +111,24 @@ module core_control
 		.*
 	);
 
+	logic final_writeback;
+	reg_num final_rd;
+
+	core_control_writeback ctrl_wb
+	(
+		.*
+	);
+
 	always_comb
 		vector_offset = 3'b001; //TODO
 
 	always_ff @(posedge clk) begin
 		branch <= 0;
-		writeback <= 0;
 		update_flags <= 0;
 		wb_alu_flags <= alu_flags;
 
-		unique case(cycle)
-			TRANSFER:       wr_value <= mem_data_rd;
-			BASE_WRITEBACK: wr_value <= saved_base;
-			default:        wr_value <= q_alu;
-		endcase
-
 		unique case(next_cycle)
 			ISSUE: begin
-				final_writeback <= 0;
 				final_update_flags <= 0;
 
 				if(issue) begin
@@ -169,15 +169,10 @@ module core_control
 					mem_regs <= dec_ldst.regs;
 					mem_write <= !dec_ldst.load;
 
-					final_rd <= dec_data.rd;
-					final_writeback <= dec.writeback;
 					final_update_flags <= dec.update_flags;
 				end
 
 				update_flags <= final_update_flags;
-				writeback <= final_writeback;
-
-				rd <= final_rd;
 			end
 
 			RD_INDIRECT_SHIFT: begin
@@ -197,49 +192,31 @@ module core_control
 					mem_offset <= alu_b;
 				end
 
-				writeback <= mem_ready && !mem_write;
-				if(mem_ready) begin
-					rd <= final_rd;
-					wr_value <= mem_data_rd;
-				end
-
 				if(cycle != TRANSFER || mem_ready) begin
 					mem_regs <= ldst_increment ? next_regs_lower : next_regs_upper;
 					mem_addr <= ldst_pre ? q_alu[31:2] : alu_a[31:2];
 					saved_base <= q_alu;
 
-					if(pop_valid) begin
+					if(pop_valid)
 						rb <= popped;
-						final_rd <= popped;
-					end else
+					else
 						rb <= final_rd; // Viene de dec_ldst.rd
 				end
 
 				mem_start <= cycle != TRANSFER || (mem_ready && pop_valid);
 			end
 
-			BASE_WRITEBACK: begin
-				rd <= final_rd;
-				wr_value <= mem_data_rd;
-				writeback <= !mem_write;
-				final_rd <= ra;
-			end
+			BASE_WRITEBACK: ;
 
 			EXCEPTION: begin
 				//TODO: spsr_<mode> = cpsr
 				//TODO: actualizar modo
 				//TODO: deshabilitar IRQs/FIQs dependiendo de modo
 				//TODO: Considerar que data abort usa + 8, no + 4
-				rd <= `R15;
-				wr_value <= vector;
-				writeback <= 1;
-
 				alu <= `ALU_ADD;
 				data_imm <= 12'd4;
 				data_snd_is_imm <= 1;
 
-				final_rd <= `R14;
-				final_writeback <= 1;
 				final_update_flags <= 0;
 			end
 		endcase
@@ -248,7 +225,6 @@ module core_control
 	initial begin
 		c_in = 0;
 		branch = 1;
-		writeback = 0;
 		branch_target = 30'd0;
 		data_snd_shift_by_reg = 0;
 
@@ -264,9 +240,6 @@ module core_control
 		mem_start = 0;
 		mem_regs = 16'b0;
 		mem_offset = 0;
-
-		final_rd = 0;
-		final_writeback = 0;
 	end
 
 endmodule
