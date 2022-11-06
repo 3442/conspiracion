@@ -54,7 +54,7 @@ module core_control
 	                       coproc
 );
 
-	logic final_update_flags, ldst, ldst_pre, ldst_increment,
+	logic ldst, ldst_pre, ldst_increment,
 	      ldst_writeback, pop_valid, exception, high_vectors;
 
 	logic[2:0] vector_offset;
@@ -114,7 +114,7 @@ module core_control
 		.*
 	);
 
-	logic final_writeback;
+	logic final_writeback, final_update_flags;
 	reg_num final_rd;
 
 	core_control_writeback ctrl_wb
@@ -126,13 +126,10 @@ module core_control
 		vector_offset = 3'b001; //TODO
 
 	always_ff @(posedge clk) begin
-		update_flags <= 0;
 		wb_alu_flags <= alu_flags;
 
 		unique case(next_cycle)
-			ISSUE: begin
-				final_update_flags <= 0;
-
+			ISSUE:
 				if(issue) begin
 					ra <= dec_data.rn;
 					rb <= dec_snd.r;
@@ -154,12 +151,7 @@ module core_control
 
 					mem_regs <= dec_ldst.regs;
 					mem_write <= !dec_ldst.load;
-
-					final_update_flags <= dec.update_flags;
 				end
-
-				update_flags <= final_update_flags;
-			end
 
 			RD_INDIRECT_SHIFT:
 				rb <= r_shift;
@@ -187,12 +179,7 @@ module core_control
 
 			BASE_WRITEBACK: ;
 
-			EXCEPTION:
-				//TODO: spsr_<mode> = cpsr
-				//TODO: actualizar modo
-				//TODO: deshabilitar IRQs/FIQs dependiendo de modo
-				//TODO: Considerar que data abort usa + 8, no + 4
-				final_update_flags <= 0;
+			EXCEPTION: ;
 		endcase
 	end
 

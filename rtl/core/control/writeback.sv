@@ -24,6 +24,8 @@ module core_control_writeback
 	                       final_rd,
 	output logic           writeback,
 	                       final_writeback,
+	                       update_flags,
+	                       final_update_flags,
 	output word            wr_value
 );
 
@@ -85,6 +87,23 @@ module core_control_writeback
 			default:        wr_value <= q_alu;
 		endcase
 
+		update_flags <= 0;
+		unique0 case(next_cycle)
+			ISSUE:
+				update_flags <= final_update_flags;
+
+			EXCEPTION:
+				final_update_flags <= 0;
+		endcase
+
+		unique0 case(next_cycle)
+			ISSUE:
+				final_update_flags <= issue && dec.update_flags;
+
+			EXCEPTION:
+				final_update_flags <= 0;
+		endcase
+
 		unique0 case(next_cycle)
 			TRANSFER:
 				if(mem_ready)
@@ -101,9 +120,14 @@ module core_control_writeback
 	initial begin
 		rd = 0;
 		final_rd = 0;
-		wr_value = 0;
+
 		writeback = 0;
 		final_writeback = 0;
+
+		update_flags = 0;
+		final_update_flags = 0;
+
+		wr_value = 0;
 	end
 
 endmodule
