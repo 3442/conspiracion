@@ -126,15 +126,13 @@ module core_control
 		.*
 	);
 
-	always_ff @(posedge clk) begin
-		wb_alu_flags <= alu_flags;
+	core_control_coproc ctrl_cp
+	(
+		.*
+	);
 
-		unique0 case(next_cycle)
-			ISSUE:
-				if(issue)
-					coproc <= dec.coproc;
-		endcase
-	end
+	always_ff @(posedge clk)
+		wb_alu_flags <= alu_flags;
 
 	initial
 		wb_alu_flags = 4'b0000;
