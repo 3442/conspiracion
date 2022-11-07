@@ -19,7 +19,7 @@ module arm810
 
 	core_fetch #(.PREFETCH_ORDER(2)) fetch
 	(
-		.branch(explicit_branch | wr_pc),
+		.branch(explicit_branch || wr_pc),
 		.flush(0), //TODO
 		.target(wr_pc ? wr_value[31:2] : branch_target),
 		.addr(insn_addr),

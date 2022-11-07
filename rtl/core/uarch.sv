@@ -22,7 +22,8 @@ typedef logic[29:0] ptr;
  *    registers are 32 bits wide and are described in General-purpose registers on
  *    page A2-6.
  */
-typedef logic[4:0] reg_index;
+`define NUM_GPREGS 30
+typedef logic[$clog2(`NUM_GPREGS) - 1:0] reg_index;
 
 typedef logic[3:0] alu_op;
 

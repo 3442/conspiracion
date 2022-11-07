@@ -3,27 +3,47 @@
 module core_reg_file
 (
 	input  logic     clk,
-	input  reg_index rd_index,
-	                 wr_index,
+	input  psr_mode  rd_mode,
+	input  reg_num   rd_r,
+	input  reg_index wr_index,
 	input  logic     wr_enable,
+	                 wr_enable_file,
 	input  word      wr_value,
+	                 wr_current,
+	                 pc_word,
 
 	output word      rd_value
 );
 
 	// Ver comentario en uarch.sv
-	word file[30] /*verilator public*/;
+	word file[`NUM_GPREGS] /*verilator public*/;
+	word rd_actual;
+	logic rd_pc, hold_rd_pc, forward;
+	reg_index rd_index;
 
-	//FIXME: Esto claramente no sirve
-`ifdef VERILATOR
-	always_ff @(negedge clk) begin
-`else
+	core_reg_map map_rd
+	(
+		.r(rd_r),
+		.mode(rd_mode),
+		.is_pc(rd_pc),
+		.index(rd_index)
+	);
+
+	assign rd_value = hold_rd_pc ? pc_word : forward ? wr_current : rd_actual;
+
 	always_ff @(posedge clk) begin
-`endif
-		if(wr_enable)
+		forward <= wr_enable && rd_index == wr_index;
+		hold_rd_pc <= rd_pc;
+
+		if(wr_enable_file)
 			file[wr_index] <= wr_value;
 
-		rd_value <= file[rd_index];
+		rd_actual <= file[rd_index];
+	end
+
+	initial begin
+		forward = 0;
+		hold_rd_pc = 0;
 	end
 
 endmodule

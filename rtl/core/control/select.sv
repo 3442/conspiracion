@@ -22,36 +22,44 @@ module core_control_select
 	output psr_mode    reg_mode
 );
 
-	reg_num r_shift;
+	reg_num r_shift, last_ra, last_rb;
 
 	assign reg_mode = `MODE_SVC; //TODO
 
-	always_ff @(posedge clk)
+	always_comb begin
+		ra = last_ra;
+		rb = last_rb;
+
 		unique case(next_cycle)
 			ISSUE:
 				if(issue) begin
-					ra <= dec_data.rn;
-					rb <= dec_snd.r;
-					r_shift <= dec_snd.r_shift;
+					ra = dec_data.rn;
+					rb = dec_snd.r;
 				end
-
-			RD_INDIRECT_SHIFT:
-				rb <= r_shift;
 
 			TRANSFER:
 				if(cycle != TRANSFER || mem_ready)
 					// final_rd viene de dec_ldst.rd
-					rb <= pop_valid ? popped : final_rd;
+					rb = pop_valid ? popped : final_rd;
 
 			MUL_ACC_LD: begin
-				ra <= mul_r_add_hi;
-				rb <= mul_r_add_lo;
+				ra = mul_r_add_hi;
+				rb = mul_r_add_lo;
 			end
 		endcase
+	end
+
+	always_ff @(posedge clk) begin
+		last_ra <= ra;
+		last_rb <= rb;
+
+		if(next_cycle == ISSUE && issue)
+			r_shift <= dec_snd.r_shift;
+	end
 
 	initial begin
-		ra = {$bits(ra){1'b0}};
-		rb = {$bits(rb){1'b0}};
+		last_ra = {$bits(ra){1'b0}};
+		last_rb = {$bits(rb){1'b0}};
 		r_shift = {$bits(r_shift){1'b0}};
 	end
 
