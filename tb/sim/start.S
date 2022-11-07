@@ -4,7 +4,7 @@ __reset:
 	b _start
 
 __undefined:
-	b __undefined
+	b undefined
 
 __swi:
 	b __data_abort
@@ -28,3 +28,7 @@ _start:
 	ldr sp, =_stack_end
 	bl  reset
 	b   .
+
+.weak undefined
+undefined:
+	b undefined
