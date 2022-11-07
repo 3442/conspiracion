@@ -23,7 +23,7 @@ module core_control_cycles
 	always_comb begin
 		next_cycle = ISSUE;
 
-		unique0 case(cycle)
+		unique case(cycle)
 			ISSUE:
 				if(exception)
 					next_cycle = EXCEPTION;

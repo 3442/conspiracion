@@ -27,7 +27,7 @@ module core_control_select
 	assign reg_mode = `MODE_SVC; //TODO
 
 	always_ff @(posedge clk)
-		unique0 case(next_cycle)
+		unique case(next_cycle)
 			ISSUE:
 				if(issue) begin
 					ra <= dec_data.rn;

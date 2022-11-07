@@ -65,7 +65,7 @@ module core_control_data
 	end
 
 	always_ff @(posedge clk)
-		unique0 case(next_cycle)
+		unique case(next_cycle)
 			ISSUE:
 				if(issue) begin
 					alu <= dec_data.op;

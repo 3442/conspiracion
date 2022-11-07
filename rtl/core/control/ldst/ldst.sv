@@ -45,7 +45,7 @@ module core_control_ldst
 	);
 
 	always_ff @(posedge clk)
-		unique0 case(next_cycle)
+		unique case(next_cycle)
 			ISSUE:
 				if(issue) begin
 					// TODO: dec_ldst.unprivileged/user_regs

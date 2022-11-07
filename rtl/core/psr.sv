@@ -129,7 +129,7 @@ module core_psr
 		end else if(!saved)
 			cpsr <= wr_clean;
 		else
-			unique0 case(mode)
+			unique case(mode)
 				`MODE_SVC: spsr_svc <= wr_clean;
 				`MODE_ABT: spsr_abt <= wr_clean;
 				`MODE_UND: spsr_und <= wr_clean;

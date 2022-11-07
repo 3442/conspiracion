@@ -35,7 +35,7 @@ module core_control_mul
 	always_ff @(posedge clk) begin
 		mul_start <= 0;
 
-		unique0 case(next_cycle)
+		unique case(next_cycle)
 			ISSUE:
 				if(issue) begin
 					mul <= dec.mul;

@@ -77,6 +77,7 @@ module core_decode_mux
 		undefined = cond_undefined;
 		writeback = 0;
 		conditional = explicit_cond;
+		restore_spsr = 0;
 
 		spsr = 0;
 		psr_write = 0;

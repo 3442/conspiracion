@@ -38,7 +38,7 @@ module core_control_writeback
 	always_ff @(posedge clk) begin
 		wb_alu_flags <= alu_flags;
 
-		unique0 case(next_cycle)
+		unique case(next_cycle)
 			TRANSFER:
 				if(mem_ready)
 					rd <= final_rd;
@@ -53,7 +53,7 @@ module core_control_writeback
 				rd <= mul_r_add_hi;
 		endcase
 
-		unique0 case(next_cycle)
+		unique case(next_cycle)
 			ISSUE:
 				if(issue)
 					final_rd <= dec_data.rd;
@@ -70,7 +70,7 @@ module core_control_writeback
 		endcase
 
 		writeback <= 0;
-		unique0 case(next_cycle)
+		unique case(next_cycle)
 			ISSUE:
 				writeback <= final_writeback;
 
@@ -84,7 +84,7 @@ module core_control_writeback
 				writeback <= 1;
 		endcase
 
-		unique0 case(next_cycle)
+		unique case(next_cycle)
 			ISSUE:
 				final_writeback <= issue && dec.writeback;
 
@@ -93,7 +93,7 @@ module core_control_writeback
 		endcase
 
 		update_flags <= 0;
-		unique0 case(next_cycle)
+		unique case(next_cycle)
 			ISSUE:
 				update_flags <= final_update_flags;
 
@@ -101,7 +101,7 @@ module core_control_writeback
 				final_update_flags <= 0;
 		endcase
 
-		unique0 case(next_cycle)
+		unique case(next_cycle)
 			ISSUE:
 				final_update_flags <= issue && dec_psr.update_flags;
 
@@ -123,7 +123,7 @@ module core_control_writeback
 				wr_value <= q_alu;
 		endcase
 
-		unique0 case(next_cycle)
+		unique case(next_cycle)
 			TRANSFER:
 				if(mem_ready)
 					wr_value <= mem_data_rd;
