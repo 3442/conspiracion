@@ -31,6 +31,7 @@ module arm810
 	);
 
 	datapath_decode dec;
+	psr_decode dec_psr;
 	branch_decode dec_branch;
 	snd_decode dec_snd;
 	data_decode dec_data;
@@ -41,6 +42,7 @@ module arm810
 	core_decode decode
 	(
 		.ctrl(dec),
+		.psr_ctrl(dec_psr),
 		.branch_ctrl(dec_branch),
 		.snd_ctrl(dec_snd),
 		.data_ctrl(dec_data),

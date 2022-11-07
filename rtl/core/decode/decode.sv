@@ -7,6 +7,7 @@ module core_decode
 	input  psr_flags       flags,
 
 	output datapath_decode ctrl,
+	output psr_decode      psr_ctrl,
 	output branch_decode   branch_ctrl,
 	output snd_decode      snd_ctrl,
 	output data_decode     data_ctrl,
@@ -15,18 +16,21 @@ module core_decode
 	output coproc_decode   coproc_ctrl
 );
 
-	logic execute, undefined, conditional, writeback,
-	      update_flags, branch, ldst, mul, coproc;
+	logic execute, undefined, explicit_cond, conditional, writeback,
+	      update_flags, branch, ldst, mul, coproc, spsr, psr_write;
 
 	assign ctrl.execute = execute;
 	assign ctrl.undefined = undefined;
 	assign ctrl.conditional = conditional;
 	assign ctrl.writeback = writeback;
-	assign ctrl.update_flags = update_flags;
 	assign ctrl.branch = branch;
 	assign ctrl.coproc = coproc;
 	assign ctrl.ldst = ldst;
 	assign ctrl.mul = mul;
+
+	assign psr_ctrl.saved = spsr;
+	assign psr_ctrl.write = psr_write;
+	assign psr_ctrl.update_flags = update_flags;
 
 	//TODO
 	logic restore_spsr;
@@ -38,6 +42,7 @@ module core_decode
 		.cond(insn `FIELD_COND),
 		.execute(cond_execute),
 		.undefined(cond_undefined),
+		.conditional(explicit_cond),
 		.*
 	);
 
@@ -174,10 +179,13 @@ module core_decode
 		ldst = 0;
 		branch = 0;
 		coproc = 0;
-
 		execute = cond_execute;
 		undefined = cond_undefined;
 		writeback = 0;
+		conditional = explicit_cond;
+
+		spsr = 0;
+		psr_write = 0;
 		update_flags = 0;
 
 		data_ctrl = {($bits(data_ctrl)){1'bx}};

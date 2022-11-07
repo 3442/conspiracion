@@ -5,6 +5,7 @@ module core_control_writeback
 	input  logic           clk,
 
 	input  datapath_decode dec,
+	input  psr_decode      dec_psr,
 	input  data_decode     dec_data,
 
 	input  ctrl_cycle      cycle,
@@ -102,7 +103,7 @@ module core_control_writeback
 
 		unique0 case(next_cycle)
 			ISSUE:
-				final_update_flags <= issue && dec.update_flags;
+				final_update_flags <= issue && dec_psr.update_flags;
 
 			EXCEPTION:
 				final_update_flags <= 0;

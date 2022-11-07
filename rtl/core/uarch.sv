@@ -83,12 +83,18 @@ typedef struct packed
 	      undefined,
 	      conditional,
 	      writeback,
-	      update_flags,
 	      branch,
 	      coproc,
 	      ldst,
 	      mul;
 } datapath_decode;
+
+typedef struct packed
+{
+	logic update_flags,
+	      saved,
+	      write;
+} psr_decode;
 
 typedef struct packed
 {

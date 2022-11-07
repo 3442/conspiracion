@@ -5,6 +5,7 @@ module core_control_stall
 	input  logic           clk,
 
 	input  datapath_decode dec,
+	input  psr_decode      dec_psr,
 	input  data_decode     dec_data,
 	input  snd_decode      dec_snd,
 
@@ -32,7 +33,7 @@ module core_control_stall
 	assign rn_hazard = dec_data.uses_rn && (final_rd == dec_data.rn || dec_data.rn == `R15);
 	assign snd_hazard = !dec_snd.is_imm && (dec_snd.r == final_rd || dec_snd.r == `R15);
 
-	assign flags_dependency = dec.update_flags || dec.conditional;
+	assign flags_dependency = dec_psr.update_flags || dec.conditional;
 	assign updating_flags = final_update_flags || update_flags;
 
 	always_ff @(posedge clk)
