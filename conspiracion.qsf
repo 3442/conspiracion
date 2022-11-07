@@ -161,6 +161,7 @@ set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/isa.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/mrs.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/msr.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/mul.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/mux.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/ldst/addr.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/ldst/misc.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/ldst/multiple.sv
