@@ -23,7 +23,7 @@ module core_decode_mul
 	assign decode.add = insn `FIELD_MUL_ACC;
 	assign decode.long_mul = long_mul;
 	assign decode.signed_mul = insn `FIELD_MUL_SIGNED;
-	assign decode.r_add_lo = long_mul ? rn : short_rd;
+	assign decode.r_add_lo = rn;
 	assign decode.r_add_hi = short_rd;
 
 	assign long_mul = insn `FIELD_MUL_LONG;

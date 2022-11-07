@@ -21,6 +21,8 @@ module core_control
 	                       mem_ready,
 	input  word            mem_data_rd,
 	input  logic           mul_ready,
+	input  word            mul_q_hi,
+	                       mul_q_lo,
 
 `ifdef VERILATOR
 	input  word            insn,
@@ -48,9 +50,13 @@ module core_control
 	output word            mem_data_wr,
 	output logic           mem_start,
 	                       mem_write,
-	                       mul,
-	                       mul_add,
+	output word            mul_a,
+	                       mul_b,
+	                       mul_c_hi,
+	                       mul_c_lo,
+	output logic           mul_add,
 	                       mul_long,
+	                       mul_start,
 	                       mul_signed,
 	                       coproc
 );
@@ -104,7 +110,10 @@ module core_control
 		.*
 	);
 
-	core_control_data ctrl_mul
+	logic mul;
+	reg_num mul_r_add_hi, mul_r_add_lo;
+
+	core_control_mul ctrl_mul
 	(
 		.*
 	);

@@ -8,6 +8,8 @@ module core_control_cycles
 	                  bubble,
 	                  exception,
 	                  mem_ready,
+	                  mul_add,
+	                  mul_long,
 	                  mul_ready,
 	                  pop_valid,
 	                  trivial_shift,
@@ -21,10 +23,12 @@ module core_control_cycles
 	always_comb begin
 		next_cycle = ISSUE;
 
-		unique case(cycle)
+		unique0 case(cycle)
 			ISSUE:
 				if(exception)
 					next_cycle = EXCEPTION;
+				else if(mul)
+					next_cycle = mul_add ? MUL_ACC_LD : MUL;
 				else if(data_snd_shift_by_reg)
 					next_cycle = RD_INDIRECT_SHIFT;
 				else if(!trivial_shift)
@@ -43,17 +47,17 @@ module core_control_cycles
 			MUL:
 				if(!mul_ready)
 					next_cycle = MUL;
+				else if(mul_long)
+					next_cycle = MUL_HI_WB;
 
-			default: ;
+			MUL_ACC_LD:
+				next_cycle = MUL;
 		endcase
 
 		if(bubble)
 			next_cycle = ISSUE;
-		else if(next_cycle == ISSUE) begin
-			if(ldst)
-				next_cycle = TRANSFER;
-			else if(mul)
-				next_cycle = MUL;
+		else if(next_cycle == ISSUE && ldst) begin
+			next_cycle = TRANSFER;
 		end
 	end
 

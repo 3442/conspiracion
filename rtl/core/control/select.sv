@@ -14,6 +14,8 @@ module core_control_select
 	                   pop_valid,
 	input  reg_num     popped,
 	                   final_rd,
+	                   mul_r_add_lo,
+	                   mul_r_add_hi,
 
 	output reg_num     ra,
 	                   rb,
@@ -40,6 +42,11 @@ module core_control_select
 				if(cycle != TRANSFER || mem_ready)
 					// final_rd viene de dec_ldst.rd
 					rb <= pop_valid ? popped : final_rd;
+
+			MUL_ACC_LD: begin
+				ra <= mul_r_add_hi;
+				rb <= mul_r_add_lo;
+			end
 		endcase
 
 	initial begin

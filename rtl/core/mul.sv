@@ -23,7 +23,7 @@ module core_mul
 	logic wait_state;
 	dword c, q;
 
-	assign ready = wait_state == {$bits(wait_state){1'b0}};
+	assign ready = !start && wait_state == {$bits(wait_state){1'b0}};
 	assign {q_hi, q_lo} = q;
 	assign n = long_mul ? q_hi[$bits(q_hi) - 1] : q_lo[$bits(q_lo) - 1];
 	assign z = q_lo == 0 && (!long_mul || q_hi == 0);
@@ -31,7 +31,7 @@ module core_mul
 	dsp_mul ip
 	(
 		.clock0(clk),
-		.aclr0(0), //TODO
+		.aclr0(1), //TODO
 		.ena0(start || !ready),
 		.dataa_0(a),
 		.datab_0(b),

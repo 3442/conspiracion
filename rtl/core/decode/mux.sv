@@ -210,6 +210,9 @@ module core_decode_mux
 		endcase
 
 		unique casez(insn `FIELD_OP)
+			// Codificación coincide con ldst
+			`GROUP_MUL: ;
+
 			`GROUP_LDST_SINGLE, `GROUP_LDST_MISC, `GROUP_LDST_MULT: begin
 				ldst = 1;
 				data_ctrl = data_ldst;

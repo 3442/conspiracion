@@ -176,7 +176,9 @@ typedef enum
 	TRANSFER,
 	BASE_WRITEBACK,
 	EXCEPTION,
-	MUL
+	MUL,
+	MUL_ACC_LD,
+	MUL_HI_WB
 } ctrl_cycle;
 
 typedef struct packed

@@ -134,7 +134,7 @@ module arm810
 		.c(c_shifter)
 	);
 
-	logic mul, mul_add, mul_long, mul_signed, mul_ready;
+	logic mul_start, mul_add, mul_long, mul_signed, mul_ready;
 	word mul_a, mul_b, mul_c_hi, mul_c_lo, mul_q_hi, mul_q_lo;
 	psr_flags mul_flags;
 
@@ -147,7 +147,7 @@ module arm810
 		.long_mul(mul_long),
 		.add(mul_add),
 		.sig(mul_signed),
-		.start(mul),
+		.start(mul_start),
 		.q_hi(mul_q_hi),
 		.q_lo(mul_q_lo),
 		.n(mul_flags.n),

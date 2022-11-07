@@ -7,20 +7,23 @@ module core_control_writeback
 	input  datapath_decode dec,
 	input  psr_decode      dec_psr,
 	input  data_decode     dec_data,
+	input  psr_flags       alu_flags,
+	input  word            q_alu,
+	                       mem_data_rd,
+	input  logic           mem_ready,
+	                       mem_write,
+	input  word            mul_q_hi,
+	                       mul_q_lo,
 
 	input  ctrl_cycle      cycle,
 	                       next_cycle,
 	input  word            saved_base,
-	                       mem_data_rd,
 	                       vector,
-	                       q_alu,
-	input  psr_flags       alu_flags,
 	input  reg_num         ra,
 	                       popped,
-	input  logic           pop_valid,
-	                       issue,
-	                       mem_ready,
-	                       mem_write,
+	                       mul_r_add_hi,
+	input  logic           issue,
+	                       pop_valid,
 
 	output reg_num         rd,
 	                       final_rd,
@@ -45,6 +48,9 @@ module core_control_writeback
 
 			EXCEPTION:
 				rd <= `R15;
+
+			MUL_HI_WB:
+				rd <= mul_r_add_hi;
 		endcase
 
 		unique0 case(next_cycle)
@@ -74,7 +80,7 @@ module core_control_writeback
 			BASE_WRITEBACK:
 				writeback <= !mem_write;
 
-			EXCEPTION:
+			EXCEPTION, MUL_HI_WB:
 				writeback <= 1;
 		endcase
 
@@ -84,12 +90,6 @@ module core_control_writeback
 
 			EXCEPTION:
 				final_writeback <= 1;
-		endcase
-
-		unique case(cycle)
-			TRANSFER:       wr_value <= mem_data_rd;
-			BASE_WRITEBACK: wr_value <= saved_base;
-			default:        wr_value <= q_alu;
 		endcase
 
 		update_flags <= 0;
@@ -109,6 +109,20 @@ module core_control_writeback
 				final_update_flags <= 0;
 		endcase
 
+		unique case(cycle)
+			TRANSFER:
+				wr_value <= mem_data_rd;
+
+			BASE_WRITEBACK:
+				wr_value <= saved_base;
+
+			MUL, MUL_HI_WB:
+				wr_value <= mul_q_lo;
+
+			default:
+				wr_value <= q_alu;
+		endcase
+
 		unique0 case(next_cycle)
 			TRANSFER:
 				if(mem_ready)
@@ -119,6 +133,9 @@ module core_control_writeback
 
 			EXCEPTION:
 				wr_value <= vector;
+
+			MUL_HI_WB:
+				wr_value <= mul_q_hi;
 		endcase
 	end
 
