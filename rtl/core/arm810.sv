@@ -74,10 +74,17 @@ module arm810
 		.*
 	);
 
+	word psr_rd, psr_wr;
+	logic psr_write, psr_saved;
+	psr_mode mode;
 	psr_flags flags;
+	psr_intmask intmask;
 
 	core_psr psr
 	(
+		.mask(intmask),
+		.write(psr_write),
+		.saved(psr_saved),
 		.alu_flags(wb_alu_flags),
 		.*
 	);

@@ -46,8 +46,18 @@ typedef logic[3:0] alu_op;
 
 typedef struct packed
 {
-	logic n, z, c, v;
+	logic n,
+	      z,
+	      c,
+	      v;
 } psr_flags;
+
+typedef struct packed
+{
+	logic a,
+	      i,
+	      f;
+} psr_intmask;
 
 typedef logic[4:0] psr_mode;
 

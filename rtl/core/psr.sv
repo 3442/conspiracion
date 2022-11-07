@@ -2,16 +2,44 @@
 
 module core_psr
 (
-	input  logic     clk,
-	                 update_flags,
-	                 alu_v_valid,
-	input  psr_flags alu_flags,
+	input  logic       clk,
+	                   write,
+	                   saved,
+	                   update_flags,
+	                   alu_v_valid,
+	input  psr_flags   alu_flags,
+	input  word        psr_wr,
 
-	output psr_flags flags
+	output psr_flags   flags,
+	output psr_intmask mask,
+	output psr_mode    mode,
+	output word        psr_rd
 );
 
+	typedef struct packed
+	{
+		psr_flags   flags;
+		psr_intmask mask;
+		psr_mode    mode;
+	} psr_state;
+
+	typedef struct packed
+	{
+		psr_flags   nzcv;
+		logic       q;
+		logic[1:0]  reserved0;
+		logic       j;
+		logic[3:0]  reserved1,
+				    ge;
+		logic[5:0]  reserved2;
+		logic       e;
+		psr_intmask aif;
+		logic       t;
+		psr_mode    m;
+	} psr_word;
+
 	/* Este diseño de doble búfer es importante por rendimiento. Reducirlo
-	 * a uno más "sencillo" tiene un costo de casi 40MHz menos en Fmax.
+	 * a uno más "sencillo" tiene una pérdida de casi 40MHz en Fmax.
 	 * Esto se debe a que el CPSR es el mayor mercado del core, se encuentra
 	 * conectado a cycles, regs, alu y decode. La dependencia con decode en
 	 * particular es crítica debido a que el condition code se especifica en
@@ -22,10 +50,18 @@ module core_psr
 	 * finalmente registrar en cycles nuevamente. Tal cosa es impermisible.
 	 */
 
-	psr_flags cpsr_flags, next_flags, wr_flags;
 	logic pending_update;
+	psr_word rd_word, wr_word;
+	psr_flags next_flags, wr_flags;
+	psr_state cpsr, spsr, spsr_svc, spsr_abt, spsr_und, spsr_irq, spsr_fiq,
+	          wr_state, wr_clean;
 
-	assign flags = pending_update ? wr_flags : cpsr_flags;
+	assign mode = cpsr.mode;
+	assign mask = cpsr.mask;
+	assign flags = pending_update ? wr_flags : cpsr.flags;
+	assign psr_rd = rd_word;
+	assign wr_word = psr_wr;
+	assign {wr_state.flags, wr_state.mask, wr_state.mode} = {wr_word.nzcv, wr_word.aif, wr_word.m};
 
 	always_comb begin
 		next_flags = flags;
@@ -35,20 +71,63 @@ module core_psr
 			if(~alu_v_valid)
 				next_flags.v = flags.v;
 		end
+
+		rd_word = {$bits(rd_word){1'b0}};
+		if(saved)
+			{rd_word.nzcv, rd_word.aif, rd_word.m} = {spsr.flags, spsr.mask, spsr.mode};
+		else
+			{rd_word.nzcv, rd_word.aif, rd_word.m} = {flags, mask, mode};
+
+		wr_clean = wr_state;
+		unique case(wr_state.mode)
+			`MODE_USR, `MODE_FIQ, `MODE_IRQ, `MODE_SVC,
+			`MODE_ABT, `MODE_UND, `MODE_SYS: ;
+
+			default:
+				wr_clean.mode = mode;
+		endcase
+
+		if(mode == `MODE_USR) begin
+			wr_clean.mask = mask;
+			wr_clean.mode = `MODE_USR;
+		end
 	end
 
 	always_ff @(posedge clk) begin
 		wr_flags <= next_flags;
-		if(pending_update)
-			cpsr_flags <= flags;
+		pending_update <= !write && update_flags;
 
-		pending_update <= update_flags;
+		if(!write) begin
+			if(pending_update)
+				cpsr.flags <= wr_flags;
+		end else if(!saved)
+			cpsr <= wr_clean;
+		else
+			unique0 case(mode)
+				`MODE_SVC: spsr_svc <= wr_clean;
+				`MODE_ABT: spsr_abt <= wr_clean;
+				`MODE_UND: spsr_und <= wr_clean;
+				`MODE_IRQ: spsr_irq <= wr_clean;
+				`MODE_FIQ: spsr_fiq <= wr_clean;
+				default: ;
+			endcase
 	end
 
 	initial begin
-		flags = 4'b0000;
-		cpsr_flags = 4'b0000;
+		wr_flags = 4'b0000;
 		pending_update = 0;
+
+		cpsr.mode = `MODE_SVC;
+		cpsr.flags = 4'b0000;
+		cpsr.mask.a = 1;
+		cpsr.mask.i = 1;
+		cpsr.mask.f = 1;
+
+		spsr_svc = {$bits(spsr_svc){1'b0}};
+		spsr_abt = {$bits(spsr_svc){1'b0}};
+		spsr_und = {$bits(spsr_svc){1'b0}};
+		spsr_irq = {$bits(spsr_svc){1'b0}};
+		spsr_fiq = {$bits(spsr_svc){1'b0}};
 	end
 
 endmodule
