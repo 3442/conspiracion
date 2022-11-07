@@ -63,6 +63,32 @@ module core_psr
 	assign wr_word = psr_wr;
 	assign {wr_state.flags, wr_state.mask, wr_state.mode} = {wr_word.nzcv, wr_word.aif, wr_word.m};
 
+`ifdef VERILATOR
+	psr_word cpsr_word /*verilator public*/,
+	         spsr_svc_word /*verilator public*/,
+	         spsr_abt_word /*verilator public*/,
+	         spsr_und_word /*verilator public*/,
+	         spsr_fiq_word /*verilator public*/,
+	         spsr_irq_word /*verilator public*/;
+
+	assign {cpsr_word.nzcv, cpsr_word.aif, cpsr_word.m} = {cpsr.flags, cpsr.mask, cpsr.mode};
+
+	assign {spsr_svc_word.nzcv, spsr_svc_word.aif, spsr_svc_word.m}
+		= {spsr_svc.flags, spsr_svc.mask, spsr_svc.mode};
+
+	assign {spsr_abt_word.nzcv, spsr_abt_word.aif, spsr_abt_word.m}
+		= {spsr_abt.flags, spsr_abt.mask, spsr_abt.mode};
+
+	assign {spsr_und_word.nzcv, spsr_und_word.aif, spsr_und_word.m}
+		= {spsr_und.flags, spsr_und.mask, spsr_und.mode};
+
+	assign {spsr_irq_word.nzcv, spsr_irq_word.aif, spsr_irq_word.m}
+		= {spsr_irq.flags, spsr_irq.mask, spsr_irq.mode};
+
+	assign {spsr_fiq_word.nzcv, spsr_fiq_word.aif, spsr_fiq_word.m}
+		= {spsr_fiq.flags, spsr_fiq.mask, spsr_fiq.mode};
+`endif
+
 	always_comb begin
 		next_flags = flags;
 

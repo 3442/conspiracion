@@ -13,6 +13,7 @@
 #include "Vconspiracion_conspiracion.h"
 #include "Vconspiracion_platform.h"
 #include "Vconspiracion_core_control.h"
+#include "Vconspiracion_core_psr.h"
 #include "Vconspiracion_core_regs.h"
 #include "Vconspiracion_core_reg_file.h"
 
@@ -243,6 +244,12 @@ int main(int argc, char **argv)
 		}
 
 		std::printf("%08x pc\n", core.control->pc << 2);
+		std::printf("%08x cpsr\n", core.psr->cpsr_word);
+		std::printf("%08x spsr_svc\n", core.psr->spsr_svc_word);
+		std::printf("%08x spsr_abt\n", core.psr->spsr_abt_word);
+		std::printf("%08x spsr_und\n", core.psr->spsr_und_word);
+		std::printf("%08x spsr_fiq\n", core.psr->spsr_fiq_word);
+		std::printf("%08x spsr_irq\n", core.psr->spsr_irq_word);
 	}
 
 	const auto &dumps = *dump_mem;
