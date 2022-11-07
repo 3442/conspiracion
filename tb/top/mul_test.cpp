@@ -69,33 +69,3 @@ int main(int argc, char** argv) {
 	trace.close();
     top.final();               // Done simulating
 }
-
-/*
-
-module mul_tb();
-
-	logic clk,rst,start;
-	logic[7:0]X,Y;
-	logic[15:0]Z;
-	logic valid;
-
-	always #5 clk = ~clk;
-
-	core_mul_mul #(.W(8)) inst (.clk(clk),.rst(rst),.start(start),.a(X),.b(Y),.rdy(valid),.result(Z));
-
-	initial
-	$monitor($time,"a=%d, b=%d, ready=%d, Z=%d ",X,Y,valid,Z);
-	initial
-	begin
-	X=255;Y=150;clk=1'b1;rst=1'b0;start=1'b0;
-	#10 rst = 1'b1;
-	#10 start = 1'b1;
-	#10 start = 1'b0;
-	@valid
-	#10 X=-80;Y=-10;start = 1'b1;
-	#10 start = 1'b0;
-	end      
-endmodule
-
-
-*/
