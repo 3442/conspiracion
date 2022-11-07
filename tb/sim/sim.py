@@ -176,6 +176,13 @@ def unsigned(n):
     assert -0x8000_0000 <= n <= 0xffff_ffff
     return n + 0x1_0000_0000 if n < 0 else n
 
+def split_dword(n):
+    assert -0x8000_0000_0000_0000 <= n <= 0xffff_ffff_ffff_ffff
+    if n < 0:
+        n += 0x1_0000_0000_0000_0000
+
+    return (n >> 32, n & 0xffff_ffff)
+
 def int_bytes(n):
     return n.to_bytes(4, 'little', signed=n < 0) if type(n) is int else n
 
@@ -218,11 +225,12 @@ spec = importlib.util.spec_from_file_location('sim', module_path)
 module = importlib.util.module_from_spec(spec)
 
 prelude = {
-    'read_reg':   read_reg,
-    'read_mem':   read_mem,
-    'assert_reg': assert_reg,
-    'assert_mem': assert_mem,
-    'init_reg':   init_reg
+    'read_reg':    read_reg,
+    'read_mem':    read_mem,
+    'assert_reg':  assert_reg,
+    'assert_mem':  assert_mem,
+    'init_reg':    init_reg,
+    'split_dword': split_dword,
     }
 
 prelude.update({k: v for k, v in all_regs})

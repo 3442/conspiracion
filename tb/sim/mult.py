@@ -1,7 +1,11 @@
+A, B, C = -123456, 7890, -98765
+
 def init():
-    init_reg(r0, -10)
-    init_reg(r1, 23)
-    init_reg(r2, -1234)
+    init_reg(r0, A)
+    init_reg(r1, B)
+    init_reg(r2, C)
 
 def final():
-    assert_reg(r0, -10 * 23 - 1234)
+    hi, lo = split_dword(A * A * (A + 2 * B) + C)
+    assert_reg(r0, lo)
+    assert_reg(r1, hi)
