@@ -146,6 +146,29 @@ module core_decode
 		.*
 	);
 
+	//TODO
+	logic mrs_spsr;
+	reg_num mrs_rd;
+
+	core_decode_mrs group_mrs
+	(
+		.rd(mrs_rd),
+		.spsr(mrs_spsr),
+		.*
+	);
+
+	//TODO
+	logic msr_spsr, msr_is_imm;
+	msr_mask msr_fields;
+
+	core_decode_msr group_msr
+	(
+		.spsr(msr_spsr),
+		.fields(msr_fields),
+		.snd_is_imm(msr_is_imm),
+		.*
+	);
+
 	always_comb begin
 		mul = 0;
 		ldst = 0;
@@ -195,7 +218,6 @@ module core_decode
 
 				snd_ctrl.is_imm = 0;
 				snd_ctrl.r = mul_rm;
-				snd_ctrl.shift_by_reg = 0;
 
 				writeback = 1;
 				update_flags = mul_update_flags;
@@ -261,12 +283,28 @@ module core_decode
 				data_ctrl.uses_rn = coproc_ctrl.load;
 			end
 
+			`INSN_MRS: begin
+				snd_ctrl.is_imm = 0;
+				snd_ctrl.r = mrs_rd;
+
+				writeback = 1;
+				conditional = 1;
+			end
+
+			`GROUP_MSR: begin
+				snd_is_imm = msr_is_imm;
+				snd_ror_if_imm = 1;
+				snd_shift_by_reg_if_reg = 0;
+
+				snd_ctrl = snd;
+				conditional = 1;
+			end
+
 			/*`GROUP_SWP: ;
-			`INSN_MRS: ;
-			`GROUP_MSR: ;
 			`INSN_SWI: ;*/
 
-			default: undefined = 1;
+			default:
+				undefined = 1;
 		endcase
 
 		unique casez(insn `FIELD_OP)

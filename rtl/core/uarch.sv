@@ -59,6 +59,14 @@ typedef struct packed
 	      f;
 } psr_intmask;
 
+typedef struct packed
+{
+	logic f,
+	      s,
+	      x,
+	      c;
+} msr_mask;
+
 typedef logic[4:0] psr_mode;
 
 `define MODE_USR 5'b10000

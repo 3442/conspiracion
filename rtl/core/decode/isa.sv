@@ -190,17 +190,11 @@
 
 `define GROUP_MSR 28'b0_0_?_1_0_?_1_0_????_1111_0000_0000_????
 
-`define FIELD_MRS_R      [24]
-`define FIELD_MRS_RD     [15:12]
-`define FIELD_MSR_I      [25]
-`define FIELD_MSR_R      [22]
-`define FIELD_MSR_F      [19]
-`define FIELD_MSR_S      [18]
-`define FIELD_MSR_X      [17]
-`define FIELD_MSR_C      [16]
-`define FIELD_MSR_ROTATE [11:8]
-`define FIELD_MSR_IMM    [7:0]
-`define FIELD_MSR_RM     [3:0]
+`define FIELD_MRS_R    [24]
+`define FIELD_MRS_RD   [15:12]
+`define FIELD_MSR_I    [25]
+`define FIELD_MSR_R    [22]
+`define FIELD_MSR_MASK [19:16]
 
 // System call
 

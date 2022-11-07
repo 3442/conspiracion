@@ -158,6 +158,8 @@ set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/coproc.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/data.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/decode.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/isa.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/mrs.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/msr.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/mul.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/ldst/addr.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/ldst/misc.sv
