@@ -15,7 +15,9 @@ int main(int argc, char** argv) {
 	top.trace(&trace, 0);
 	trace.open("decode_test.vcd");
 
-    int instructions[4] = {};
+    unsigned long instructions[3] = {3766898695, 
+                                     3825578010, 
+                                     3120562179};
     top.n = 0;
     top.z = 0;
     top.c = 0;
