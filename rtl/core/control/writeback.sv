@@ -2,37 +2,35 @@
 
 module core_control_writeback
 (
-	input  logic           clk,
+	input  logic       clk,
 
-	input  datapath_decode dec,
-	input  psr_decode      dec_psr,
-	input  data_decode     dec_data,
-	input  psr_flags       alu_flags,
-	input  word            q_alu,
-	                       mem_data_rd,
-	input  logic           mem_ready,
-	                       mem_write,
-	input  word            mul_q_hi,
-	                       mul_q_lo,
+	input  insn_decode dec,
+	input  psr_flags   alu_flags,
+	input  word        q_alu,
+	                   mem_data_rd,
+	input  logic       mem_ready,
+	                   mem_write,
+	input  word        mul_q_hi,
+	                   mul_q_lo,
 
-	input  ctrl_cycle      cycle,
-	                       next_cycle,
-	input  word            saved_base,
-	                       vector,
-	input  reg_num         ra,
-	                       popped,
-	                       mul_r_add_hi,
-	input  logic           issue,
-	                       pop_valid,
+	input  ctrl_cycle  cycle,
+	                   next_cycle,
+	input  word        saved_base,
+	                   vector,
+	input  reg_num     ra,
+	                   popped,
+	                   mul_r_add_hi,
+	input  logic       issue,
+	                   pop_valid,
 
-	output reg_num         rd,
-	                       final_rd,
-	output logic           writeback,
-	                       final_writeback,
-	                       update_flags,
-	                       final_update_flags,
-	output word            wr_value,
-	output psr_flags       wb_alu_flags
+	output reg_num     rd,
+	                   final_rd,
+	output logic       writeback,
+	                   final_writeback,
+	                   update_flags,
+	                   final_update_flags,
+	output word        wr_value,
+	output psr_flags   wb_alu_flags
 );
 
 	reg_num last_rd;
@@ -108,7 +106,7 @@ module core_control_writeback
 
 		unique case(next_cycle)
 			ISSUE:
-				final_rd <= dec_data.rd;
+				final_rd <= dec.data.rd;
 
 			TRANSFER:
 				if((cycle != TRANSFER || mem_ready) && pop_valid)
@@ -123,7 +121,7 @@ module core_control_writeback
 
 		unique case(next_cycle)
 			ISSUE:
-				final_writeback <= issue && dec.writeback;
+				final_writeback <= issue && dec.ctrl.writeback;
 
 			EXCEPTION:
 				final_writeback <= 1;
@@ -140,7 +138,7 @@ module core_control_writeback
 
 		unique case(next_cycle)
 			ISSUE:
-				final_update_flags <= issue && dec_psr.update_flags;
+				final_update_flags <= issue && dec.psr.update_flags;
 
 			EXCEPTION:
 				final_update_flags <= 0;

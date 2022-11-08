@@ -2,19 +2,19 @@
 
 module core_control_coproc
 (
-	input  logic           clk,
+	input  logic       clk,
 
-	input  datapath_decode dec,
+	input  insn_decode dec,
 
-	input  ctrl_cycle      next_cycle,
-	input  logic           issue,
+	input  ctrl_cycle  next_cycle,
+	input  logic       issue,
 
-	output logic           coproc
+	output logic       coproc
 );
 
 	always_ff @(posedge clk)
 		if(next_cycle == ISSUE && issue)
-			coproc <= dec.coproc;
+			coproc <= dec.ctrl.coproc;
 
 	initial
 		coproc = 0;

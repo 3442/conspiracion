@@ -2,29 +2,28 @@
 
 module core_control_ldst
 (
-	input  logic           clk,
+	input  logic       clk,
 
-	input  datapath_decode dec,
-	input  ldst_decode     dec_ldst,
-	input  logic           issue,
-	                       mem_ready,
-	input  word            rd_value_b,
-	                       q_alu,
+	input  insn_decode dec,
+	input  logic       issue,
+	                   mem_ready,
+	input  word        rd_value_b,
+	                   q_alu,
 
-	input  ctrl_cycle      cycle,
-	                       next_cycle,
-	input  word            alu_a,
-	                       alu_b,
+	input  ctrl_cycle  cycle,
+	                   next_cycle,
+	input  word        alu_a,
+	                   alu_b,
 
-	output ptr             mem_addr,
-	output word            mem_data_wr,
-	                       mem_offset,
-	output logic           mem_start,
-	                       mem_write,
-	                       pop_valid,
-	                       ldst,
-	                       ldst_writeback,
-	output reg_num         popped
+	output ptr         mem_addr,
+	output word        mem_data_wr,
+	                   mem_offset,
+	output logic       mem_start,
+	                   mem_write,
+	                   pop_valid,
+	                   ldst,
+	                   ldst_writeback,
+	output reg_num     popped
 );
 
 	logic ldst_pre, ldst_increment;
@@ -47,17 +46,17 @@ module core_control_ldst
 	always_ff @(posedge clk)
 		unique case(next_cycle)
 			ISSUE: begin
-				// TODO: dec_ldst.unprivileged/user_regs
+				// TODO: dec.ldst.unprivileged/user_regs
 				// TODO: byte/halfword sizes
 				if(issue)
-					ldst <= dec.ldst;
+					ldst <= dec.ctrl.ldst;
 
-				ldst_pre <= dec_ldst.pre_indexed;
-				ldst_increment <= dec_ldst.increment;
-				ldst_writeback <= dec_ldst.writeback;
+				ldst_pre <= dec.ldst.pre_indexed;
+				ldst_increment <= dec.ldst.increment;
+				ldst_writeback <= dec.ldst.writeback;
 
-				mem_regs <= dec_ldst.regs;
-				mem_write <= !dec_ldst.load;
+				mem_regs <= dec.ldst.regs;
+				mem_write <= !dec.ldst.load;
 			end
 
 			TRANSFER: begin

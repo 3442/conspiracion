@@ -29,25 +29,10 @@ module arm810
 		.*
 	);
 
-	datapath_decode dec;
-	psr_decode dec_psr;
-	branch_decode dec_branch;
-	snd_decode dec_snd;
-	data_decode dec_data;
-	ldst_decode dec_ldst;
-	mul_decode dec_mul;
-	coproc_decode dec_coproc;
+	insn_decode dec;
 
 	core_decode decode
 	(
-		.ctrl(dec),
-		.psr_ctrl(dec_psr),
-		.branch_ctrl(dec_branch),
-		.snd_ctrl(dec_snd),
-		.data_ctrl(dec_data),
-		.ldst_ctrl(dec_ldst),
-		.mul_ctrl(dec_mul),
-		.coproc_ctrl(dec_coproc),
 		.*
 	);
 
@@ -170,7 +155,7 @@ module arm810
 	core_cp15 cp15
 	(
 		.transfer(coproc),
-		.dec(dec_coproc),
+		.dec(dec.coproc),
 		.read(coproc_read),
 		.write(coproc_write),
 		.*

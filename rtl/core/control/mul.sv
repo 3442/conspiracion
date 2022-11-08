@@ -2,29 +2,28 @@
 
 module core_control_mul
 (
-	input  logic           clk,
+	input  logic       clk,
 
-	input  datapath_decode dec,
-	input  mul_decode      dec_mul,
-	input  logic           mul_ready,
-	input  word            rd_value_a,
-	                       rd_value_b,
+	input  insn_decode dec,
+	input  logic       mul_ready,
+	input  word        rd_value_a,
+	                   rd_value_b,
 
-	input  ctrl_cycle      cycle,
-	                       next_cycle,
-	input  logic           issue,
+	input  ctrl_cycle  cycle,
+	                   next_cycle,
+	input  logic       issue,
 
-	output word            mul_a,
-	                       mul_b,
-	                       mul_c_hi,
-	                       mul_c_lo,
-	output reg_num         mul_r_add_hi,
-	                       mul_r_add_lo,
-	output logic           mul,
-	                       mul_add,
-	                       mul_long,
-	                       mul_start,
-	                       mul_signed
+	output word        mul_a,
+	                   mul_b,
+	                   mul_c_hi,
+	                   mul_c_lo,
+	output reg_num     mul_r_add_hi,
+	                   mul_r_add_lo,
+	output logic       mul,
+	                   mul_add,
+	                   mul_long,
+	                   mul_start,
+	                   mul_signed
 );
 
 	word hold_a, hold_b;
@@ -37,12 +36,12 @@ module core_control_mul
 
 		unique case(next_cycle)
 			ISSUE: begin
-				mul <= issue && dec.mul;
-				mul_add <= dec_mul.add;
-				mul_long <= dec_mul.long_mul;
-				mul_signed <= dec_mul.signed_mul;
-				mul_r_add_hi <= dec_mul.r_add_hi;
-				mul_r_add_lo <= dec_mul.r_add_lo;
+				mul <= issue && dec.ctrl.mul;
+				mul_add <= dec.mul.add;
+				mul_long <= dec.mul.long_mul;
+				mul_signed <= dec.mul.signed_mul;
+				mul_r_add_hi <= dec.mul.r_add_hi;
+				mul_r_add_lo <= dec.mul.r_add_lo;
 			end
 
 			MUL:

@@ -4,8 +4,7 @@ module core_control_select
 (
 	input  logic       clk,
 
-	input  data_decode dec_data,
-	input  snd_decode  dec_snd,
+	input  insn_decode dec,
 
 	input  ctrl_cycle  cycle,
 	                   next_cycle,
@@ -31,13 +30,13 @@ module core_control_select
 
 		unique case(next_cycle)
 			ISSUE: begin
-				ra = dec_data.rn;
-				rb = dec_snd.r;
+				ra = dec.data.rn;
+				rb = dec.snd.r;
 			end
 
 			TRANSFER:
 				if(cycle != TRANSFER || mem_ready)
-					// final_rd viene de dec_ldst.rd
+					// final_rd viene de dec.ldst.rd
 					rb = pop_valid ? popped : final_rd;
 
 			MUL_ACC_LD: begin
@@ -52,7 +51,7 @@ module core_control_select
 		last_rb <= rb;
 
 		if(next_cycle == ISSUE)
-			r_shift <= dec_snd.r_shift;
+			r_shift <= dec.snd.r_shift;
 	end
 
 	initial begin

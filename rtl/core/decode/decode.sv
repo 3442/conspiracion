@@ -3,18 +3,29 @@
 
 module core_decode
 (
-	input  word            insn,
-	input  psr_flags       flags,
+	input  word        insn,
+	input  psr_flags   flags,
 
-	output datapath_decode ctrl,
-	output psr_decode      psr_ctrl,
-	output branch_decode   branch_ctrl,
-	output snd_decode      snd_ctrl,
-	output data_decode     data_ctrl,
-	output ldst_decode     ldst_ctrl,
-	output mul_decode      mul_ctrl,
-	output coproc_decode   coproc_ctrl
+	output insn_decode dec
 );
+
+	mul_decode mul_ctrl;
+	psr_decode psr_ctrl;
+	snd_decode snd_ctrl;
+	data_decode data_ctrl;
+	ldst_decode ldst_ctrl;
+	branch_decode branch_ctrl;
+	coproc_decode coproc_ctrl;
+	datapath_decode ctrl;
+
+	assign dec.mul = mul_ctrl;
+	assign dec.psr = psr_ctrl;
+	assign dec.snd = snd_ctrl;
+	assign dec.ctrl = ctrl;
+	assign dec.data = data_ctrl;
+	assign dec.ldst = ldst_ctrl;
+	assign dec.branch = branch_ctrl;
+	assign dec.coproc = coproc_ctrl;
 
 	assign ctrl.execute = execute;
 	assign ctrl.undefined = undefined;

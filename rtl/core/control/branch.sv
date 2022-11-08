@@ -2,24 +2,23 @@
 
 module core_control_branch
 (
-	input  logic           clk,
+	input  logic       clk,
 
-	input  datapath_decode dec,
-	input  branch_decode   dec_branch,
+	input  insn_decode dec,
 
-	input  ctrl_cycle      next_cycle,
-	input  logic           issue,
-	input  ptr             next_pc_visible,
+	input  ctrl_cycle  next_cycle,
+	input  logic       issue,
+	input  ptr         next_pc_visible,
 
-	output logic           branch,
-	output ptr             branch_target
+	output logic       branch,
+	output ptr         branch_target
 );
 
 	always_ff @(posedge clk) begin
 		branch <= 0;
 		if(next_cycle == ISSUE && issue) begin
-			branch <= dec.branch;
-			branch_target <= next_pc_visible + dec_branch.offset;
+			branch <= dec.ctrl.branch;
+			branch_target <= next_pc_visible + dec.branch.offset;
 		end
 	end
 

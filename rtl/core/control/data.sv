@@ -4,8 +4,7 @@ module core_control_data
 (
 	input  logic           clk,
 
-	input  data_decode     dec_data,
-	input  snd_decode      dec_snd,
+	input  insn_decode     dec,
 	input  word            rd_value_a,
 	                       rd_value_b,
 	input  logic           mem_ready,
@@ -66,18 +65,18 @@ module core_control_data
 	always_ff @(posedge clk)
 		unique case(next_cycle)
 			ISSUE: begin
-				alu <= dec_data.op;
+				alu <= dec.data.op;
 				c_in <= flags.c;
 
-				data_snd_is_imm <= dec_snd.is_imm;
-				data_snd_shift_by_reg <= dec_snd.shift_by_reg;
-				data_imm <= dec_snd.imm;
-				data_shift_imm <= dec_snd.shift_imm;
+				data_snd_is_imm <= dec.snd.is_imm;
+				data_snd_shift_by_reg <= dec.snd.shift_by_reg;
+				data_imm <= dec.snd.imm;
+				data_shift_imm <= dec.snd.shift_imm;
 
-				shifter.shr <= dec_snd.shr;
-				shifter.ror <= dec_snd.ror;
-				shifter.put_carry <= dec_snd.put_carry;
-				shifter.sign_extend <= dec_snd.sign_extend;
+				shifter.shr <= dec.snd.shr;
+				shifter.ror <= dec.snd.ror;
+				shifter.put_carry <= dec.snd.put_carry;
+				shifter.sign_extend <= dec.snd.sign_extend;
 			end
 
 			RD_INDIRECT_SHIFT: begin

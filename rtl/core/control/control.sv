@@ -3,13 +3,7 @@
 module core_control
 (
 	input  logic           clk,
-	input  datapath_decode dec,
-	input  psr_decode      dec_psr,
-	input  branch_decode   dec_branch,
-	input  data_decode     dec_data,
-	input  snd_decode      dec_snd,
-	input  ldst_decode     dec_ldst,
-	input  mul_decode      dec_mul,
+	input  insn_decode     dec,
 	input  ptr             fetch_insn_pc,
 	input  psr_flags       flags,
 	                       alu_flags,
