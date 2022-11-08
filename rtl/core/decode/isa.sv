@@ -21,6 +21,12 @@
 `define COND_AL 4'b1110
 `define COND_UD 4'b1111 // Indefnido antes de ARMv5
 
+// Necesario para evitar caminos combinacionales largos en ALU
+`define FIELD_ALUOP_SUB_SBC        [2]
+`define FIELD_ALUOP_RSB_RSC        [2]
+`define FIELD_ALUOP_ADD_CMN        [1]
+`define FIELD_ALUOP_ADD_NOTCMN_ADC [0]
+
 // Segundo operando de varios grupos de instrucciones
 
 `define FIELD_SND_ROR8      [11:8]

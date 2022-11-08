@@ -1,4 +1,5 @@
 `include "core/uarch.sv"
+`include "core/decode/isa.sv"
 
 module core_alu
 #(parameter W=16)
@@ -13,28 +14,50 @@ module core_alu
 	output logic          v_valid
 );
 
-	logic c, v, swap, sub, and_not, c_add, v_add;
-	logic[W - 1:0] swap_a, swap_b, not_b, c_in_add, q_add, q_and, q_orr, q_xor;
+	logic c, v, c_add, c_sub, c_rsb, v_add, v_sub, v_rsb;
+	logic[W - 1:0] not_b, q_add, q_sub, q_rsb, q_and, q_bic, q_orr, q_xor;
 
-	assign swap_a = swap ? b : a;
-	assign swap_b = swap ? a : b;
 	assign not_b = ~b;
 
-	core_alu_add #(.W(W)) op_add
+	core_alu_add #(.W(W), .SUB(0)) op_add
 	(
-		.a(swap_a),
-		.b(sub ? -swap_b : swap_b),
-		.c_in(c_in_add),
 		.q(q_add),
 		.c(c_add),
 		.v(v_add),
+		.c_in(c_in && !op `FIELD_ALUOP_ADD_CMN && op `FIELD_ALUOP_ADD_NOTCMN_ADC),
+		.*
+	);
+
+	core_alu_add #(.W(W), .SUB(1)) op_sub
+	(
+		.q(q_sub),
+		.c(c_sub),
+		.v(v_sub),
+		.c_in(c_in && op `FIELD_ALUOP_SUB_SBC),
+		.*
+	);
+
+	core_alu_add #(.W(W), .SUB(1)) op_rsb
+	(
+		.a(b),
+		.b(a),
+		.q(q_rsb),
+		.c(c_rsb),
+		.v(v_rsb),
+		.c_in(c_in && op `FIELD_ALUOP_RSB_RSC),
 		.*
 	);
 
 	core_alu_and #(.W(W)) op_and
 	(
-		.b(and_not ? not_b : b),
 		.q(q_and),
+		.*
+	);
+
+	core_alu_and #(.W(W)) op_bic
+	(
+		.b(not_b),
+		.q(q_bic),
 		.*
 	);
 
@@ -52,58 +75,20 @@ module core_alu
 
 	always_comb begin
 		unique case(op)
-			`ALU_ADD, `ALU_ADC, `ALU_CMN, `ALU_CMP, `ALU_SUB, `ALU_SBC:
-				swap = 0;
-
-			`ALU_RSB, `ALU_RSC:
-				swap = 1;
-
-			default:
-				swap = 1'bx;
-		endcase
-
-		unique case(op)
-			`ALU_ADD, `ALU_CMN, `ALU_ADC:
-				sub = 0;
-
-			`ALU_SUB, `ALU_CMP, `ALU_SBC, `ALU_RSB, `ALU_RSC:
-				sub = 1;
-
-			default:
-				sub = 1'bx;
-		endcase
-
-		unique case(op)
-			`ALU_ADD, `ALU_CMN, `ALU_CMP, `ALU_SUB, `ALU_RSB:
-				c_in_add = 0;
-
-			`ALU_ADC:
-				c_in_add = {{(W - 1){1'b0}}, c_in};
-
-			`ALU_SBC, `ALU_RSC:
-				c_in_add = {{(W - 1){~c_in}}, ~c_in};
-
-			default:
-				c_in_add = {W{1'bx}};
-		endcase
-
-		unique case(op)
-			`ALU_AND, `ALU_TST:
-				and_not = 0;
-
-			`ALU_BIC:
-				and_not = 1;
-
-			default:
-				and_not = 1'bx;
-		endcase
-
-		unique case(op)
-			`ALU_SUB, `ALU_RSB, `ALU_ADD, `ALU_ADC, `ALU_SBC, `ALU_RSC, `ALU_CMP, `ALU_CMN:
+			`ALU_ADD, `ALU_ADC, `ALU_CMN:
 				q = q_add;
 
-			`ALU_AND, `ALU_TST, `ALU_BIC:
+			`ALU_SUB, `ALU_SBC, `ALU_CMP:
+				q = q_sub;
+
+			`ALU_RSB, `ALU_RSC:
+				q = q_rsb;
+
+			`ALU_AND, `ALU_TST:
 				q = q_and;
+
+			`ALU_BIC:
+				q = q_bic;
 
 			`ALU_EOR, `ALU_TEQ:
 				q = q_xor;
@@ -118,21 +103,36 @@ module core_alu
 				q = not_b;
 		endcase
 
+		v = 1'bx;
 		unique case(op)
-			`ALU_AND, `ALU_EOR, `ALU_TST, `ALU_TEQ, `ALU_ORR, `ALU_MOV, `ALU_BIC, `ALU_MVN: begin
+			`ALU_AND, `ALU_EOR, `ALU_TST, `ALU_TEQ, `ALU_ORR, `ALU_MOV, `ALU_BIC, `ALU_MVN:
 				c = c_in;
-				v = 1'bx;
-				v_valid = 0;
-			end
 
-			`ALU_SUB, `ALU_RSB, `ALU_ADD, `ALU_ADC, `ALU_SBC, `ALU_RSC, `ALU_CMP, `ALU_CMN: begin
+			`ALU_ADD, `ALU_ADC, `ALU_CMN: begin
 				c = c_add;
 				v = v_add;
-				v_valid = 1;
 			end
+
+			`ALU_SUB, `ALU_SBC, `ALU_CMP: begin
+				c = c_sub;
+				v = v_sub;
+			end
+
+			`ALU_RSB, `ALU_RSC: begin
+				c = c_rsb;
+				v = v_rsb;
+			end
+		endcase
+
+		unique case(op)
+			`ALU_AND, `ALU_EOR, `ALU_TST, `ALU_TEQ, `ALU_ORR, `ALU_MOV, `ALU_BIC, `ALU_MVN:
+				v_valid = 0;
+
+			`ALU_SUB, `ALU_RSB, `ALU_ADD, `ALU_ADC, `ALU_SBC, `ALU_RSC, `ALU_CMP, `ALU_CMN:
+				v_valid = 1;
 		endcase
 	end
 
-	assign nzcv = {q[W - 1], ~|q, c, v};
+	assign nzcv = {q[W - 1], q == 0, c, v};
 
 endmodule
