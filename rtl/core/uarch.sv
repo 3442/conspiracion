@@ -88,7 +88,7 @@ typedef struct packed
 	      coproc,
 	      ldst,
 	      mul;
-} datapath_decode;
+} ctrl_decode;
 
 typedef struct packed
 {
@@ -171,14 +171,14 @@ typedef struct packed
 
 typedef struct packed
 {
-	datapath_decode ctrl;
-	psr_decode      psr;
-	branch_decode   branch;
-	snd_decode      snd;
-	data_decode     data;
-	ldst_decode     ldst;
-	mul_decode      mul;
-	coproc_decode   coproc;
+	ctrl_decode   ctrl;
+	psr_decode    psr;
+	branch_decode branch;
+	snd_decode    snd;
+	data_decode   data;
+	ldst_decode   ldst;
+	mul_decode    mul;
+	coproc_decode coproc;
 } insn_decode;
 
 typedef enum

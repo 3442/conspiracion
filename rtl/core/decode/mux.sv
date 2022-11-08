@@ -37,7 +37,7 @@ module core_decode_mux
 	                     mul_rs,
 	                     mul_rm,
 
-	input  coproc_decode coproc_ctrl,
+	input  coproc_decode dec_coproc,
 	input  logic         coproc_writeback,
 	                     coproc_update_flags,
 	input  reg_num       coproc_rd,
@@ -48,9 +48,9 @@ module core_decode_mux
 	input  reg_num       mrs_rd,
 	input  msr_mask      msr_fields,
 
-	output snd_decode    snd_ctrl,
-	output data_decode   data_ctrl,
-	output ldst_decode   ldst_ctrl,
+	output snd_decode    dec_snd,
+	output data_decode   dec_data,
+	output ldst_decode   dec_ldst,
 	                     ldst_addr,
 	output logic         execute,
 	                     undefined,
@@ -84,32 +84,32 @@ module core_decode_mux
 		psr_write = 0;
 		update_flags = 0;
 
-		data_ctrl = {($bits(data_ctrl)){1'bx}};
-		data_ctrl.uses_rn = 1;
+		dec_data = {($bits(dec_data)){1'bx}};
+		dec_data.uses_rn = 1;
 
-		snd_ctrl = {$bits(snd_ctrl){1'bx}};
-		snd_ctrl.shr = 0;
-		snd_ctrl.ror = 0;
-		snd_ctrl.is_imm = 1;
-		snd_ctrl.shift_imm = {$bits(snd_ctrl.shift_imm){1'b0}};
-		snd_ctrl.shift_by_reg = 0;
+		dec_snd = {$bits(dec_snd){1'bx}};
+		dec_snd.shr = 0;
+		dec_snd.ror = 0;
+		dec_snd.is_imm = 1;
+		dec_snd.shift_imm = {$bits(dec_snd.shift_imm){1'b0}};
+		dec_snd.shift_by_reg = 0;
 
 		snd_is_imm = 1'bx;
 		snd_ror_if_imm = 1'bx;
 		snd_shift_by_reg_if_reg = 1'bx;
 
 		ldst_addr = {($bits(ldst_addr)){1'bx}};
-		ldst_ctrl = {($bits(ldst_ctrl)){1'bx}};
+		dec_ldst = {($bits(dec_ldst)){1'bx}};
 
 		// El orden de los casos es importante, NO CAMBIAR
 		priority casez(insn `FIELD_OP)
 			`GROUP_B: begin
 				branch = 1;
 				if(branch_link) begin
-					data_ctrl.op = `ALU_SUB;
-					data_ctrl.rd = `R14;
-					data_ctrl.rn = `R15;
-					snd_ctrl.imm = 12'd4;
+					dec_data.op = `ALU_SUB;
+					dec_data.rd = `R14;
+					dec_data.rn = `R15;
+					dec_snd.imm = 12'd4;
 					writeback = 1;
 				end
 			end
@@ -117,11 +117,11 @@ module core_decode_mux
 			`GROUP_MUL: begin
 				mul = 1;
 
-				data_ctrl.rd = mul_rd;
-				data_ctrl.rn = mul_rs;
+				dec_data.rd = mul_rd;
+				dec_data.rn = mul_rs;
 
-				snd_ctrl.is_imm = 0;
-				snd_ctrl.r = mul_rm;
+				dec_snd.is_imm = 0;
+				dec_snd.r = mul_rm;
 
 				writeback = 1;
 				update_flags = mul_update_flags;
@@ -132,8 +132,8 @@ module core_decode_mux
 				snd_ror_if_imm = 1;
 				snd_shift_by_reg_if_reg = data_shift_by_reg_if_reg;
 
-				snd_ctrl = snd;
-				data_ctrl = data;
+				dec_snd = snd;
+				dec_data = data;
 
 				writeback = data_writeback;
 				update_flags = data_update_flags;
@@ -148,8 +148,8 @@ module core_decode_mux
 				snd_ror_if_imm = 0;
 				snd_shift_by_reg_if_reg = 0;
 
-				snd_ctrl = snd;
-				ldst_ctrl = ldst_single;
+				dec_snd = snd;
+				dec_ldst = ldst_single;
 				ldst_addr = ldst_single;
 
 				undefined = undefined | snd_undefined;
@@ -158,12 +158,12 @@ module core_decode_mux
 			`GROUP_LDST_MISC_IMM, `GROUP_LDST_MISC_REG:
 				priority casez(insn `FIELD_OP)
 					`INSN_LDRB, `INSN_LDRSB, `INSN_LDRSH, `INSN_STRH: begin
-						ldst_ctrl = ldst_misc;
+						dec_ldst = ldst_misc;
 						ldst_addr = ldst_misc;
 
-						snd_ctrl.r = ldst_misc_off_reg;
-						snd_ctrl.imm = {4'b0, ldst_misc_off_imm};
-						snd_ctrl.is_imm = !ldst_misc_off_is_reg;
+						dec_snd.r = ldst_misc_off_reg;
+						dec_snd.imm = {4'b0, ldst_misc_off_imm};
+						dec_snd.is_imm = !ldst_misc_off_is_reg;
 					end
 
 					default:
@@ -171,9 +171,9 @@ module core_decode_mux
 				endcase
 
 			`GROUP_LDST_MULT: begin
-				ldst_ctrl = ldst_multiple;
+				dec_ldst = ldst_multiple;
 				ldst_addr = ldst_multiple;
-				snd_ctrl.imm = 12'd4;
+				dec_snd.imm = 12'd4;
 
 				restore_spsr = ldst_mult_restore_spsr;
 			end
@@ -183,15 +183,15 @@ module core_decode_mux
 				writeback = coproc_writeback;
 				update_flags = coproc_update_flags;
 
-				data_ctrl.op = `ALU_MOV;
-				data_ctrl.rn = coproc_rd;
-				data_ctrl.rd = coproc_rd;
-				data_ctrl.uses_rn = coproc_ctrl.load;
+				dec_data.op = `ALU_MOV;
+				dec_data.rn = coproc_rd;
+				dec_data.rd = coproc_rd;
+				dec_data.uses_rn = dec_coproc.load;
 			end
 
 			`INSN_MRS: begin
-				snd_ctrl.is_imm = 0;
-				snd_ctrl.r = mrs_rd;
+				dec_snd.is_imm = 0;
+				dec_snd.r = mrs_rd;
 
 				writeback = 1;
 				conditional = 1;
@@ -202,7 +202,7 @@ module core_decode_mux
 				snd_ror_if_imm = 1;
 				snd_shift_by_reg_if_reg = 0;
 
-				snd_ctrl = snd;
+				dec_snd = snd;
 				conditional = 1;
 			end
 
@@ -219,8 +219,8 @@ module core_decode_mux
 
 			`GROUP_LDST_SINGLE, `GROUP_LDST_MISC, `GROUP_LDST_MULT: begin
 				ldst = 1;
-				data_ctrl = data_ldst;
-				writeback = ldst_ctrl.writeback || ldst_ctrl.load;
+				dec_data = data_ldst;
+				writeback = dec_ldst.writeback || dec_ldst.load;
 			end
 
 			default: ;
@@ -237,9 +237,9 @@ module core_decode_mux
 			conditional = 1'bx;
 			update_flags = 1'bx;
 
-			snd_ctrl = {($bits(snd_ctrl)){1'bx}};
-			data_ctrl = {($bits(data_ctrl)){1'bx}};
-			ldst_ctrl = {($bits(ldst_ctrl)){1'bx}};
+			dec_snd = {($bits(dec_snd)){1'bx}};
+			dec_data = {($bits(dec_data)){1'bx}};
+			dec_ldst = {($bits(dec_ldst)){1'bx}};
 		end
 	end
 

@@ -9,36 +9,36 @@ module core_decode
 	output insn_decode dec
 );
 
-	mul_decode mul_ctrl;
-	psr_decode psr_ctrl;
-	snd_decode snd_ctrl;
-	data_decode data_ctrl;
-	ldst_decode ldst_ctrl;
-	branch_decode branch_ctrl;
-	coproc_decode coproc_ctrl;
-	datapath_decode ctrl;
+	mul_decode dec_mul;
+	psr_decode dec_psr;
+	snd_decode dec_snd;
+	ctrl_decode dec_ctrl;
+	data_decode dec_data;
+	ldst_decode dec_ldst;
+	branch_decode dec_branch;
+	coproc_decode dec_coproc;
 
-	assign dec.mul = mul_ctrl;
-	assign dec.psr = psr_ctrl;
-	assign dec.snd = snd_ctrl;
-	assign dec.ctrl = ctrl;
-	assign dec.data = data_ctrl;
-	assign dec.ldst = ldst_ctrl;
-	assign dec.branch = branch_ctrl;
-	assign dec.coproc = coproc_ctrl;
+	assign dec.mul = dec_mul;
+	assign dec.psr = dec_psr;
+	assign dec.snd = dec_snd;
+	assign dec.ctrl = dec_ctrl;
+	assign dec.data = dec_data;
+	assign dec.ldst = dec_ldst;
+	assign dec.branch = dec_branch;
+	assign dec.coproc = dec_coproc;
 
-	assign ctrl.execute = execute;
-	assign ctrl.undefined = undefined;
-	assign ctrl.conditional = conditional;
-	assign ctrl.writeback = writeback;
-	assign ctrl.branch = branch;
-	assign ctrl.coproc = coproc;
-	assign ctrl.ldst = ldst;
-	assign ctrl.mul = mul;
+	assign dec_ctrl.execute = execute;
+	assign dec_ctrl.undefined = undefined;
+	assign dec_ctrl.conditional = conditional;
+	assign dec_ctrl.writeback = writeback;
+	assign dec_ctrl.branch = branch;
+	assign dec_ctrl.coproc = coproc;
+	assign dec_ctrl.ldst = ldst;
+	assign dec_ctrl.mul = mul;
 
-	assign psr_ctrl.saved = spsr;
-	assign psr_ctrl.write = psr_write;
-	assign psr_ctrl.update_flags = update_flags;
+	assign dec_psr.saved = spsr;
+	assign dec_psr.write = psr_write;
+	assign dec_psr.update_flags = update_flags;
 
 	logic execute, undefined, conditional, writeback, update_flags,
 	      branch, ldst, mul, coproc, spsr, psr_write;
@@ -80,7 +80,7 @@ module core_decode
 	core_decode_branch group_branch
 	(
 		.link(branch_link),
-		.offset(branch_ctrl.offset),
+		.offset(dec_branch.offset),
 		.*
 	);
 
@@ -148,7 +148,7 @@ module core_decode
 
 	core_decode_mul group_mul
 	(
-		.decode(mul_ctrl),
+		.decode(dec_mul),
 		.rd(mul_rd),
 		.rs(mul_rs),
 		.rm(mul_rm),
@@ -162,7 +162,7 @@ module core_decode
 	core_decode_coproc group_coproc
 	(
 		.rd(coproc_rd),
-		.decode(coproc_ctrl),
+		.decode(dec_coproc),
 		.writeback(coproc_writeback),
 		.update_flags(coproc_update_flags),
 		.*
