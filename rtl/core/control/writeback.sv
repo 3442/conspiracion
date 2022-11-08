@@ -108,8 +108,7 @@ module core_control_writeback
 
 		unique case(next_cycle)
 			ISSUE:
-				if(issue)
-					final_rd <= dec_data.rd;
+				final_rd <= dec_data.rd;
 
 			TRANSFER:
 				if((cycle != TRANSFER || mem_ready) && pop_valid)

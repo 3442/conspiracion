@@ -46,18 +46,19 @@ module core_control_ldst
 
 	always_ff @(posedge clk)
 		unique case(next_cycle)
-			ISSUE:
-				if(issue) begin
-					// TODO: dec_ldst.unprivileged/user_regs
-					// TODO: byte/halfword sizes
+			ISSUE: begin
+				// TODO: dec_ldst.unprivileged/user_regs
+				// TODO: byte/halfword sizes
+				if(issue)
 					ldst <= dec.ldst;
-					ldst_pre <= dec_ldst.pre_indexed;
-					ldst_increment <= dec_ldst.increment;
-					ldst_writeback <= dec_ldst.writeback;
 
-					mem_regs <= dec_ldst.regs;
-					mem_write <= !dec_ldst.load;
-				end
+				ldst_pre <= dec_ldst.pre_indexed;
+				ldst_increment <= dec_ldst.increment;
+				ldst_writeback <= dec_ldst.writeback;
+
+				mem_regs <= dec_ldst.regs;
+				mem_write <= !dec_ldst.load;
+			end
 
 			TRANSFER: begin
 				if(cycle != TRANSFER) begin

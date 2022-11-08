@@ -36,15 +36,14 @@ module core_control_mul
 		mul_start <= 0;
 
 		unique case(next_cycle)
-			ISSUE:
-				if(issue) begin
-					mul <= dec.mul;
-					mul_add <= dec_mul.add;
-					mul_long <= dec_mul.long_mul;
-					mul_signed <= dec_mul.signed_mul;
-					mul_r_add_hi <= dec_mul.r_add_hi;
-					mul_r_add_lo <= dec_mul.r_add_lo;
-				end
+			ISSUE: begin
+				mul <= issue && dec.mul;
+				mul_add <= dec_mul.add;
+				mul_long <= dec_mul.long_mul;
+				mul_signed <= dec_mul.signed_mul;
+				mul_r_add_hi <= dec_mul.r_add_hi;
+				mul_r_add_lo <= dec_mul.r_add_lo;
+			end
 
 			MUL:
 				mul_start <= cycle != MUL;

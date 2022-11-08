@@ -9,8 +9,7 @@ module core_control_select
 
 	input  ctrl_cycle  cycle,
 	                   next_cycle,
-	input  logic       issue,
-	                   mem_ready,
+	input  logic       mem_ready,
 	                   pop_valid,
 	input  reg_num     popped,
 	                   final_rd,
@@ -31,11 +30,10 @@ module core_control_select
 		rb = last_rb;
 
 		unique case(next_cycle)
-			ISSUE:
-				if(issue) begin
-					ra = dec_data.rn;
-					rb = dec_snd.r;
-				end
+			ISSUE: begin
+				ra = dec_data.rn;
+				rb = dec_snd.r;
+			end
 
 			TRANSFER:
 				if(cycle != TRANSFER || mem_ready)
@@ -53,7 +51,7 @@ module core_control_select
 		last_ra <= ra;
 		last_rb <= rb;
 
-		if(next_cycle == ISSUE && issue)
+		if(next_cycle == ISSUE)
 			r_shift <= dec_snd.r_shift;
 	end
 

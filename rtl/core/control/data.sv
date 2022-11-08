@@ -15,7 +15,6 @@ module core_control_data
 
 	input  ctrl_cycle      cycle,
 	                       next_cycle,
-	input  logic           issue,
 	input  ptr             pc,
 	input  word            mem_offset,
 	input  psr_flags       flags,
@@ -66,21 +65,20 @@ module core_control_data
 
 	always_ff @(posedge clk)
 		unique case(next_cycle)
-			ISSUE:
-				if(issue) begin
-					alu <= dec_data.op;
-					c_in <= flags.c;
+			ISSUE: begin
+				alu <= dec_data.op;
+				c_in <= flags.c;
 
-					data_snd_is_imm <= dec_snd.is_imm;
-					data_snd_shift_by_reg <= dec_snd.shift_by_reg;
-					data_imm <= dec_snd.imm;
-					data_shift_imm <= dec_snd.shift_imm;
+				data_snd_is_imm <= dec_snd.is_imm;
+				data_snd_shift_by_reg <= dec_snd.shift_by_reg;
+				data_imm <= dec_snd.imm;
+				data_shift_imm <= dec_snd.shift_imm;
 
-					shifter.shr <= dec_snd.shr;
-					shifter.ror <= dec_snd.ror;
-					shifter.put_carry <= dec_snd.put_carry;
-					shifter.sign_extend <= dec_snd.sign_extend;
-				end
+				shifter.shr <= dec_snd.shr;
+				shifter.ror <= dec_snd.ror;
+				shifter.put_carry <= dec_snd.put_carry;
+				shifter.sign_extend <= dec_snd.sign_extend;
+			end
 
 			RD_INDIRECT_SHIFT: begin
 				saved_base <= rd_value_b;
