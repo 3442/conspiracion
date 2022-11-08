@@ -1,9 +1,11 @@
 `timescale 1 ns / 1 ps
+`include "core/decode/isa.sv"
+`include "core/uarch.sv"
 
 module decode_test
 (
     input  word            insn,
-	input  logic           n, z, c, v
+	input  logic           n, z, c, v,
 
 	output datapath_decode ctrl,
 	output psr_decode      psr_ctrl,
@@ -15,8 +17,8 @@ module decode_test
 	output coproc_decode   coproc_ctrl
 
 );
-    psr_flags nzcv;
-	assign {n, z, c, v} = nzcv;
+    psr_flags flags;
+	assign flags = {n, z, c, v};
 
     core_decode DUT (.*);
 
