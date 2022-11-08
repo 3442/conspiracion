@@ -4,7 +4,6 @@
 module core_decode
 (
 	input  word        insn,
-	input  psr_flags   flags,
 
 	output insn_decode dec
 );
@@ -50,17 +49,6 @@ module core_decode
 
 	//TODO
 	logic restore_spsr;
-
-	logic cond_undefined, cond_execute, explicit_cond;
-
-	core_decode_conds conds
-	(
-		.cond(insn `FIELD_COND),
-		.execute(cond_execute),
-		.undefined(cond_undefined),
-		.conditional(explicit_cond),
-		.*
-	);
 
 	logic snd_is_imm, snd_ror_if_imm, snd_shift_by_reg_if_reg, snd_undefined;
 	snd_decode snd;

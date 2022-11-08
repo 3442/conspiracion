@@ -1,9 +1,9 @@
 `include "core/decode/isa.sv"
 `include "core/uarch.sv"
 
-module core_decode_conds
+module core_porch_conds
 (
-	input  logic[3:0] cond,
+	input  word       insn,
 	input  psr_flags  flags,
 
 	output logic      execute,
@@ -15,7 +15,7 @@ module core_decode_conds
 		undefined = 0;
 		conditional = 1;
 
-		unique case(cond)
+		unique case(insn `FIELD_COND)
 			`COND_EQ: execute =  flags.z;
 			`COND_NE: execute = ~flags.z;
 			`COND_HS: execute =  flags.c;

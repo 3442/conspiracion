@@ -13,25 +13,38 @@ module arm810
 	output word  bus_data_wr
 );
 
-	logic stall, prefetch_flush, insn_start;
-	word insn;
 	ptr fetch_insn_pc, insn_addr;
+	word fetch_insn;
+	logic stall, flush, prefetch_flush, insn_start;
+
+	//TODO
+	assign prefetch_flush = 0;
 
 	core_fetch #(.PREFETCH_ORDER(2)) fetch
 	(
-		.branch(explicit_branch || wr_pc),
-		.flush(0), //TODO
 		.addr(insn_addr),
-		.fetched(insn_ready),
-		.fetch_data(insn_data_rd),
+		.insn(fetch_insn),
 		.fetch(insn_start),
+		.branch(explicit_branch || wr_pc),
+		.fetched(insn_ready),
 		.insn_pc(fetch_insn_pc),
+		.fetch_data(insn_data_rd),
 		.*
 	);
 
-	insn_decode dec;
+	insn_decode fetch_dec;
 
 	core_decode decode
+	(
+		.dec(fetch_dec),
+		.insn(fetch_insn)
+	);
+
+	ptr insn_pc;
+	word insn;
+	insn_decode dec;
+
+	core_porch porch
 	(
 		.*
 	);

@@ -4,7 +4,7 @@ module core_control
 (
 	input  logic           clk,
 	input  insn_decode     dec,
-	input  ptr             fetch_insn_pc,
+	input  ptr             insn_pc,
 	input  psr_flags       flags,
 	                       alu_flags,
 	input  word            rd_value_a,

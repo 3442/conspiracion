@@ -5,10 +5,6 @@ module core_decode_mux
 (
 	input  word          insn,
 
-	input  logic         cond_undefined,
-	                     cond_execute,
-	                     explicit_cond,
-
 	input  logic         branch_link,
 
 	input  snd_decode    snd,
@@ -74,10 +70,10 @@ module core_decode_mux
 		ldst = 0;
 		branch = 0;
 		coproc = 0;
-		execute = cond_execute;
-		undefined = cond_undefined;
+		execute = 1;
+		undefined = 0;
 		writeback = 0;
-		conditional = explicit_cond;
+		conditional = 0;
 		restore_spsr = 0;
 
 		spsr = 0;
@@ -139,8 +135,8 @@ module core_decode_mux
 				update_flags = data_update_flags;
 				restore_spsr = data_restore_spsr;
 
-				undefined = undefined | snd_undefined;
-				conditional = conditional | data_conditional;
+				undefined = snd_undefined;
+				conditional = data_conditional;
 			end
 
 			`GROUP_LDST_SINGLE_IMM, `GROUP_LDST_SINGLE_REG: begin
@@ -152,7 +148,7 @@ module core_decode_mux
 				dec_ldst = ldst_single;
 				ldst_addr = ldst_single;
 
-				undefined = undefined | snd_undefined;
+				undefined = snd_undefined;
 			end
 
 			`GROUP_LDST_MISC_IMM, `GROUP_LDST_MISC_REG:

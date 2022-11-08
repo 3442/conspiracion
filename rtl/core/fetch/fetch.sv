@@ -6,29 +6,29 @@ module core_fetch
 	input  logic clk,
 	             stall,
 	             branch,
-	             flush,
 	             fetched,
 	             wr_pc,
+	             prefetch_flush,
 	input  ptr   branch_target,
 	input  word  wr_current,
 	             fetch_data,
 
 	output logic fetch,
+	             flush,
 	output word  insn,
 	output ptr   insn_pc,
 	             addr
 );
 
 	ptr next_pc, head, hold_addr, target;
-	logic fetched_valid, do_flush, discard;
+	logic fetched_valid, discard;
 
+	assign flush = branch || prefetch_flush;
 	assign target = wr_pc ? wr_current[31:2] : branch_target; //TODO: alignment exception
-	assign do_flush = branch || flush;
 	assign fetched_valid = fetched && !discard;
 
 	core_prefetch #(.ORDER(PREFETCH_ORDER)) prefetch
 	(
-		.flush(do_flush),
 		.fetched(fetched_valid),
 		.*
 	);
@@ -36,12 +36,12 @@ module core_fetch
 	always_comb begin
 		if(branch)
 			head = target;
-		else if(flush)
+		else if(prefetch_flush)
 			head = next_pc;
 		else
 			head = {30{1'bx}};
 
-		if(do_flush)
+		if(flush)
 			addr = head;
 		else if(fetch && fetched_valid)
 			addr = hold_addr + 1;
@@ -50,7 +50,7 @@ module core_fetch
 	end
 
 	always_ff @(posedge clk) begin
-		discard <= discard ? ~fetched : do_flush & fetch;
+		discard <= discard ? !fetched : flush && fetch;
 		hold_addr <= addr;
 	end
 

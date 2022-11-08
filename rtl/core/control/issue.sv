@@ -5,7 +5,7 @@ module core_control_issue
 	input  logic       clk,
 
 	input  insn_decode dec,
-	input  ptr         fetch_insn_pc,
+	input  ptr         insn_pc,
 
 	input  ctrl_cycle  next_cycle,
 	input  logic       next_bubble,
@@ -22,7 +22,7 @@ module core_control_issue
 );
 
 	assign issue = next_cycle == ISSUE && dec.ctrl.execute && !next_bubble;
-	assign next_pc_visible = fetch_insn_pc + 2;
+	assign next_pc_visible = insn_pc + 2;
 
 	always_ff @(posedge clk)
 		if(next_cycle == ISSUE) begin
@@ -30,10 +30,10 @@ module core_control_issue
 
 `ifdef VERILATOR
 			if(dec.ctrl.undefined)
-				$display("[core] undefined insn: [0x%08x] %08x", fetch_insn_pc << 2, insn);
+				$display("[core] undefined insn: [0x%08x] %08x", insn_pc << 2, insn);
 `endif
 
-			pc <= fetch_insn_pc;
+			pc <= insn_pc;
 			pc_visible <= next_pc_visible;
 		end
 
