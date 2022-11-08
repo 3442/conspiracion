@@ -14,6 +14,7 @@ module core_regs
 
 	output word     rd_value_a,
 	                rd_value_b,
+	                wr_current,
 	output logic    branch
 );
 
@@ -23,11 +24,10 @@ module core_regs
 	 * sincronizadas del archivo de registros.
 	 */
 
-	word pc_word, wr_current;
+	word pc_word;
 	logic wr_pc, wr_enable_file;
 	reg_index wr_index;
 
-	assign branch = wr_enable && wr_pc;
 	assign pc_word = {pc_visible, 2'b00};
 	assign wr_enable_file = wr_enable && !wr_pc;
 
@@ -53,11 +53,16 @@ module core_regs
 		.index(wr_index)
 	);
 
-	always_ff @(posedge clk)
+	always_ff @(posedge clk) begin
 		if(wr_enable)
 			wr_current <= wr_value;
 
-	initial
+		branch <= wr_enable && wr_pc;
+	end
+
+	initial begin
+		branch = 0;
 		wr_current = 0;
+	end
 
 endmodule

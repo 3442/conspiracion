@@ -8,8 +8,10 @@ module core_fetch
 	             branch,
 	             flush,
 	             fetched,
-	input  word  fetch_data,
-	input  ptr   target,
+	             wr_pc,
+	input  ptr   branch_target,
+	input  word  wr_current,
+	             fetch_data,
 
 	output logic fetch,
 	output word  insn,
@@ -17,9 +19,10 @@ module core_fetch
 	             addr
 );
 
-	ptr next_pc, head, hold_addr;
+	ptr next_pc, head, hold_addr, target;
 	logic fetched_valid, do_flush, discard;
 
+	assign target = wr_pc ? wr_current[31:2] : branch_target; //TODO: alignment exception
 	assign do_flush = branch || flush;
 	assign fetched_valid = fetched && !discard;
 
@@ -52,8 +55,8 @@ module core_fetch
 	end
 
 	initial begin
-		hold_addr = 0;
 		discard = 0;
+		hold_addr = 0;
 	end
 
 endmodule

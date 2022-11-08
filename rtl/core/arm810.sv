@@ -21,7 +21,6 @@ module arm810
 	(
 		.branch(explicit_branch || wr_pc),
 		.flush(0), //TODO
-		.target(wr_pc ? wr_value[31:2] : branch_target),
 		.addr(insn_addr),
 		.fetched(insn_ready),
 		.fetch_data(insn_data_rd),
@@ -92,7 +91,7 @@ module arm810
 	);
 
 	logic wr_pc;
-	word rd_value_a, rd_value_b;
+	word rd_value_a, rd_value_b, wr_current;
 
 	core_regs regs
 	(
