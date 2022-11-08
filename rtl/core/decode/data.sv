@@ -9,6 +9,7 @@ module core_decode_data
 	output logic       snd_is_imm,
 	                   snd_shift_by_reg_if_reg,
 	                   writeback,
+	                   conditional,
 	                   update_flags,
 	                   restore_spsr
 );
@@ -30,6 +31,14 @@ module core_decode_data
 	assign snd_shift_by_reg_if_reg = insn `FIELD_DATA_REGSHIFT;
 
 	always_comb begin
+		unique case(op)
+			`ALU_ADC, `ALU_SBC, `ALU_RSC:
+				conditional = 1;
+
+			default:
+				conditional = 0;
+		endcase
+
 		unique case(op)
 			`ALU_CMP, `ALU_CMN, `ALU_TST, `ALU_TEQ:
 				writeback = 0;

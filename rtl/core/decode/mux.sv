@@ -16,6 +16,7 @@ module core_decode_mux
 
 	input  data_decode   data,
 	input  logic         data_writeback,
+	                     data_conditional,
 	                     data_update_flags,
 	                     data_restore_spsr,
 	                     data_is_imm,
@@ -137,7 +138,9 @@ module core_decode_mux
 				writeback = data_writeback;
 				update_flags = data_update_flags;
 				restore_spsr = data_restore_spsr;
+
 				undefined = undefined | snd_undefined;
+				conditional = conditional | data_conditional;
 			end
 
 			`GROUP_LDST_SINGLE_IMM, `GROUP_LDST_SINGLE_REG: begin

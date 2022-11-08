@@ -75,12 +75,13 @@ module core_decode
 
 	data_decode data;
 	logic data_writeback, data_update_flags, data_restore_spsr,
-	      data_is_imm, data_shift_by_reg_if_reg;
+	      data_is_imm, data_shift_by_reg_if_reg, data_conditional;
 
 	core_decode_data group_data
 	(
 		.decode(data),
 		.writeback(data_writeback),
+		.conditional(data_conditional),
 		.update_flags(data_update_flags),
 		.restore_spsr(data_restore_spsr),
 		.snd_is_imm(data_is_imm),
