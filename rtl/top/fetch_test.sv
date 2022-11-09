@@ -6,7 +6,7 @@ module fetch_test
     input  logic clk,
 	             stall,
 	             branch,
-	             flush,
+	             prefetch_flush,
 	             fetched,
 	             wr_pc,
 	input  ptr   branch_target,
@@ -20,6 +20,6 @@ module fetch_test
 
 );
 
-    core_fetch #(.PREFETCH_ORDER(3)) DUT (.*);
+    core_fetch #(.PREFETCH_ORDER(3)) DUT (.flush(), .*);
 
 endmodule

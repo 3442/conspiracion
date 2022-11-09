@@ -16,14 +16,14 @@ int main(int argc, char** argv) {
 	trace.open("fetch_test.vcd");
 
     top.clk = 0;
-    top.stall = 0;              //insn y insn_pc se detienen
-    top.branch = 0;             //forma de flush -> instr saltan a la instr de la branch
-    top.flush = 0;              //limpia prefetch
-    top.fetched = 1;            //estado del fetch (ready)
-    top.wr_pc = 0;              //cuando hay un write al pc
-    top.branch_target = 0;      //direccion a la que se hace salto
-    top.wr_current = 0;         //ultimo que se guardo en registros
-    top.fetch_data = 0x00000000;    //data que se leyó al hacer fetch
+    top.stall = 0;               //insn y insn_pc se detienen
+    top.branch = 0;              //forma de flush -> instr saltan a la instr de la branch
+    top.prefetch_flush = 0;      //limpia prefetch
+    top.fetched = 1;             //estado del fetch (ready)
+    top.wr_pc = 0;               //cuando hay un write al pc
+    top.branch_target = 0;       //direccion a la que se hace salto
+    top.wr_current = 0;          //ultimo que se guardo en registros
+    top.fetch_data = 0x00000000; //data que se leyó al hacer fetch
 
     uint32_t rom[] =
     {
@@ -138,12 +138,12 @@ int main(int argc, char** argv) {
             std::printf("Se hace un flush:\n");
             top.branch = 0;
             top.branch_target = 0;
-			top.flush = 1;
+			top.prefetch_flush = 1;
 		}
 
         if(time == 69){
             std::printf("Se termina el flush:\n");
-			top.flush = 0;
+			top.prefetch_flush = 0;
 		}
 
         if(time == 75)

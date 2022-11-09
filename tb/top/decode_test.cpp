@@ -77,11 +77,6 @@ int main(int argc, char** argv) {
         0x20000000,
     };
 
-    top.n = 0;
-    top.z = 0;
-    top.c = 0;
-    top.v = 0;
-
     int clk_tick = 0;
 	int time = 0;
 
@@ -92,9 +87,13 @@ int main(int argc, char** argv) {
         top.eval();
         trace.dump(time++);
     
-        std::printf("insn=0x%08x, ctrl=0x%08x\n", 
-                    rom[i], top.ctrl);
-    
+        std::printf("insn=0x%08x, dec=0x", top.insn);
+		for(std::size_t j = 0; j < sizeof(top.dec) / sizeof(top.dec[0]); ++j)
+		{
+			std::printf("%08x", top.dec[j]);
+		}
+
+		std::puts("");
     }
 
 	trace.close();
