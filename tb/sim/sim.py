@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 
-import importlib.util, os, pathlib, subprocess, sys
+import importlib.util, os, pathlib, random, subprocess, sys
 
 module_path, verilated, image = sys.argv[1:]
 test_name = pathlib.Path(module_path).stem
 module = None
+
+seed = os.getenv('SIM_SEED', str(random.randint(0, 0x7fff_ffff)))
 
 all_regs = [
     ('r0', 'r0'),
@@ -123,7 +125,14 @@ COLOR_YELLOW = '\033[33;1m'
 COLOR_BLUE   = '\033[34;1m'
 
 def exit(*, success):
-    status, color = ('passed', COLOR_GREEN) if success else ('failed', COLOR_RED)
+    global seed
+
+    if not success:
+        while_running()
+        if exec_args:
+            print('cmdline:', subprocess.list2cmdline(exec_args), file=sys.stderr)
+
+    status, color = ('passed', COLOR_GREEN) if success else (f'failed (seed: {seed})', COLOR_RED)
     print( \
         f'{color}Test \'{COLOR_YELLOW}{test_name}{COLOR_RESET}{color}\' ' +
         f'{status}{COLOR_RESET}', file=sys.stderr)
@@ -163,9 +172,6 @@ def test_assert(condition, message):
     if not condition:
         while_running()
         print(f'{COLOR_RED}{message()}{COLOR_RESET}', file=sys.stderr)
-
-        if exec_args:
-            print('cmdline:', subprocess.list2cmdline(exec_args), file=sys.stderr)
 
         if regs:
             dump_regs()
@@ -257,6 +263,8 @@ for r, value in init_regs.items():
 
 init_regs = None
 exec_args.append(image)
+
+exec_args.extend([f'+verilator+seed+{seed}', '+verilator+rand+reset+2'])
 
 output = subprocess.run(exec_args, stdout=subprocess.PIPE, text=True)
 if output.returncode != 0:

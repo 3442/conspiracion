@@ -109,7 +109,7 @@ set_global_assignment -name ECO_REGENERATE_REPORT ON
 
 set_location_assignment PIN_AF14 -to clk_clk
 
-set_location_assignment PIN_AB12 -to debug
+set_location_assignment PIN_AB12 -to reset_reset_n
 
 set_location_assignment PIN_V16 -to pio_leds[0]
 set_location_assignment PIN_W16 -to pio_leds[1]

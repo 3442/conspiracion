@@ -63,4 +63,7 @@ $(OBJ_DIR)/%.mk: \
   $$(shell find $(TB_DIR)/top/$$(dir $$*) -type f -name '*.cpp' 2>/dev/null)
 
 	mkdir -p $(dir $@)
-	$(VERILATOR) -O3 --cc --exe --trace -y $(RTL_DIR) --Mdir $(dir $@) --top $(word 1,$(subst /, ,$*)) $(patsubst tb/%,../tb/%,$^)
+	$(VERILATOR) \
+		-O3 --cc --exe --trace -y $(RTL_DIR) --Mdir $(dir $@) \
+		--top $(word 1,$(subst /, ,$*)) $(patsubst tb/%,../tb/%,$^) \
+		--x-assign unique --x-initial unique

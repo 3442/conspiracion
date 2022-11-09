@@ -116,6 +116,16 @@ int main(int argc, char **argv)
 
 	Verilated::commandArgs(argc, argv);
 
+	for(char **arg = argv; *arg; ++arg)
+	{
+		if(**arg == '+')
+		{
+			*arg = NULL;
+			argc = arg - argv;
+			break;
+		}
+	}
+
 	args::ArgumentParser parser("Simulador proyecto final CE3201");
 
 	args::ValueFlagList<reg_init> init_regs
@@ -219,6 +229,10 @@ int main(int argc, char **argv)
 		tick();
 		tick();
 	};
+
+	top.reset_reset_n = 0;
+	cycle();
+	top.reset_reset_n = 1;
 
 	for(unsigned i = 0; i < *cycles; ++i)
 	{

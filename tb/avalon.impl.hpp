@@ -24,6 +24,17 @@ namespace taller::avalon
 	template<class Platform>
 	void interconnect<Platform>::tick(bool clk)
 	{
+		if(!plat.reset_reset_n) [[unlikely]]
+		{
+			active = nullptr;
+			avl_read = false;
+			avl_write = false;
+			avl_address = 0;
+			avl_writedata = 0;
+			avl_byteenable = 0;
+			return;
+		}
+
 		if(active)
 		{
 			assert(avl_address == plat.avl_address);
