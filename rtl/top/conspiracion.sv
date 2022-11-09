@@ -1,6 +1,7 @@
 module conspiracion
 (
 	input  wire        clk_clk,
+	input  wire        debug,
 	output wire [12:0] memory_mem_a,
 	output wire [2:0]  memory_mem_ba,
 	output wire        memory_mem_ck,
@@ -17,6 +18,7 @@ module conspiracion
 	output wire        memory_mem_odt,
 	output wire        memory_mem_dm,
 	input  wire        memory_oct_rzqin,
+	output wire        vram_wire_clk,
 	output wire [12:0] vram_wire_addr,
 	output wire [1:0]  vram_wire_ba,
 	output wire        vram_wire_cas_n,
@@ -26,6 +28,7 @@ module conspiracion
 	output wire [1:0]  vram_wire_dqm,
 	output wire        vram_wire_ras_n,
 	output wire        vram_wire_we_n,
+	output wire [7:0]  pio_leds,
 	output wire        vga_controller_0_dac_clk,
 	output wire        vga_controller_0_dac_hsync,
 	output wire        vga_controller_0_dac_vsync,
@@ -56,9 +59,6 @@ module conspiracion
 		.*
 	);
 
-	//TODO: pio_0_external_connection_export,
-	//TODO: pll_0_outclk3_clk,
-
 	platform plat
 	(
 		.master_0_core_cpu_clk(cpu_clk),
@@ -69,8 +69,8 @@ module conspiracion
 		.master_0_core_write(write),
 		.master_0_core_start(start),
 		.master_0_core_irq(irq),
-		.pll_0_outclk3_clk(),
-		.pio_0_external_connection_export(),
+		.pll_0_outclk3_clk(vram_wire_clk),
+		.pio_0_external_connection_export(pio_leds),
 		.*
 	);
 

@@ -107,26 +107,88 @@ set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING ON
 set_global_assignment -name ECO_REGENERATE_REPORT ON
 
 
-set_location_assignment PIN_AB12 -to dir
-
-set_location_assignment PIN_AA14 -to clr
-set_location_assignment PIN_AA15 -to mov
-set_location_assignment PIN_W15 -to add
-set_location_assignment PIN_Y16 -to io
-
-set_location_assignment PIN_V16 -to out[0]
-set_location_assignment PIN_W16 -to out[1]
-set_location_assignment PIN_V17 -to out[2]
-set_location_assignment PIN_V18 -to out[3]
-set_location_assignment PIN_W17 -to out[4]
-set_location_assignment PIN_W19 -to out[5]
-set_location_assignment PIN_Y19 -to out[6]
-set_location_assignment PIN_W20 -to out[7]
-set_location_assignment PIN_Y21 -to done
-
-
-
 set_location_assignment PIN_AF14 -to clk_clk
+
+set_location_assignment PIN_AB12 -to debug
+
+set_location_assignment PIN_V16 -to pio_leds[0]
+set_location_assignment PIN_W16 -to pio_leds[1]
+set_location_assignment PIN_V17 -to pio_leds[2]
+set_location_assignment PIN_V18 -to pio_leds[3]
+set_location_assignment PIN_W17 -to pio_leds[4]
+set_location_assignment PIN_W19 -to pio_leds[5]
+set_location_assignment PIN_Y19 -to pio_leds[6]
+set_location_assignment PIN_W20 -to pio_leds[7]
+
+set_location_assignment PIN_A11 -to vga_controller_0_dac_clk
+set_location_assignment PIN_B11 -to vga_controller_0_dac_hsync
+set_location_assignment PIN_D11 -to vga_controller_0_dac_vsync
+set_location_assignment PIN_F10 -to vga_controller_0_dac_blank_n
+set_location_assignment PIN_C10 -to vga_controller_0_dac_sync_n
+set_location_assignment PIN_A13 -to vga_controller_0_dac_r[0]
+set_location_assignment PIN_C13 -to vga_controller_0_dac_r[1]
+set_location_assignment PIN_E13 -to vga_controller_0_dac_r[2]
+set_location_assignment PIN_B12 -to vga_controller_0_dac_r[3]
+set_location_assignment PIN_C12 -to vga_controller_0_dac_r[4]
+set_location_assignment PIN_D12 -to vga_controller_0_dac_r[5]
+set_location_assignment PIN_E12 -to vga_controller_0_dac_r[6]
+set_location_assignment PIN_F13 -to vga_controller_0_dac_r[7]
+set_location_assignment PIN_J9 -to vga_controller_0_dac_g[0]
+set_location_assignment PIN_J10 -to vga_controller_0_dac_g[1]
+set_location_assignment PIN_H12 -to vga_controller_0_dac_g[2]
+set_location_assignment PIN_G10 -to vga_controller_0_dac_g[3]
+set_location_assignment PIN_G11 -to vga_controller_0_dac_g[4]
+set_location_assignment PIN_G12 -to vga_controller_0_dac_g[5]
+set_location_assignment PIN_F11 -to vga_controller_0_dac_g[6]
+set_location_assignment PIN_E11 -to vga_controller_0_dac_g[7]
+set_location_assignment PIN_B13 -to vga_controller_0_dac_b[0]
+set_location_assignment PIN_G13 -to vga_controller_0_dac_b[1]
+set_location_assignment PIN_H13 -to vga_controller_0_dac_b[2]
+set_location_assignment PIN_F14 -to vga_controller_0_dac_b[3]
+set_location_assignment PIN_H14 -to vga_controller_0_dac_b[4]
+set_location_assignment PIN_F15 -to vga_controller_0_dac_b[5]
+set_location_assignment PIN_G15 -to vga_controller_0_dac_b[6]
+set_location_assignment PIN_J14 -to vga_controller_0_dac_b[7]
+
+set_location_assignment PIN_AK14 -to vram_wire_addr[0]
+set_location_assignment PIN_AH14 -to vram_wire_addr[1]
+set_location_assignment PIN_AG15 -to vram_wire_addr[2]
+set_location_assignment PIN_AE14 -to vram_wire_addr[3]
+set_location_assignment PIN_AB15 -to vram_wire_addr[4]
+set_location_assignment PIN_AC14 -to vram_wire_addr[5]
+set_location_assignment PIN_AD14 -to vram_wire_addr[6]
+set_location_assignment PIN_AF15 -to vram_wire_addr[7]
+set_location_assignment PIN_AH15 -to vram_wire_addr[8]
+set_location_assignment PIN_AG13 -to vram_wire_addr[9]
+set_location_assignment PIN_AG12 -to vram_wire_addr[10]
+set_location_assignment PIN_AH13 -to vram_wire_addr[11]
+set_location_assignment PIN_AJ14 -to vram_wire_addr[12]
+set_location_assignment PIN_AF13 -to vram_wire_ba[0]
+set_location_assignment PIN_AJ12 -to vram_wire_ba[1]
+set_location_assignment PIN_AF11 -to vram_wire_cas_n
+set_location_assignment PIN_AK13 -to vram_wire_cke
+set_location_assignment PIN_AH12 -to vram_wire_clk
+set_location_assignment PIN_AG11 -to vram_wire_cs_n
+set_location_assignment PIN_AK6 -to vram_wire_dq[0]
+set_location_assignment PIN_AJ7 -to vram_wire_dq[1]
+set_location_assignment PIN_AK7 -to vram_wire_dq[2]
+set_location_assignment PIN_AK8 -to vram_wire_dq[3]
+set_location_assignment PIN_AK9 -to vram_wire_dq[4]
+set_location_assignment PIN_AG10 -to vram_wire_dq[5]
+set_location_assignment PIN_AK11 -to vram_wire_dq[6]
+set_location_assignment PIN_AJ11 -to vram_wire_dq[7]
+set_location_assignment PIN_AH10 -to vram_wire_dq[8]
+set_location_assignment PIN_AJ10 -to vram_wire_dq[9]
+set_location_assignment PIN_AJ9 -to vram_wire_dq[10]
+set_location_assignment PIN_AH9 -to vram_wire_dq[11]
+set_location_assignment PIN_AH8 -to vram_wire_dq[12]
+set_location_assignment PIN_AH7 -to vram_wire_dq[13]
+set_location_assignment PIN_AJ6 -to vram_wire_dq[14]
+set_location_assignment PIN_AJ5 -to vram_wire_dq[15]
+set_location_assignment PIN_AB13 -to vram_wire_dqm[0]
+set_location_assignment PIN_AK12 -to vram_wire_dqm[1]
+set_location_assignment PIN_AE13 -to vram_wire_ras_n
+set_location_assignment PIN_AA13 -to vram_wire_we_n
 
 set_global_assignment -name SEARCH_PATH rtl
 
@@ -278,6 +340,8 @@ set_instance_assignment -name OUTPUT_TERMINATION "SERIES 50 OHM WITH CALIBRATION
 
 set_global_assignment -name QIP_FILE ip/dsp_mul.qip
 set_global_assignment -name SIP_FILE ip/dsp_mul.sip
+
+
 
 
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
