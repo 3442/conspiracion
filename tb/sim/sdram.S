@@ -1,9 +1,9 @@
 .global reset
 
 reset:
-	ldr r0, =0x1000
+	ldr r0, =0x1004
 	ldr r1, =0x2000
-	mov r2, #0
+	mov r2, #42
 
 	.loop:
 	str r2, [r0], #4
