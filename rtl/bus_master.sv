@@ -1,7 +1,7 @@
 module bus_master
 (
 	input  logic       clk,
-	                   rst,
+	                   rst_n,
 
 	input  logic[29:0] addr,
 	input  logic       start,
@@ -39,7 +39,7 @@ module bus_master
 			WAIT: ready = !avl_waitrequest;
 		endcase
 
-	always_ff @(posedge clk)
+	always_ff @(posedge clk or negedge rst_n)
 		/* P. 16:
 		 * A host must make no assumption about the assertion state of
 		 * waitrequest when the host is idle: waitrequest may be high or
@@ -47,7 +47,11 @@ module bus_master
 		 * host control signals to the agent must remain constant except for
 		 * beginbursttransfer.
 		 */
-		if((state == IDLE || !avl_waitrequest) && start) begin
+		if(!rst_n) begin
+			state <= IDLE;
+			avl_read <= 0;
+			avl_write <= 0;
+		end else if((state == IDLE || !avl_waitrequest) && start) begin
 			state <= WAIT;
 			avl_read <= ~write;
 			avl_write <= write;
@@ -60,9 +64,6 @@ module bus_master
 		end
 
 	initial begin
-		state = IDLE;
-		avl_read = 0;
-		avl_write = 0;
 	end
 
 endmodule
