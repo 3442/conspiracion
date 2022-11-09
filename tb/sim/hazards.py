@@ -1,6 +1,6 @@
 SP = 256
 
-cycles = 256
+cycles = 1024
 mem_dumps = [range(SP - 4, SP)]
 
 def final():
