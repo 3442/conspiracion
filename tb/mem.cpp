@@ -16,7 +16,7 @@ namespace taller::avalon
 	bool mem::read(std::uint32_t addr, std::uint32_t &data)
 	{
 		data = block[addr];
-		return true;
+		return ready();
 	}
 
 	bool mem::write(std::uint32_t addr, std::uint32_t data, unsigned byte_enable)
@@ -44,6 +44,12 @@ namespace taller::avalon
 		}
 
 		block[addr] = (data & bytes) | (block[addr] & ~bytes);
-		return true;
+		return ready();
+	}
+
+	bool mem::ready() noexcept
+	{
+		count = count > 0 ? count - 1 : 2;
+		return count == 0;
 	}
 }

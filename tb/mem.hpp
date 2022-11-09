@@ -36,6 +36,9 @@ namespace taller::avalon
 			std::unique_ptr<std::uint32_t[]> block;
 			std::uint32_t                    base;
 			std::uint32_t                    mask;
+			unsigned                         count = 0;
+
+			bool ready() noexcept;
 	};
 
 	template<typename F>

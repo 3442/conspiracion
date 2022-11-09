@@ -47,7 +47,7 @@ module bus_master
 			end
 
 			WAIT:
-				if(!start)
+				if(!avl_waitrequest)
 					state <= IDLE;
 		endcase
 
