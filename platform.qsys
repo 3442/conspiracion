@@ -1111,6 +1111,7 @@
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection kind="clock" version="20.1" start="clk_0.clk" end="master_1.clk" />
+ <connection kind="clock" version="20.1" start="clk_0.clk" end="master_0.clock" />
  <connection kind="clock" version="20.1" start="clk_0.clk" end="pll_0.refclk" />
  <connection
    kind="clock"
@@ -1129,11 +1130,6 @@
    version="20.1"
    start="pll_0.outclk0"
    end="hps_0.f2h_sdram0_clock" />
- <connection
-   kind="clock"
-   version="20.1"
-   start="pll_0.outclk1"
-   end="master_0.clock" />
  <connection kind="clock" version="20.1" start="pll_0.outclk2" end="vram.clk" />
  <connection
    kind="clock"
