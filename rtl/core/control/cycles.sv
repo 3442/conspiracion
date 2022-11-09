@@ -3,6 +3,7 @@
 module core_control_cycles
 (
 	input  logic      clk,
+	                  rst_n,
 	                  mul,
 	                  ldst,
 	                  bubble,
@@ -61,10 +62,7 @@ module core_control_cycles
 		end
 	end
 
-	always_ff @(posedge clk)
-		cycle <= next_cycle;
-
-	initial
-		cycle = ISSUE;
+	always_ff @(posedge clk or negedge rst_n)
+		cycle <= !rst_n ? ISSUE : next_cycle;
 
 endmodule

@@ -3,6 +3,7 @@
 module core_control_writeback
 (
 	input  logic       clk,
+	                   rst_n,
 
 	input  insn_decode dec,
 	input  psr_flags   alu_flags,
@@ -100,60 +101,59 @@ module core_control_writeback
 		endcase
 	end
 
-	always_ff @(posedge clk) begin
-		last_rd <= rd;
-		wb_alu_flags <= alu_flags;
+	always_ff @(posedge clk or negedge rst_n)
+		if(!rst_n) begin
+			last_rd <= 0;
+			final_rd <= 0;
+			final_writeback <= 0;
 
-		unique case(next_cycle)
-			ISSUE:
-				final_rd <= dec.data.rd;
+			update_flags <= 0;
+			final_update_flags <= 0;
 
-			TRANSFER:
-				if((cycle != TRANSFER || mem_ready) && pop_valid)
-					final_rd <= popped;
+			wb_alu_flags <= {$bits(wb_alu_flags){1'b0}};
+		end else begin
+			last_rd <= rd;
+			wb_alu_flags <= alu_flags;
 
-			BASE_WRITEBACK:
-				final_rd <= ra;
+			unique case(next_cycle)
+				ISSUE:
+					final_rd <= dec.data.rd;
 
-			EXCEPTION:
-				final_rd <= `R14;
-		endcase
+				TRANSFER:
+					if((cycle != TRANSFER || mem_ready) && pop_valid)
+						final_rd <= popped;
 
-		unique case(next_cycle)
-			ISSUE:
-				final_writeback <= issue && dec.ctrl.writeback;
+				BASE_WRITEBACK:
+					final_rd <= ra;
 
-			EXCEPTION:
-				final_writeback <= 1;
-		endcase
+				EXCEPTION:
+					final_rd <= `R14;
+			endcase
 
-		update_flags <= 0;
-		unique case(next_cycle)
-			ISSUE:
-				update_flags <= final_update_flags;
+			unique case(next_cycle)
+				ISSUE:
+					final_writeback <= issue && dec.ctrl.writeback;
 
-			EXCEPTION:
-				final_update_flags <= 0;
-		endcase
+				EXCEPTION:
+					final_writeback <= 1;
+			endcase
 
-		unique case(next_cycle)
-			ISSUE:
-				final_update_flags <= issue && dec.psr.update_flags;
+			update_flags <= 0;
+			unique case(next_cycle)
+				ISSUE:
+					update_flags <= final_update_flags;
 
-			EXCEPTION:
-				final_update_flags <= 0;
-		endcase
-	end
+				EXCEPTION:
+					final_update_flags <= 0;
+			endcase
 
-	initial begin
-		last_rd = 0;
-		final_rd = 0;
-		final_writeback = 0;
+			unique case(next_cycle)
+				ISSUE:
+					final_update_flags <= issue && dec.psr.update_flags;
 
-		update_flags = 0;
-		final_update_flags = 0;
-
-		wb_alu_flags = {$bits(wb_alu_flags){1'b0}};
-	end
+				EXCEPTION:
+					final_update_flags <= 0;
+			endcase
+		end
 
 endmodule

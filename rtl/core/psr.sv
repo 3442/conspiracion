@@ -3,6 +3,7 @@
 module core_psr
 (
 	input  logic       clk,
+	                   rst_n,
 	                   write,
 	                   saved,
 	                   update_flags,
@@ -119,41 +120,40 @@ module core_psr
 		end
 	end
 
-	always_ff @(posedge clk) begin
-		wr_flags <= next_flags;
-		pending_update <= !write && update_flags;
+	always_ff @(posedge clk or negedge rst_n)
+		if(!rst_n) begin
+			wr_flags <= 4'b0000;
+			pending_update <= 0;
 
-		if(!write) begin
-			if(pending_update)
-				cpsr.flags <= wr_flags;
-		end else if(!saved)
-			cpsr <= wr_clean;
-		else
-			unique case(mode)
-				`MODE_SVC: spsr_svc <= wr_clean;
-				`MODE_ABT: spsr_abt <= wr_clean;
-				`MODE_UND: spsr_und <= wr_clean;
-				`MODE_IRQ: spsr_irq <= wr_clean;
-				`MODE_FIQ: spsr_fiq <= wr_clean;
-				default: ;
-			endcase
-	end
+			cpsr.mode <= `MODE_SVC;
+			cpsr.flags <= 4'b0000;
+			cpsr.mask.a <= 1;
+			cpsr.mask.i <= 1;
+			cpsr.mask.f <= 1;
 
-	initial begin
-		wr_flags = 4'b0000;
-		pending_update = 0;
+			spsr_svc <= {$bits(spsr_svc){1'b0}};
+			spsr_abt <= {$bits(spsr_svc){1'b0}};
+			spsr_und <= {$bits(spsr_svc){1'b0}};
+			spsr_irq <= {$bits(spsr_svc){1'b0}};
+			spsr_fiq <= {$bits(spsr_svc){1'b0}};
+		end else begin
+			wr_flags <= next_flags;
+			pending_update <= !write && update_flags;
 
-		cpsr.mode = `MODE_SVC;
-		cpsr.flags = 4'b0000;
-		cpsr.mask.a = 1;
-		cpsr.mask.i = 1;
-		cpsr.mask.f = 1;
-
-		spsr_svc = {$bits(spsr_svc){1'b0}};
-		spsr_abt = {$bits(spsr_svc){1'b0}};
-		spsr_und = {$bits(spsr_svc){1'b0}};
-		spsr_irq = {$bits(spsr_svc){1'b0}};
-		spsr_fiq = {$bits(spsr_svc){1'b0}};
-	end
+			if(!write) begin
+				if(pending_update)
+					cpsr.flags <= wr_flags;
+			end else if(!saved)
+				cpsr <= wr_clean;
+			else
+				unique case(mode)
+					`MODE_SVC: spsr_svc <= wr_clean;
+					`MODE_ABT: spsr_abt <= wr_clean;
+					`MODE_UND: spsr_und <= wr_clean;
+					`MODE_IRQ: spsr_irq <= wr_clean;
+					`MODE_FIQ: spsr_fiq <= wr_clean;
+					default: ;
+				endcase
+		end
 
 endmodule

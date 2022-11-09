@@ -3,6 +3,7 @@
 module core_porch
 (
 	input  logic       clk,
+	                   rst_n,
 	                   flush,
 	                   stall,
 	input  psr_flags   flags,
@@ -35,19 +36,17 @@ module core_porch
 		dec.ctrl.conditional = !flush && (dec.ctrl.conditional || conditional);
 	end
 
-	always @(posedge clk)
-		if(!stall) begin
+	always_ff @(posedge clk or negedge rst_n)
+		if(!rst_n) begin
+			insn <= `NOP;
+			insn_pc <= 0;
+			hold_dec <= nop;
+		end else if(!stall) begin
 			insn <= fetch_insn;
 			hold_dec <= fetch_dec;
 
 			if(!flush)
 				insn_pc <= fetch_insn_pc;
 		end
-
-	initial begin
-		insn = `NOP;
-		insn_pc = 0;
-		hold_dec = nop;
-	end
 
 endmodule

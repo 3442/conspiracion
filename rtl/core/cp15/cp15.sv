@@ -4,6 +4,7 @@
 module core_cp15
 (
 	input  logic         clk,
+	                     rst_n,
 	                     transfer,
 	input  coproc_decode dec,
 	input  word          write,

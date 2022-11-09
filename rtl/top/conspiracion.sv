@@ -1,7 +1,7 @@
 module conspiracion
 (
 	input  wire        clk_clk,
-	input  wire        debug,
+	input  wire        reset_reset_n,
 	output wire [12:0] memory_mem_a,
 	output wire [2:0]  memory_mem_ba,
 	output wire        memory_mem_ck,
@@ -39,10 +39,6 @@ module conspiracion
 	output wire [7:0]  vga_controller_0_dac_b
 );
 
-	//TODO
-	wire reset_reset_n;
-	assign reset_reset_n = 1'b1;
-
 	logic[29:0] addr;
 	logic[31:0] data_rd, data_wr;
 	logic cpu_clk, ready, write, start, irq;
@@ -50,6 +46,7 @@ module conspiracion
 	arm810 core
 	(
 		.clk(cpu_clk),
+		.rst_n(reset_reset_n),
 		.bus_addr(addr),
 		.bus_data_rd(data_rd),
 		.bus_data_wr(data_wr),

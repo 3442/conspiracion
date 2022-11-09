@@ -3,6 +3,7 @@
 module core_control_mul
 (
 	input  logic       clk,
+	                   rst_n,
 
 	input  insn_decode dec,
 	input  logic       mul_ready,
@@ -31,42 +32,41 @@ module core_control_mul
 	assign {mul_c_hi, mul_c_lo} = {rd_value_a, rd_value_b};
 	assign {mul_a, mul_b} = mul_add ? {hold_a, hold_b} : {rd_value_a, rd_value_b};
 
-	always_ff @(posedge clk) begin
-		mul_start <= 0;
+	always_ff @(posedge clk or negedge rst_n)
+		if(!rst_n) begin
+			mul <= 0;
+			mul_add <= 0;
+			mul_long <= 0;
+			mul_start <= 0;
+			mul_signed <= 0;
+			mul_r_add_hi <= {$bits(mul_r_add_hi){1'b0}};
+			mul_r_add_lo <= {$bits(mul_r_add_lo){1'b0}};
 
-		unique case(next_cycle)
-			ISSUE: begin
-				mul <= issue && dec.ctrl.mul;
-				mul_add <= dec.mul.add;
-				mul_long <= dec.mul.long_mul;
-				mul_signed <= dec.mul.signed_mul;
-				mul_r_add_hi <= dec.mul.r_add_hi;
-				mul_r_add_lo <= dec.mul.r_add_lo;
-			end
+			hold_a <= 0;
+			hold_b <= 0;
+		end else begin
+			mul_start <= 0;
 
-			MUL:
-				mul_start <= cycle != MUL;
+			unique case(next_cycle)
+				ISSUE: begin
+					mul <= issue && dec.ctrl.mul;
+					mul_add <= dec.mul.add;
+					mul_long <= dec.mul.long_mul;
+					mul_signed <= dec.mul.signed_mul;
+					mul_r_add_hi <= dec.mul.r_add_hi;
+					mul_r_add_lo <= dec.mul.r_add_lo;
+				end
 
-			MUL_ACC_LD: begin
-				hold_a <= rd_value_a;
-				hold_b <= rd_value_b;
-			end
-		endcase
-	end
+				MUL:
+					mul_start <= cycle != MUL;
+
+				MUL_ACC_LD: begin
+					hold_a <= rd_value_a;
+					hold_b <= rd_value_b;
+				end
+			endcase
+		end
 
 	//TODO: mul update_flags
-
-	initial begin
-		mul = 0;
-		mul_add = 0;
-		mul_long = 0;
-		mul_start = 0;
-		mul_signed = 0;
-		mul_r_add_hi = {$bits(mul_r_add_hi){1'b0}};
-		mul_r_add_lo = {$bits(mul_r_add_lo){1'b0}};
-
-		hold_a = 0;
-		hold_b = 0;
-	end
 
 endmodule

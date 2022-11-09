@@ -3,6 +3,8 @@
 module core_reg_file
 (
 	input  logic     clk,
+	                 rst_n,
+
 	input  psr_mode  rd_mode,
 	input  reg_num   rd_r,
 	input  reg_index wr_index,
@@ -31,19 +33,18 @@ module core_reg_file
 
 	assign rd_value = hold_rd_pc ? pc_word : forward ? wr_current : rd_actual;
 
-	always_ff @(posedge clk) begin
-		forward <= wr_enable && rd_index == wr_index;
-		hold_rd_pc <= rd_pc;
+	always_ff @(posedge clk or negedge rst_n)
+		if(!rst_n) begin
+			forward <= 0;
+			hold_rd_pc <= 0;
+		end else begin
+			forward <= wr_enable && rd_index == wr_index;
+			hold_rd_pc <= rd_pc;
 
-		if(wr_enable_file)
-			file[wr_index] <= wr_value;
+			if(wr_enable_file)
+				file[wr_index] <= wr_value;
 
-		rd_actual <= file[rd_index];
-	end
-
-	initial begin
-		forward = 0;
-		hold_rd_pc = 0;
-	end
+			rd_actual <= file[rd_index];
+		end
 
 endmodule

@@ -1,6 +1,7 @@
 module core_mmu
 (
 	input  logic clk,
+	             rst_n,
 
 	input  logic bus_ready,
 	input  word  bus_data_rd,
@@ -80,35 +81,34 @@ module core_mmu
 		end
 	end
 
-	always_ff @(posedge clk) begin
-		master <= next_master;
-		active <= bus_start || (active && !bus_ready);
+	always_ff @(posedge clk or negedge rst_n)
+		if(!rst_n) begin
+			master <= INSN;
+			active <= 0;
 
-		if(hold_free)
-			unique case(next_master)
-				INSN: begin
-					hold_start <= data_start;
-					hold_addr <= data_addr;
-					hold_write <= data_write;
-					hold_data_wr <= data_data_wr;
-				end
+			hold_addr <= 30'b0;
+			hold_start <= 0;
+			hold_write <= 0;
+			hold_data_wr <= 0;
+		end else begin
+			master <= next_master;
+			active <= bus_start || (active && !bus_ready);
 
-				DATA: begin
-					hold_start <= insn_start;
-					hold_addr <= insn_addr;
-					hold_write <= 0;
-				end
-			endcase
-	end
+			if(hold_free)
+				unique case(next_master)
+					INSN: begin
+						hold_start <= data_start;
+						hold_addr <= data_addr;
+						hold_write <= data_write;
+						hold_data_wr <= data_data_wr;
+					end
 
-	initial begin
-		master = INSN;
-		active = 0;
-
-		hold_addr = 30'b0;
-		hold_start = 0;
-		hold_write = 0;
-		hold_data_wr = 0;
-	end
+					DATA: begin
+						hold_start <= insn_start;
+						hold_addr <= insn_addr;
+						hold_write <= 0;
+					end
+				endcase
+		end
 
 endmodule

@@ -4,6 +4,8 @@
 module core_mul
 (
 	input  logic clk,      // clock, ya que es una máquina de estados
+	             rst_n,
+
 	input  word  a,        // primer sumando
 	             b,        // segundo sumando
 	             c_hi,     // parte más significativa de c
@@ -31,7 +33,7 @@ module core_mul
 	dsp_mul ip
 	(
 		.clock0(clk),
-		.aclr0(1), //TODO
+		.aclr0(rst_n),
 		.ena0(start || !ready),
 		.dataa_0(a),
 		.datab_0(b),
@@ -49,13 +51,12 @@ module core_mul
 		else
 			c = {{$bits(word){sig && c_lo[$bits(c_lo) - 1]}}, c_lo};
 
-	always_ff @(posedge clk)
-		if(wait_state > {$bits(wait_state){1'b0}})
+	always_ff @(posedge clk or negedge rst_n)
+		if(!rst_n)
+			wait_state <= 0;
+		else if(wait_state > {$bits(wait_state){1'b0}})
 			wait_state <= wait_state - 1;
 		else if(start)
 			wait_state <= 1;
-
-	initial
-		wait_state = 0;
 
 endmodule

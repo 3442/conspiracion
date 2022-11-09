@@ -3,6 +3,7 @@
 module core_control_select
 (
 	input  logic       clk,
+	                   rst_n,
 
 	input  insn_decode dec,
 
@@ -46,18 +47,17 @@ module core_control_select
 		endcase
 	end
 
-	always_ff @(posedge clk) begin
-		last_ra <= ra;
-		last_rb <= rb;
+	always_ff @(posedge clk or negedge rst_n)
+		if(!rst_n) begin
+			last_ra <= {$bits(ra){1'b0}};
+			last_rb <= {$bits(rb){1'b0}};
+			r_shift <= {$bits(r_shift){1'b0}};
+		end else begin
+			last_ra <= ra;
+			last_rb <= rb;
 
-		if(next_cycle == ISSUE)
-			r_shift <= dec.snd.r_shift;
-	end
-
-	initial begin
-		last_ra = {$bits(ra){1'b0}};
-		last_rb = {$bits(rb){1'b0}};
-		r_shift = {$bits(r_shift){1'b0}};
-	end
+			if(next_cycle == ISSUE)
+				r_shift <= dec.snd.r_shift;
+		end
 
 endmodule

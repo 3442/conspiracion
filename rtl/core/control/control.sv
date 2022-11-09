@@ -3,6 +3,8 @@
 module core_control
 (
 	input  logic           clk,
+	                       rst_n,
+
 	input  insn_decode     dec,
 	input  ptr             insn_pc,
 	input  psr_flags       flags,

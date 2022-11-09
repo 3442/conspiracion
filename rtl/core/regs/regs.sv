@@ -3,6 +3,8 @@
 module core_regs
 (
 	input  logic    clk,
+	                rst_n,
+
 	input  reg_num  rd_r_a,
 	                rd_r_b,
 	                wr_r,
@@ -53,16 +55,15 @@ module core_regs
 		.index(wr_index)
 	);
 
-	always_ff @(posedge clk) begin
-		if(wr_enable)
-			wr_current <= wr_value;
+	always_ff @(posedge clk or negedge rst_n)
+		if(!rst_n) begin
+			branch <= 0;
+			wr_current <= 0;
+		end else begin
+			if(wr_enable)
+				wr_current <= wr_value;
 
-		branch <= wr_enable && wr_pc;
-	end
-
-	initial begin
-		branch = 0;
-		wr_current = 0;
-	end
+			branch <= wr_enable && wr_pc;
+		end
 
 endmodule

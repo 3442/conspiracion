@@ -62,7 +62,7 @@ module platform
 	bus_master master_0
 	(
 		.clk(clk_clk),
-		.rst_n(!reset_reset_n),
+		.rst_n(reset_reset_n),
 		.addr(master_0_core_addr),
 		.start(master_0_core_start),
 		.write(master_0_core_write),

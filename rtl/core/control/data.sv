@@ -3,6 +3,7 @@
 module core_control_data
 (
 	input  logic           clk,
+	                       rst_n,
 
 	input  insn_decode     dec,
 	input  word            rd_value_a,
@@ -62,8 +63,16 @@ module core_control_data
 		endcase
 	end
 
-	always_ff @(posedge clk)
-		unique case(next_cycle)
+	always_ff @(posedge clk or negedge rst_n)
+		if(!rst_n) begin
+			alu <= {$bits(alu){1'b0}};
+			c_in <= 0;
+			shifter <= {$bits(shifter){1'b0}};
+			data_imm <= {$bits(data_imm){1'b0}};
+			data_shift_imm <= {$bits(data_shift_imm){1'b0}};
+			data_snd_is_imm <= 0;
+			data_snd_shift_by_reg <= 0;
+		end else unique case(next_cycle)
 			ISSUE: begin
 				alu <= dec.data.op;
 				c_in <= flags.c;
@@ -99,15 +108,5 @@ module core_control_data
 				data_snd_is_imm <= 1;
 			end
 		endcase
-
-	initial begin
-		alu = {$bits(alu){1'b0}};
-		c_in = 0;
-		shifter = {$bits(shifter){1'b0}};
-		data_imm = {$bits(data_imm){1'b0}};
-		data_shift_imm = {$bits(data_shift_imm){1'b0}};
-		data_snd_is_imm = 0;
-		data_snd_shift_by_reg = 0;
-	end
 
 endmodule

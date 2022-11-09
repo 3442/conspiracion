@@ -3,6 +3,7 @@
 module core_control_coproc
 (
 	input  logic       clk,
+	                   rst_n,
 
 	input  insn_decode dec,
 
@@ -12,11 +13,10 @@ module core_control_coproc
 	output logic       coproc
 );
 
-	always_ff @(posedge clk)
-		if(next_cycle == ISSUE && issue)
+	always_ff @(posedge clk or negedge rst_n)
+		if(!rst_n)
+			coproc <= 0;
+		else if(next_cycle == ISSUE && issue)
 			coproc <= dec.ctrl.coproc;
-
-	initial
-		coproc = 0;
 
 endmodule

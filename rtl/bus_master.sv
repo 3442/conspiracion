@@ -63,7 +63,4 @@ module bus_master
 			avl_write <= 0;
 		end
 
-	initial begin
-	end
-
 endmodule

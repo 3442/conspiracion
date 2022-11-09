@@ -3,6 +3,7 @@
 module core_control_issue
 (
 	input  logic       clk,
+	                   rst_n,
 
 	input  insn_decode dec,
 	input  ptr         insn_pc,
@@ -24,8 +25,12 @@ module core_control_issue
 	assign issue = next_cycle == ISSUE && dec.ctrl.execute && !next_bubble;
 	assign next_pc_visible = insn_pc + 2;
 
-	always_ff @(posedge clk)
-		if(next_cycle == ISSUE) begin
+	always_ff @(posedge clk or negedge rst_n)
+		if(!rst_n) begin
+			pc <= 0;
+			undefined <= 0;
+			pc_visible <= 2;
+		end else if(next_cycle == ISSUE) begin
 			undefined <= dec.ctrl.undefined;
 
 `ifdef VERILATOR
@@ -36,11 +41,5 @@ module core_control_issue
 			pc <= insn_pc;
 			pc_visible <= next_pc_visible;
 		end
-
-	initial begin
-		pc = 0;
-		pc_visible = 2;
-		undefined = 0;
-	end
 
 endmodule

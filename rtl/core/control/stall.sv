@@ -3,6 +3,7 @@
 module core_control_stall
 (
 	input  logic       clk,
+	                   rst_n,
 
 	input  insn_decode dec,
 
@@ -33,10 +34,7 @@ module core_control_stall
 	assign flags_dependency = dec.psr.update_flags || dec.ctrl.conditional;
 	assign updating_flags = final_update_flags || update_flags;
 
-	always_ff @(posedge clk)
-		bubble <= next_cycle == ISSUE && next_bubble;
-
-	initial
-		bubble = 0;
+	always_ff @(posedge clk or negedge rst_n)
+		bubble <= !rst_n ? 0 : next_cycle == ISSUE && next_bubble;
 
 endmodule

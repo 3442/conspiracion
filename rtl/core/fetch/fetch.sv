@@ -4,6 +4,7 @@ module core_fetch
 #(parameter PREFETCH_ORDER=2)
 (
 	input  logic clk,
+	             rst_n,
 	             stall,
 	             branch,
 	             fetched,
@@ -49,14 +50,13 @@ module core_fetch
 			addr = hold_addr;
 	end
 
-	always_ff @(posedge clk) begin
-		discard <= discard ? !fetched : flush && fetch;
-		hold_addr <= addr;
-	end
-
-	initial begin
-		discard = 0;
-		hold_addr = 0;
-	end
+	always_ff @(posedge clk or negedge rst_n)
+		if(!rst_n) begin
+			discard <= 0;
+			hold_addr <= 0;
+		end else begin
+			discard <= discard ? !fetched : flush && fetch;
+			hold_addr <= addr;
+		end
 
 endmodule

@@ -3,6 +3,7 @@
 module core_control_ldst
 (
 	input  logic       clk,
+	                   rst_n,
 
 	input  insn_decode dec,
 	input  logic       issue,
@@ -43,8 +44,19 @@ module core_control_ldst
 		.pop_lower(popped_lower)
 	);
 
-	always_ff @(posedge clk)
-		unique case(next_cycle)
+	always_ff @(posedge clk or negedge rst_n)
+		if(!rst_n) begin
+			ldst <= 0;
+			ldst_pre <= 0;
+			ldst_writeback <= 0;
+			ldst_increment <= 0;
+
+			mem_addr <= {$bits(mem_addr){1'b0}};
+			mem_write <= 0;
+			mem_start <= 0;
+			mem_regs <= {$bits(mem_regs){1'b0}};
+			mem_offset <= 0;
+		end else unique case(next_cycle)
 			ISSUE: begin
 				// TODO: dec.ldst.unprivileged/user_regs
 				// TODO: byte/halfword sizes
@@ -73,18 +85,5 @@ module core_control_ldst
 				mem_start <= cycle != TRANSFER || (mem_ready && pop_valid);
 			end
 		endcase
-
-	initial begin
-		ldst = 0;
-		ldst_pre = 0;
-		ldst_writeback = 0;
-		ldst_increment = 0;
-
-		mem_addr = {$bits(mem_addr){1'b0}};
-		mem_write = 0;
-		mem_start = 0;
-		mem_regs = {$bits(mem_regs){1'b0}};
-		mem_offset = 0;
-	end
 
 endmodule

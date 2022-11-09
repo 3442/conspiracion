@@ -3,6 +3,7 @@
 module core_control_exception
 (
 	input  logic clk,
+	             rst_n,
 
 	input  logic undefined,
 

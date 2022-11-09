@@ -3,6 +3,7 @@
 module core_control_branch
 (
 	input  logic       clk,
+	                   rst_n,
 
 	input  insn_decode dec,
 
@@ -14,17 +15,16 @@ module core_control_branch
 	output ptr         branch_target
 );
 
-	always_ff @(posedge clk) begin
-		branch <= 0;
-		if(next_cycle == ISSUE && issue) begin
-			branch <= dec.ctrl.branch;
-			branch_target <= next_pc_visible + dec.branch.offset;
+	always_ff @(posedge clk or negedge rst_n)
+		if(!rst_n) begin
+			branch <= 1;
+			branch_target <= {$bits(branch_target){1'b0}};
+		end else begin
+			branch <= 0;
+			if(next_cycle == ISSUE && issue) begin
+				branch <= dec.ctrl.branch;
+				branch_target <= next_pc_visible + dec.branch.offset;
+			end
 		end
-	end
-
-	initial begin
-		branch = 1;
-		branch_target = {$bits(branch_target){1'b0}};
-	end
 
 endmodule
