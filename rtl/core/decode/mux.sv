@@ -94,13 +94,15 @@ module core_decode_mux
 		snd_ror_if_imm = 1'bx;
 		snd_shift_by_reg_if_reg = 1'bx;
 
-		ldst_addr = {($bits(ldst_addr)){1'bx}};
 		dec_ldst = {($bits(dec_ldst)){1'bx}};
+		ldst_addr = {($bits(ldst_addr)){1'bx}};
 
 		// El orden de los casos es importante, NO CAMBIAR
 		priority casez(insn `FIELD_OP)
 			`GROUP_B: begin
 				branch = 1;
+				dec_data.uses_rn = branch_link;
+
 				if(branch_link) begin
 					dec_data.op = `ALU_SUB;
 					dec_data.rd = `R14;
@@ -186,14 +188,16 @@ module core_decode_mux
 			end
 
 			`INSN_MRS: begin
-				dec_snd.is_imm = 0;
-				dec_snd.r = mrs_rd;
+				dec_data.rd = mrs_rd;
+				dec_data.uses_rn = 0;
 
 				writeback = 1;
 				conditional = 1;
 			end
 
 			`GROUP_MSR: begin
+				dec_data.uses_rn = 0;
+
 				snd_is_imm = msr_is_imm;
 				snd_ror_if_imm = 1;
 				snd_shift_by_reg_if_reg = 0;

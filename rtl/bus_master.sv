@@ -51,6 +51,8 @@ module bus_master
 			state <= IDLE;
 			avl_read <= 0;
 			avl_write <= 0;
+			avl_address <= 0;
+			avl_writedata <= 0;
 		end else if((state == IDLE || !avl_waitrequest) && start) begin
 			state <= WAIT;
 			avl_read <= ~write;

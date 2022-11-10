@@ -80,6 +80,10 @@ module arm810
 	psr_flags flags;
 	psr_intmask intmask;
 
+	//TODO
+	assign psr_write = 0;
+	assign psr_saved = 0;
+
 	core_psr psr
 	(
 		.mask(intmask),

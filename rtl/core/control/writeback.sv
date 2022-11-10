@@ -144,7 +144,7 @@ module core_control_writeback
 					update_flags <= final_update_flags;
 
 				EXCEPTION:
-					final_update_flags <= 0;
+					update_flags <= 0;
 			endcase
 
 			unique case(next_cycle)

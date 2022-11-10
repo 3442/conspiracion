@@ -36,6 +36,7 @@ module core_reg_file
 	always_ff @(posedge clk or negedge rst_n)
 		if(!rst_n) begin
 			forward <= 0;
+			rd_actual <= 0;
 			hold_rd_pc <= 0;
 		end else begin
 			forward <= wr_enable && rd_index == wr_index;

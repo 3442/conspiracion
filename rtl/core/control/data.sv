@@ -69,6 +69,7 @@ module core_control_data
 			c_in <= 0;
 			shifter <= {$bits(shifter){1'b0}};
 			data_imm <= {$bits(data_imm){1'b0}};
+			saved_base <= 0;
 			data_shift_imm <= {$bits(data_shift_imm){1'b0}};
 			data_snd_is_imm <= 0;
 			data_snd_shift_by_reg <= 0;
@@ -77,10 +78,10 @@ module core_control_data
 				alu <= dec.data.op;
 				c_in <= flags.c;
 
-				data_snd_is_imm <= dec.snd.is_imm;
-				data_snd_shift_by_reg <= dec.snd.shift_by_reg;
 				data_imm <= dec.snd.imm;
 				data_shift_imm <= dec.snd.shift_imm;
+				data_snd_is_imm <= dec.snd.is_imm;
+				data_snd_shift_by_reg <= dec.snd.shift_by_reg;
 
 				shifter.shr <= dec.snd.shr;
 				shifter.ror <= dec.snd.ror;

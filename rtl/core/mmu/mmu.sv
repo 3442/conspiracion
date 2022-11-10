@@ -97,15 +97,15 @@ module core_mmu
 			if(hold_free)
 				unique case(next_master)
 					INSN: begin
-						hold_start <= data_start;
 						hold_addr <= data_addr;
+						hold_start <= data_start;
 						hold_write <= data_write;
 						hold_data_wr <= data_data_wr;
 					end
 
 					DATA: begin
-						hold_start <= insn_start;
 						hold_addr <= insn_addr;
+						hold_start <= insn_start;
 						hold_write <= 0;
 					end
 				endcase

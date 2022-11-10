@@ -10,5 +10,6 @@ module core_decode_ldst_addr
 	assign alu.op = ldst.increment ? `ALU_ADD : `ALU_SUB;
 	assign alu.rn = ldst.rn;
 	assign alu.rd = ldst.rd;
+	assign alu.uses_rn = 1;
 
 endmodule

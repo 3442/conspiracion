@@ -52,9 +52,9 @@ module core_control_ldst
 			ldst_increment <= 0;
 
 			mem_addr <= {$bits(mem_addr){1'b0}};
+			mem_regs <= {$bits(mem_regs){1'b0}};
 			mem_write <= 0;
 			mem_start <= 0;
-			mem_regs <= {$bits(mem_regs){1'b0}};
 			mem_offset <= 0;
 		end else unique case(next_cycle)
 			ISSUE: begin
