@@ -264,7 +264,9 @@ for r, value in init_regs.items():
 init_regs = None
 exec_args.append(image)
 
-exec_args.extend([f'+verilator+seed+{seed}', '+verilator+rand+reset+2'])
+exec_args.append(f'+verilator+seed+{seed}')
+if not os.getenv('SIM_PULLX', 0):
+    exec_args.append('+verilator+rand+reset+2')
 
 output = subprocess.run(exec_args, stdout=subprocess.PIPE, text=True)
 if output.returncode != 0:
