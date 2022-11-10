@@ -18,10 +18,11 @@ module core_fetch
 	             flush,
 	output word  insn,
 	output ptr   insn_pc,
-	             addr
+	             addr,
+	             fetch_head
 );
 
-	ptr next_pc, head, hold_addr, target;
+	ptr next_pc, hold_addr, target;
 	logic fetched_valid, discard;
 
 	assign flush = branch || prefetch_flush;
@@ -30,20 +31,21 @@ module core_fetch
 
 	core_prefetch #(.ORDER(PREFETCH_ORDER)) prefetch
 	(
+		.head(fetch_head),
 		.fetched(fetched_valid),
 		.*
 	);
 
 	always_comb begin
 		if(branch)
-			head = target;
+			fetch_head = target;
 		else if(prefetch_flush)
-			head = next_pc;
+			fetch_head = next_pc;
 		else
-			head = {30{1'bx}};
+			fetch_head = {30{1'bx}};
 
 		if(flush)
-			addr = head;
+			addr = fetch_head;
 		else if(fetch && fetched_valid)
 			addr = hold_addr + 1;
 		else

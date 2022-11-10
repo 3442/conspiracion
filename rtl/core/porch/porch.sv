@@ -10,6 +10,7 @@ module core_porch
 
 	input  word        fetch_insn,
 	input  ptr         fetch_insn_pc,
+	                   fetch_head,
 	input  insn_decode fetch_dec,
 
 	output word        insn,
@@ -18,16 +19,7 @@ module core_porch
 );
 
 	logic execute, conditional, undefined;
-	insn_decode nop, hold_dec;
-
-	core_porch_conds conds
-	(
-		.*
-	);
-
-	assign nop.ctrl.execute = 0;
-	assign nop.ctrl.undefined = 0;
-	assign nop.ctrl.conditional = 0;
+	insn_decode hold_dec;
 
 	always_comb begin
 		dec = hold_dec;
@@ -36,17 +28,20 @@ module core_porch
 		dec.ctrl.conditional = !flush && (dec.ctrl.conditional || conditional);
 	end
 
+	core_porch_conds conds
+	(
+		.*
+	);
+
 	always_ff @(posedge clk or negedge rst_n)
 		if(!rst_n) begin
 			insn <= `NOP;
 			insn_pc <= 0;
-			hold_dec <= nop;
-		end else if(!stall) begin
-			insn <= fetch_insn;
+			hold_dec <= {$bits(hold_dec){1'b0}};
+		end else if(flush || !stall) begin
+			insn <= flush ? `NOP : fetch_insn;
+			insn_pc <= flush ? fetch_head : fetch_insn_pc;
 			hold_dec <= fetch_dec;
-
-			if(!flush)
-				insn_pc <= fetch_insn_pc;
 		end
 
 endmodule

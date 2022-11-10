@@ -14,7 +14,7 @@ module arm810
 	output word  bus_data_wr
 );
 
-	ptr fetch_insn_pc, insn_addr;
+	ptr fetch_insn_pc, fetch_head, insn_addr;
 	word fetch_insn;
 	logic stall, flush, prefetch_flush, insn_start;
 
