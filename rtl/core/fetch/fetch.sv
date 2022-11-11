@@ -23,16 +23,19 @@ module core_fetch
 );
 
 	ptr next_pc, hold_addr, target;
-	logic fetched_valid, discard;
+	logic prefetch_ready, fetched_valid, discard, pending, next_pending;
 
+	assign fetch = prefetch_ready && !discard;
 	assign flush = branch || prefetch_flush;
 	assign target = wr_pc ? wr_current[31:2] : branch_target; //TODO: alignment exception
+	assign next_pending = fetch || (pending && !fetched);
 	assign fetched_valid = fetched && !discard;
 
 	core_prefetch #(.ORDER(PREFETCH_ORDER)) prefetch
 	(
 		.head(fetch_head),
 		.fetched(fetched_valid),
+		.fetch(prefetch_ready),
 		.*
 	);
 
@@ -54,10 +57,12 @@ module core_fetch
 
 	always_ff @(posedge clk or negedge rst_n)
 		if(!rst_n) begin
+			pending <= 0;
 			discard <= 0;
 			hold_addr <= 0;
 		end else begin
-			discard <= discard ? !fetched : flush && fetch;
+			pending <= next_pending;
+			discard <= next_pending && (discard || flush);
 			hold_addr <= addr;
 		end
 

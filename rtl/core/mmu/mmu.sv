@@ -28,9 +28,9 @@ module core_mmu
 		DATA
 	} master, next_master;
 
-	logic active, hold_start, hold_write, hold_issue, hold_free, transition;
 	ptr hold_addr;
 	word hold_data_wr;
+	logic active, hold_start, hold_write, hold_issue, hold_free, transition;
 
 	//TODO
 	assign insn_data_rd = bus_data_rd;
