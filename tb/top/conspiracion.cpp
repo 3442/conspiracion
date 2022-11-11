@@ -230,9 +230,9 @@ int main(int argc, char **argv)
 		tick();
 	};
 
-	top.reset_reset_n = 0;
+	top.rst_n = 0;
 	cycle();
-	top.reset_reset_n = 1;
+	top.rst_n = 1;
 
 	for(unsigned i = 0; i < *cycles; ++i)
 	{

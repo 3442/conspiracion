@@ -108,8 +108,7 @@ set_global_assignment -name ECO_REGENERATE_REPORT ON
 
 
 set_location_assignment PIN_AF14 -to clk_clk
-
-set_location_assignment PIN_AB12 -to reset_reset_n
+set_location_assignment PIN_AB12 -to rst_n
 
 set_location_assignment PIN_V16 -to pio_leds[0]
 set_location_assignment PIN_W16 -to pio_leds[1]
@@ -340,6 +339,7 @@ set_instance_assignment -name OUTPUT_TERMINATION "SERIES 50 OHM WITH CALIBRATION
 
 set_global_assignment -name QIP_FILE ip/dsp_mul.qip
 set_global_assignment -name SIP_FILE ip/dsp_mul.sip
+
 
 
 

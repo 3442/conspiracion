@@ -1,7 +1,7 @@
 module conspiracion
 (
 	input  wire        clk_clk,
-	input  wire        reset_reset_n,
+	input  wire        rst_n,
 	output wire [12:0] memory_mem_a,
 	output wire [2:0]  memory_mem_ba,
 	output wire        memory_mem_ck,
@@ -41,7 +41,18 @@ module conspiracion
 
 	logic[29:0] addr;
 	logic[31:0] data_rd, data_wr;
-	logic cpu_clk, ready, write, start, irq;
+	logic reset_reset_n, cpu_clk, ready, write, start, irq;
+
+`ifdef VERILATOR
+	assign reset_reset_n = rst_n;
+`else
+	debounce reset_debounce
+	(
+		.clk(clk_clk),
+		.dirty(rst_n),
+		.clean(reset_reset_n)
+	);
+`endif
 
 	arm810 core
 	(
