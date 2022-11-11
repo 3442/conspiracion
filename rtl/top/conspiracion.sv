@@ -66,6 +66,7 @@ module conspiracion
 		.master_0_core_write(write),
 		.master_0_core_start(start),
 		.master_0_core_irq(irq),
+		.pll_0_reset_reset(0), //TODO: reset controller, algún día
 		.pll_0_outclk3_clk(vram_wire_clk),
 		.pio_0_external_connection_export(pio_leds),
 		.*

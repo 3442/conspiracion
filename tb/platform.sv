@@ -29,6 +29,7 @@ module platform
 	output wire        memory_mem_dm,                    //                          .mem_dm
 	input  wire        memory_oct_rzqin,                 //                          .oct_rzqin
 	output wire [7:0]  pio_0_external_connection_export, // pio_0_external_connection.export
+	input  wire        pll_0_reset_reset,
 	output wire        pll_0_outclk3_clk,                //             pll_0_outclk3.clk
 	input  wire        reset_reset_n /*verilator public*/,//                     reset.reset_n
 	output wire [12:0] vram_wire_addr,                   //                 vram_wire.addr

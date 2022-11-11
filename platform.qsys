@@ -168,6 +168,7 @@
    internal="pll_0.outclk3"
    type="clock"
    dir="start" />
+ <interface name="pll_0_reset" internal="pll_0.reset" type="reset" dir="end" />
  <interface name="reset" internal="clk_0.clk_in_reset" type="reset" dir="end" />
  <interface
    name="vga_controller_0_dac"
@@ -953,7 +954,7 @@
   <parameter name="gui_phase_shift_deg8" value="0.0" />
   <parameter name="gui_phase_shift_deg9" value="0.0" />
   <parameter name="gui_phout_division" value="1" />
-  <parameter name="gui_pll_auto_reset" value="Off" />
+  <parameter name="gui_pll_auto_reset" value="On" />
   <parameter name="gui_pll_bandwidth_preset" value="Auto" />
   <parameter name="gui_pll_cascading_mode">Create an adjpllin signal to connect with an upstream PLL</parameter>
   <parameter name="gui_pll_mode" value="Fractional-N PLL" />
@@ -1146,7 +1147,6 @@
    version="20.1"
    start="clk_0.clk_reset"
    end="address_span_extender_0.reset" />
- <connection kind="reset" version="20.1" start="clk_0.clk_reset" end="pll_0.reset" />
  <connection kind="reset" version="20.1" start="clk_0.clk_reset" end="vram.reset" />
  <connection
    kind="reset"
