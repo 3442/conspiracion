@@ -6,7 +6,9 @@ module debounce
 );
 
 	logic last;
-	logic[15:0] clean_for;
+
+	// 168ms para reloj de 50MHz
+	logic[22:0] clean_for;
 
 	always @(posedge clk) begin
 		last <= dirty;
