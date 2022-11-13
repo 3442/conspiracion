@@ -98,6 +98,13 @@ module core_control_cycles
 
 			MUL_ACC_LD:
 				next_state = MUL;
+
+			/* Este default evita problemas de sintetizado, ya que Quartus
+			 * asume que los casos mencionados son exhaustivos, provocando
+			 * bugs muy difíciles de depurar. No es lo mismo que si se quita
+			 * default.
+			 */
+			default: ;
 		endcase
 
 		if(bubble)

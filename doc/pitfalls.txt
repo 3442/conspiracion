@@ -206,3 +206,42 @@ analyzer, pero ymmv según esto:
 <https://community.intel.com/t5/Intel-Quartus-Prime-Software/No-hardware-detected-in-beta-bus-analyzer/m-p/670701>
 
 También puse el debouncer del lab4 antes del reset que va a platform.
+
+Agrego Signal Tap e implemento halt de CPU para facilitar todo.
+
+Después de muchas pruebas con Signal Tap, resulta ser que Quartus no interpreta
+las FSMs como yo creía en varias formas. La primera es que esto no se entiende
+como variable de estado de FSM:
+
+	enum
+	{
+		A,
+		B,
+		C
+	} state;
+
+Pero esto otro sí:
+
+	enum int unsigned
+	{
+		A,
+		B,
+		C
+	} state;
+
+Lo segundo, y más importante, es que Quartus y Verilator difieren en su
+interpretación de unique case, pero creo que la de Quartus viola el estándar y
+además no parece estar documentada en ningún lado. Este case no menciona a C:
+
+	unique case(state)
+		A: ...
+		B: ...
+	endcase
+
+Como no se menciona el estado C y no tiene un default, Verilator lo compila a
+lo mismo que si tuviera `default: ;`, pero Quartus cae en undefined behavior y
+asume que los dos estados de los cases son exhaustivos. Esto provocó problemas
+en el bus que fueron muy difíciles de depurar.
+
+Se alcanza el trivio al ser ser las 05:44:03 horas del 13 de noviembre de 2022
+según Signal Tap.
