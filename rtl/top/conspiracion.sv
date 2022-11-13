@@ -49,9 +49,6 @@ module conspiracion
 	assign cpu_halt = halt;
 	assign reset_reset_n = rst_n;
 `else
-	assign pio_leds[0] = reset_reset_n;
-	assign pio_leds[1] = cpu_halted;
-
 	debounce reset_debounce
 	(
 		.clk(clk_clk),
@@ -93,11 +90,9 @@ module conspiracion
 		.master_0_core_write(write),
 		.master_0_core_start(start),
 		.master_0_core_irq(irq),
-`ifdef VERILATOR
 		.pll_0_reset_reset(0), //TODO: reset controller, algún día
 		.pll_0_outclk3_clk(vram_wire_clk),
 		.pio_0_external_connection_export(pio_leds),
-`endif
 		.*
 	);
 

@@ -49,14 +49,6 @@
          type = "int";
       }
    }
-   element master_1
-   {
-      datum _sortIndex
-      {
-         value = "10";
-         type = "int";
-      }
-   }
    element pio_0
    {
       datum _sortIndex
@@ -752,20 +744,6 @@
    enabled="1">
   <parameter name="AUTO_IRQ_INTERRUPTS_USED" value="0" />
  </module>
- <module
-   name="master_1"
-   kind="altera_jtag_avalon_master"
-   version="20.1"
-   enabled="1">
-  <parameter name="AUTO_DEVICE" value="5CSEMA5F31C6" />
-  <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
-  <parameter name="AUTO_DEVICE_SPEEDGRADE" value="6" />
-  <parameter name="COMPONENT_CLOCK" value="0" />
-  <parameter name="FAST_VER" value="0" />
-  <parameter name="FIFO_DEPTHS" value="2" />
-  <parameter name="PLI_PORT" value="50000" />
-  <parameter name="USE_PLI" value="0" />
- </module>
  <module name="pio_0" kind="altera_avalon_pio" version="20.1" enabled="1">
   <parameter name="bitClearingEdgeCapReg" value="false" />
   <parameter name="bitModifyingOutReg" value="true" />
@@ -1041,7 +1019,7 @@
  <connection
    kind="avalon"
    version="20.1"
-   start="master_0.avalon_master_1"
+   start="master_0.avalon_master_1_1"
    end="jtag_uart_0.avalon_jtag_slave">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x30000000" />
@@ -1050,7 +1028,7 @@
  <connection
    kind="avalon"
    version="20.1"
-   start="master_0.avalon_master_1"
+   start="master_0.avalon_master_1_1"
    end="pio_0.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x30010000" />
@@ -1059,7 +1037,7 @@
  <connection
    kind="avalon"
    version="20.1"
-   start="master_0.avalon_master_1"
+   start="master_0.avalon_master_1_1"
    end="timer_0.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x30020000" />
@@ -1068,7 +1046,7 @@
  <connection
    kind="avalon"
    version="20.1"
-   start="master_0.avalon_master_1"
+   start="master_0.avalon_master_1_1"
    end="vram.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x38000000" />
@@ -1077,7 +1055,7 @@
  <connection
    kind="avalon"
    version="20.1"
-   start="master_0.avalon_master_1"
+   start="master_0.avalon_master_1_1"
    end="address_span_extender_0.windowed_slave">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x0000" />
@@ -1092,27 +1070,6 @@
   <parameter name="baseAddress" value="0x0000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
- <connection kind="avalon" version="20.1" start="master_1.master" end="pio_0.s1">
-  <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x30010000" />
-  <parameter name="defaultConnection" value="false" />
- </connection>
- <connection kind="avalon" version="20.1" start="master_1.master" end="timer_0.s1">
-  <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x30020000" />
-  <parameter name="defaultConnection" value="false" />
- </connection>
- <connection
-   kind="avalon"
-   version="20.1"
-   start="master_1.master"
-   end="address_span_extender_0.windowed_slave">
-  <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x0000" />
-  <parameter name="defaultConnection" value="false" />
- </connection>
- <connection kind="clock" version="20.1" start="clk_0.clk" end="master_1.clk" />
- <connection kind="clock" version="20.1" start="clk_0.clk" end="master_0.clock" />
  <connection kind="clock" version="20.1" start="clk_0.clk" end="pll_0.refclk" />
  <connection
    kind="clock"
@@ -1130,6 +1087,11 @@
    kind="clock"
    version="20.1"
    start="pll_0.outclk0"
+   end="master_0.clock" />
+ <connection
+   kind="clock"
+   version="20.1"
+   start="pll_0.outclk0"
    end="hps_0.f2h_sdram0_clock" />
  <connection kind="clock" version="20.1" start="pll_0.outclk2" end="vram.clk" />
  <connection
@@ -1137,11 +1099,6 @@
    version="20.1"
    start="pll_0.outclk2"
    end="vga_controller_0.clock_sink" />
- <connection
-   kind="reset"
-   version="20.1"
-   start="clk_0.clk_reset"
-   end="master_1.clk_reset" />
  <connection
    kind="reset"
    version="20.1"
@@ -1171,7 +1128,7 @@
    end="vga_controller_0.reset_sink" />
  <interconnectRequirement for="$system" name="qsys_mm.clockCrossingAdapter" value="HANDSHAKE" />
  <interconnectRequirement for="$system" name="qsys_mm.enableEccProtection" value="FALSE" />
- <interconnectRequirement for="$system" name="qsys_mm.enableInstrumentation" value="TRUE" />
+ <interconnectRequirement for="$system" name="qsys_mm.enableInstrumentation" value="FALSE" />
  <interconnectRequirement for="$system" name="qsys_mm.insertDefaultSlave" value="FALSE" />
  <interconnectRequirement for="$system" name="qsys_mm.maxAdditionalLatency" value="1" />
 </system>
