@@ -4,6 +4,7 @@ module core_control_stall
 (
 	input  logic       clk,
 	                   rst_n,
+	                   halt,
 
 	input  insn_decode dec,
 
@@ -14,7 +15,8 @@ module core_control_stall
 	                   writeback,
 	input  reg_num     final_rd,
 
-	output logic       stall,
+	output logic       halted,
+	                   stall,
 	                   bubble,
 	                   next_bubble
 );
@@ -22,7 +24,8 @@ module core_control_stall
 	logic pc_rd_hazard, pc_wr_hazard, rn_pc_hazard, snd_pc_hazard,
 		  flags_hazard, flags_dependency, updating_flags;
 
-	assign stall = next_cycle != ISSUE || next_bubble;
+	assign stall = next_cycle != ISSUE || next_bubble || halt;
+	assign halted = halt && !next_bubble;
 	assign next_bubble = pc_rd_hazard || pc_wr_hazard || flags_hazard;
 
 	//FIXME: pc_rd_hazard no debería definirse sin final_writeback?

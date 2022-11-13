@@ -4,6 +4,7 @@ module core_control
 (
 	input  logic           clk,
 	                       rst_n,
+	                       halt,
 
 	input  insn_decode     dec,
 	input  ptr             insn_pc,
@@ -24,7 +25,8 @@ module core_control
 	input  word            insn,
 `endif
 
-	output logic           stall,
+	output logic           halted,
+	                       stall,
 	                       branch,
 	                       writeback,
 	                       update_flags,

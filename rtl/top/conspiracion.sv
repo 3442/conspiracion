@@ -2,6 +2,7 @@ module conspiracion
 (
 	input  wire        clk_clk,
 	input  wire        rst_n,
+	input  wire        halt,
 	output wire [12:0] memory_mem_a,
 	output wire [2:0]  memory_mem_ba,
 	output wire        memory_mem_ck,
@@ -41,20 +42,28 @@ module conspiracion
 
 	logic[29:0] addr;
 	logic[31:0] data_rd, data_wr;
-	logic reset_reset_n, cpu_clk, cpu_rst_n, ready, write, start, irq;
-
-`ifndef VERILATOR`
-	assign pio_leds[0] = reset_reset_n;
-`endif
+	logic reset_reset_n, cpu_clk, cpu_rst_n, cpu_halt, cpu_halted,
+	      ready, write, start, irq;
 
 `ifdef VERILATOR
+	assign cpu_halt = halt;
 	assign reset_reset_n = rst_n;
 `else
+	assign pio_leds[0] = reset_reset_n;
+	assign pio_leds[1] = cpu_halted;
+
 	debounce reset_debounce
 	(
 		.clk(clk_clk),
 		.dirty(rst_n),
 		.clean(reset_reset_n)
+	);
+
+	debounce halt_debounce
+	(
+		.clk(cpu_clk),
+		.dirty(halt),
+		.clean(cpu_halt)
 	);
 `endif
 
@@ -62,6 +71,8 @@ module conspiracion
 	(
 		.clk(cpu_clk),
 		.rst_n(cpu_rst_n),
+		.halt(cpu_halt),
+		.halted(cpu_halted),
 		.bus_addr(addr),
 		.bus_data_rd(data_rd),
 		.bus_data_wr(data_wr),

@@ -5,13 +5,15 @@ module arm810
 	input  logic clk,
 	             rst_n,
 	             irq,
+	             halt,
 
 	output ptr   bus_addr,
 	output logic bus_start,
 	             bus_write,
 	input  logic bus_ready,
 	input  word  bus_data_rd,
-	output word  bus_data_wr
+	output word  bus_data_wr,
+	output logic halted
 );
 
 	ptr fetch_insn_pc, fetch_head, insn_addr;

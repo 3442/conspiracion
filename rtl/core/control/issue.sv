@@ -4,6 +4,7 @@ module core_control_issue
 (
 	input  logic       clk,
 	                   rst_n,
+	                   halt,
 
 	input  insn_decode dec,
 	input  ptr         insn_pc,
@@ -22,7 +23,7 @@ module core_control_issue
 	                   next_pc_visible
 );
 
-	assign issue = next_cycle == ISSUE && dec.ctrl.execute && !next_bubble;
+	assign issue = next_cycle == ISSUE && dec.ctrl.execute && !next_bubble && !halt;
 	assign next_pc_visible = insn_pc + 2;
 
 	always_ff @(posedge clk or negedge rst_n)

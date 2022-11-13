@@ -230,6 +230,7 @@ int main(int argc, char **argv)
 		tick();
 	};
 
+	top.halt = 0;
 	top.rst_n = 0;
 	cycle();
 	top.rst_n = 1;

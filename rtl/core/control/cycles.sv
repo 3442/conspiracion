@@ -4,6 +4,7 @@ module core_control_cycles
 (
 	input  logic      clk,
 	                  rst_n,
+	                  halt,
 	                  mul,
 	                  ldst,
 	                  bubble,
@@ -28,6 +29,8 @@ module core_control_cycles
 			ISSUE:
 				if(exception)
 					next_cycle = EXCEPTION;
+				else if(halt)
+					next_cycle = ISSUE;
 				else if(mul)
 					next_cycle = mul_add ? MUL_ACC_LD : MUL;
 				else if(data_snd_shift_by_reg)
