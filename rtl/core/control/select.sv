@@ -29,22 +29,17 @@ module core_control_select
 		ra = last_ra;
 		rb = last_rb;
 
-		unique case(next_cycle)
-			ISSUE: begin
-				ra = dec.data.rn;
-				rb = dec.snd.r;
-			end
-
-			TRANSFER:
-				if(cycle != TRANSFER || mem_ready)
-					// final_rd viene de dec.ldst.rd
-					rb = pop_valid ? popped : final_rd;
-
-			MUL_ACC_LD: begin
-				ra = mul_r_add_hi;
-				rb = mul_r_add_lo;
-			end
-		endcase
+		if(next_cycle.issue) begin
+			ra = dec.data.rn;
+			rb = dec.snd.r;
+		end else if(next_cycle.transfer) begin
+			if(!cycle.transfer || mem_ready)
+				// final_rd viene de dec.ldst.rd
+				rb = pop_valid ? popped : final_rd;
+		end else if(next_cycle.mul_acc_ld) begin
+			ra = mul_r_add_hi;
+			rb = mul_r_add_lo;
+		end
 	end
 
 	always_ff @(posedge clk or negedge rst_n)
@@ -56,7 +51,7 @@ module core_control_select
 			last_ra <= ra;
 			last_rb <= rb;
 
-			if(next_cycle == ISSUE)
+			if(next_cycle.issue)
 				r_shift <= dec.snd.r_shift;
 		end
 

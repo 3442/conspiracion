@@ -38,67 +38,46 @@ module core_control_writeback
 
 	always_comb begin
 		rd = last_rd;
-		unique case(next_cycle)
-			TRANSFER:
-				if(mem_ready)
-					rd = final_rd;
-
-			ISSUE, BASE_WRITEBACK:
+		if(next_cycle.transfer) begin
+			if(mem_ready)
 				rd = final_rd;
+		end else if(next_cycle.issue || next_cycle.base_writeback)
+			rd = final_rd;
+		else if(next_cycle.exception)
+			rd = `R15;
+		else if(next_cycle.mul_hi_wb)
+			rd = mul_r_add_hi;
 
-			EXCEPTION:
-				rd = `R15;
+		if(next_cycle.issue)
+			writeback = final_writeback;
+		else if(next_cycle.transfer)
+			writeback = mem_ready && !mem_write;
+		else if(next_cycle.base_writeback)
+			writeback = !mem_write;
+		else if(next_cycle.exception || next_cycle.mul_hi_wb)
+			writeback = 1;
+		else
+			writeback = 0;
 
-			MUL_HI_WB:
-				rd = mul_r_add_hi;
-		endcase
+		if(cycle.transfer)
+			wr_value = mem_data_rd;
+		else if(cycle.base_writeback)
+			wr_value = saved_base;
+		else if(cycle.mul || cycle.mul_hi_wb)
+			wr_value = mul_q_lo;
+		else
+			// Ruta combinacional larga
+			wr_value = q_alu;
 
-		unique case(next_cycle)
-			ISSUE:
-				writeback = final_writeback;
-
-			TRANSFER:
-				writeback = mem_ready && !mem_write;
-
-			BASE_WRITEBACK:
-				writeback = !mem_write;
-
-			EXCEPTION, MUL_HI_WB:
-				writeback = 1;
-
-			default:
-				writeback = 0;
-		endcase
-
-		unique case(cycle)
-			TRANSFER:
+		if(next_cycle.transfer) begin
+			if(mem_ready)
 				wr_value = mem_data_rd;
-
-			BASE_WRITEBACK:
-				wr_value = saved_base;
-
-			MUL, MUL_HI_WB:
-				wr_value = mul_q_lo;
-
-			default:
-				// Ruta combinacional larga
-				wr_value = q_alu;
-		endcase
-
-		unique case(next_cycle)
-			TRANSFER:
-				if(mem_ready)
-					wr_value = mem_data_rd;
-
-			BASE_WRITEBACK:
-				wr_value = mem_data_rd;
-
-			EXCEPTION:
-				wr_value = vector;
-
-			MUL_HI_WB:
-				wr_value = mul_q_hi;
-		endcase
+		end else if(next_cycle.base_writeback)
+			wr_value = mem_data_rd;
+		else if(next_cycle.exception)
+			wr_value = vector;
+		else if(next_cycle.mul_hi_wb)
+			wr_value = mul_q_hi;
 	end
 
 	always_ff @(posedge clk or negedge rst_n)
@@ -115,45 +94,31 @@ module core_control_writeback
 			last_rd <= rd;
 			wb_alu_flags <= alu_flags;
 
-			unique case(next_cycle)
-				ISSUE:
-					final_rd <= dec.data.rd;
+			if(next_cycle.issue)
+				final_rd <= dec.data.rd;
+			else if(next_cycle.transfer) begin
+				if((!cycle.transfer || mem_ready) && pop_valid)
+					final_rd <= popped;
+			end else if(next_cycle.base_writeback)
+				final_rd <= ra;
+			else if(next_cycle.exception)
+				final_rd <= `R14;
 
-				TRANSFER:
-					if((cycle != TRANSFER || mem_ready) && pop_valid)
-						final_rd <= popped;
-
-				BASE_WRITEBACK:
-					final_rd <= ra;
-
-				EXCEPTION:
-					final_rd <= `R14;
-			endcase
-
-			unique case(next_cycle)
-				ISSUE:
-					final_writeback <= issue && dec.ctrl.writeback;
-
-				EXCEPTION:
-					final_writeback <= 1;
-			endcase
+			if(next_cycle.issue)
+				final_writeback <= issue && dec.ctrl.writeback;
+			else
+				final_writeback <= 1;
 
 			update_flags <= 0;
-			unique case(next_cycle)
-				ISSUE:
-					update_flags <= final_update_flags;
+			if(next_cycle.issue)
+				update_flags <= final_update_flags;
+			else if(next_cycle.exception)
+				update_flags <= 0;
 
-				EXCEPTION:
-					update_flags <= 0;
-			endcase
-
-			unique case(next_cycle)
-				ISSUE:
-					final_update_flags <= issue && dec.psr.update_flags;
-
-				EXCEPTION:
-					final_update_flags <= 0;
-			endcase
+			if(next_cycle.issue)
+				final_update_flags <= issue && dec.psr.update_flags;
+			else if(next_cycle.exception)
+				final_update_flags <= 0;
 		end
 
 endmodule

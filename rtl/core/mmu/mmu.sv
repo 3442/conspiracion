@@ -22,7 +22,7 @@ module core_mmu
 	             data_data_rd
 );
 
-	enum
+	enum int unsigned
 	{
 		INSN,
 		DATA

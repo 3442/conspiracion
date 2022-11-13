@@ -23,7 +23,8 @@ module bus_master
 	input  logic       avl_irq
 );
 
-	enum {
+	enum int unsigned
+	{
 		IDLE,
 		WAIT
 	} state;

@@ -124,7 +124,7 @@ typedef struct packed
 	logic[5:0]  shift_imm;
 } snd_decode;
 
-typedef enum
+typedef enum int unsigned
 {
 	LDST_WORD,
 	LDST_BYTE,
@@ -181,17 +181,18 @@ typedef struct packed
 	coproc_decode coproc;
 } insn_decode;
 
-typedef enum
+// Ver comentario en cycles.sv, este diseño es más óptimo
+typedef struct packed
 {
-	ISSUE,
-	RD_INDIRECT_SHIFT,
-	WITH_SHIFT,
-	TRANSFER,
-	BASE_WRITEBACK,
-	EXCEPTION,
-	MUL,
-	MUL_ACC_LD,
-	MUL_HI_WB
+	logic issue,
+	      rd_indirect_shift,
+	      with_shift,
+	      transfer,
+	      base_writeback,
+	      exception,
+	      mul,
+	      mul_acc_ld,
+	      mul_hi_wb;
 } ctrl_cycle;
 
 typedef struct packed

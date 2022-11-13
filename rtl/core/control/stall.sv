@@ -24,7 +24,7 @@ module core_control_stall
 	logic pc_rd_hazard, pc_wr_hazard, rn_pc_hazard, snd_pc_hazard,
 		  flags_hazard, flags_dependency, updating_flags;
 
-	assign stall = next_cycle != ISSUE || next_bubble || halt;
+	assign stall = !next_cycle.issue || next_bubble || halt;
 	assign halted = halt && !next_bubble;
 	assign next_bubble = pc_rd_hazard || pc_wr_hazard || flags_hazard;
 
@@ -40,6 +40,6 @@ module core_control_stall
 	assign flags_dependency = dec.psr.update_flags || dec.ctrl.conditional;
 
 	always_ff @(posedge clk or negedge rst_n)
-		bubble <= !rst_n ? 0 : next_cycle == ISSUE && next_bubble;
+		bubble <= !rst_n ? 0 : next_cycle.issue && next_bubble;
 
 endmodule

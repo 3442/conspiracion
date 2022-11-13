@@ -21,7 +21,7 @@ module core_control_branch
 			branch_target <= {$bits(branch_target){1'b0}};
 		end else begin
 			branch <= 0;
-			if(next_cycle == ISSUE && issue) begin
+			if(next_cycle.issue && issue) begin
 				branch <= dec.ctrl.branch;
 				branch_target <= next_pc_visible + dec.branch.offset;
 			end

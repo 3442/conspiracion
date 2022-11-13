@@ -47,24 +47,19 @@ module core_control_mul
 		end else begin
 			mul_start <= 0;
 
-			unique case(next_cycle)
-				ISSUE: begin
-					mul <= issue && dec.ctrl.mul;
-					mul_add <= dec.mul.add;
-					mul_long <= dec.mul.long_mul;
-					mul_signed <= dec.mul.signed_mul;
-					mul_r_add_hi <= dec.mul.r_add_hi;
-					mul_r_add_lo <= dec.mul.r_add_lo;
-				end
-
-				MUL:
-					mul_start <= cycle != MUL;
-
-				MUL_ACC_LD: begin
-					hold_a <= rd_value_a;
-					hold_b <= rd_value_b;
-				end
-			endcase
+			if(next_cycle.issue) begin
+				mul <= issue && dec.ctrl.mul;
+				mul_add <= dec.mul.add;
+				mul_long <= dec.mul.long_mul;
+				mul_signed <= dec.mul.signed_mul;
+				mul_r_add_hi <= dec.mul.r_add_hi;
+				mul_r_add_lo <= dec.mul.r_add_lo;
+			end else if(next_cycle.mul)
+				mul_start <= !cycle.mul;
+			else if(next_cycle.mul_acc_ld) begin
+				hold_a <= rd_value_a;
+				hold_b <= rd_value_b;
+			end
 		end
 
 	//TODO: mul update_flags

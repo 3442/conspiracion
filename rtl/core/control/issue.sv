@@ -23,7 +23,7 @@ module core_control_issue
 	                   next_pc_visible
 );
 
-	assign issue = next_cycle == ISSUE && dec.ctrl.execute && !next_bubble && !halt;
+	assign issue = next_cycle.issue && dec.ctrl.execute && !next_bubble && !halt;
 	assign next_pc_visible = insn_pc + 2;
 
 	always_ff @(posedge clk or negedge rst_n)
@@ -31,7 +31,7 @@ module core_control_issue
 			pc <= 0;
 			undefined <= 0;
 			pc_visible <= 2;
-		end else if(next_cycle == ISSUE) begin
+		end else if(next_cycle.issue) begin
 			undefined <= dec.ctrl.undefined;
 
 `ifdef VERILATOR

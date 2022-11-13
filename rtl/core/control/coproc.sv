@@ -16,7 +16,7 @@ module core_control_coproc
 	always_ff @(posedge clk or negedge rst_n)
 		if(!rst_n)
 			coproc <= 0;
-		else if(next_cycle == ISSUE && issue)
+		else if(next_cycle.issue && issue)
 			coproc <= dec.ctrl.coproc;
 
 endmodule

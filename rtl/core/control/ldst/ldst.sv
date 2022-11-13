@@ -56,8 +56,10 @@ module core_control_ldst
 			mem_write <= 0;
 			mem_start <= 0;
 			mem_offset <= 0;
-		end else unique case(next_cycle)
-			ISSUE: begin
+		end else begin
+			mem_start <= 0;
+
+			if(next_cycle.issue) begin
 				// TODO: dec.ldst.unprivileged/user_regs
 				// TODO: byte/halfword sizes
 				if(issue)
@@ -69,21 +71,18 @@ module core_control_ldst
 
 				mem_regs <= dec.ldst.regs;
 				mem_write <= !dec.ldst.load;
-			end
-
-			TRANSFER: begin
-				if(cycle != TRANSFER) begin
+			end else if(next_cycle.transfer) begin
+				if(!cycle.transfer) begin
 					ldst <= 0;
 					mem_offset <= alu_b;
 				end
 
-				if(cycle != TRANSFER || mem_ready) begin
+				if(!cycle.transfer || mem_ready) begin
 					mem_regs <= ldst_increment ? next_regs_lower : next_regs_upper;
 					mem_addr <= ldst_pre ? q_alu[31:2] : alu_a[31:2];
 				end
 
-				mem_start <= cycle != TRANSFER || (mem_ready && pop_valid);
+				mem_start <= !cycle.transfer || (mem_ready && pop_valid);
 			end
-		endcase
-
+		end
 endmodule

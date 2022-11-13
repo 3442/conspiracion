@@ -37,30 +37,26 @@ module core_control_data
 	assign trivial_shift = shifter_shift == 0;
 
 	always_comb begin
-		unique case(cycle)
-			RD_INDIRECT_SHIFT: shifter_shift = rd_value_b[7:0];
-			default:           shifter_shift = {2'b00, data_shift_imm};
-		endcase
+		if(cycle.rd_indirect_shift)
+			shifter_shift = rd_value_b[7:0];
+		else
+			shifter_shift = {2'b00, data_shift_imm};
 
-		unique case(cycle)
-			TRANSFER:  alu_a = saved_base;
-			EXCEPTION: alu_a = {pc, 2'b00};
-			default:   alu_a = rd_value_a;
-		endcase
+		if(cycle.transfer)
+			alu_a = saved_base;
+		else if(cycle.exception)
+			alu_a = {pc, 2'b00};
+		else
+			alu_a = rd_value_a;
 
-		unique case(cycle)
-			RD_INDIRECT_SHIFT, WITH_SHIFT:
-				alu_b = saved_base;
-
-			TRANSFER:
-				alu_b = mem_offset;
-
-			default:
-				if(data_snd_is_imm)
-					alu_b = {{20{1'b0}}, data_imm};
-				else
-					alu_b = rd_value_b;
-		endcase
+		if(cycle.rd_indirect_shift || cycle.with_shift)
+			alu_b = saved_base;
+		else if(cycle.transfer)
+			alu_b = mem_offset;
+		else if(data_snd_is_imm)
+			alu_b = {{20{1'b0}}, data_imm};
+		else
+			alu_b = rd_value_b;
 	end
 
 	always_ff @(posedge clk or negedge rst_n)
@@ -73,41 +69,32 @@ module core_control_data
 			data_shift_imm <= {$bits(data_shift_imm){1'b0}};
 			data_snd_is_imm <= 0;
 			data_snd_shift_by_reg <= 0;
-		end else unique case(next_cycle)
-			ISSUE: begin
-				alu <= dec.data.op;
-				c_in <= flags.c;
+		end else if(next_cycle.issue) begin
+			alu <= dec.data.op;
+			c_in <= flags.c;
 
-				data_imm <= dec.snd.imm;
-				data_shift_imm <= dec.snd.shift_imm;
-				data_snd_is_imm <= dec.snd.is_imm;
-				data_snd_shift_by_reg <= dec.snd.shift_by_reg;
+			data_imm <= dec.snd.imm;
+			data_shift_imm <= dec.snd.shift_imm;
+			data_snd_is_imm <= dec.snd.is_imm;
+			data_snd_shift_by_reg <= dec.snd.shift_by_reg;
 
-				shifter.shr <= dec.snd.shr;
-				shifter.ror <= dec.snd.ror;
-				shifter.put_carry <= dec.snd.put_carry;
-				shifter.sign_extend <= dec.snd.sign_extend;
-			end
-
-			RD_INDIRECT_SHIFT: begin
-				saved_base <= rd_value_b;
-				data_snd_shift_by_reg <= 0;
-			end
-
-			WITH_SHIFT: begin
-				c_in <= c_shifter;
-				saved_base <= q_shifter;
-			end
-
-			TRANSFER:
-				if(cycle != TRANSFER || mem_ready)
-					saved_base <= q_alu;
-
-			EXCEPTION: begin
-				alu <= `ALU_ADD;
-				data_imm <= 12'd4;
-				data_snd_is_imm <= 1;
-			end
-		endcase
+			shifter.shr <= dec.snd.shr;
+			shifter.ror <= dec.snd.ror;
+			shifter.put_carry <= dec.snd.put_carry;
+			shifter.sign_extend <= dec.snd.sign_extend;
+		end else if(next_cycle.rd_indirect_shift) begin
+			saved_base <= rd_value_b;
+			data_snd_shift_by_reg <= 0;
+		end else if(next_cycle.with_shift) begin
+			c_in <= c_shifter;
+			saved_base <= q_shifter;
+		end else if(next_cycle.transfer) begin
+			if(!cycle.transfer || mem_ready)
+				saved_base <= q_alu;
+		end else if(next_cycle.exception) begin
+			alu <= `ALU_ADD;
+			data_imm <= 12'd4;
+			data_snd_is_imm <= 1;
+		end
 
 endmodule
