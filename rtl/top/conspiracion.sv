@@ -41,7 +41,11 @@ module conspiracion
 
 	logic[29:0] addr;
 	logic[31:0] data_rd, data_wr;
-	logic reset_reset_n, cpu_clk, ready, write, start, irq;
+	logic reset_reset_n, cpu_clk, cpu_rst_n, ready, write, start, irq;
+
+`ifndef VERILATOR`
+	assign pio_leds[0] = reset_reset_n;
+`endif
 
 `ifdef VERILATOR
 	assign reset_reset_n = rst_n;
@@ -57,7 +61,7 @@ module conspiracion
 	arm810 core
 	(
 		.clk(cpu_clk),
-		.rst_n(reset_reset_n),
+		.rst_n(cpu_rst_n),
 		.bus_addr(addr),
 		.bus_data_rd(data_rd),
 		.bus_data_wr(data_wr),
@@ -70,6 +74,7 @@ module conspiracion
 	platform plat
 	(
 		.master_0_core_cpu_clk(cpu_clk),
+		.master_0_core_cpu_rst_n(cpu_rst_n),
 		.master_0_core_addr(addr),
 		.master_0_core_data_rd(data_rd),
 		.master_0_core_data_wr(data_wr),
@@ -77,9 +82,11 @@ module conspiracion
 		.master_0_core_write(write),
 		.master_0_core_start(start),
 		.master_0_core_irq(irq),
+`ifdef VERILATOR
 		.pll_0_reset_reset(0), //TODO: reset controller, algún día
 		.pll_0_outclk3_clk(vram_wire_clk),
 		.pio_0_external_connection_export(pio_leds),
+`endif
 		.*
 	);
 

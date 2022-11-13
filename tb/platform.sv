@@ -12,6 +12,7 @@ module platform
 	input  wire        master_0_core_start   /*verilator public*/,//              .start
 	output wire        master_0_core_irq,                //                          .irq
 	output wire        master_0_core_cpu_clk,            //                          .cpu_clk
+	output wire        master_0_core_cpu_rst_n,
 	output wire [12:0] memory_mem_a,                     //                    memory.mem_a
 	output wire [2:0]  memory_mem_ba,                    //                          .mem_ba
 	output wire        memory_mem_ck,                    //                          .mem_ck
@@ -71,6 +72,7 @@ module platform
 		.data_rd(master_0_core_data_rd),
 		.data_wr(master_0_core_data_wr),
 		.cpu_clk(master_0_core_cpu_clk),
+		.cpu_rst_n(master_0_core_cpu_rst_n),
 		.irq(master_0_core_irq),
 		.*
 	);

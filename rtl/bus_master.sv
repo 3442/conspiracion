@@ -10,6 +10,7 @@ module bus_master
 	output logic[31:0] data_rd,
 	input  logic[31:0] data_wr,
 	output logic       cpu_clk,
+	                   cpu_rst_n,
 	                   irq,
 
 	output logic[31:0] avl_address,
@@ -29,6 +30,7 @@ module bus_master
 
 	assign irq = avl_irq;
 	assign cpu_clk = clk;
+	assign cpu_rst_n = rst_n;
 
 	assign data_rd = avl_readdata;
 	assign avl_byteenable = 4'b1111; //TODO
