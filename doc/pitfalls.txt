@@ -155,7 +155,7 @@ Voy a seguir con esto después.
 
 
 	===
-	[V] Port de U-Boot
+	[V] Port (more like stub inicial) de U-Boot
 	===
 
 Lo útil empieza en l[ineas 2108 y 3086 del README.
@@ -172,3 +172,37 @@ es por configuración de fonts. Ver este caso:
 	La soloución es usar home-manager o utilizar:
 		export LOCALE_ARCHIVE="${pkgs.glibcLocales}/lib/locale/locale-archive"
 		export FONTCONFIG_FILE="${pkgs.fontconfig.out}/etc/fonts/fonts.conf"
+
+
+	===
+	[VII] Reset
+	===
+
+Hasta el momento todo había sido simulado y eso ha evitado mil problemas
+imposibles de depurar que, inevitablemente, ocurrieron cuando traté de ejecutar
+el sistema en la FPGA. Desde U-Boot (HPS) hubo indicios de que algo estaba
+ocurriendo en las direcciones de memoria que sim/sdram presuntamente escribe.
+0x20001000 estaba forzado a cero y cualquier intento de escribir con md.l no
+tenía efecto (probablemente por writes sin fin a esa dirección). Además, a
+veces esto no pasaba al azar, sino que del todo no ocurría nada. Claramente hay
+problemas de reset.
+
+En el primer intento no existían conexiones de reset del todo, y además
+Verilator inicializaba todos los x-values a cero. Introduje aleatorización de
+'x en simulación para arreglar todos los glitches de reset, y además reemplacé
+los bloques initial con resets reales en listas de sensibilidad. En el proceso
+descubrí varios bugs en fetch, decode y control. Agregué un JTAG-to-Avalon
+Bridge para depurar.
+
+Luego de realizar estos arreglos, el sistema no parecía hacer nada del todo, ni
+en 0x20000000 ni tampoco en 0x20001000. Noté que una diferencia importante
+entre lab4 y el proyecto es que en lab4 la PLL tiene un reset (lógica positiva)
+forzado a 0, pero en Platform Designer es obligatorio conectarlo a algo. Como
+conecté reset a un slide switch, probablemente existieron problemas de bouncing
+y cosas analógicas raras, en especial cuando ese reset también le caía a PLL.
+Habilité "debug instrumentation", que presuntamente me permite usar el bus
+analyzer, pero ymmv según esto:
+
+<https://community.intel.com/t5/Intel-Quartus-Prime-Software/No-hardware-detected-in-beta-bus-analyzer/m-p/670701>
+
+También puse el debouncer del lab4 antes del reset que va a platform.
