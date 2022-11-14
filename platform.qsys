@@ -875,7 +875,7 @@
   <parameter name="gui_fractional_cout" value="32" />
   <parameter name="gui_mif_generate" value="false" />
   <parameter name="gui_multiply_factor" value="1" />
-  <parameter name="gui_number_of_clocks" value="4" />
+  <parameter name="gui_number_of_clocks" value="5" />
   <parameter name="gui_operation_mode" value="direct" />
   <parameter name="gui_output_clock_frequency0" value="50.0" />
   <parameter name="gui_output_clock_frequency1" value="100.0" />
@@ -887,9 +887,9 @@
   <parameter name="gui_output_clock_frequency15" value="100.0" />
   <parameter name="gui_output_clock_frequency16" value="100.0" />
   <parameter name="gui_output_clock_frequency17" value="100.0" />
-  <parameter name="gui_output_clock_frequency2" value="25.175" />
-  <parameter name="gui_output_clock_frequency3" value="25.175" />
-  <parameter name="gui_output_clock_frequency4" value="100.0" />
+  <parameter name="gui_output_clock_frequency2" value="143.0" />
+  <parameter name="gui_output_clock_frequency3" value="143.0" />
+  <parameter name="gui_output_clock_frequency4" value="25.175" />
   <parameter name="gui_output_clock_frequency5" value="100.0" />
   <parameter name="gui_output_clock_frequency6" value="100.0" />
   <parameter name="gui_output_clock_frequency7" value="100.0" />
@@ -924,7 +924,7 @@
   <parameter name="gui_phase_shift_deg16" value="0.0" />
   <parameter name="gui_phase_shift_deg17" value="0.0" />
   <parameter name="gui_phase_shift_deg2" value="0.0" />
-  <parameter name="gui_phase_shift_deg3" value="0.0" />
+  <parameter name="gui_phase_shift_deg3" value="-50.0" />
   <parameter name="gui_phase_shift_deg4" value="0.0" />
   <parameter name="gui_phase_shift_deg5" value="0.0" />
   <parameter name="gui_phase_shift_deg6" value="0.0" />
@@ -947,7 +947,7 @@
   <parameter name="gui_ps_units16" value="ps" />
   <parameter name="gui_ps_units17" value="ps" />
   <parameter name="gui_ps_units2" value="ps" />
-  <parameter name="gui_ps_units3" value="ps" />
+  <parameter name="gui_ps_units3" value="degrees" />
   <parameter name="gui_ps_units4" value="ps" />
   <parameter name="gui_ps_units5" value="ps" />
   <parameter name="gui_ps_units6" value="ps" />
@@ -959,7 +959,7 @@
   <parameter name="gui_reference_clock_frequency" value="50.0" />
   <parameter name="gui_switchover_delay" value="0" />
   <parameter name="gui_switchover_mode">Automatic Switchover</parameter>
-  <parameter name="gui_use_locked" value="true" />
+  <parameter name="gui_use_locked" value="false" />
  </module>
  <module name="timer_0" kind="altera_avalon_timer" version="20.1" enabled="1">
   <parameter name="alwaysRun" value="false" />
@@ -990,7 +990,7 @@
   <parameter name="TRP" value="15.0" />
   <parameter name="TWR" value="14.0" />
   <parameter name="casLatency" value="3" />
-  <parameter name="clockRate" value="25396825" />
+  <parameter name="clockRate" value="142857142" />
   <parameter name="columnWidth" value="10" />
   <parameter name="componentName" value="$${FILENAME}_vram" />
   <parameter name="dataWidth" value="16" />
@@ -1097,7 +1097,7 @@
  <connection
    kind="clock"
    version="20.1"
-   start="pll_0.outclk2"
+   start="pll_0.outclk4"
    end="vga_controller_0.clock_sink" />
  <connection
    kind="reset"
