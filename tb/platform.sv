@@ -1,6 +1,3 @@
-
-
-
 module platform
 (
 	input  wire        clk_clk,                          //                       clk.clk
@@ -74,6 +71,11 @@ module platform
 		.cpu_clk(master_0_core_cpu_clk),
 		.cpu_rst_n(master_0_core_cpu_rst_n),
 		.irq(master_0_core_irq),
+		.*
+	);
+
+	vga_domain vga
+	(
 		.*
 	);
 

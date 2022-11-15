@@ -12,6 +12,7 @@
 #include "Vconspiracion_arm810.h"
 #include "Vconspiracion_conspiracion.h"
 #include "Vconspiracion_platform.h"
+#include "Vconspiracion_vga_domain.h"
 #include "Vconspiracion_core_control.h"
 #include "Vconspiracion_core_psr.h"
 #include "Vconspiracion_core_regs.h"
@@ -21,6 +22,9 @@
 
 #include "../avalon.hpp"
 #include "../mem.hpp"
+#include "../null.hpp"
+#include "../window.hpp"
+#include "../vga.hpp"
 
 namespace
 {
@@ -113,6 +117,7 @@ namespace
 int main(int argc, char **argv)
 {
 	using namespace taller::avalon;
+	using namespace taller::vga;
 
 	Verilated::commandArgs(argc, argv);
 
@@ -136,6 +141,11 @@ int main(int argc, char **argv)
 	args::Flag dump_regs
 	(
 		parser, "dump-regs", "Dump all registers", {"dump-regs"}
+	);
+
+	args::Flag headless
+	(
+		parser, "headless", "Disable video output", {"headless"}
 	);
 
 	args::ValueFlag<unsigned> cycles
@@ -184,9 +194,26 @@ int main(int argc, char **argv)
 	}
 
 	interconnect<Vconspiracion_platform> avl(*top.conspiracion->plat);
-	mem hps_ddr3(0x0000'0000, 512 << 20);
+	interconnect<Vconspiracion_vga_domain> avl_vga(*top.conspiracion->plat->vga);
+
+	mem<std::uint32_t> hps_ddr3(0x0000'0000, 512 << 20);
+	mem<std::uint16_t> vram(0x3800'0000, 64 << 20);
+	null vram_null(0x3800'0000, 64 << 20, 2);
+	window vram_window(vram, 0x0000'0000);
+	display<Vconspiracion_vga_domain> vga(*top.conspiracion->plat->vga, 25'175'000);
+
+	bool enable_video = !headless;
 
 	avl.attach(hps_ddr3);
+
+	if(enable_video)
+	{
+		avl.attach(vram);
+		avl_vga.attach(vram_window);
+	} else
+	{
+		avl.attach(vram_null);
+	}
 
 	FILE *img_file = std::fopen(image->c_str(), "rb");
 	if(!img_file)
@@ -216,7 +243,13 @@ int main(int argc, char **argv)
 	{
 		top.clk_clk = !top.clk_clk;
 		top.eval();
+
 		avl.tick(top.clk_clk);
+		if(enable_video)
+		{
+			avl_vga.tick(top.clk_clk);
+			vga.tick(top.clk_clk);
+		}
 
 		if(enable_trace)
 		{

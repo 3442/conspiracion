@@ -1,5 +1,5 @@
-#ifndef AVALON_IMPL_HPP
-#define AVALON_IMPL_HPP
+#ifndef TALLER_AVALON_IMPL_HPP
+#define TALLER_AVALON_IMPL_HPP
 
 #include <cassert>
 #include <cstdio>
@@ -61,11 +61,9 @@ namespace taller::avalon
 			avl_byteenable = plat.avl_byteenable;
 
 			assert(!avl_read || !avl_write);
-
-			if(avl_address & 0b11)
+			if(!avl_read && !avl_write)
 			{
-				fprintf(stderr, "[avl] unaligned address: 0x%08x\n", avl_address);
-				assert(false);
+				return;
 			}
 
 			for(auto &binding : devices)
@@ -83,13 +81,21 @@ namespace taller::avalon
 				fprintf(stderr, "[avl] attempt to %s memory hole at 0x%08x\n", op, avl_address);
 				assert(false);
 			}
+
+			if(avl_address & active->word_mask())
+			{
+				fprintf(stderr, "[avl] unaligned address: 0x%08x\n", avl_address);
+				assert(false);
+			}
 		}
 
-		auto pos = (avl_address & ~active->address_mask()) >> 2;
+		auto pos = (avl_address & ~active->address_mask()) >> active->word_bits();
 
 		if(avl_read)
 		{
-			plat.avl_waitrequest = !active->read(pos, plat.avl_readdata);
+			std::uint32_t readdata;
+			plat.avl_waitrequest = !active->read(pos, readdata);
+			plat.avl_readdata = readdata;
 		} else if(avl_write)
 		{
 			plat.avl_waitrequest = !active->write(pos, avl_writedata, avl_byteenable);
