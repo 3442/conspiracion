@@ -105,6 +105,14 @@
          type = "int";
       }
    }
+   element sys_sdram_pll_0
+   {
+      datum _sortIndex
+      {
+         value = "11";
+         type = "int";
+      }
+   }
    element timer_0
    {
       datum _sortIndex
@@ -163,13 +171,14 @@
    internal="pio_0.external_connection"
    type="conduit"
    dir="end" />
- <interface
-   name="pll_0_outclk3"
-   internal="pll_0.outclk3"
-   type="clock"
-   dir="start" />
+ <interface name="pll_0_outclk3" internal="pll_0.outclk3" />
  <interface name="pll_0_reset" internal="pll_0.reset" type="reset" dir="end" />
  <interface name="reset" internal="clk_0.clk_in_reset" type="reset" dir="end" />
+ <interface
+   name="sys_sdram_pll_0_sdram_clk"
+   internal="sys_sdram_pll_0.sdram_clk"
+   type="clock"
+   dir="start" />
  <interface
    name="vga_controller_0_dac"
    internal="vga_controller_0.dac"
@@ -897,7 +906,7 @@
   <parameter name="gui_fractional_cout" value="32" />
   <parameter name="gui_mif_generate" value="false" />
   <parameter name="gui_multiply_factor" value="1" />
-  <parameter name="gui_number_of_clocks" value="5" />
+  <parameter name="gui_number_of_clocks" value="3" />
   <parameter name="gui_operation_mode" value="direct" />
   <parameter name="gui_output_clock_frequency0" value="50.0" />
   <parameter name="gui_output_clock_frequency1" value="100.0" />
@@ -909,7 +918,7 @@
   <parameter name="gui_output_clock_frequency15" value="100.0" />
   <parameter name="gui_output_clock_frequency16" value="100.0" />
   <parameter name="gui_output_clock_frequency17" value="100.0" />
-  <parameter name="gui_output_clock_frequency2" value="143.0" />
+  <parameter name="gui_output_clock_frequency2" value="25.175" />
   <parameter name="gui_output_clock_frequency3" value="143.0" />
   <parameter name="gui_output_clock_frequency4" value="25.175" />
   <parameter name="gui_output_clock_frequency5" value="100.0" />
@@ -983,6 +992,22 @@
   <parameter name="gui_switchover_mode">Automatic Switchover</parameter>
   <parameter name="gui_use_locked" value="false" />
  </module>
+ <module
+   name="sys_sdram_pll_0"
+   kind="altera_up_avalon_sys_sdram_pll"
+   version="18.0"
+   enabled="1">
+  <parameter name="AUTO_DEVICE" value="5CSEMA5F31C6" />
+  <parameter name="AUTO_DEVICE_SPEEDGRADE" value="6" />
+  <parameter name="CIII_boards" value="DE0" />
+  <parameter name="CIV_boards" value="DE2-115" />
+  <parameter name="CV_boards" value="DE1-SoC" />
+  <parameter name="MAX10_boards" value="DE10-Lite" />
+  <parameter name="device_family" value="Cyclone V" />
+  <parameter name="gui_outclk" value="143.0" />
+  <parameter name="gui_refclk" value="50.0" />
+  <parameter name="other_boards" value="None" />
+ </module>
  <module name="timer_0" kind="altera_avalon_timer" version="20.1" enabled="1">
   <parameter name="alwaysRun" value="false" />
   <parameter name="counterSize" value="32" />
@@ -1012,7 +1037,7 @@
   <parameter name="TRP" value="15.0" />
   <parameter name="TWR" value="14.0" />
   <parameter name="casLatency" value="3" />
-  <parameter name="clockRate" value="142857142" />
+  <parameter name="clockRate" value="143000000" />
   <parameter name="columnWidth" value="10" />
   <parameter name="componentName" value="$${FILENAME}_vram" />
   <parameter name="dataWidth" value="16" />
@@ -1125,6 +1150,11 @@
   <parameter name="baseAddress" value="0x0000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
+ <connection
+   kind="clock"
+   version="20.1"
+   start="clk_0.clk"
+   end="sys_sdram_pll_0.ref_clk" />
  <connection kind="clock" version="20.1" start="clk_0.clk" end="pll_0.refclk" />
  <connection
    kind="clock"
@@ -1149,12 +1179,16 @@
    version="20.1"
    start="pll_0.outclk0"
    end="hps_0.f2h_sdram0_clock" />
- <connection kind="clock" version="20.1" start="pll_0.outclk2" end="vram.clk" />
  <connection
    kind="clock"
    version="20.1"
-   start="pll_0.outclk4"
+   start="pll_0.outclk2"
    end="vga_controller_0.clock_sink" />
+ <connection
+   kind="clock"
+   version="20.1"
+   start="sys_sdram_pll_0.sys_clk"
+   end="vram.clk" />
  <connection
    kind="reset"
    version="20.1"
@@ -1164,8 +1198,12 @@
    kind="reset"
    version="20.1"
    start="clk_0.clk_reset"
+   end="sys_sdram_pll_0.ref_reset" />
+ <connection
+   kind="reset"
+   version="20.1"
+   start="clk_0.clk_reset"
    end="address_span_extender_0.reset" />
- <connection kind="reset" version="20.1" start="clk_0.clk_reset" end="vram.reset" />
  <connection
    kind="reset"
    version="20.1"
@@ -1187,6 +1225,11 @@
    version="20.1"
    start="clk_0.clk_reset"
    end="vga_controller_0.reset_sink" />
+ <connection
+   kind="reset"
+   version="20.1"
+   start="sys_sdram_pll_0.reset_source"
+   end="vram.reset" />
  <interconnectRequirement for="$system" name="qsys_mm.clockCrossingAdapter" value="HANDSHAKE" />
  <interconnectRequirement for="$system" name="qsys_mm.enableEccProtection" value="FALSE" />
  <interconnectRequirement for="$system" name="qsys_mm.enableInstrumentation" value="FALSE" />
