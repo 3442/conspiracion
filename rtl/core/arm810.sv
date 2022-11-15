@@ -28,7 +28,6 @@ module arm810
 		.addr(insn_addr),
 		.insn(fetch_insn),
 		.fetch(insn_start),
-		.branch(explicit_branch || wr_pc),
 		.fetched(insn_ready),
 		.insn_pc(fetch_insn_pc),
 		.fetch_data(insn_data_rd),

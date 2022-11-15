@@ -6,8 +6,8 @@ module core_fetch
 	input  logic clk,
 	             rst_n,
 	             stall,
-	             branch,
 	             fetched,
+	             explicit_branch,
 	             wr_pc,
 	             prefetch_flush,
 	input  ptr   branch_target,
@@ -23,10 +23,11 @@ module core_fetch
 );
 
 	ptr next_pc, hold_addr, target;
-	logic prefetch_ready, fetched_valid, discard, pending, next_pending;
+	logic branch, prefetch_ready, fetched_valid, discard, pending, next_pending;
 
 	assign fetch = prefetch_ready && !discard;
 	assign flush = branch || prefetch_flush;
+	assign branch = explicit_branch || wr_pc;
 	assign target = wr_pc ? wr_current[31:2] : branch_target; //TODO: alignment exception
 	assign next_pending = fetch || (pending && !fetched);
 	assign fetched_valid = fetched && !discard;
