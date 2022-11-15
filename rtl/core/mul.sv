@@ -30,7 +30,8 @@ module core_mul
 	assign n = long_mul ? q_hi[$bits(q_hi) - 1] : q_lo[$bits(q_lo) - 1];
 	assign z = q_lo == 0 && (!long_mul || q_hi == 0);
 
-	dsp_mul ip
+	//TODO: no está probado cuantos ciclos ocupa esto una vez sintetizado
+	dsp_mul it
 	(
 		.clock0(clk),
 		.aclr0(rst_n),
