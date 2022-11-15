@@ -28,7 +28,7 @@ module platform
 	input  wire        memory_oct_rzqin,                 //                          .oct_rzqin
 	output wire [7:0]  pio_0_external_connection_export, // pio_0_external_connection.export
 	input  wire        pll_0_reset_reset,
-	output wire        pll_0_outclk3_clk,                //             pll_0_outclk3.clk
+	output wire        sys_sdram_pll_0_sdram_clk_clk,
 	input  wire        reset_reset_n /*verilator public*/,//                     reset.reset_n
 	output wire [12:0] vram_wire_addr,                   //                 vram_wire.addr
 	output wire [1:0]  vram_wire_ba,                     //                          .ba
@@ -39,14 +39,14 @@ module platform
 	output wire [1:0]  vram_wire_dqm,                    //                          .dqm
 	output wire        vram_wire_ras_n,                  //                          .ras_n
 	output wire        vram_wire_we_n,                   //                          .we_n
-	output wire        vga_controller_0_dac_clk,         //      vga_controller_0_dac.clk
-	output wire        vga_controller_0_dac_hsync,       //                          .hsync
-	output wire        vga_controller_0_dac_vsync,       //                          .vsync
-	output wire        vga_controller_0_dac_blank_n,     //                          .blank_n
-	output wire        vga_controller_0_dac_sync_n,      //                          .sync_n
-	output wire [7:0]  vga_controller_0_dac_r,           //                          .r
-	output wire [7:0]  vga_controller_0_dac_g,           //                          .g
-	output wire [7:0]  vga_controller_0_dac_b            //                          .b
+	output wire        vga_dac_CLK,                      //                   vga_dac.CLK
+	output wire        vga_dac_HS,                       //                          .HS
+	output wire        vga_dac_VS,                       //                          .VS
+	output wire        vga_dac_BLANK,                    //                          .BLANK
+	output wire        vga_dac_SYNC,                     //                          .SYNC
+	output wire [7:0]  vga_dac_R,                        //                          .R
+	output wire [7:0]  vga_dac_G,                        //                          .G
+	output wire [7:0]  vga_dac_B                        //                          .B
 );
 
 	logic[31:0] avl_address /*verilator public*/;

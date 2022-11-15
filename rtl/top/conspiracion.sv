@@ -30,14 +30,14 @@ module conspiracion
 	output wire        vram_wire_ras_n,
 	output wire        vram_wire_we_n,
 	output wire [7:0]  pio_leds,
-	output wire        vga_controller_0_dac_clk,
-	output wire        vga_controller_0_dac_hsync,
-	output wire        vga_controller_0_dac_vsync,
-	output wire        vga_controller_0_dac_blank_n,
-	output wire        vga_controller_0_dac_sync_n,
-	output wire [7:0]  vga_controller_0_dac_r,
-	output wire [7:0]  vga_controller_0_dac_g,
-	output wire [7:0]  vga_controller_0_dac_b
+	output wire        vga_dac_clk,
+	output wire        vga_dac_hsync,
+	output wire        vga_dac_vsync,
+	output wire        vga_dac_blank_n,
+	output wire        vga_dac_sync_n,
+	output wire [7:0]  vga_dac_r,
+	output wire [7:0]  vga_dac_g,
+	output wire [7:0]  vga_dac_b
 );
 
 	logic[29:0] addr;
@@ -93,6 +93,14 @@ module conspiracion
 		.pll_0_reset_reset(0), //TODO: reset controller, algún día
 		.pio_0_external_connection_export(pio_leds),
 		.sys_sdram_pll_0_sdram_clk_clk(vram_wire_clk),
+		.vga_dac_CLK(vga_dac_clk),
+		.vga_dac_HS(vga_dac_hsync),
+		.vga_dac_VS(vga_dac_vsync),
+		.vga_dac_BLANK(vga_dac_blank_n),
+		.vga_dac_SYNC(vga_dac_sync_n),
+		.vga_dac_R(vga_dac_r),
+		.vga_dac_G(vga_dac_g),
+		.vga_dac_B(vga_dac_b),
 		.*
 	);
 

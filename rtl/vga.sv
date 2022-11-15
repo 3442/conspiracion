@@ -120,6 +120,9 @@ module vga
 			B: current = read_b;
 		endcase
 
+		if(!next_active)
+			current = {$bits(current){1'b0}};
+
 		if(x != H_TOTAL - 1) begin
 			next_x = x + 1;
 			next_y = y;

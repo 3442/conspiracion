@@ -37,7 +37,7 @@
    {
       datum _sortIndex
       {
-         value = "10";
+         value = "9";
          type = "int";
       }
    }
@@ -63,6 +63,35 @@
       {
          value = "8";
          type = "int";
+      }
+   }
+   element pixdma
+   {
+      datum _sortIndex
+      {
+         value = "13";
+         type = "int";
+      }
+   }
+   element pixfifo
+   {
+      datum _sortIndex
+      {
+         value = "15";
+         type = "int";
+      }
+   }
+   element pixfmt
+   {
+      datum _sortIndex
+      {
+         value = "14";
+         type = "int";
+      }
+      datum sopceditor_expanded
+      {
+         value = "0";
+         type = "boolean";
       }
    }
    element platform
@@ -109,7 +138,7 @@
    {
       datum _sortIndex
       {
-         value = "11";
+         value = "10";
          type = "int";
       }
    }
@@ -121,11 +150,24 @@
          type = "int";
       }
    }
-   element vga_controller_0
+   element vga
    {
       datum _sortIndex
       {
-         value = "9";
+         value = "12";
+         type = "int";
+      }
+      datum sopceditor_expanded
+      {
+         value = "0";
+         type = "boolean";
+      }
+   }
+   element video_pll_0
+   {
+      datum _sortIndex
+      {
+         value = "11";
          type = "int";
       }
    }
@@ -180,8 +222,8 @@
    type="clock"
    dir="start" />
  <interface
-   name="vga_controller_0_dac"
-   internal="vga_controller_0.dac"
+   name="vga_dac"
+   internal="vga.external_interface"
    type="conduit"
    dir="end" />
  <interface name="vram_wire" internal="vram.wire" type="conduit" dir="end" />
@@ -789,6 +831,42 @@
   <parameter name="simDrivenValue" value="0" />
   <parameter name="width" value="8" />
  </module>
+ <module
+   name="pixdma"
+   kind="altera_up_avalon_video_pixel_buffer_dma"
+   version="18.0"
+   enabled="1">
+  <parameter name="AUTO_CLK_CLOCK_RATE" value="143000000" />
+  <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
+  <parameter name="addr_mode" value="Consecutive" />
+  <parameter name="back_start_address" value="2097152" />
+  <parameter name="color_space" value="32-bit RGBA" />
+  <parameter name="image_height" value="480" />
+  <parameter name="image_width" value="640" />
+  <parameter name="start_address" value="0" />
+ </module>
+ <module
+   name="pixfifo"
+   kind="altera_up_avalon_video_dual_clock_buffer"
+   version="18.0"
+   enabled="1">
+  <parameter name="AUTO_CLOCK_STREAM_IN_CLOCK_RATE" value="143000000" />
+  <parameter name="AUTO_CLOCK_STREAM_OUT_CLOCK_RATE" value="25000000" />
+  <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
+  <parameter name="color_bits" value="10" />
+  <parameter name="color_planes" value="3" />
+ </module>
+ <module
+   name="pixfmt"
+   kind="altera_up_avalon_video_rgb_resampler"
+   version="18.0"
+   enabled="1">
+  <parameter name="AUTO_CLK_CLOCK_RATE" value="143000000" />
+  <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
+  <parameter name="alpha" value="1023" />
+  <parameter name="input_type" value="32-bit RGBA" />
+  <parameter name="output_type" value="30-bit RGB" />
+ </module>
  <module name="pll_0" kind="altera_pll" version="20.1" enabled="1">
   <parameter name="debug_print_output" value="false" />
   <parameter name="debug_use_rbc_taf_method" value="false" />
@@ -906,7 +984,7 @@
   <parameter name="gui_fractional_cout" value="32" />
   <parameter name="gui_mif_generate" value="false" />
   <parameter name="gui_multiply_factor" value="1" />
-  <parameter name="gui_number_of_clocks" value="3" />
+  <parameter name="gui_number_of_clocks" value="2" />
   <parameter name="gui_operation_mode" value="direct" />
   <parameter name="gui_output_clock_frequency0" value="50.0" />
   <parameter name="gui_output_clock_frequency1" value="100.0" />
@@ -1021,10 +1099,33 @@
   <parameter name="watchdogPulse" value="2" />
  </module>
  <module
-   name="vga_controller_0"
-   kind="vga_controller"
-   version="1.0"
-   enabled="1" />
+   name="vga"
+   kind="altera_up_avalon_video_vga_controller"
+   version="18.0"
+   enabled="1">
+  <parameter name="AUTO_CLK_CLOCK_RATE" value="25000000" />
+  <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
+  <parameter name="board" value="DE1-SoC" />
+  <parameter name="device" value="VGA Connector" />
+  <parameter name="resolution" value="VGA 640x480" />
+  <parameter name="underflow_flag" value="false" />
+ </module>
+ <module
+   name="video_pll_0"
+   kind="altera_up_avalon_video_pll"
+   version="18.0"
+   enabled="1">
+  <parameter name="AUTO_DEVICE" value="5CSEMA5F31C6" />
+  <parameter name="AUTO_DEVICE_SPEEDGRADE" value="6" />
+  <parameter name="camera">5MP Digital Camera (THDB_D5M)</parameter>
+  <parameter name="device_family" value="Cyclone V" />
+  <parameter name="gui_refclk" value="50.0" />
+  <parameter name="gui_resolution" value="VGA 640x480" />
+  <parameter name="lcd">7" LCD on VEEK-MT and MTL/MTL2 Modules</parameter>
+  <parameter name="lcd_clk_en" value="false" />
+  <parameter name="vga_clk_en" value="true" />
+  <parameter name="video_in_clk_en" value="false" />
+ </module>
  <module
    name="vram"
    kind="altera_avalon_new_sdram_controller"
@@ -1057,10 +1158,10 @@
  <connection
    kind="avalon"
    version="20.1"
-   start="vga_controller_0.avalon_master"
-   end="vram.s1">
+   start="master_0.avalon_master_1_1"
+   end="pixdma.avalon_control_slave">
   <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="baseAddress" value="0x30030000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
@@ -1070,6 +1171,15 @@
    end="jtag_uart_0.avalon_jtag_slave">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x30000000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="20.1"
+   start="master_0.avalon_master_1_1"
+   end="pixfmt.avalon_rgb_slave">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x30040000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
@@ -1111,6 +1221,15 @@
  <connection
    kind="avalon"
    version="20.1"
+   start="pixdma.avalon_pixel_dma_master"
+   end="vram.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="20.1"
    start="address_span_extender_0.expanded_master"
    end="hps_0.f2h_sdram0_data">
   <parameter name="arbitrationPriority" value="1" />
@@ -1121,9 +1240,27 @@
    kind="avalon"
    version="20.1"
    start="jtag_dbg.master"
+   end="pixdma.avalon_control_slave">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x30030000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="20.1"
+   start="jtag_dbg.master"
    end="jtag_uart_0.avalon_jtag_slave">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x30000000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="20.1"
+   start="jtag_dbg.master"
+   end="pixfmt.avalon_rgb_slave">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x30040000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection kind="avalon" version="20.1" start="jtag_dbg.master" end="pio_0.s1">
@@ -1151,10 +1288,30 @@
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
+   kind="avalon_streaming"
+   version="20.1"
+   start="pixfifo.avalon_dc_buffer_source"
+   end="vga.avalon_vga_sink" />
+ <connection
+   kind="avalon_streaming"
+   version="20.1"
+   start="pixdma.avalon_pixel_source"
+   end="pixfmt.avalon_rgb_sink" />
+ <connection
+   kind="avalon_streaming"
+   version="20.1"
+   start="pixfmt.avalon_rgb_source"
+   end="pixfifo.avalon_dc_buffer_sink" />
+ <connection
    kind="clock"
    version="20.1"
    start="clk_0.clk"
    end="sys_sdram_pll_0.ref_clk" />
+ <connection
+   kind="clock"
+   version="20.1"
+   start="clk_0.clk"
+   end="video_pll_0.ref_clk" />
  <connection kind="clock" version="20.1" start="clk_0.clk" end="pll_0.refclk" />
  <connection
    kind="clock"
@@ -1182,13 +1339,29 @@
  <connection
    kind="clock"
    version="20.1"
-   start="pll_0.outclk2"
-   end="vga_controller_0.clock_sink" />
+   start="sys_sdram_pll_0.sys_clk"
+   end="vram.clk" />
  <connection
    kind="clock"
    version="20.1"
    start="sys_sdram_pll_0.sys_clk"
-   end="vram.clk" />
+   end="pixdma.clk" />
+ <connection
+   kind="clock"
+   version="20.1"
+   start="sys_sdram_pll_0.sys_clk"
+   end="pixfmt.clk" />
+ <connection
+   kind="clock"
+   version="20.1"
+   start="sys_sdram_pll_0.sys_clk"
+   end="pixfifo.clock_stream_in" />
+ <connection kind="clock" version="20.1" start="video_pll_0.vga_clk" end="vga.clk" />
+ <connection
+   kind="clock"
+   version="20.1"
+   start="video_pll_0.vga_clk"
+   end="pixfifo.clock_stream_out" />
  <connection
    kind="reset"
    version="20.1"
@@ -1199,6 +1372,11 @@
    version="20.1"
    start="clk_0.clk_reset"
    end="sys_sdram_pll_0.ref_reset" />
+ <connection
+   kind="reset"
+   version="20.1"
+   start="clk_0.clk_reset"
+   end="video_pll_0.ref_reset" />
  <connection
    kind="reset"
    version="20.1"
@@ -1223,13 +1401,33 @@
  <connection
    kind="reset"
    version="20.1"
-   start="clk_0.clk_reset"
-   end="vga_controller_0.reset_sink" />
+   start="sys_sdram_pll_0.reset_source"
+   end="vram.reset" />
+ <connection
+   kind="reset"
+   version="20.1"
+   start="video_pll_0.reset_source"
+   end="vga.reset" />
  <connection
    kind="reset"
    version="20.1"
    start="sys_sdram_pll_0.reset_source"
-   end="vram.reset" />
+   end="pixdma.reset" />
+ <connection
+   kind="reset"
+   version="20.1"
+   start="sys_sdram_pll_0.reset_source"
+   end="pixfmt.reset" />
+ <connection
+   kind="reset"
+   version="20.1"
+   start="sys_sdram_pll_0.reset_source"
+   end="pixfifo.reset_stream_in" />
+ <connection
+   kind="reset"
+   version="20.1"
+   start="video_pll_0.reset_source"
+   end="pixfifo.reset_stream_out" />
  <interconnectRequirement for="$system" name="qsys_mm.clockCrossingAdapter" value="HANDSHAKE" />
  <interconnectRequirement for="$system" name="qsys_mm.enableEccProtection" value="FALSE" />
  <interconnectRequirement for="$system" name="qsys_mm.enableInstrumentation" value="FALSE" />
