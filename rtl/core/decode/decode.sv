@@ -99,7 +99,7 @@ module core_decode
 	);
 
 	ldst_decode ldst_misc;
-	logic ldst_misc_off_is_reg;
+	logic ldst_misc_off_is_imm;
 	reg_num ldst_misc_off_reg;
 	logic[7:0] ldst_misc_off_imm;
 
@@ -108,7 +108,7 @@ module core_decode
 		.decode(ldst_misc),
 		.off_imm(ldst_misc_off_imm),
 		.off_reg(ldst_misc_off_reg),
-		.off_is_reg(ldst_misc_off_is_reg),
+		.off_is_imm(ldst_misc_off_is_imm),
 		.*
 	);
 

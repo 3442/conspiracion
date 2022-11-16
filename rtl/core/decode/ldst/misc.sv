@@ -6,7 +6,7 @@ module core_decode_ldst_misc
 	input  word        insn,
 
 	output ldst_decode decode,
-	output logic       off_is_reg,
+	output logic       off_is_imm,
 	output logic[7:0]  off_imm,
 	output reg_num     off_reg
 );
@@ -27,7 +27,7 @@ module core_decode_ldst_misc
 
 	assign off_imm = {insn `FIELD_LDST_MISC_IMM_HI, insn `FIELD_LDST_MISC_IMM_LO};
 	assign off_reg = insn `FIELD_LDST_MISC_RM;
-	assign off_is_reg = insn `FIELD_LDST_MISC_REG;
+	assign off_is_imm = insn `FIELD_LDST_MISC_IMM;
 
 	assign p = insn `FIELD_LDST_MISC_P;
 	assign w = insn `FIELD_LDST_MISC_W;

@@ -22,7 +22,7 @@ module core_decode_mux
 	                     ldst_misc,
 	                     ldst_multiple,
 	input  logic         ldst_single_is_imm,
-	                     ldst_misc_off_is_reg,
+	                     ldst_misc_off_is_imm,
 	input  reg_num       ldst_misc_off_reg,
 	input  logic[7:0]    ldst_misc_off_imm,
 	input  logic         ldst_mult_restore_spsr,
@@ -125,6 +125,15 @@ module core_decode_mux
 				update_flags = mul_update_flags;
 			end
 
+			`GROUP_LDST_MISC: begin
+				dec_ldst = ldst_misc;
+				ldst_addr = ldst_misc;
+
+				dec_snd.r = ldst_misc_off_reg;
+				dec_snd.imm = {4'b0, ldst_misc_off_imm};
+				dec_snd.is_imm = ldst_misc_off_is_imm;
+			end
+
 			`GROUP_ALU: begin
 				snd_is_imm = data_is_imm;
 				snd_ror_if_imm = 1;
@@ -141,7 +150,7 @@ module core_decode_mux
 				conditional = data_conditional;
 			end
 
-			`GROUP_LDST_SINGLE_IMM, `GROUP_LDST_SINGLE_REG: begin
+			`GROUP_LDST_SINGLE: begin
 				snd_is_imm = ldst_single_is_imm;
 				snd_ror_if_imm = 0;
 				snd_shift_by_reg_if_reg = 0;
@@ -152,21 +161,6 @@ module core_decode_mux
 
 				undefined = snd_undefined;
 			end
-
-			`GROUP_LDST_MISC_IMM, `GROUP_LDST_MISC_REG:
-				priority casez(insn `FIELD_OP)
-					`INSN_LDRB, `INSN_LDRSB, `INSN_LDRSH, `INSN_STRH: begin
-						dec_ldst = ldst_misc;
-						ldst_addr = ldst_misc;
-
-						dec_snd.r = ldst_misc_off_reg;
-						dec_snd.imm = {4'b0, ldst_misc_off_imm};
-						dec_snd.is_imm = !ldst_misc_off_is_reg;
-					end
-
-					default:
-						undefined = 1;
-				endcase
 
 			`GROUP_LDST_MULT: begin
 				dec_ldst = ldst_multiple;
