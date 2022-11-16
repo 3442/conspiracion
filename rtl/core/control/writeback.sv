@@ -107,7 +107,7 @@ module core_control_writeback
 
 			if(next_cycle.issue)
 				final_writeback <= issue && dec.ctrl.writeback;
-			else
+			else if(next_cycle.exception)
 				final_writeback <= 1;
 
 			update_flags <= 0;
