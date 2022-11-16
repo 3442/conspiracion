@@ -208,6 +208,7 @@ set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/issue.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/mul.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/ldst/ldst.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/ldst/pop.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/ldst/sizes.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/select.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/stall.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/writeback.sv

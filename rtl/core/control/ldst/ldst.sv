@@ -10,6 +10,7 @@ module core_control_ldst
 	                   mem_ready,
 	input  word        rd_value_b,
 	                   q_alu,
+	                   q_shifter,
 
 	input  ctrl_cycle  cycle,
 	                   next_cycle,
@@ -25,16 +26,20 @@ module core_control_ldst
 	                   ldst,
 	                   ldst_next,
 	                   ldst_writeback,
+	output logic[1:0]  ldst_shift,
+	output word        ldst_read,
 	output reg_num     popped
 );
 
-	logic pre, increment;
+	word base;
+	logic pre, increment, sign_extend;
 	reg_num popped_upper, popped_lower;
 	reg_list mem_regs, next_regs_upper, next_regs_lower;
+	ldst_size size;
 
 	assign popped = increment ? popped_lower : popped_upper;
 	assign ldst_next = !cycle.transfer || mem_ready;
-	assign mem_data_wr = rd_value_b;
+	assign mem_data_wr = q_shifter;
 
 	core_control_ldst_pop pop
 	(
@@ -46,14 +51,26 @@ module core_control_ldst
 		.pop_lower(popped_lower)
 	);
 
+	core_control_ldst_sizes sizes
+	(
+		.addr(mem_addr),
+		.read(ldst_read),
+		.shift(ldst_shift),
+		.fault(), //TODO: alignment check
+		.byteenable(), //TODO
+		.*
+	);
+
 	always_ff @(posedge clk or negedge rst_n)
 		if(!rst_n) begin
 			pre <= 0;
 			ldst <= 0;
+			size <= LDST_WORD;
 			increment <= 0;
+			sign_extend <= 0;
 			ldst_writeback <= 0;
 
-			mem_addr <= {$bits(mem_addr){1'b0}};
+			base <= {$bits(base){1'b0}};
 			mem_regs <= {$bits(mem_regs){1'b0}};
 			mem_write <= 0;
 			mem_start <= 0;
@@ -63,12 +80,13 @@ module core_control_ldst
 
 			if(next_cycle.issue) begin
 				// TODO: dec.ldst.unprivileged
-				// TODO: byte/halfword sizes
 				if(issue)
 					ldst <= dec.ctrl.ldst;
 
 				pre <= dec.ldst.pre_indexed;
+				size <= dec.ldst.size;
 				increment <= dec.ldst.increment;
+				sign_extend <= dec.ldst.sign_extend;
 				ldst_writeback <= dec.ldst.writeback;
 
 				mem_regs <= dec.ldst.regs;
@@ -80,8 +98,8 @@ module core_control_ldst
 				end
 
 				if(ldst_next) begin
+					base <= pre ? q_alu : alu_a;
 					mem_regs <= increment ? next_regs_lower : next_regs_upper;
-					mem_addr <= pre ? q_alu[31:2] : alu_a[31:2];
 				end
 
 				mem_start <= !cycle.transfer || (mem_ready && pop_valid);

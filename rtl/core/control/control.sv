@@ -43,6 +43,7 @@ module core_control
 	                       alu_b,
 	                       wr_value,
 	output shifter_control shifter,
+	output word            shifter_base,
 	output logic[7:0]      shifter_shift,
 	output ptr             mem_addr,
 	output word            mem_data_wr,
@@ -86,9 +87,10 @@ module core_control
 		.*
 	);
 
-	word mem_offset;
+	word mem_offset, ldst_read;
 	logic ldst, ldst_next, ldst_writeback, pop_valid;
 	reg_num popped;
+	logic[1:0] ldst_shift;
 
 	core_control_ldst ctrl_ldst
 	(

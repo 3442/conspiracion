@@ -8,7 +8,7 @@ module core_control_writeback
 	input  insn_decode dec,
 	input  psr_flags   alu_flags,
 	input  word        q_alu,
-	                   mem_data_rd,
+	                   ldst_read,
 	input  logic       mem_ready,
 	                   mem_write,
 	input  word        mul_q_hi,
@@ -61,7 +61,7 @@ module core_control_writeback
 			writeback = 0;
 
 		if(cycle.transfer)
-			wr_value = mem_data_rd;
+			wr_value = ldst_read;
 		else if(cycle.base_writeback)
 			wr_value = saved_base;
 		else if(cycle.mul || cycle.mul_hi_wb)
@@ -72,9 +72,9 @@ module core_control_writeback
 
 		if(next_cycle.transfer) begin
 			if(mem_ready)
-				wr_value = mem_data_rd;
+				wr_value = ldst_read;
 		end else if(next_cycle.base_writeback)
-			wr_value = mem_data_rd;
+			wr_value = ldst_read;
 		else if(next_cycle.exception)
 			wr_value = vector;
 		else if(next_cycle.mul_hi_wb)

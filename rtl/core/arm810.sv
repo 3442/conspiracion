@@ -124,13 +124,13 @@ module arm810
 		.*
 	);
 
-	word q_shifter;
+	word shifter_base, q_shifter;
 	logic c_shifter;
 
 	core_shifter #(.W(32)) shifter
 	(
 		.ctrl(shifter_ctrl),
-		.base(alu_b),
+		.base(shifter_base),
 		.shift(shifter_shift),
 		.c_in(flags.c),
 		.q(q_shifter),

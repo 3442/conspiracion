@@ -9,7 +9,9 @@ module core_control_data
 	input  word            rd_value_a,
 	                       rd_value_b,
 	input  logic           mem_ready,
-	input  word            q_alu,
+	                       mem_write,
+	input  word            mem_data_rd,
+	                       q_alu,
 	                       q_shifter,
 	input  logic           c_shifter,
 
@@ -17,6 +19,7 @@ module core_control_data
 	                       next_cycle,
 	input  ptr             pc,
 	input  logic           ldst_next,
+	input  logic[1:0]      ldst_shift,
 	input  word            mem_offset,
 	input  psr_flags       flags,
 
@@ -25,6 +28,7 @@ module core_control_data
 	                       alu_b,
 	                       saved_base,
 	output shifter_control shifter,
+	output word            shifter_base,
 	output logic[7:0]      shifter_shift,
 	output logic           c_in,
 	                       trivial_shift,
@@ -40,6 +44,8 @@ module core_control_data
 	always_comb begin
 		if(cycle.rd_indirect_shift)
 			shifter_shift = rd_value_b[7:0];
+		else if(cycle.transfer)
+			shifter_shift = {3'b000, ldst_shift, 3'b000};
 		else
 			shifter_shift = {2'b00, data_shift_imm};
 
@@ -58,6 +64,11 @@ module core_control_data
 			alu_b = {{20{1'b0}}, data_imm};
 		else
 			alu_b = rd_value_b;
+
+		if(cycle.transfer)
+			shifter_base = mem_write ? rd_value_b : mem_data_rd;
+		else
+			shifter_base = alu_b;
 	end
 
 	always_ff @(posedge clk or negedge rst_n)
@@ -92,6 +103,9 @@ module core_control_data
 		end else if(next_cycle.transfer) begin
 			if(ldst_next)
 				saved_base <= q_alu;
+
+			shifter.ror <= 0;
+			shifter.shr <= !mem_write;
 		end else if(next_cycle.exception) begin
 			alu <= `ALU_ADD;
 			data_imm <= 12'd4;
