@@ -35,7 +35,7 @@ module core_shifter
 		if(ctrl.ror)
 			{c, q} = {c_ror, q_ror};
 		else if(ctrl.shr)
-			{c, q} = {c_shr, q_shr[W - 1] | (ctrl.put_carry & c_in), q_shr[W - 2:0]};
+			{c, q} = {c_shr, q_shr[W - 1] | (ctrl.put_carry && c_in && shift != 0), q_shr[W - 2:0]};
 		else
 			{c, q} = {c_shl, q_shl};
 
