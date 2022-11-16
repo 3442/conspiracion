@@ -42,27 +42,14 @@ module core_psr
 		psr_mode    m;
 	} psr_word;
 
-	/* Este diseño de doble búfer es importante por rendimiento. Reducirlo
-	 * a uno más "sencillo" tiene una pérdida de casi 40MHz en Fmax.
-	 * Esto se debe a que el CPSR es el mayor mercado del core, se encuentra
-	 * conectado a cycles, regs, alu y decode. La dependencia con decode en
-	 * particular es crítica debido a que el condition code se especifica en
-	 * términos de banderas de CPSR. Una ruta combinacional que atraviese flags
-	 * iniciaría en cycles, tomaría valores de regs, llegaría a ALU, caería
-	 * en flags y, debido al operand forwarding que se necesita por hazards de
-	 * pipeline, esa misma señal seguiría combinacionalmente hacia decode para
-	 * finalmente registrar en cycles nuevamente. Tal cosa es impermisible.
-	 */
-
-	logic pending_update;
 	psr_word rd_word, wr_word;
-	psr_flags next_flags, wr_alu_flags;
+	psr_flags next_flags;
 	psr_state cpsr, spsr, spsr_svc, spsr_abt, spsr_und, spsr_irq, spsr_fiq,
 	          wr_state, wr_clean;
 
 	assign mode = cpsr.mode;
 	assign mask = cpsr.mask;
-	assign flags = pending_update ? wr_alu_flags : cpsr.flags;
+	assign flags = cpsr.flags;
 	assign psr_rd = rd_word;
 	assign wr_word = psr_wr;
 	assign {wr_state.flags, wr_state.mask, wr_state.mode} = {wr_word.nzcv, wr_word.if_, wr_word.m};
@@ -94,13 +81,9 @@ module core_psr
 `endif
 
 	always_comb begin
-		next_flags = flags;
-
-		if(update_flags) begin
-			next_flags = alu_flags;
-			if(~alu_v_valid)
-				next_flags.v = flags.v;
-		end
+		next_flags = alu_flags;
+		if(!alu_v_valid)
+			next_flags.v = flags.v;
 
 		rd_word = {$bits(rd_word){1'b0}};
 		rd_word.a = 1;
@@ -135,9 +118,6 @@ module core_psr
 
 	always_ff @(posedge clk or negedge rst_n)
 		if(!rst_n) begin
-			wr_alu_flags <= 4'b0000;
-			pending_update <= 0;
-
 			cpsr.mode <= `MODE_SVC;
 			cpsr.flags <= 4'b0000;
 			cpsr.mask.i <= 1;
@@ -149,12 +129,9 @@ module core_psr
 			spsr_irq <= {$bits(spsr_svc){1'b0}};
 			spsr_fiq <= {$bits(spsr_svc){1'b0}};
 		end else begin
-			wr_alu_flags <= next_flags;
-			pending_update <= !write && update_flags;
-
 			if(!write) begin
-				if(pending_update)
-					cpsr.flags <= wr_alu_flags;
+				if(update_flags)
+					cpsr.flags <= next_flags;
 			end else if(!saved)
 				cpsr <= wr_clean;
 			else

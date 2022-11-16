@@ -31,8 +31,7 @@ module core_control_writeback
 	                   final_writeback,
 	                   update_flags,
 	                   final_update_flags,
-	output word        wr_value,
-	output psr_flags   wb_alu_flags
+	output word        wr_value
 );
 
 	reg_num last_rd;
@@ -79,6 +78,12 @@ module core_control_writeback
 			wr_value = vector;
 		else if(next_cycle.mul_hi_wb)
 			wr_value = mul_q_hi;
+
+		update_flags = 0;
+		if(next_cycle.issue)
+			update_flags = final_update_flags;
+		else if(next_cycle.exception)
+			update_flags = 0;
 	end
 
 	always_ff @(posedge clk or negedge rst_n)
@@ -86,14 +91,9 @@ module core_control_writeback
 			last_rd <= 0;
 			final_rd <= 0;
 			final_writeback <= 0;
-
-			update_flags <= 0;
 			final_update_flags <= 0;
-
-			wb_alu_flags <= {$bits(wb_alu_flags){1'b0}};
 		end else begin
 			last_rd <= rd;
-			wb_alu_flags <= alu_flags;
 
 			if(next_cycle.issue)
 				final_rd <= dec.data.rd;
@@ -109,12 +109,6 @@ module core_control_writeback
 				final_writeback <= issue && dec.ctrl.writeback;
 			else if(next_cycle.exception)
 				final_writeback <= 1;
-
-			update_flags <= 0;
-			if(next_cycle.issue)
-				update_flags <= final_update_flags;
-			else if(next_cycle.exception)
-				update_flags <= 0;
 
 			if(next_cycle.issue)
 				final_update_flags <= issue && dec.psr.update_flags;

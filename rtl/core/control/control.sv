@@ -37,7 +37,6 @@ module core_control
 	output ptr             branch_target,
 	                       pc_visible,
 	output psr_mode        reg_mode,
-	output psr_flags       wb_alu_flags,
 	output alu_op          alu,
 	output word            alu_a,
 	                       alu_b,

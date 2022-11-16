@@ -10,9 +10,7 @@ module core_control_stall
 
 	input  ctrl_cycle  next_cycle,
 	input  logic       final_update_flags,
-	                   update_flags,
 	                   final_writeback,
-	                   writeback,
 	input  reg_num     final_rd,
 
 	output logic       halted,
@@ -21,8 +19,7 @@ module core_control_stall
 	                   next_bubble
 );
 
-	logic pc_rd_hazard, pc_wr_hazard, rn_pc_hazard, snd_pc_hazard,
-		  flags_hazard, flags_dependency, updating_flags;
+	logic pc_rd_hazard, pc_wr_hazard, rn_pc_hazard, snd_pc_hazard, flags_hazard;
 
 	assign stall = !next_cycle.issue || next_bubble || halt;
 	assign halted = halt && !next_bubble;
@@ -32,12 +29,8 @@ module core_control_stall
 	assign pc_rd_hazard = final_writeback && (rn_pc_hazard || snd_pc_hazard);
 	assign pc_wr_hazard = final_writeback && final_rd == `R15;
 	assign rn_pc_hazard = dec.data.uses_rn && dec.data.rn == `R15;
+	assign flags_hazard = dec.ctrl.conditional && final_update_flags;
 	assign snd_pc_hazard = !dec.snd.is_imm && dec.snd.r == `R15;
-
-	assign flags_hazard = flags_dependency && updating_flags;
-
-	assign updating_flags = final_update_flags || update_flags;
-	assign flags_dependency = dec.psr.update_flags || dec.ctrl.conditional;
 
 	always_ff @(posedge clk or negedge rst_n)
 		bubble <= !rst_n ? 0 : next_cycle.issue && next_bubble;

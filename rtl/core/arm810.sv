@@ -56,7 +56,6 @@ module arm810
 	logic explicit_branch, writeback, c_in;
 	ptr branch_target, pc_visible;
 	psr_mode reg_mode;
-	psr_flags wb_alu_flags;
 	alu_op alu_ctrl;
 	shifter_control shifter_ctrl;
 	word alu_a, alu_b, wr_value;
@@ -93,7 +92,6 @@ module arm810
 		.write(psr_write),
 		.saved(psr_saved),
 		.wr_flags(psr_wr_flags),
-		.alu_flags(wb_alu_flags),
 		.wr_control(psr_wr_control),
 		.*
 	);
