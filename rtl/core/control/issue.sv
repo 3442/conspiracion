@@ -32,11 +32,13 @@ module core_control_issue
 			undefined <= 0;
 			pc_visible <= 2;
 		end else if(next_cycle.issue) begin
-			undefined <= dec.ctrl.undefined;
+			if(issue) begin
+				undefined <= dec.ctrl.undefined;
 
 `ifdef VERILATOR
-			if(dec.ctrl.undefined)
-				$display("[core] undefined insn: [0x%08x] %08x", insn_pc << 2, insn);
+				if(dec.ctrl.undefined)
+					$display("[core] undefined insn: [0x%08x] %08x", insn_pc << 2, insn);
+			end
 `endif
 
 			pc <= insn_pc;
