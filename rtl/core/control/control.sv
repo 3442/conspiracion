@@ -87,7 +87,7 @@ module core_control
 	);
 
 	word mem_offset;
-	logic ldst, ldst_writeback, pop_valid;
+	logic ldst, ldst_next, ldst_writeback, pop_valid;
 	reg_num popped;
 
 	core_control_ldst ctrl_ldst

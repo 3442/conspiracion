@@ -23,16 +23,18 @@ module core_control_ldst
 	                   mem_write,
 	                   pop_valid,
 	                   ldst,
+	                   ldst_next,
 	                   ldst_writeback,
 	output reg_num     popped
 );
 
-	logic ldst_pre, ldst_increment;
+	logic pre, increment;
 	reg_num popped_upper, popped_lower;
 	reg_list mem_regs, next_regs_upper, next_regs_lower;
 
+	assign popped = increment ? popped_lower : popped_upper;
+	assign ldst_next = !cycle.transfer || mem_ready;
 	assign mem_data_wr = rd_value_b;
-	assign popped = ldst_increment ? popped_lower : popped_upper;
 
 	core_control_ldst_pop pop
 	(
@@ -46,10 +48,10 @@ module core_control_ldst
 
 	always_ff @(posedge clk or negedge rst_n)
 		if(!rst_n) begin
+			pre <= 0;
 			ldst <= 0;
-			ldst_pre <= 0;
+			increment <= 0;
 			ldst_writeback <= 0;
-			ldst_increment <= 0;
 
 			mem_addr <= {$bits(mem_addr){1'b0}};
 			mem_regs <= {$bits(mem_regs){1'b0}};
@@ -60,13 +62,13 @@ module core_control_ldst
 			mem_start <= 0;
 
 			if(next_cycle.issue) begin
-				// TODO: dec.ldst.unprivileged/user_regs
+				// TODO: dec.ldst.unprivileged
 				// TODO: byte/halfword sizes
 				if(issue)
 					ldst <= dec.ctrl.ldst;
 
-				ldst_pre <= dec.ldst.pre_indexed;
-				ldst_increment <= dec.ldst.increment;
+				pre <= dec.ldst.pre_indexed;
+				increment <= dec.ldst.increment;
 				ldst_writeback <= dec.ldst.writeback;
 
 				mem_regs <= dec.ldst.regs;
@@ -77,9 +79,9 @@ module core_control_ldst
 					mem_offset <= alu_b;
 				end
 
-				if(!cycle.transfer || mem_ready) begin
-					mem_regs <= ldst_increment ? next_regs_lower : next_regs_upper;
-					mem_addr <= ldst_pre ? q_alu[31:2] : alu_a[31:2];
+				if(ldst_next) begin
+					mem_regs <= increment ? next_regs_lower : next_regs_upper;
+					mem_addr <= pre ? q_alu[31:2] : alu_a[31:2];
 				end
 
 				mem_start <= !cycle.transfer || (mem_ready && pop_valid);

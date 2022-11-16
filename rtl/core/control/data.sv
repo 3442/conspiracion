@@ -16,6 +16,7 @@ module core_control_data
 	input  ctrl_cycle      cycle,
 	                       next_cycle,
 	input  ptr             pc,
+	input  logic           ldst_next,
 	input  word            mem_offset,
 	input  psr_flags       flags,
 
@@ -89,7 +90,7 @@ module core_control_data
 			c_in <= c_shifter;
 			saved_base <= q_shifter;
 		end else if(next_cycle.transfer) begin
-			if(!cycle.transfer || mem_ready)
+			if(ldst_next)
 				saved_base <= q_alu;
 		end else if(next_cycle.exception) begin
 			alu <= `ALU_ADD;

@@ -23,6 +23,7 @@ module core_control_writeback
 	                   mul_r_add_hi,
 	input  logic       issue,
 	                   pop_valid,
+	                   ldst_next,
 
 	output reg_num     rd,
 	                   final_rd,
@@ -97,7 +98,7 @@ module core_control_writeback
 			if(next_cycle.issue)
 				final_rd <= dec.data.rd;
 			else if(next_cycle.transfer) begin
-				if((!cycle.transfer || mem_ready) && pop_valid)
+				if(ldst_next && pop_valid)
 					final_rd <= popped;
 			end else if(next_cycle.base_writeback)
 				final_rd <= ra;

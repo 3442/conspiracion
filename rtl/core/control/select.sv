@@ -7,10 +7,10 @@ module core_control_select
 
 	input  insn_decode dec,
 
-	input  ctrl_cycle  cycle,
-	                   next_cycle,
+	input  ctrl_cycle  next_cycle,
 	input  logic       mem_ready,
 	                   pop_valid,
+	                   ldst_next,
 	input  reg_num     popped,
 	                   final_rd,
 	                   mul_r_add_lo,
@@ -33,7 +33,7 @@ module core_control_select
 			ra = dec.data.rn;
 			rb = dec.snd.r;
 		end else if(next_cycle.transfer) begin
-			if(!cycle.transfer || mem_ready)
+			if(ldst_next)
 				// final_rd viene de dec.ldst.rd
 				rb = pop_valid ? popped : final_rd;
 		end else if(next_cycle.mul_acc_ld) begin
