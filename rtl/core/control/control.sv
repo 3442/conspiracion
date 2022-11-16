@@ -47,6 +47,7 @@ module core_control
 	output logic[7:0]      shifter_shift,
 	output ptr             mem_addr,
 	output word            mem_data_wr,
+	output logic[3:0]      mem_data_be,
 	output logic           mem_start,
 	                       mem_write,
 	output word            mul_a,

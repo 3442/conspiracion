@@ -1,25 +1,27 @@
 module core_mmu_arbiter
 (
-	input  logic clk,
-	             rst_n,
+	input  logic      clk,
+	                  rst_n,
 
-	input  logic bus_ready,
-	input  word  bus_data_rd,
-	             data_data_wr,
-	input  ptr   insn_addr,
-	             data_addr,
-	input  logic insn_start,
-	             data_start,
-	             data_write,
+	input  logic      bus_ready,
+	input  word       bus_data_rd,
+	                  data_data_wr,
+	input  ptr        insn_addr,
+	                  data_addr,
+	input  logic      insn_start,
+	                  data_start,
+	                  data_write,
+	input  logic[3:0] data_data_be,
 
-	output word  bus_data_wr,
-	output ptr   bus_addr,
-	output logic bus_start,
-	             bus_write,
-	             insn_ready,
-	             data_ready,
-	output word  insn_data_rd,
-	             data_data_rd
+	output word       bus_data_wr,
+	output logic[3:0] bus_data_be,
+	output ptr        bus_addr,
+	output logic      bus_start,
+	                  bus_write,
+	                  insn_ready,
+	                  data_ready,
+	output word       insn_data_rd,
+	                  data_data_rd
 );
 
 	enum int unsigned
@@ -31,6 +33,7 @@ module core_mmu_arbiter
 	ptr hold_addr;
 	word hold_data_wr;
 	logic active, hold_start, hold_write, hold_issue, hold_free, transition;
+	logic[3:0] hold_data_be;
 
 	assign insn_data_rd = bus_data_rd;
 	assign data_data_rd = bus_data_rd;
@@ -56,19 +59,20 @@ module core_mmu_arbiter
 			DATA: data_ready = bus_ready;
 		endcase
 
+		bus_data_wr = data_data_wr;
 		unique case(next_master)
 			INSN: begin
 				bus_addr = insn_addr;
 				bus_write = 0;
 				bus_start = insn_start;
-				bus_data_wr = {32{1'bx}};
+				bus_data_be = 4'b1111;
 			end
 
 			DATA: begin
 				bus_addr = data_addr;
 				bus_write = data_write;
 				bus_start = data_start;
-				bus_data_wr = data_data_wr;
+				bus_data_be = data_data_be;
 			end
 		endcase
 
@@ -77,6 +81,7 @@ module core_mmu_arbiter
 			bus_write = hold_write;
 			bus_start = 1;
 			bus_data_wr = hold_data_wr;
+			bus_data_be = hold_data_be;
 		end
 	end
 
@@ -89,6 +94,7 @@ module core_mmu_arbiter
 			hold_start <= 0;
 			hold_write <= 0;
 			hold_data_wr <= 0;
+			hold_data_be <= 0;
 		end else begin
 			master <= next_master;
 			active <= bus_start || (active && !bus_ready);
@@ -100,12 +106,14 @@ module core_mmu_arbiter
 						hold_start <= data_start;
 						hold_write <= data_write;
 						hold_data_wr <= data_data_wr;
+						hold_data_be <= data_data_be;
 					end
 
 					DATA: begin
 						hold_addr <= insn_addr;
 						hold_start <= insn_start;
 						hold_write <= 0;
+						hold_data_be <= 4'b1111;
 					end
 				endcase
 		end

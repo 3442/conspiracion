@@ -9,6 +9,7 @@ module bus_master
 	output logic       ready,
 	output logic[31:0] data_rd,
 	input  logic[31:0] data_wr,
+	input  logic[3:0]  data_be,
 	output logic       cpu_clk,
 	                   cpu_rst_n,
 	                   irq,
@@ -34,7 +35,6 @@ module bus_master
 	assign cpu_rst_n = rst_n;
 
 	assign data_rd = avl_readdata;
-	assign avl_byteenable = 4'b1111; //TODO
 
 	always_comb
 		unique case(state)
@@ -56,12 +56,14 @@ module bus_master
 			avl_write <= 0;
 			avl_address <= 0;
 			avl_writedata <= 0;
+			avl_byteenable <= 0;
 		end else if((state == IDLE || !avl_waitrequest) && start) begin
 			state <= WAIT;
 			avl_read <= ~write;
 			avl_write <= write;
 			avl_address <= {addr, 2'b00};
 			avl_writedata <= data_wr;
+			avl_byteenable <= write ? data_be : 4'b1111;
 		end else if(state == WAIT && !avl_waitrequest) begin
 			state <= IDLE;
 			avl_read <= 0;

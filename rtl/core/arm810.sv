@@ -2,18 +2,19 @@
 
 module arm810
 (
-	input  logic clk,
-	             rst_n,
-	             irq,
-	             halt,
+	input  logic      clk,
+	                  rst_n,
+	                  irq,
+	                  halt,
 
-	output ptr   bus_addr,
-	output logic bus_start,
-	             bus_write,
-	input  logic bus_ready,
-	input  word  bus_data_rd,
-	output word  bus_data_wr,
-	output logic halted
+	output ptr        bus_addr,
+	output logic      bus_start,
+	                  bus_write,
+	input  logic      bus_ready,
+	input  word       bus_data_rd,
+	output word       bus_data_wr,
+	output logic[3:0] bus_data_be,
+	output logic      halted
 );
 
 	ptr fetch_insn_pc, fetch_head, insn_addr;
@@ -72,6 +73,7 @@ module arm810
 		.mem_ready(data_ready),
 		.mem_data_rd(data_data_rd),
 		.mem_data_wr(data_data_wr),
+		.mem_data_be(data_data_be),
 		.*
 	);
 
@@ -160,8 +162,9 @@ module arm810
 	);
 
 	ptr data_addr;
-	logic data_start, data_write, data_ready, insn_ready;
 	word data_data_rd, data_data_wr, insn_data_rd;
+	logic data_start, data_write, data_ready, insn_ready;
+	logic[3:0] data_data_be;
 
 	core_mmu mmu
 	(

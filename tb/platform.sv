@@ -1,12 +1,13 @@
 module platform
 (
 	input  wire        clk_clk,                          //                       clk.clk
-	input  wire [29:0] master_0_core_addr    /*verilator public*/,// master_0_core.addr
-	output wire [31:0] master_0_core_data_rd /*verilator public*/,//              .data_rd
-	input  wire [31:0] master_0_core_data_wr /*verilator public*/,//              .data_wr
-	output wire        master_0_core_ready   /*verilator public*/,//              .ready
-	input  wire        master_0_core_write   /*verilator public*/,//              .write
-	input  wire        master_0_core_start   /*verilator public*/,//              .start
+	input  wire [29:0] master_0_core_addr,               // master_0_core.addr
+	output wire [31:0] master_0_core_data_rd,            //              .data_rd
+	input  wire [31:0] master_0_core_data_wr,            //              .data_wr
+	input  wire [3:0]  master_0_core_data_be,            //              .data_be
+	output wire        master_0_core_ready,              //              .ready
+	input  wire        master_0_core_write,              //              .write
+	input  wire        master_0_core_start,              //              .start
 	output wire        master_0_core_irq,                //                          .irq
 	output wire        master_0_core_cpu_clk,            //                          .cpu_clk
 	output wire        master_0_core_cpu_rst_n,
@@ -68,6 +69,7 @@ module platform
 		.ready(master_0_core_ready),
 		.data_rd(master_0_core_data_rd),
 		.data_wr(master_0_core_data_wr),
+		.data_be(master_0_core_data_be),
 		.cpu_clk(master_0_core_cpu_clk),
 		.cpu_rst_n(master_0_core_cpu_rst_n),
 		.irq(master_0_core_irq),

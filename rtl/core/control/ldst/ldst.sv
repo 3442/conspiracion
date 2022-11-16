@@ -18,6 +18,7 @@ module core_control_ldst
 	                   alu_b,
 
 	output ptr         mem_addr,
+	output logic[3:0]  mem_data_be,
 	output word        mem_data_wr,
 	                   mem_offset,
 	output logic       mem_start,
@@ -57,7 +58,7 @@ module core_control_ldst
 		.read(ldst_read),
 		.shift(ldst_shift),
 		.fault(), //TODO: alignment check
-		.byteenable(), //TODO
+		.byteenable(mem_data_be),
 		.*
 	);
 
