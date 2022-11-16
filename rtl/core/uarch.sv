@@ -55,8 +55,7 @@ typedef struct packed
 
 typedef struct packed
 {
-	logic a,
-	      i,
+	logic i,
 	      f;
 } psr_intmask;
 
@@ -93,8 +92,11 @@ typedef struct packed
 typedef struct packed
 {
 	logic update_flags,
+	      restore_spsr,
 	      saved,
-	      write;
+	      write,
+	      wr_flags,
+	      wr_control;
 } psr_decode;
 
 typedef struct packed

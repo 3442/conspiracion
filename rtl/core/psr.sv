@@ -6,6 +6,8 @@ module core_psr
 	                   rst_n,
 	                   write,
 	                   saved,
+	                   wr_flags,
+	                   wr_control,
 	                   update_flags,
 	                   alu_v_valid,
 	input  psr_flags   alu_flags,
@@ -34,7 +36,8 @@ module core_psr
 				    ge;
 		logic[5:0]  reserved2;
 		logic       e;
-		psr_intmask aif;
+		logic       a;
+		psr_intmask if_;
 		logic       t;
 		psr_mode    m;
 	} psr_word;
@@ -53,16 +56,16 @@ module core_psr
 
 	logic pending_update;
 	psr_word rd_word, wr_word;
-	psr_flags next_flags, wr_flags;
+	psr_flags next_flags, wr_alu_flags;
 	psr_state cpsr, spsr, spsr_svc, spsr_abt, spsr_und, spsr_irq, spsr_fiq,
 	          wr_state, wr_clean;
 
 	assign mode = cpsr.mode;
 	assign mask = cpsr.mask;
-	assign flags = pending_update ? wr_flags : cpsr.flags;
+	assign flags = pending_update ? wr_alu_flags : cpsr.flags;
 	assign psr_rd = rd_word;
 	assign wr_word = psr_wr;
-	assign {wr_state.flags, wr_state.mask, wr_state.mode} = {wr_word.nzcv, wr_word.aif, wr_word.m};
+	assign {wr_state.flags, wr_state.mask, wr_state.mode} = {wr_word.nzcv, wr_word.if_, wr_word.m};
 
 `ifdef VERILATOR
 	psr_word cpsr_word /*verilator public*/,
@@ -72,21 +75,21 @@ module core_psr
 	         spsr_fiq_word /*verilator public*/,
 	         spsr_irq_word /*verilator public*/;
 
-	assign {cpsr_word.nzcv, cpsr_word.aif, cpsr_word.m} = {cpsr.flags, cpsr.mask, cpsr.mode};
+	assign {cpsr_word.nzcv, cpsr_word.if_, cpsr_word.m} = {cpsr.flags, cpsr.mask, cpsr.mode};
 
-	assign {spsr_svc_word.nzcv, spsr_svc_word.aif, spsr_svc_word.m}
+	assign {spsr_svc_word.nzcv, spsr_svc_word.if_, spsr_svc_word.m}
 		= {spsr_svc.flags, spsr_svc.mask, spsr_svc.mode};
 
-	assign {spsr_abt_word.nzcv, spsr_abt_word.aif, spsr_abt_word.m}
+	assign {spsr_abt_word.nzcv, spsr_abt_word.if_, spsr_abt_word.m}
 		= {spsr_abt.flags, spsr_abt.mask, spsr_abt.mode};
 
-	assign {spsr_und_word.nzcv, spsr_und_word.aif, spsr_und_word.m}
+	assign {spsr_und_word.nzcv, spsr_und_word.if_, spsr_und_word.m}
 		= {spsr_und.flags, spsr_und.mask, spsr_und.mode};
 
-	assign {spsr_irq_word.nzcv, spsr_irq_word.aif, spsr_irq_word.m}
+	assign {spsr_irq_word.nzcv, spsr_irq_word.if_, spsr_irq_word.m}
 		= {spsr_irq.flags, spsr_irq.mask, spsr_irq.mode};
 
-	assign {spsr_fiq_word.nzcv, spsr_fiq_word.aif, spsr_fiq_word.m}
+	assign {spsr_fiq_word.nzcv, spsr_fiq_word.if_, spsr_fiq_word.m}
 		= {spsr_fiq.flags, spsr_fiq.mask, spsr_fiq.mode};
 `endif
 
@@ -100,10 +103,12 @@ module core_psr
 		end
 
 		rd_word = {$bits(rd_word){1'b0}};
+		rd_word.a = 1;
+
 		if(saved)
-			{rd_word.nzcv, rd_word.aif, rd_word.m} = {spsr.flags, spsr.mask, spsr.mode};
+			{rd_word.nzcv, rd_word.if_, rd_word.m} = {spsr.flags, spsr.mask, spsr.mode};
 		else
-			{rd_word.nzcv, rd_word.aif, rd_word.m} = {flags, mask, mode};
+			{rd_word.nzcv, rd_word.if_, rd_word.m} = {flags, mask, mode};
 
 		wr_clean = wr_state;
 		unique case(wr_state.mode)
@@ -114,6 +119,14 @@ module core_psr
 				wr_clean.mode = mode;
 		endcase
 
+		if(!wr_flags)
+			wr_clean.flags = flags;
+
+		if(!wr_control) begin
+			wr_clean.mask = mask;
+			wr_clean.mode = mode;
+		end
+
 		if(mode == `MODE_USR) begin
 			wr_clean.mask = mask;
 			wr_clean.mode = `MODE_USR;
@@ -122,12 +135,11 @@ module core_psr
 
 	always_ff @(posedge clk or negedge rst_n)
 		if(!rst_n) begin
-			wr_flags <= 4'b0000;
+			wr_alu_flags <= 4'b0000;
 			pending_update <= 0;
 
 			cpsr.mode <= `MODE_SVC;
 			cpsr.flags <= 4'b0000;
-			cpsr.mask.a <= 1;
 			cpsr.mask.i <= 1;
 			cpsr.mask.f <= 1;
 
@@ -137,12 +149,12 @@ module core_psr
 			spsr_irq <= {$bits(spsr_svc){1'b0}};
 			spsr_fiq <= {$bits(spsr_svc){1'b0}};
 		end else begin
-			wr_flags <= next_flags;
+			wr_alu_flags <= next_flags;
 			pending_update <= !write && update_flags;
 
 			if(!write) begin
 				if(pending_update)
-					cpsr.flags <= wr_flags;
+					cpsr.flags <= wr_alu_flags;
 			end else if(!saved)
 				cpsr <= wr_clean;
 			else

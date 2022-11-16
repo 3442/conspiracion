@@ -26,29 +26,30 @@ module core_decode
 	assign dec.branch = dec_branch;
 	assign dec.coproc = dec_coproc;
 
-	assign dec_ctrl.execute = execute;
-	assign dec_ctrl.undefined = undefined;
-	assign dec_ctrl.conditional = conditional;
-	assign dec_ctrl.writeback = writeback;
+	assign dec_ctrl.mul = mul;
+	assign dec_ctrl.ldst = ldst;
 	assign dec_ctrl.branch = branch;
 	assign dec_ctrl.coproc = coproc;
-	assign dec_ctrl.ldst = ldst;
-	assign dec_ctrl.mul = mul;
+	assign dec_ctrl.execute = execute;
+	assign dec_ctrl.writeback = writeback;
+	assign dec_ctrl.undefined = undefined;
+	assign dec_ctrl.conditional = conditional;
 
 	assign dec_psr.saved = spsr;
 	assign dec_psr.write = psr_write;
+	assign dec_psr.wr_flags = psr_wr_flags;
+	assign dec_psr.wr_control = psr_wr_control;
 	assign dec_psr.update_flags = update_flags;
+	assign dec_psr.restore_spsr = restore_spsr;
 
 	logic execute, undefined, conditional, writeback, update_flags,
-	      branch, ldst, mul, coproc, spsr, psr_write;
+	      restore_spsr, branch, ldst, mul, coproc, spsr, psr_write,
+	      psr_wr_flags, psr_wr_control;
 
 	core_decode_mux mux
 	(
 		.*
 	);
-
-	//TODO
-	logic restore_spsr;
 
 	logic snd_is_imm, snd_ror_if_imm, snd_shift_by_reg_if_reg, snd_undefined;
 	snd_decode snd;
@@ -156,7 +157,6 @@ module core_decode
 		.*
 	);
 
-	//TODO
 	logic mrs_spsr;
 	reg_num mrs_rd;
 
@@ -167,7 +167,6 @@ module core_decode
 		.*
 	);
 
-	//TODO
 	logic msr_spsr, msr_is_imm;
 	msr_mask msr_fields;
 

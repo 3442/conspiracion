@@ -53,7 +53,7 @@ module arm810
 	);
 
 	reg_num rd, ra, rb;
-	logic explicit_branch, writeback, update_flags, c_in;
+	logic explicit_branch, writeback, c_in;
 	ptr branch_target, pc_visible;
 	psr_mode reg_mode;
 	psr_flags wb_alu_flags;
@@ -78,7 +78,7 @@ module arm810
 	);
 
 	word psr_rd, psr_wr;
-	logic psr_write, psr_saved;
+	logic psr_write, psr_saved, update_flags, psr_wr_flags, psr_wr_control;
 	psr_mode mode;
 	psr_flags flags;
 	psr_intmask intmask;
@@ -92,7 +92,9 @@ module arm810
 		.mask(intmask),
 		.write(psr_write),
 		.saved(psr_saved),
+		.wr_flags(psr_wr_flags),
 		.alu_flags(wb_alu_flags),
+		.wr_control(psr_wr_control),
 		.*
 	);
 

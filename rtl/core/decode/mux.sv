@@ -52,13 +52,15 @@ module core_decode_mux
 	                     undefined,
 	                     conditional,
 	                     writeback,
-	                     update_flags,
 	                     branch,
 	                     ldst,
 	                     mul,
 	                     coproc,
 	                     spsr,
 	                     psr_write,
+	                     psr_wr_flags,
+	                     psr_wr_control,
+	                     update_flags,
 	                     restore_spsr,
 	                     snd_is_imm,
 	                     snd_ror_if_imm,
@@ -79,6 +81,8 @@ module core_decode_mux
 		spsr = 0;
 		psr_write = 0;
 		update_flags = 0;
+		psr_wr_flags = 1;
+		psr_wr_control = 1;
 
 		dec_data = {($bits(dec_data)){1'bx}};
 		dec_data.uses_rn = 1;
@@ -185,6 +189,7 @@ module core_decode_mux
 				dec_data.rd = mrs_rd;
 				dec_data.uses_rn = 0;
 
+				spsr = mrs_spsr;
 				writeback = 1;
 				conditional = 1;
 			end
@@ -196,8 +201,12 @@ module core_decode_mux
 				snd_ror_if_imm = 1;
 				snd_shift_by_reg_if_reg = 0;
 
+				spsr = msr_spsr;
 				dec_snd = snd;
+				psr_write = 1;
 				conditional = 1;
+				psr_wr_flags = msr_fields.f;
+				psr_wr_control = msr_fields.c;
 			end
 
 			/*`GROUP_SWP: ;
