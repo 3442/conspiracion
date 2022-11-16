@@ -86,7 +86,8 @@ typedef struct packed
 	      branch,
 	      coproc,
 	      ldst,
-	      mul;
+	      mul,
+	      psr;
 } ctrl_decode;
 
 typedef struct packed
@@ -194,7 +195,8 @@ typedef struct packed
 	      exception,
 	      mul,
 	      mul_acc_ld,
-	      mul_hi_wb;
+	      mul_hi_wb,
+	      psr;
 } ctrl_cycle;
 
 typedef struct packed

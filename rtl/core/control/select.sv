@@ -17,13 +17,10 @@ module core_control_select
 	                   mul_r_add_hi,
 
 	output reg_num     ra,
-	                   rb,
-	output psr_mode    reg_mode
+	                   rb
 );
 
 	reg_num r_shift, last_ra, last_rb;
-
-	assign reg_mode = `MODE_SVC; //TODO
 
 	always_comb begin
 		ra = last_ra;

@@ -1,5 +1,6 @@
 .global reset
 reset:
+	mov  r6, lr
 	mrs  r0, cpsr
 	udf
 	mrs  r2, cpsr
@@ -12,7 +13,7 @@ reset:
 	nop
 	msr  cpsr_fxc, r0 
 	msr  spsr_fxc, r0
-	mov  pc, lr
+	mov  pc, r6
 
 .global undefined
 undefined:

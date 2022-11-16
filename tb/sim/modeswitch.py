@@ -1,3 +1,10 @@
 def final():
-    #TODO
-    assert_reg(r0, -1)
+    assert_reg(r0, 0x0000_01d3)
+    assert_reg(r1, 0x0000_01d3)
+    assert_reg(r2, 0x0000_01d3)
+    assert_reg(r3, 0x0000_0010)
+    assert_reg(r4, 0x0000_0110)
+    assert_reg(r5, 0x4000_0110)
+    assert_reg(cpsr, 0x0000_0110)
+    assert_reg(r13_svc, 0x2000_0000)
+    assert_reg(r13_und, 0x0000_01db)

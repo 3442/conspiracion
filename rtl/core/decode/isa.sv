@@ -194,7 +194,7 @@
 
 `define GROUP_MSR 28'b0_0_?_1_0_?_1_0_????_1111_0000_0000_????
 
-`define FIELD_MRS_R    [24]
+`define FIELD_MRS_R    [22]
 `define FIELD_MRS_RD   [15:12]
 `define FIELD_MSR_I    [25]
 `define FIELD_MSR_R    [22]

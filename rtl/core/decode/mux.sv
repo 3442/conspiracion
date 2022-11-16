@@ -55,8 +55,9 @@ module core_decode_mux
 	                     branch,
 	                     ldst,
 	                     mul,
+	                     psr,
 	                     coproc,
-	                     spsr,
+	                     psr_saved,
 	                     psr_write,
 	                     psr_wr_flags,
 	                     psr_wr_control,
@@ -78,7 +79,8 @@ module core_decode_mux
 		conditional = 0;
 		restore_spsr = 0;
 
-		spsr = 0;
+		psr = 0;
+		psr_saved = 0;
 		psr_write = 0;
 		update_flags = 0;
 		psr_wr_flags = 1;
@@ -189,7 +191,8 @@ module core_decode_mux
 				dec_data.rd = mrs_rd;
 				dec_data.uses_rn = 0;
 
-				spsr = mrs_spsr;
+				psr = 1;
+				psr_saved = mrs_spsr;
 				writeback = 1;
 				conditional = 1;
 			end
@@ -201,9 +204,10 @@ module core_decode_mux
 				snd_ror_if_imm = 1;
 				snd_shift_by_reg_if_reg = 0;
 
-				spsr = msr_spsr;
+				psr = 1;
 				dec_snd = snd;
 				psr_write = 1;
+				psr_saved = msr_spsr;
 				conditional = 1;
 				psr_wr_flags = msr_fields.f;
 				psr_wr_control = msr_fields.c;
@@ -233,6 +237,7 @@ module core_decode_mux
 			execute = 0;
 
 			mul = 1'bx;
+			psr = 1'bx;
 			ldst = 1'bx;
 			branch = 1'bx;
 			coproc = 1'bx;

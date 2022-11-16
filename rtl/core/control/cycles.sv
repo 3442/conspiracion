@@ -6,6 +6,7 @@ module core_control_cycles
 	                  rst_n,
 	                  halt,
 	                  mul,
+	                  psr,
 	                  ldst,
 	                  bubble,
 	                  exception,
@@ -39,7 +40,8 @@ module core_control_cycles
 		EXCEPTION,
 		MUL,
 		MUL_ACC_LD,
-		MUL_HI_WB
+		MUL_HI_WB,
+		PSR
 	} state, next_state;
 
 	// TODO: debe estar escrito de tal forma que Quartus infiera una FSM
@@ -53,6 +55,7 @@ module core_control_cycles
 	assign cycle.mul = state == MUL;
 	assign cycle.mul_acc_ld = state == MUL_ACC_LD;
 	assign cycle.mul_hi_wb = state == MUL_HI_WB;
+	assign cycle.psr = state == PSR;
 
 	assign next_cycle.issue = next_state == ISSUE;
 	assign next_cycle.rd_indirect_shift = next_state == RD_INDIRECT_SHIFT;
@@ -63,6 +66,7 @@ module core_control_cycles
 	assign next_cycle.mul = next_state == MUL;
 	assign next_cycle.mul_acc_ld = next_state == MUL_ACC_LD;
 	assign next_cycle.mul_hi_wb = next_state == MUL_HI_WB;
+	assign next_cycle.psr = next_state == PSR;
 
 	always_comb begin
 		next_state = ISSUE;
@@ -109,8 +113,11 @@ module core_control_cycles
 
 		if(bubble)
 			next_state = ISSUE;
-		else if(next_state == ISSUE && ldst) begin
-			next_state = TRANSFER;
+		else if(next_state == ISSUE) begin
+			if(ldst)
+				next_state = TRANSFER;
+			else if(psr)
+				next_state = PSR;
 		end
 	end
 

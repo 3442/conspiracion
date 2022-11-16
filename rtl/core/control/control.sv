@@ -8,9 +8,12 @@ module core_control
 
 	input  insn_decode     dec,
 	input  ptr             insn_pc,
+	input  psr_mode        mode,
 	input  psr_flags       flags,
 	                       alu_flags,
-	input  word            rd_value_a,
+	input  word            cpsr_rd,
+	                       spsr_rd,
+	                       rd_value_a,
 	                       rd_value_b,
 	                       q_alu,
 	                       q_shifter,
@@ -57,7 +60,12 @@ module core_control
 	                       mul_long,
 	                       mul_start,
 	                       mul_signed,
-	                       coproc
+	                       coproc,
+	                       psr_saved,
+	                       psr_write,
+	                       psr_wr_flags,
+	                       psr_wr_control,
+	output word            psr_wr
 );
 
 	ctrl_cycle cycle, next_cycle;
@@ -114,6 +122,14 @@ module core_control
 	reg_num mul_r_add_hi, mul_r_add_lo;
 
 	core_control_mul ctrl_mul
+	(
+		.*
+	);
+
+	word psr_wb;
+	logic psr, final_psr_write, final_restore_spsr;
+
+	core_control_psr ctrl_psr
 	(
 		.*
 	);

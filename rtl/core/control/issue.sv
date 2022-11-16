@@ -23,7 +23,10 @@ module core_control_issue
 	                   next_pc_visible
 );
 
-	assign issue = next_cycle.issue && dec.ctrl.execute && !next_bubble && !halt;
+	logic valid;
+
+	assign valid = !next_bubble && !halt;
+	assign issue = next_cycle.issue && dec.ctrl.execute && valid;
 	assign next_pc_visible = insn_pc + 2;
 
 	always_ff @(posedge clk or negedge rst_n)
@@ -32,14 +35,14 @@ module core_control_issue
 			undefined <= 0;
 			pc_visible <= 2;
 		end else if(next_cycle.issue) begin
-			if(issue) begin
+			if(valid) begin
 				undefined <= dec.ctrl.undefined;
 
 `ifdef VERILATOR
 				if(dec.ctrl.undefined)
 					$display("[core] undefined insn: [0x%08x] %08x", insn_pc << 2, insn);
-			end
 `endif
+			end
 
 			pc <= insn_pc;
 			pc_visible <= next_pc_visible;

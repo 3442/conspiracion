@@ -76,15 +76,11 @@ module arm810
 		.*
 	);
 
-	word psr_rd, psr_wr;
+	word cpsr_rd, spsr_rd, psr_wr;
 	logic psr_write, psr_saved, update_flags, psr_wr_flags, psr_wr_control;
 	psr_mode mode;
 	psr_flags flags;
 	psr_intmask intmask;
-
-	//TODO
-	assign psr_write = 0;
-	assign psr_saved = 0;
 
 	core_psr psr
 	(
