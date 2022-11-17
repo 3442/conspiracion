@@ -70,7 +70,7 @@ namespace taller::avalon
 		public:
 			interconnect(Platform &plat) noexcept;
 
-			void tick(bool clk);
+			bool tick(bool clk);
 			void attach(slave &dev);
 
 			std::uint32_t dump(std::uint32_t addr);

@@ -242,15 +242,25 @@ int main(int argc, char **argv)
 	int time = 0;
 	top.clk_clk = 1;
 
+	bool failed = false;
+
 	auto tick = [&]()
 	{
 		top.clk_clk = !top.clk_clk;
 		top.eval();
 
-		avl.tick(top.clk_clk);
+		if(!avl.tick(top.clk_clk))
+		{
+			failed = true;
+		}
+
 		if(enable_video)
 		{
-			avl_vga.tick(top.clk_clk);
+			if(!avl_vga.tick(top.clk_clk))
+			{
+				failed = true;
+			}
+
 			vga.tick(top.clk_clk);
 		}
 
@@ -274,6 +284,10 @@ int main(int argc, char **argv)
 	for(unsigned i = 0; i < *cycles; ++i)
 	{
 		cycle();
+		if(failed)
+		{
+			break;
+		}
 	}
 
 	if(enable_trace)
@@ -281,7 +295,7 @@ int main(int argc, char **argv)
 		trace.close();
 	}
 
-	if(dump_regs)
+	if(dump_regs || failed)
 	{
 		std::puts("=== dump-regs ===");
 
@@ -327,5 +341,5 @@ int main(int argc, char **argv)
 	}
 
 	top.final();
-	return EXIT_SUCCESS;
+	return failed ? EXIT_FAILURE : EXIT_SUCCESS;
 }
