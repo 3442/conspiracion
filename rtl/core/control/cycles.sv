@@ -37,6 +37,7 @@ module core_control_cycles
 		WITH_SHIFT,
 		TRANSFER,
 		BASE_WRITEBACK,
+		ESCALATE,
 		EXCEPTION,
 		MUL,
 		MUL_ACC_LD,
@@ -51,6 +52,7 @@ module core_control_cycles
 	assign cycle.with_shift = state == WITH_SHIFT;
 	assign cycle.transfer = state == TRANSFER;
 	assign cycle.base_writeback = state == BASE_WRITEBACK;
+	assign cycle.escalate = state == ESCALATE;
 	assign cycle.exception = state == EXCEPTION;
 	assign cycle.mul = state == MUL;
 	assign cycle.mul_acc_ld = state == MUL_ACC_LD;
@@ -62,6 +64,7 @@ module core_control_cycles
 	assign next_cycle.with_shift = next_state == WITH_SHIFT;
 	assign next_cycle.transfer = next_state == TRANSFER;
 	assign next_cycle.base_writeback = next_state == BASE_WRITEBACK;
+	assign next_cycle.escalate = next_state == ESCALATE;
 	assign next_cycle.exception = next_state == EXCEPTION;
 	assign next_cycle.mul = next_state == MUL;
 	assign next_cycle.mul_acc_ld = next_state == MUL_ACC_LD;
@@ -74,7 +77,7 @@ module core_control_cycles
 		unique case(state)
 			ISSUE:
 				if(exception)
-					next_state = EXCEPTION;
+					next_state = ESCALATE;
 				else if(halt)
 					next_state = ISSUE;
 				else if(mul)
@@ -87,6 +90,9 @@ module core_control_cycles
 			RD_INDIRECT_SHIFT:
 				if(!trivial_shift)
 					next_state = WITH_SHIFT;
+
+			ESCALATE:
+				next_state = EXCEPTION;
 
 			TRANSFER:
 				if(!mem_ready || pop_valid)

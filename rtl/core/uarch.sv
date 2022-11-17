@@ -192,6 +192,7 @@ typedef struct packed
 	      with_shift,
 	      transfer,
 	      base_writeback,
+	      escalate,
 	      exception,
 	      mul,
 	      mul_acc_ld,
