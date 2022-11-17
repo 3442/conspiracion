@@ -216,6 +216,20 @@ module core_decode_mux
 			/*`GROUP_SWP: ;
 			`INSN_SWI: ;*/
 
+		   /* No es parte de ARMv4 pero U-Boot lo necesita. esto se
+		    * decodifica igual que `mov pc, lr` ya que no tenemos Thumb.
+			*/
+		   `INSN_BXLR: begin
+				dec_data.op = `ALU_MOV;
+				dec_data.rd = `R15;
+				dec_data.uses_rn = 0;
+
+				dec_snd.r = `R14;
+				dec_snd.is_imm = 0;
+
+				writeback = 1;
+			end
+
 			default:
 				undefined = 1;
 		endcase

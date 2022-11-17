@@ -17,4 +17,4 @@ stub2:
 	mov  r4, sp
 	pop  {lr}
 	mov  r5, sp
-	mov  pc, lr
+	bx   lr
