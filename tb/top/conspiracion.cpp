@@ -4,6 +4,7 @@
 #include <cstring>
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include <verilated.h>
 #include <verilated_vcd_c.h>
@@ -21,6 +22,7 @@
 #include "../args.hxx"
 
 #include "../avalon.hpp"
+#include "../const.hpp"
 #include "../mem.hpp"
 #include "../jtag_uart.hpp"
 #include "../null.hpp"
@@ -75,12 +77,52 @@ namespace
 		std::uint32_t value;
 	};
 
+	struct mem_init
+	{
+		std::uint32_t addr;
+		std::uint32_t value;
+	};
+
+	struct file_load
+	{
+		std::uint32_t addr;
+		std::string   filename;
+	};
+
 	std::istream &operator>>(std::istream &stream, mem_region &region)
 	{
 		stream >> region.start;
 		if(stream.get() == ',')
 		{
 			stream >> region.length;
+		} else
+		{
+			stream.setstate(std::istream::failbit);
+		}
+
+		return stream;
+	}
+
+	std::istream &operator>>(std::istream &stream, mem_init &init)
+	{
+		stream >> init.addr;
+		if(stream.get() == ',')
+		{
+			stream >> init.value;
+		} else
+		{
+			stream.setstate(std::istream::failbit);
+		}
+
+		return stream;
+	}
+
+	std::istream &operator>>(std::istream &stream, file_load &load)
+	{
+		stream >> load.addr;
+		if(stream.get() == ',')
+		{
+			stream >> load.filename;
 		} else
 		{
 			stream.setstate(std::istream::failbit);
@@ -159,6 +201,16 @@ int main(int argc, char **argv)
 		parser, "addr,length", "Dump a memory region", {"dump-mem"}
 	);
 
+	args::ValueFlagList<mem_init> const_
+	(
+		parser, "addr,value", "Add a constant map", {"const"}
+	);
+
+	args::ValueFlagList<file_load> loads
+	(
+		parser, "addr,filename", "Load a file", {"load"}
+	);
+
 	args::Positional<std::string> image
 	(
 		parser, "image", "Executable image to run", args::Options::Required
@@ -199,15 +251,26 @@ int main(int argc, char **argv)
 
 	mem<std::uint32_t> hps_ddr3(0x0000'0000, 512 << 20);
 	jtag_uart ttyj0(0x3000'0000);
-	mem<std::uint16_t> vram(0x3800'0000, 64 << 20);
+	mem<std::uint32_t> vram(0x3800'0000, 64 << 20);
 	null vram_null(0x3800'0000, 64 << 20, 2);
 	window vram_window(vram, 0x0000'0000);
 	display<Vconspiracion_vga_domain> vga(*top.conspiracion->plat->vga, 25'175'000);
+
+	std::vector<const_map> consts;
+	for(const auto &init : *const_)
+	{
+		consts.emplace_back(init.addr, init.value);
+	}
 
 	bool enable_video = !headless;
 
 	avl.attach(hps_ddr3);
 	avl.attach(ttyj0);
+
+	for(auto &slave : consts)
+	{
+		avl.attach(slave);
+	}
 
 	if(enable_video)
 	{
@@ -231,6 +294,23 @@ int main(int argc, char **argv)
 	});
 
 	std::fclose(img_file);
+
+	for(const auto &load : *loads)
+	{
+		FILE *img_file = std::fopen(load.filename.c_str(), "rb");
+		if(!img_file)
+		{
+			std::perror("fopen()");
+			return EXIT_FAILURE;
+		}
+
+		hps_ddr3.load([&](std::uint32_t *buffer, std::size_t words)
+		{
+			return std::fread(buffer, 4, words, img_file);
+		}, load.addr);
+
+		std::fclose(img_file);
+	}
 
 	for(const auto &init : init_regs)
 	{

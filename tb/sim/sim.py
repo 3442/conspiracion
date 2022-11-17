@@ -261,6 +261,12 @@ for rng in mem_dumps:
 for r, value in init_regs.items():
     exec_args.extend(['--init-reg', f'{r}={value}'])
 
+for addr, const in module_get('consts', {}).items():
+    exec_args.extend(['--const', f'{addr},{const}'])
+
+for addr, filename in module_get('loads', {}).items():
+    exec_args.extend(['--load', f'{addr},{filename}'])
+
 init_regs = None
 exec_args.append(image)
 
