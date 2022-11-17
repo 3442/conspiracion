@@ -22,6 +22,7 @@
 
 #include "../avalon.hpp"
 #include "../mem.hpp"
+#include "../jtag_uart.hpp"
 #include "../null.hpp"
 #include "../window.hpp"
 #include "../vga.hpp"
@@ -197,6 +198,7 @@ int main(int argc, char **argv)
 	interconnect<Vconspiracion_vga_domain> avl_vga(*top.conspiracion->plat->vga);
 
 	mem<std::uint32_t> hps_ddr3(0x0000'0000, 512 << 20);
+	jtag_uart ttyj0(0x3000'0000);
 	mem<std::uint16_t> vram(0x3800'0000, 64 << 20);
 	null vram_null(0x3800'0000, 64 << 20, 2);
 	window vram_window(vram, 0x0000'0000);
@@ -205,6 +207,7 @@ int main(int argc, char **argv)
 	bool enable_video = !headless;
 
 	avl.attach(hps_ddr3);
+	avl.attach(ttyj0);
 
 	if(enable_video)
 	{
