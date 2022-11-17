@@ -5,11 +5,15 @@
   in {
     devShells."${system}".default = pkgs.mkShell {
       buildInputs = with pkgs; [
+        openssl
         SDL2
       ];
 
       nativeBuildInputs = with pkgs; [
+        bc
         binutils
+        bison
+        flex
         gcc
         gcc-arm-embedded
         gdb
@@ -22,6 +26,9 @@
       ];
 
       shellHook = ''
+        # U-Boot
+        export CROSS_COMPILE=arm-none-eabi-
+
         export MAKEFLAGS="AR=gcc-ar"
         export CXXFLAGS="-O3 -flto $(pkg-config --cflags sdl2)"
         export LDFLAGS="-O3 -flto $(pkg-config --libs sdl2)"
