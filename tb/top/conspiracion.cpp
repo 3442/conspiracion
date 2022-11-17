@@ -411,7 +411,7 @@ int main(int argc, char **argv)
 			auto word = avl.dump(dump.start + i);
 			word = (word & 0xff) << 24
 				 | ((word >> 8) & 0xff) << 16
-				 | ((word >> 16) & 0xff) << 24
+				 | ((word >> 16) & 0xff) << 8
 				 | ((word >> 24) & 0xff);
 
 			std::printf("%08x", word);
