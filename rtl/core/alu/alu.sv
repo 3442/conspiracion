@@ -33,7 +33,7 @@ module core_alu
 		.q(q_sub),
 		.c(c_sub),
 		.v(v_sub),
-		.c_in(c_in && op `FIELD_ALUOP_SUB_SBC),
+		.c_in(!c_in && op `FIELD_ALUOP_SUB_SBC),
 		.*
 	);
 
@@ -44,7 +44,7 @@ module core_alu
 		.q(q_rsb),
 		.c(c_rsb),
 		.v(v_rsb),
-		.c_in(c_in && op `FIELD_ALUOP_RSB_RSC),
+		.c_in(!c_in && op `FIELD_ALUOP_RSB_RSC),
 		.*
 	);
 
