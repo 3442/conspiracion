@@ -30,6 +30,8 @@ module conspiracion
 	output wire        vram_wire_ras_n,
 	output wire        vram_wire_we_n,
 	output wire [7:0]  pio_leds,
+	input  wire 	   pio_buttons,
+	input  wire [5:0]  pio_switches,
 	output wire        vga_dac_clk,
 	output wire        vga_dac_hsync,
 	output wire        vga_dac_vsync,
@@ -40,6 +42,7 @@ module conspiracion
 	output wire [7:0]  vga_dac_b
 );
 
+	logic button;
 	logic[3:0] data_be;
 	logic[29:0] addr;
 	logic[31:0] data_rd, data_wr;
@@ -49,6 +52,7 @@ module conspiracion
 `ifdef VERILATOR
 	assign cpu_halt = halt;
 	assign reset_reset_n = rst_n;
+	assign button = pio_buttons;
 `else
 	debounce reset_debounce
 	(
@@ -62,6 +66,13 @@ module conspiracion
 		.clk(cpu_clk),
 		.dirty(halt),
 		.clean(cpu_halt)
+	);
+
+	debounce button_debounce
+	(
+		.clk(clk_clk),
+		.dirty(pio_buttons),
+		.clean(button)
 	);
 `endif
 
@@ -95,6 +106,9 @@ module conspiracion
 		.master_0_core_irq(irq),
 		.pll_0_reset_reset(0), //TODO: reset controller, algún día
 		.pio_0_external_connection_export(pio_leds),
+		.switches_external_connection_export({2'b00, pio_switches}),
+		//TODO: glitch rst
+		.buttons_external_connection_export({7'b0000000, !button}),
 		.sys_sdram_pll_0_sdram_clk_clk(vram_wire_clk),
 		.vga_dac_CLK(vga_dac_clk),
 		.vga_dac_HS(vga_dac_hsync),

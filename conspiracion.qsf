@@ -120,6 +120,15 @@ set_location_assignment PIN_W19 -to pio_leds[5]
 set_location_assignment PIN_Y19 -to pio_leds[6]
 set_location_assignment PIN_W20 -to pio_leds[7]
 
+set_location_assignment PIN_AA14 -to pio_buttons
+
+set_location_assignment PIN_AD11 -to pio_switches[0]
+set_location_assignment PIN_AD12 -to pio_switches[1]
+set_location_assignment PIN_AE11 -to pio_switches[2]
+set_location_assignment PIN_AC9 -to pio_switches[3]
+set_location_assignment PIN_AD10 -to pio_switches[4]
+set_location_assignment PIN_AE12 -to pio_switches[5]
+
 set_location_assignment PIN_A11 -to vga_dac_clk
 set_location_assignment PIN_B11 -to vga_dac_hsync
 set_location_assignment PIN_D11 -to vga_dac_vsync

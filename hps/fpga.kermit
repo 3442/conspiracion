@@ -63,6 +63,8 @@ lineout "fatload mmc 0:1 0x20000000 taller_bootrom.bin"
 input 1 "SOCFPGA_CYCLONE5 #"
 lineout "fatload mmc 0:1 0x2000000 soc_system.rbf"
 input 1 "SOCFPGA_CYCLONE5 #"
+lineout "fatload mmc 0:1 0x20010000 jerry"
+input 1 "SOCFPGA_CYCLONE5 #"
 lineout "fpga load 0 0x2000000 0x700000"
 # Falla con mw 0xFFC2505C 0xA
 input 1 "SOCFPGA_CYCLONE5 #"

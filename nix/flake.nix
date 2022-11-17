@@ -20,7 +20,7 @@
         gnumake
         gtkwave
         pkg-config
-        (python39.withPackages (py: [ py.numpy py.pillow ]))
+        (python39.withPackages (py: [ py.numpy py.pillow py.matplotlib ]))
         (quartus-prime-lite.override { supportedDevices = [ "Cyclone V" ]; })
         verilator
       ];

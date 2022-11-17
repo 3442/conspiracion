@@ -28,6 +28,8 @@ module platform
 	output wire        memory_mem_dm,                    //                          .mem_dm
 	input  wire        memory_oct_rzqin,                 //                          .oct_rzqin
 	output wire [7:0]  pio_0_external_connection_export, // pio_0_external_connection.export
+	input  wire [7:0]  switches_external_connection_export, // pio_1_external_connection.export
+	input  wire [7:0]  buttons_external_connection_export, // pio_2_external_connection.export
 	input  wire        pll_0_reset_reset,
 	output wire        sys_sdram_pll_0_sdram_clk_clk,
 	input  wire        reset_reset_n /*verilator public*/,//                     reset.reset_n

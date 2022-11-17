@@ -17,6 +17,14 @@
          type = "int";
       }
    }
+   element buttons
+   {
+      datum _sortIndex
+      {
+         value = "17";
+         type = "int";
+      }
+   }
    element clk_0
    {
       datum _sortIndex
@@ -134,6 +142,14 @@
          type = "int";
       }
    }
+   element switches
+   {
+      datum _sortIndex
+      {
+         value = "16";
+         type = "int";
+      }
+   }
    element sys_sdram_pll_0
    {
       datum _sortIndex
@@ -200,6 +216,11 @@
  <parameter name="timeStamp" value="0" />
  <parameter name="useTestBenchNamingPattern" value="false" />
  <instanceScript></instanceScript>
+ <interface
+   name="buttons_external_connection"
+   internal="buttons.external_connection"
+   type="conduit"
+   dir="end" />
  <interface name="clk" internal="clk_0.clk_in" type="clock" dir="end" />
  <interface name="master_0_conduit_end" internal="master_0.conduit_end" />
  <interface
@@ -216,6 +237,11 @@
  <interface name="pll_0_outclk3" internal="pll_0.outclk3" />
  <interface name="pll_0_reset" internal="pll_0.reset" type="reset" dir="end" />
  <interface name="reset" internal="clk_0.clk_in_reset" type="reset" dir="end" />
+ <interface
+   name="switches_external_connection"
+   internal="switches.external_connection"
+   type="conduit"
+   dir="end" />
  <interface
    name="sys_sdram_pll_0_sdram_clk"
    internal="sys_sdram_pll_0.sdram_clk"
@@ -240,6 +266,20 @@
   <parameter name="MAX_PENDING_READS" value="1" />
   <parameter name="SLAVE_ADDRESS_WIDTH" value="27" />
   <parameter name="SUB_WINDOW_COUNT" value="1" />
+ </module>
+ <module name="buttons" kind="altera_avalon_pio" version="20.1" enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="50000000" />
+  <parameter name="direction" value="Input" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="8" />
  </module>
  <module name="clk_0" kind="clock_source" version="20.1" enabled="1">
   <parameter name="clockFrequency" value="50000000" />
@@ -1070,6 +1110,20 @@
   <parameter name="gui_switchover_mode">Automatic Switchover</parameter>
   <parameter name="gui_use_locked" value="false" />
  </module>
+ <module name="switches" kind="altera_avalon_pio" version="20.1" enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="50000000" />
+  <parameter name="direction" value="Input" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="8" />
+ </module>
  <module
    name="sys_sdram_pll_0"
    kind="altera_up_avalon_sys_sdram_pll"
@@ -1213,6 +1267,24 @@
    kind="avalon"
    version="20.1"
    start="master_0.avalon_master_1_1"
+   end="switches.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x30060000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="20.1"
+   start="master_0.avalon_master_1_1"
+   end="buttons.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x30050000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="20.1"
+   start="master_0.avalon_master_1_1"
    end="address_span_extender_0.windowed_slave">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x0000" />
@@ -1282,6 +1354,20 @@
    kind="avalon"
    version="20.1"
    start="jtag_dbg.master"
+   end="switches.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x30060000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection kind="avalon" version="20.1" start="jtag_dbg.master" end="buttons.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x30050000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="20.1"
+   start="jtag_dbg.master"
    end="address_span_extender_0.windowed_slave">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x0000" />
@@ -1321,6 +1407,8 @@
  <connection kind="clock" version="20.1" start="pll_0.outclk0" end="timer_0.clk" />
  <connection kind="clock" version="20.1" start="pll_0.outclk0" end="pio_0.clk" />
  <connection kind="clock" version="20.1" start="pll_0.outclk0" end="jtag_dbg.clk" />
+ <connection kind="clock" version="20.1" start="pll_0.outclk0" end="switches.clk" />
+ <connection kind="clock" version="20.1" start="pll_0.outclk0" end="buttons.clk" />
  <connection
    kind="clock"
    version="20.1"
@@ -1393,6 +1481,16 @@
    start="clk_0.clk_reset"
    end="timer_0.reset" />
  <connection kind="reset" version="20.1" start="clk_0.clk_reset" end="pio_0.reset" />
+ <connection
+   kind="reset"
+   version="20.1"
+   start="clk_0.clk_reset"
+   end="switches.reset" />
+ <connection
+   kind="reset"
+   version="20.1"
+   start="clk_0.clk_reset"
+   end="buttons.reset" />
  <connection
    kind="reset"
    version="20.1"
