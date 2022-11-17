@@ -27,39 +27,38 @@ idle:
   bne  idle
 
 @ Verificar el algoritmo seleccionado
-
-  lsr r9, r6, #1			  @ Obtener la llave
-  mov r0, r9, lsl #8		@ Mover llave para no afectar alpha
-  orr r0, r0, r9, lsl #16 @ Replicar la llave en el siguiente byte
-  orr r0, r0, r9, lsl #24 @ Replicar la llave en el siguiente byte
-
-  and r6, r6, #1  @ Bit mask para seleccionar el primer bit de los switches
-  cmp r6, #1    	@ Si el valor es 1, se salta a not, si es 0 a xor
+  and r10, r6, #1  @ Bit mask para seleccionar el primer bit de los switches
+  cmp r10, #1    	@ Si el valor es 1, se salta a not, si es 0 a xor
   beq not
-  cmp r6, #0
+  cmp r10, #0
   beq  xor
   
 
 @ Recorrer la memoria desde START y hacer not al valor en cada posicion
 @ y volverlo a guardar
 not:
-  ldr  r4, [r1]  	@ Guarda en r4 el dato en la posición de memoria de start
-  mvn  r4, r4    	@ Guarda en r4 el valor de r4 negado
-  str  r4, [r1]  	@ Vuelve a guardar en memoria ya modificado
-  add  r1, r1, #4  	@ Incrementa el valor de r4, para ir al siguiente pixel
-  add  r7, r7, #1  	@ Incrementa contador de tamaño de la imagen
-  cmp  r7, r8    	@ Compara contador con tamaño de la imagen 640 * 480
-  bne  not
-  b  halt
+  @Procesar la mask
+	mov r9, #0b11111111     @Hacer mask de 1s
+	mov r0, r9, lsl #8      
+	orr r0, r0, r9, lsl #16
+	orr r0, r0, r9, lsl #24
+	b loop
 
 xor:
+@Procesar la llave
+	lsr r9, r6, #1
+	mov r0, r9, lsl #8
+	orr r0, r0, r9, lsl #16
+	orr r0, r0, r9, lsl #24
+
+loop:
   ldr  r4, [r1]  	@ Guarda en r4 el dato en la posición de memoria de start
   eor  r4, r4, r0  	@ Hace XOR entre r4 y 46
-  str  r4, [r4]   	@ Vuelve a guardar en memoria ya modificado
+  str  r4, [r1]   	@ Vuelve a guardar en memoria ya modificado
   add  r1, r1, #4  	@ Incrementa el valor de r4, para ir al siguiente pixel
   add  r7, r7, #1  	@ Incrementa contador de tamaño de la imagen
   cmp  r7, r8    	@ Compara contador con tamaño de la imagen 640 * 480
-  bne  xor
+  bne  loop
   b  halt
 
 halt:
