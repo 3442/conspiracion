@@ -25,6 +25,7 @@
 #include "../const.hpp"
 #include "../mem.hpp"
 #include "../jtag_uart.hpp"
+#include "../interval_timer.hpp"
 #include "../null.hpp"
 #include "../window.hpp"
 #include "../vga.hpp"
@@ -251,6 +252,7 @@ int main(int argc, char **argv)
 
 	mem<std::uint32_t> hps_ddr3(0x0000'0000, 512 << 20);
 	jtag_uart ttyj0(0x3000'0000);
+	interval_timer timer(0x3002'0000);
 	mem<std::uint32_t> vram(0x3800'0000, 64 << 20);
 	null vram_null(0x3800'0000, 64 << 20, 2);
 	window vram_window(vram, 0x0000'0000);
@@ -266,6 +268,7 @@ int main(int argc, char **argv)
 
 	avl.attach(hps_ddr3);
 	avl.attach(ttyj0);
+	avl.attach(timer);
 
 	for(auto &slave : consts)
 	{
@@ -328,6 +331,11 @@ int main(int argc, char **argv)
 	{
 		top.clk_clk = !top.clk_clk;
 		top.eval();
+
+		if(top.clk_clk)
+		{
+			timer.tick();
+		}
 
 		if(!avl.tick(top.clk_clk))
 		{
