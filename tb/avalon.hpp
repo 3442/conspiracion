@@ -50,6 +50,12 @@ namespace taller::avalon
 				return ~mask + 1;
 			}
 
+			inline virtual void tick() noexcept
+			{}
+
+			inline virtual void bail() noexcept
+			{}
+
 			virtual bool read(std::uint32_t addr, std::uint32_t &data) = 0;
 			virtual bool write(std::uint32_t addr, std::uint32_t data, unsigned byte_enable) = 0;
 
@@ -72,6 +78,7 @@ namespace taller::avalon
 
 			bool tick(bool clk);
 			void attach(slave &dev);
+			void bail() noexcept;
 
 			std::uint32_t dump(std::uint32_t addr);
 

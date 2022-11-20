@@ -144,6 +144,7 @@ namespace taller::avalon
 		if(took_over)
 		{
 			::endwin();
+			putchar('\n');
 		}
 	}
 }

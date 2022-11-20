@@ -12,7 +12,7 @@ namespace taller::avalon
 		public:
 			interval_timer(std::uint32_t base) noexcept;
 
-			void tick() noexcept;
+			virtual void tick() noexcept final override;
 
 			virtual bool read(std::uint32_t addr, std::uint32_t &data) noexcept final override;
 			virtual bool write(std::uint32_t addr, std::uint32_t data, unsigned byte_enable) noexcept final override;

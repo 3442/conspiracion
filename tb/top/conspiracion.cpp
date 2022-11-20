@@ -337,12 +337,6 @@ int main(int argc, char **argv)
 		top.clk_clk = !top.clk_clk;
 		top.eval();
 
-		if(top.clk_clk)
-		{
-			ttyJ0.tick();
-			timer.tick();
-		}
-
 		if(!avl.tick(top.clk_clk))
 		{
 			failed = true;

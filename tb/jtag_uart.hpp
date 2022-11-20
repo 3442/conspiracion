@@ -13,7 +13,12 @@ namespace taller::avalon
 			jtag_uart(std::uint32_t base) noexcept;
 			~jtag_uart() noexcept;
 
-			void tick() noexcept;
+			virtual void tick() noexcept final override;
+
+			inline virtual void bail() noexcept final override
+			{
+				release();
+			}
 
 			virtual bool read(std::uint32_t addr, std::uint32_t &data) noexcept final override;
 			virtual bool write(std::uint32_t addr, std::uint32_t data, unsigned byte_enable) noexcept final override;

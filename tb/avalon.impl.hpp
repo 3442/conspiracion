@@ -52,7 +52,14 @@ namespace taller::avalon
 			}
 
 			return true;
-		} else if(!active)
+		}
+
+		for(auto &binding : devices)
+		{
+			binding.dev.tick();
+		}
+
+		if(!active)
 		{
 			avl_address = plat.avl_address;
 			avl_read = plat.avl_read;
@@ -77,6 +84,8 @@ namespace taller::avalon
 
 			if(!active)
 			{
+				bail();
+
 				const char *op = avl_read ? "read" : "write";
 				fprintf(stderr, "[avl] attempt to %s memory hole at 0x%08x\n", op, avl_address);
 				return false;
@@ -84,6 +93,8 @@ namespace taller::avalon
 
 			if(avl_address & active->word_mask())
 			{
+				bail();
+
 				fprintf(stderr, "[avl] unaligned address: 0x%08x\n", avl_address);
 				return false;
 			}
@@ -102,6 +113,15 @@ namespace taller::avalon
 		}
 
 		return true;
+	}
+
+	template<class Platform>
+	void interconnect<Platform>::bail() noexcept
+	{
+		for(auto &binding : devices)
+		{
+			binding.dev.bail();
+		}
 	}
 
 	template<class Platform>
