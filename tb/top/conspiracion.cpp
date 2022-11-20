@@ -192,6 +192,11 @@ int main(int argc, char **argv)
 		parser, "headless", "Disable video output", {"headless"}
 	);
 
+	args::Flag no_tty
+	(
+		parser, "no-tty", "Disable TTY takeoveer", {"no-tty"}
+	);
+
 	args::ValueFlag<unsigned> cycles
 	(
 		parser, "cycles", "Number of core cycles to run", {"cycles"}, 256
@@ -251,7 +256,7 @@ int main(int argc, char **argv)
 	interconnect<Vconspiracion_vga_domain> avl_vga(*top.conspiracion->plat->vga);
 
 	mem<std::uint32_t> hps_ddr3(0x0000'0000, 512 << 20);
-	jtag_uart ttyj0(0x3000'0000);
+	jtag_uart ttyJ0(0x3000'0000);
 	interval_timer timer(0x3002'0000);
 	mem<std::uint32_t> vram(0x3800'0000, 64 << 20);
 	null vram_null(0x3800'0000, 64 << 20, 2);
@@ -267,7 +272,7 @@ int main(int argc, char **argv)
 	bool enable_video = !headless;
 
 	avl.attach(hps_ddr3);
-	avl.attach(ttyj0);
+	avl.attach(ttyJ0);
 	avl.attach(timer);
 
 	for(auto &slave : consts)
@@ -334,6 +339,7 @@ int main(int argc, char **argv)
 
 		if(top.clk_clk)
 		{
+			ttyJ0.tick();
 			timer.tick();
 		}
 
@@ -364,6 +370,11 @@ int main(int argc, char **argv)
 		tick();
 	};
 
+	if(!no_tty)
+	{
+		ttyJ0.takeover();
+	}
+
 	top.halt = 0;
 	top.rst_n = 0;
 	cycle();
@@ -376,6 +387,11 @@ int main(int argc, char **argv)
 		{
 			break;
 		}
+	}
+
+	if(!no_tty)
+	{
+		ttyJ0.release();
 	}
 
 	if(enable_trace)

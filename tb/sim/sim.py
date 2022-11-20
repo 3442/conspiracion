@@ -249,7 +249,7 @@ mem_dumps = module_get('mem_dumps', [])
 if init := module_get('init'):
     init()
 
-exec_args = [verilated, '--headless', '--cycles', str(cycles), '--dump-regs']
+exec_args = [verilated, '--headless', '--no-tty', '--cycles', str(cycles), '--dump-regs']
 
 for rng in mem_dumps:
     length = rng.stop - rng.start

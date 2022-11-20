@@ -1,3 +1,5 @@
+#include <cstdint>
+
 #include "avalon.hpp"
 #include "interval_timer.hpp"
 

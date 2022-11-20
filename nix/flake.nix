@@ -5,6 +5,7 @@
   in {
     devShells."${system}".default = pkgs.mkShell {
       buildInputs = with pkgs; [
+        ncurses
         openssl
         SDL2
       ];
@@ -30,8 +31,8 @@
         export CROSS_COMPILE=arm-none-eabi-
 
         export MAKEFLAGS="AR=gcc-ar"
-        export CXXFLAGS="-O3 -flto $(pkg-config --cflags sdl2)"
-        export LDFLAGS="-O3 -flto $(pkg-config --libs sdl2)"
+        export CXXFLAGS="-O3 -flto $(pkg-config --cflags sdl2 ncursesw)"
+        export LDFLAGS="-O3 -flto $(pkg-config --libs sdl2 ncursesw)"
 
         # <https://discourse.nixos.org/t/fonts-in-nix-installed-packages-on-a-non-nixos-system/5871/7>
         export LOCALE_ARCHIVE="${pkgs.glibcLocales}/lib/locale/locale-archive"
