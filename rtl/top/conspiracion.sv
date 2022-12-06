@@ -4,6 +4,7 @@ module conspiracion
 	input  wire        rst_n,
 	input  wire        halt,
 	output wire        cpu_halted,
+	output wire        breakpoint,
 	output wire [12:0] memory_mem_a,
 	output wire [2:0]  memory_mem_ba,
 	output wire        memory_mem_ck,

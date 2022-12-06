@@ -29,6 +29,7 @@ module core_decode
 	assign dec_ctrl.mul = mul;
 	assign dec_ctrl.psr = psr;
 	assign dec_ctrl.ldst = ldst;
+	assign dec_ctrl.bkpt = bkpt;
 	assign dec_ctrl.branch = branch;
 	assign dec_ctrl.coproc = coproc;
 	assign dec_ctrl.execute = execute;
@@ -44,8 +45,8 @@ module core_decode
 	assign dec_psr.restore_spsr = restore_spsr;
 
 	logic execute, undefined, conditional, writeback, update_flags,
-	      restore_spsr, branch, ldst, mul, psr, coproc, psr_saved,
-	      psr_write, psr_wr_flags, psr_wr_control;
+	      restore_spsr, branch, ldst, mul, psr, coproc, bkpt,
+	      psr_saved, psr_write, psr_wr_flags, psr_wr_control;
 
 	core_decode_mux mux
 	(

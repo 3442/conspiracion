@@ -209,4 +209,8 @@
 
 `define FIELD_SWI_IMM [23:0]
 
+// GDB swbreak (a magic 'und')
+
+`define INSN_GDB_SWBREAK 28'h7ffdefe 
+
 `endif

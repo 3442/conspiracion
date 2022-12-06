@@ -14,7 +14,9 @@ module arm810
 	input  word       bus_data_rd,
 	output word       bus_data_wr,
 	output logic[3:0] bus_data_be,
-	output logic      halted
+
+	output logic      halted,
+	                  breakpoint
 );
 
 	ptr fetch_insn_pc, fetch_head, insn_addr;

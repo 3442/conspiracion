@@ -87,7 +87,8 @@ typedef struct packed
 	      coproc,
 	      ldst,
 	      mul,
-	      psr;
+	      psr,
+	      bkpt;
 } ctrl_decode;
 
 typedef struct packed

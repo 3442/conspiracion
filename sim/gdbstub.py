@@ -50,14 +50,14 @@ def halt():
 
         client.send(b'+')
 
-        if data[0] == b'?'[0]:
+        if data == b'?':
             out = b'S05'
         elif data[0] == b'c'[0]:
             assert not data[1:] #TODO
             break
-        elif data[0] == b'D'[0]:
+        elif data == b'D':
             out = b'OK'
-        elif data[0] == b'g'[0]:
+        elif data == b'g':
             out = hexout(read_reg(gdb_reg(r)) for r in range(16))
         elif data[0] == b'm'[0]:
             addr, length = (int(x, 16) for x in data[1:].split(b','))
@@ -128,7 +128,6 @@ def hexout(data, size=4):
     elif type(data) is bytes:
         return data.hex().encode('ascii')
     elif type(data) is int:
-        data = [data]
+        return data.to_bytes(size, 'little').hex().encode('ascii')
 
-    return b''.join(hex(d)[2:].zfill(2 * size)[:2 * size].encode('ascii') for d in data)
-
+    return b''.join(hexout(d) for d in data)

@@ -24,7 +24,7 @@ module core_control_stall
 	logic pc_rd_hazard, pc_wr_hazard, rn_pc_hazard, snd_pc_hazard, psr_hazard, flags_hazard;
 
 	assign stall = !next_cycle.issue || next_bubble || halt;
-	assign halted = halt && !next_bubble;
+	assign halted = halt && !next_bubble && next_cycle.issue;
 	assign next_bubble = pc_rd_hazard || pc_wr_hazard || flags_hazard || psr_hazard;
 
 	//FIXME: pc_rd_hazard no debería definirse sin final_writeback?

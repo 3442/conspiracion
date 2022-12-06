@@ -57,6 +57,7 @@ module core_decode_mux
 	                     mul,
 	                     psr,
 	                     coproc,
+	                     bkpt,
 	                     psr_saved,
 	                     psr_write,
 	                     psr_wr_flags,
@@ -71,6 +72,7 @@ module core_decode_mux
 	always_comb begin
 		mul = 0;
 		ldst = 0;
+		bkpt = 0;
 		branch = 0;
 		coproc = 0;
 		execute = 1;
@@ -230,6 +232,14 @@ module core_decode_mux
 				writeback = 1;
 			end
 
+`ifdef VERILATOR
+			// No es parte de ARM del todo, es un hack para soportar gdb
+			`INSN_GDB_SWBREAK: begin
+				bkpt = 1;
+				dec_data.uses_rn = 0;
+			end
+`endif
+
 			default:
 				undefined = 1;
 		endcase
@@ -252,6 +262,7 @@ module core_decode_mux
 
 			mul = 1'bx;
 			psr = 1'bx;
+			bkpt = 1'bx;
 			ldst = 1'bx;
 			branch = 1'bx;
 			coproc = 1'bx;

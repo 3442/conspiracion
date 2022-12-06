@@ -379,6 +379,11 @@ int main(int argc, char **argv)
 	{
 		tick();
 		tick();
+
+		if(top.breakpoint)
+		{
+			top.halt = 1;
+		}
 	};
 
 	if(!no_tty)
@@ -481,7 +486,7 @@ int main(int argc, char **argv)
 				const char *cmd = std::strtok(line, " ");
 				if(!std::strcmp(cmd, "continue"))
 				{
-					top.halt = false;
+					top.halt = 0;
 					break;
 				} else if(!std::strcmp(cmd, "dump-mem"))
 				{

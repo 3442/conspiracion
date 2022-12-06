@@ -32,6 +32,7 @@ module core_control
 	                       stall,
 	                       branch,
 	                       writeback,
+	                       breakpoint,
 	                       update_flags,
 	                       c_in,
 	output reg_num         rd,

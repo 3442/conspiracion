@@ -18,6 +18,7 @@ module core_control_issue
 
 	output logic       issue,
 	                   undefined,
+	                   breakpoint,
 	output ptr         pc,
 	                   pc_visible,
 	                   next_pc_visible
@@ -27,6 +28,7 @@ module core_control_issue
 
 	assign valid = !next_bubble && !halt;
 	assign issue = next_cycle.issue && dec.ctrl.execute && valid;
+	assign breakpoint = issue && dec.ctrl.bkpt;
 	assign next_pc_visible = insn_pc + 2;
 
 	always_ff @(posedge clk or negedge rst_n)
