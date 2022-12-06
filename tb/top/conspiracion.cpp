@@ -197,9 +197,19 @@ int main(int argc, char **argv)
 		parser, "no-tty", "Disable TTY takeoveer", {"no-tty"}
 	);
 
+	args::Flag start_halted
+	(
+		parser, "start-halted", "Halt before running the first instruction", {"start-halted"}
+	);
+
 	args::ValueFlag<unsigned> cycles
 	(
 		parser, "cycles", "Number of core cycles to run", {"cycles"}, 256
+	);
+
+	args::ValueFlag<int> control_fd
+	(
+		parser, "fd", "Control file descriptor", {"control-fd"}, -1
 	);
 
 	args::ValueFlagList<mem_region> dump_mem
@@ -209,7 +219,7 @@ int main(int argc, char **argv)
 
 	args::ValueFlagList<mem_init> const_
 	(
-		parser, "addr,value", "Add a constant map", {"const"}
+		parser, "addr,value", "Add a constant mapping", {"const"}
 	);
 
 	args::ValueFlagList<file_load> loads
@@ -238,6 +248,13 @@ int main(int argc, char **argv)
 	{
 		std::cerr << e.what() << std::endl;
 		std::cerr << parser;
+		return EXIT_FAILURE;
+	}
+
+	FILE *ctrl = stdout;
+	if(*control_fd != -1 && (ctrl = fdopen(*control_fd, "r+")) == nullptr)
+	{
+		std::perror("fdopen()");
 		return EXIT_FAILURE;
 	}
 
@@ -369,17 +386,136 @@ int main(int argc, char **argv)
 		ttyJ0.takeover();
 	}
 
-	top.halt = 0;
+	top.halt = start_halted;
 	top.rst_n = 0;
 	cycle();
 	top.rst_n = 1;
 
-	for(unsigned i = 0; i < *cycles; ++i)
+	auto do_reg_dump = [&]()
 	{
-		cycle();
-		if(failed)
+		std::fputs("=== dump-regs ===\n", ctrl);
+
+		const auto &core = *top.conspiracion->core;
+		const auto &regfile = core.regs->a->file;
+
+		int i = 0;
+		for(const auto *name : gp_regs)
 		{
-			break;
+			std::fprintf(ctrl, "%08x %s\n", regfile[i++], name);
+		}
+
+		std::fprintf(ctrl, "%08x pc\n", core.control->pc << 2);
+		std::fprintf(ctrl, "%08x cpsr\n", core.psr->cpsr_word);
+		std::fprintf(ctrl, "%08x spsr_svc\n", core.psr->spsr_svc_word);
+		std::fprintf(ctrl, "%08x spsr_abt\n", core.psr->spsr_abt_word);
+		std::fprintf(ctrl, "%08x spsr_und\n", core.psr->spsr_und_word);
+		std::fprintf(ctrl, "%08x spsr_fiq\n", core.psr->spsr_fiq_word);
+		std::fprintf(ctrl, "%08x spsr_irq\n", core.psr->spsr_irq_word);
+		std::fputs("=== end-regs ===\n", ctrl);
+	};
+
+	auto do_mem_dump = [&](const mem_region *dumps, std::size_t count)
+	{
+		std::fputs("=== dump-mem ===\n", ctrl);
+		for(std::size_t i = 0; i < count; ++i)
+		{
+			const auto &dump = dumps[i];
+
+			std::fprintf(ctrl, "%08x ", static_cast<std::uint32_t>(dump.start));
+			for(std::size_t i = 0; i < dump.length; ++i)
+			{
+				auto word = avl.dump(dump.start + i);
+				word = (word & 0xff) << 24
+					 | ((word >> 8) & 0xff) << 16
+					 | ((word >> 16) & 0xff) << 8
+					 | ((word >> 24) & 0xff);
+
+				std::fprintf(ctrl, "%08x", word);
+			}
+
+			std::fputc('\n', ctrl);
+		}
+
+		std::fputs("=== end-mem ===\n", ctrl);
+	};
+
+	unsigned i = 0;
+	while(!failed && i < *cycles)
+	{
+		for(; i < *cycles; ++i)
+		{
+			cycle();
+			if(failed || top.cpu_halted) [[unlikely]]
+			{
+				break;
+			}
+		}
+
+		if(top.cpu_halted)
+		{
+			do_reg_dump();
+			std::fputs("=== halted ===\n", ctrl);
+
+			char *line = nullptr;
+			std::size_t buf_size = 0;
+
+			while(true)
+			{
+				ssize_t read = getline(&line, &buf_size, ctrl);
+				if(read == -1)
+				{
+					if(!std::feof(ctrl))
+					{
+						std::perror("getline()");
+						failed = true;
+					}
+
+					break;
+				}
+
+				if(read > 0 && line[read - 1] == '\n')
+				{
+					line[read - 1] = '\0';
+				}
+
+				const char *cmd = std::strtok(line, " ");
+				if(!std::strcmp(cmd, "continue"))
+				{
+					top.halt = false;
+					break;
+				} else if(!std::strcmp(cmd, "dump-mem"))
+				{
+					mem_region dump = {};
+					std::sscanf(std::strtok(nullptr, " "), "%zu", &dump.start);
+					std::sscanf(std::strtok(nullptr, " "), "%zu", &dump.length);
+					do_mem_dump(&dump, 1);
+				} else if(!std::strcmp(cmd, "patch-mem"))
+				{
+					std::uint32_t addr;
+					std::sscanf(std::strtok(nullptr, " "), "%u", &addr);
+
+					const char *data = std::strtok(nullptr, " ");
+					std::size_t length = std::strlen(data);
+
+					while(data && length >= 8)
+					{
+						std::uint32_t word;
+						std::sscanf(data, "%08x", &word);
+
+						data += 8;
+						length -= 8;
+
+						word = (word & 0xff) << 24
+							 | ((word >> 8) & 0xff) << 16
+							 | ((word >> 16) & 0xff) << 8
+							 | ((word >> 24) & 0xff);
+
+						avl.patch(addr++, word);
+					}
+				}
+			}
+
+			std::free(line);
 		}
 	}
 
@@ -395,49 +531,20 @@ int main(int argc, char **argv)
 
 	if(dump_regs || failed)
 	{
-		std::puts("=== dump-regs ===");
-
-		const auto &core = *top.conspiracion->core;
-		const auto &regfile = core.regs->a->file;
-
-		int i = 0;
-		for(const auto *name : gp_regs)
-		{
-			std::printf("%08x %s\n", regfile[i++], name);
-		}
-
-		std::printf("%08x pc\n", core.control->pc << 2);
-		std::printf("%08x cpsr\n", core.psr->cpsr_word);
-		std::printf("%08x spsr_svc\n", core.psr->spsr_svc_word);
-		std::printf("%08x spsr_abt\n", core.psr->spsr_abt_word);
-		std::printf("%08x spsr_und\n", core.psr->spsr_und_word);
-		std::printf("%08x spsr_fiq\n", core.psr->spsr_fiq_word);
-		std::printf("%08x spsr_irq\n", core.psr->spsr_irq_word);
+		do_reg_dump();
 	}
 
 	const auto &dumps = *dump_mem;
 	if(!dumps.empty())
 	{
-		std::puts("=== dump-mem ===");
-	}
-
-	for(const auto &dump : dumps)
-	{
-		std::printf("%08x ", static_cast<std::uint32_t>(dump.start));
-		for(std::size_t i = 0; i < dump.length; ++i)
-		{
-			auto word = avl.dump(dump.start + i);
-			word = (word & 0xff) << 24
-				 | ((word >> 8) & 0xff) << 16
-				 | ((word >> 16) & 0xff) << 8
-				 | ((word >> 24) & 0xff);
-
-			std::printf("%08x", word);
-		}
-
-		std::putchar('\n');
+		do_mem_dump(dumps.data(), dumps.size());
 	}
 
 	top.final();
+	if(ctrl != stdout)
+	{
+		std::fclose(ctrl);
+	}
+
 	return failed ? EXIT_FAILURE : EXIT_SUCCESS;
 }

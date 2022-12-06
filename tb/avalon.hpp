@@ -81,6 +81,7 @@ namespace taller::avalon
 			void bail() noexcept;
 
 			std::uint32_t dump(std::uint32_t addr);
+			void patch(std::uint32_t addr, std::uint32_t readdata);
 
 		private:
 			struct binding
@@ -98,6 +99,8 @@ namespace taller::avalon
 			unsigned             avl_byteenable = 0;
 			bool                 avl_read       = false;
 			bool                 avl_write      = false;
+
+			slave &resolve_external(std::uint32_t avl_address);
 	};
 }
 

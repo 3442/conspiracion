@@ -3,7 +3,8 @@ VCD_DIR       := vcd
 OBJ_DIR       := obj
 RTL_DIR       := rtl
 TB_DIR        := tb
-SIM_DIR       := $(TB_DIR)/sim
+SIM_DIR       := sim
+TB_SIM_DIR    := $(TB_DIR)/sim
 SIM_OBJ_DIR   := $(OBJ_DIR)/$(TOP)/sim
 VERILATOR     := verilator
 CROSS_CC      := arm-none-eabi-gcc
@@ -28,10 +29,13 @@ trace/%: exe/% $(VCD_DIR)/%
 $(VCD_DIR)/%:
 	mkdir -p $@
 
-sim: $(patsubst $(SIM_DIR)/%.py,sim/%,$(filter-out $(SIM_DIR)/sim.py,$(wildcard $(SIM_DIR)/*.py)))
+sim: $(patsubst $(TB_SIM_DIR)/%.py,sim/%,$(wildcard $(TB_SIM_DIR)/*.py))
 
-sim/%: $(SIM_DIR)/sim.py $(SIM_DIR)/%.py exe/$(TOP) $(SIM_OBJ_DIR)/%.bin
-	@$< $(SIM_DIR)/$*.py $(OBJ_DIR)/$(TOP)/V$(TOP) $(SIM_OBJ_DIR)/$*.bin
+sim/%: $(SIM_DIR)/sim.py $(TB_SIM_DIR)/%.py exe/$(TOP) $(SIM_OBJ_DIR)/%.bin
+	@$< $(TB_SIM_DIR)/$*.py $(OBJ_DIR)/$(TOP)/V$(TOP) $(SIM_OBJ_DIR)/$*.bin
+
+vmlaunch: $(SIM_DIR)/sim.py $(SIM_DIR)/gdbstub.py exe/$(TOP)
+	@$< $(SIM_DIR)/gdbstub.py $(OBJ_DIR)/$(TOP)/V$(TOP) u-boot/build/u-boot-dtb.bin
 
 $(SIM_OBJ_DIR)/%.bin: $(SIM_OBJ_DIR)/%
 	$(CROSS_OBJCOPY) -O binary --only-section=._img $< $@
@@ -39,9 +43,13 @@ $(SIM_OBJ_DIR)/%.bin: $(SIM_OBJ_DIR)/%
 $(SIM_OBJ_DIR)/%: $(SIM_OBJ_DIR)/%.o $(SIM_OBJ_DIR)/start.o
 	$(CROSS_CC) $(CROSS_LDFLAGS) -o $@ -g -T $(SIM_DIR)/link.ld -nostartfiles -nostdlib $^
 
-$(SIM_OBJ_DIR)/%.o: $(SIM_DIR)/%.c
+$(SIM_OBJ_DIR)/%.o: $(TB_SIM_DIR)/%.c
 	@mkdir -p $(SIM_OBJ_DIR)
 	$(CROSS_CC) $(CROSS_CFLAGS) -o $@ -g -c $< -mcpu=arm810
+
+$(SIM_OBJ_DIR)/%.o: $(TB_SIM_DIR)/%.S
+	@mkdir -p $(SIM_OBJ_DIR)
+	$(CROSS_CC) $(CROSS_CFLAGS) -o $@ -g -c $<
 
 $(SIM_OBJ_DIR)/%.o: $(SIM_DIR)/%.S
 	@mkdir -p $(SIM_OBJ_DIR)

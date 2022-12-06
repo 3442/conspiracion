@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import importlib.util, os, pathlib, random, subprocess, sys
+import importlib.util, os, pathlib, random, socket, subprocess, sys
 
 module_path, verilated, image = sys.argv[1:]
 test_name = pathlib.Path(module_path).stem
@@ -74,9 +74,27 @@ regs = {}
 read_reg = lambda r: regs.setdefault(r, 0)
 
 dumped = []
+halted = False
+
+def recv_mem_dump():
+    dumped.clear()
+    for line in sim_end:
+        line = line.strip()
+        if line == '=== dump-mem ===' or not line:
+            continue
+        elif line == '=== end-mem ===':
+            break
+
+        base, data = line.split()
+        dumped.append((int(base, 16) << 2, bytes.fromhex(data)))
+
 def read_mem(base, length):
     fragments = []
     i = 0
+
+    if halted and length > 0:
+        print('dump-mem', base >> 2, (length + base - (base & ~0b11) + 0b11) >> 2, file=sim_end, flush=True)
+        recv_mem_dump()
 
     while length > 0:
         assert i < len(dumped), f'memory at 0x{base:08x} not dumped'
@@ -95,6 +113,19 @@ def read_mem(base, length):
             i += 1
 
     return b''.join(fragments)
+
+def write_mem(base, data):
+    assert halted
+ 
+    if not data:
+        return
+
+    prefix = read_mem(base & ~0b11, base & 0b11)
+    suffix = read_mem(base + len(data), (4 - ((base + len(data)) & 0b11)) & 0b11)
+    print('patch-mem ', base >> 2, ' ', prefix.hex(), data.hex(), suffix.hex(), sep='', file=sim_end, flush=True)
+
+    #TODO: Invalidate written addresses only
+    dumped.clear()
 
 def hexdump(base, memory):
     lines = []
@@ -233,6 +264,7 @@ module = importlib.util.module_from_spec(spec)
 prelude = {
     'read_reg':    read_reg,
     'read_mem':    read_mem,
+    'write_mem':   write_mem,
     'assert_reg':  assert_reg,
     'assert_mem':  assert_mem,
     'init_reg':    init_reg,
@@ -267,6 +299,15 @@ for addr, const in module_get('consts', {}).items():
 for addr, filename in module_get('loads', {}).items():
     exec_args.extend(['--load', f'{addr},{filename}'])
 
+if module_get('start_halted', False):
+    exec_args.append('--start-halted')
+
+sim_end, target_end = socket.socketpair()
+sim_end = sim_end.makefile('rw')
+target_fd = target_end.fileno()
+
+exec_args.extend(['--control-fd', str(target_fd)])
+
 init_regs = None
 exec_args.append(image)
 
@@ -274,29 +315,45 @@ exec_args.append(f'+verilator+seed+{seed}')
 if not os.getenv('SIM_PULLX', 0):
     exec_args.append('+verilator+rand+reset+2')
 
-output = subprocess.run(exec_args, stdout=subprocess.PIPE, text=True)
-if output.returncode != 0:
-    exit(success=False)
+process = subprocess.Popen(exec_args, pass_fds=(target_fd,))
+target_end.close()
 
 in_regs = False
-in_mem = False
+halt = module_get('halt')
 
-for line in output.stdout.split('\n'):
-    if line == '=== dump-regs ===':
-        in_regs = True
-    elif line == '=== dump-mem ===':
-        in_mem = True
-    elif not line:
-        continue
-    elif in_mem:
-        base, data = line.split()
-        dumped.append((int(base, 16) << 2, bytes.fromhex(data)))
-    elif in_regs:
-        value, reg = line.split()
-        regs[reg] = int(value, 16)
+while True:
+    for line in sim_end:
+        line = line.strip()
+        if line == '=== halted ===':
+            break
+        if line == '=== dump-regs ===':
+            in_regs = True
+        elif line == '=== end-regs ===':
+            in_regs = False
+        elif line == '=== dump-mem ===':
+            recv_mem_dump()
+        elif not line:
+            continue
+        elif in_regs:
+            value, reg = line.split()
+            regs[reg] = int(value, 16)
+        else:
+            while_running()
+            print(f'{COLOR_BLUE}{line}{COLOR_RESET}')
     else:
-        while_running()
-        print(f'{COLOR_BLUE}{line}{COLOR_RESET}')
+        break
+
+    halted = True
+    if halt:
+        halt()
+
+    print('continue', file=sim_end, flush=True)
+    if not halt:
+        break
+
+process.wait(timeout=1)
+if process.returncode != 0:
+    exit(success=False)
 
 if final := module_get('final'):
     final()

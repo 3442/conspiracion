@@ -3,6 +3,7 @@ module conspiracion
 	input  wire        clk_clk,
 	input  wire        rst_n,
 	input  wire        halt,
+	output wire        cpu_halted,
 	output wire [12:0] memory_mem_a,
 	output wire [2:0]  memory_mem_ba,
 	output wire        memory_mem_ck,
@@ -46,7 +47,7 @@ module conspiracion
 	logic[3:0] data_be;
 	logic[29:0] addr;
 	logic[31:0] data_rd, data_wr;
-	logic reset_reset_n, cpu_clk, cpu_rst_n, cpu_halt, cpu_halted,
+	logic reset_reset_n, cpu_clk, cpu_rst_n, cpu_halt,
 	      ready, write, start, irq;
 
 `ifdef VERILATOR

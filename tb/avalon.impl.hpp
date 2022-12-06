@@ -128,25 +128,45 @@ namespace taller::avalon
 	std::uint32_t interconnect<Platform>::dump(std::uint32_t addr)
 	{
 		std::uint32_t avl_address = addr << 2;
+		auto &dev = resolve_external(avl_address);
 
+		auto pos = (avl_address & ~dev.address_mask()) >> dev.word_bits();
+
+		std::uint32_t readdata;
+		while(!dev.read(pos, readdata))
+		{
+			continue;
+		}
+
+		return readdata;
+	}
+
+	template<class Platform>
+	void interconnect<Platform>::patch(std::uint32_t addr, std::uint32_t writedata)
+	{
+		std::uint32_t avl_address = addr << 2;
+		auto &dev = resolve_external(avl_address);
+
+		auto pos = (avl_address & ~dev.address_mask()) >> dev.word_bits();
+
+		while(!dev.write(pos, writedata, 0b1111))
+		{
+			continue;
+		}
+	}
+
+	template<class Platform>
+	slave& interconnect<Platform>::resolve_external(std::uint32_t avl_address)
+	{
 		for(auto &binding : devices)
 		{
 			if((avl_address & binding.mask) == binding.base)
 			{
-				auto &dev = binding.dev;
-				auto pos = (avl_address & ~dev.address_mask()) >> 2;
-
-				std::uint32_t readdata;
-				while(!dev.read(pos, readdata))
-				{
-					continue;
-				}
-
-				return readdata;
+				return binding.dev;
 			}
 		}
 
-		fprintf(stderr, "[avl] attempt to dump memory hole at 0x%08x\n", addr);
+		fprintf(stderr, "[avl] attempt to access hole at 0x%08x\n", avl_address);
 		assert(false);
 	}
 }
