@@ -391,6 +391,7 @@ int main(int argc, char **argv)
 		ttyJ0.takeover();
 	}
 
+	top.step = 0;
 	top.halt = start_halted;
 	top.rst_n = 0;
 	cycle();
@@ -458,6 +459,9 @@ int main(int argc, char **argv)
 
 		if(top.cpu_halted)
 		{
+			top.step = 0;
+			top.halt = 0;
+
 			do_reg_dump();
 			std::fputs("=== halted ===\n", ctrl);
 
@@ -486,7 +490,10 @@ int main(int argc, char **argv)
 				const char *cmd = std::strtok(line, " ");
 				if(!std::strcmp(cmd, "continue"))
 				{
-					top.halt = 0;
+					break;
+				} else if(!std::strcmp(cmd, "step"))
+				{
+					top.step = 1;
 					break;
 				} else if(!std::strcmp(cmd, "dump-mem"))
 				{

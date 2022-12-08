@@ -11,18 +11,20 @@ module core_fetch
 	             wr_pc,
 	             prefetch_flush,
 	input  ptr   branch_target,
+	             porch_insn_pc,
 	input  word  wr_current,
 	             fetch_data,
 
 	output logic fetch,
 	             flush,
+	             nop,
 	output word  insn,
 	output ptr   insn_pc,
 	             addr,
 	             fetch_head
 );
 
-	ptr next_pc, hold_addr, target;
+	ptr hold_addr, target;
 	logic branch, prefetch_ready, fetched_valid, discard, pending, next_pending;
 
 	assign fetch = prefetch_ready && !discard;
@@ -44,7 +46,7 @@ module core_fetch
 		if(branch)
 			fetch_head = target;
 		else if(prefetch_flush)
-			fetch_head = next_pc;
+			fetch_head = porch_insn_pc;
 		else
 			fetch_head = {30{1'bx}};
 

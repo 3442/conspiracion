@@ -13,15 +13,17 @@ module core_prefetch
 
 	output word  insn,
 	output ptr   insn_pc,
-	             next_pc,
-	output logic fetch
+	output logic fetch,
+	             nop
 );
 
 	localparam SIZE = (1 << ORDER) - 1;
 
+	ptr next_pc;
 	logic[31:0] prefetch[SIZE];
 	logic[ORDER - 1:0] valid;
 
+	assign nop = flush ? 1 : ~|valid;
 	assign insn = flush ? `NOP : prefetch[0];
 	assign next_pc = ~stall & |valid ? insn_pc + 1 : insn_pc;
 	assign fetch = !stall || ~&valid;

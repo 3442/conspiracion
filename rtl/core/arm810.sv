@@ -6,6 +6,7 @@ module arm810
 	                  rst_n,
 	                  irq,
 	                  halt,
+	                  step,
 
 	output ptr        bus_addr,
 	output logic      bus_start,
@@ -21,19 +22,21 @@ module arm810
 
 	ptr fetch_insn_pc, fetch_head, insn_addr;
 	word fetch_insn;
-	logic stall, flush, prefetch_flush, insn_start;
+	logic fetch_nop, stall, flush, prefetch_flush, insn_start;
 
 	//TODO
-	assign prefetch_flush = 0;
+	assign prefetch_flush = halt;
 
 	core_fetch #(.PREFETCH_ORDER(2)) fetch
 	(
+		.nop(fetch_nop),
 		.addr(insn_addr),
 		.insn(fetch_insn),
 		.fetch(insn_start),
 		.fetched(insn_ready),
 		.insn_pc(fetch_insn_pc),
 		.fetch_data(insn_data_rd),
+		.porch_insn_pc(insn_pc),
 		.*
 	);
 

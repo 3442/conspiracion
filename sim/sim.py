@@ -343,11 +343,12 @@ while True:
     else:
         break
 
+    mode = None
     halted = True
     if halt:
-        halt()
+        mode = halt()
 
-    print('continue', file=sim_end, flush=True)
+    print('step' if mode == 'step' else 'continue', file=sim_end, flush=True)
     if not halt:
         break
 

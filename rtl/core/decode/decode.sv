@@ -26,6 +26,7 @@ module core_decode
 	assign dec.branch = dec_branch;
 	assign dec.coproc = dec_coproc;
 
+	assign dec_ctrl.nop = 0;
 	assign dec_ctrl.mul = mul;
 	assign dec_ctrl.psr = psr;
 	assign dec_ctrl.ldst = ldst;

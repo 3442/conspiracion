@@ -22,8 +22,8 @@ def halt():
 
     if haltFromStop:
         reply(b'S05')
-        haltFromStop = False
 
+    haltFromStop = True
     while True:
         data = client.recv(4096)
         if not data:
@@ -52,9 +52,8 @@ def halt():
 
         if data == b'?':
             out = b'S05'
-        elif data[0] == b'c'[0]:
-            assert not data[1:] #TODO
-            break
+        elif data == b'c':
+            return 'continue'
         elif data == b'D':
             out = b'OK'
         elif data == b'g':
@@ -74,13 +73,13 @@ def halt():
         elif data[0] == b'p'[0]:
             reg = gdb_reg(int(data[1:], 16))
             out = hexout(read_reg(reg) if reg is not None else None)
+        elif data == b's':
+            return 'step'
         else:
-            print('unhandled packet:', data)
+            print('unhandled packet:', data, file=sys.stderr)
             out = b''
 
         reply(out)
-
-    haltFromStop = True
 
 def reply(out):
     client.send(b'$' + out + b'#' + hexout(sum(out) & 0xff, 1))
@@ -100,26 +99,27 @@ def gdb_reg(n):
         if mode == 0b10001:
             regs = (r8_fiq, r9_fiq, r10_fiq, r11_fiq, r12_fiq)
         else:
-            regs = (r8_fiq, r9_fiq, r10_fiq, r11_fiq, r12_fiq)
+            regs = (r8_usr, r9_usr, r10_usr, r11_usr, r12_usr)
 
         return regs[n - 8]
 
     if 13 <= n < 15:
         if mode == 0b10011:
             regs = (r13_svc, r14_svc)
-        if mode == 0b10111:
+        elif mode == 0b10111:
             regs = (r13_abt, r14_abt)
-        if mode == 0b11011:
+        elif mode == 0b11011:
             regs = (r13_und, r14_und)
-        if mode == 0b10010:
+        elif mode == 0b10010:
             regs = (r13_irq, r14_irq)
-        if mode == 0b10001:
+        elif mode == 0b10001:
             regs = (r13_fiq, r14_fiq)
         else:
             regs = (r13_usr, r14_usr)
 
         return regs[n - 13]
 
+    print('bad gdb regnum:', n, file=sys.stderr)
     return None
 
 def hexout(data, size=4):

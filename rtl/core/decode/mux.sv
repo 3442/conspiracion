@@ -262,7 +262,6 @@ module core_decode_mux
 
 			mul = 1'bx;
 			psr = 1'bx;
-			bkpt = 1'bx;
 			ldst = 1'bx;
 			branch = 1'bx;
 			coproc = 1'bx;

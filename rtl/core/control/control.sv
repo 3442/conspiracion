@@ -5,6 +5,7 @@ module core_control
 	input  logic           clk,
 	                       rst_n,
 	                       halt,
+	                       step,
 
 	input  insn_decode     dec,
 	input  ptr             insn_pc,
@@ -152,6 +153,11 @@ module core_control
 	);
 
 	core_control_coproc ctrl_cp
+	(
+		.*
+	);
+
+	core_control_debug ctrl_dbg
 	(
 		.*
 	);
