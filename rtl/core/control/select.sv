@@ -29,7 +29,9 @@ module core_control_select
 		if(next_cycle.issue) begin
 			ra = dec.data.rn;
 			rb = dec.snd.r;
-		end else if(next_cycle.transfer) begin
+		end else if(next_cycle.rd_indirect_shift)
+			rb = r_shift;
+		else if(next_cycle.transfer) begin
 			if(ldst_next)
 				// final_rd viene de dec.ldst.rd
 				rb = pop_valid ? popped : final_rd;

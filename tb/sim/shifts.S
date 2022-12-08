@@ -14,4 +14,7 @@ reset:
 	# tmp = 0
 	# r2 = r0 = 00015000
 	eor r2, r0, r2, asr #7
+	ldr r4, =(512 << 20)
+	ldr r5, =#60
+	lsr r4, r4, r5
 	mov pc, lr
