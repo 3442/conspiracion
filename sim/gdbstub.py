@@ -1,5 +1,6 @@
 import sys, socket
 
+cycles = None
 start_halted = True
 
 def init():

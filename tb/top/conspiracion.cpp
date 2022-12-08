@@ -1,3 +1,4 @@
+#include <climits>
 #include <cstdio>
 #include <cstdint>
 #include <cstdlib>
@@ -204,7 +205,7 @@ int main(int argc, char **argv)
 
 	args::ValueFlag<unsigned> cycles
 	(
-		parser, "cycles", "Number of core cycles to run", {"cycles"}, 256
+		parser, "cycles", "Max number of core cycles to run", {"cycles"}, UINT_MAX
 	);
 
 	args::ValueFlag<int> control_fd
@@ -446,9 +447,10 @@ int main(int argc, char **argv)
 	};
 
 	unsigned i = 0;
-	while(!failed && i < *cycles)
+	// Abuse unsigned overflow (cycles is UINT_MAX by default)
+	while(!failed && i + 1 <= *cycles)
 	{
-		for(; i < *cycles; ++i)
+		for(; i + 1 <= *cycles; ++i)
 		{
 			cycle();
 			if(failed || top.cpu_halted) [[unlikely]]
