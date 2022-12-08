@@ -1,6 +1,7 @@
 import sys, socket
 
 cycles = None
+enable_tty = True
 start_halted = True
 
 def init():
@@ -77,7 +78,6 @@ def halt():
         elif data == b's':
             return 'step'
         else:
-            print('unhandled packet:', data, file=sys.stderr)
             out = b''
 
         reply(out)

@@ -280,11 +280,14 @@ mem_dumps = module_get('mem_dumps', [])
 if init := module_get('init'):
     init()
 
-exec_args = [verilated, '--headless', '--no-tty', '--dump-regs']
+exec_args = [verilated, '--headless', '--dump-regs']
 
 cycles = module_get('cycles', 1024)
 if cycles is not None:
     exec_args.extend(['--cycles', str(cycles)])
+
+if not module_get('enable_tty', False):
+    exec_args.append('--no-tty')
 
 for rng in mem_dumps:
     length = rng.stop - rng.start
