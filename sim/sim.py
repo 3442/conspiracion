@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import importlib.util, os, pathlib, random, socket, subprocess, sys
+import importlib.util, os, pathlib, random, selectors, signal, socket, subprocess, sys
 
 module_path, verilated, image = sys.argv[1:]
 test_name = pathlib.Path(module_path).stem
@@ -258,17 +258,26 @@ if test_name in os.getenv('SIM_SKIP', '').split(','):
 
     exit(success=True)
 
+sel = selectors.DefaultSelector()
+def interrupt():
+    if not halted:
+        process.send_signal(signal.SIGUSR1)
+
+def register_interrupt(source):
+    sel.register(source, selectors.EVENT_READ, interrupt)
+
 spec = importlib.util.spec_from_file_location('sim', module_path)
 module = importlib.util.module_from_spec(spec)
 
 prelude = {
-    'read_reg':    read_reg,
-    'read_mem':    read_mem,
-    'write_mem':   write_mem,
-    'assert_reg':  assert_reg,
-    'assert_mem':  assert_mem,
-    'init_reg':    init_reg,
-    'split_dword': split_dword,
+    'read_reg':           read_reg,
+    'read_mem':           read_mem,
+    'write_mem':          write_mem,
+    'assert_reg':         assert_reg,
+    'assert_mem':         assert_mem,
+    'init_reg':           init_reg,
+    'split_dword':        split_dword,
+    'register_interrupt': register_interrupt,
     }
 
 prelude.update({k: v for k, v in all_regs})
@@ -308,8 +317,8 @@ for addr, filename in module_get('loads', {}).items():
 if module_get('start_halted', False):
     exec_args.append('--start-halted')
 
-sim_end, target_end = socket.socketpair()
-sim_end = sim_end.makefile('rw')
+sim_end_sock, target_end = socket.socketpair()
+sim_end = sim_end_sock.makefile('rw')
 target_fd = target_end.fileno()
 
 exec_args.extend(['--control-fd', str(target_fd)])
@@ -327,36 +336,64 @@ target_end.close()
 in_regs = False
 halt = module_get('halt')
 
-while True:
-    for line in sim_end:
-        line = line.strip()
-        if line == '=== halted ===':
+done = False
+halted = False
+faulted = False
+
+def read_ctrl():
+    global done, halted, faulted, in_regs
+
+    while True:
+        try:
+            sim_end_sock.setblocking(False)
+            line = next(sim_end)
+        except StopIteration:
+            done = True
+            return
+        finally:
+            sim_end_sock.setblocking(True)
+
+        if line := line.strip():
+            if line == '=== halted ===':
+                halted = True
+                break
+            elif line == '=== fault ===':
+                faulted = True
+                break
+            elif line == '=== dump-regs ===':
+                in_regs = True
+            elif line == '=== end-regs ===':
+                in_regs = False
+            elif line == '=== dump-mem ===':
+                recv_mem_dump()
+            elif in_regs:
+                value, reg = line.split()
+                regs[reg] = int(value, 16)
+            else:
+                while_running()
+                print(f'{COLOR_BLUE}{line}{COLOR_RESET}')
+
+sel.register(sim_end_sock, selectors.EVENT_READ, read_ctrl)
+while not done:
+    events = sel.select()
+    for key, _ in events:
+        (key.data)()
+
+    if faulted:
+        if fatal := module_get('fatal'):
+            fatal()
+
+        break
+    elif halted:
+        mode = None
+        if halt:
+            mode = halt()
+
+        print('step' if mode == 'step' else 'continue', file=sim_end, flush=True)
+        if not halt:
             break
-        if line == '=== dump-regs ===':
-            in_regs = True
-        elif line == '=== end-regs ===':
-            in_regs = False
-        elif line == '=== dump-mem ===':
-            recv_mem_dump()
-        elif not line:
-            continue
-        elif in_regs:
-            value, reg = line.split()
-            regs[reg] = int(value, 16)
-        else:
-            while_running()
-            print(f'{COLOR_BLUE}{line}{COLOR_RESET}')
-    else:
-        break
 
-    mode = None
-    halted = True
-    if halt:
-        mode = halt()
-
-    print('step' if mode == 'step' else 'continue', file=sim_end, flush=True)
-    if not halt:
-        break
+        halted = False
 
 process.wait(timeout=1)
 if process.returncode != 0:

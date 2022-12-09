@@ -1,4 +1,5 @@
 #include <climits>
+#include <csignal>
 #include <cstdio>
 #include <cstdint>
 #include <cstdlib>
@@ -33,6 +34,8 @@
 
 namespace
 {
+	volatile sig_atomic_t async_halt = 0;
+
 	constexpr const char *gp_regs[30] =
 	{
 		[0] = "r0",
@@ -156,6 +159,11 @@ namespace
 		}
 
 		return stream;
+	}
+
+	void async_halt_handler(int)
+	{
+		async_halt = 1;
 	}
 }
 
@@ -381,7 +389,7 @@ int main(int argc, char **argv)
 		tick();
 		tick();
 
-		if(top.breakpoint)
+		if(top.breakpoint || (!(time & ((1 << 8) - 1)) && async_halt)) [[unlikely]]
 		{
 			top.halt = 1;
 		}
@@ -446,91 +454,94 @@ int main(int argc, char **argv)
 		std::fputs("=== end-mem ===\n", ctrl);
 	};
 
+	std::signal(SIGUSR1, async_halt_handler);
+
 	unsigned i = 0;
 	// Abuse unsigned overflow (cycles is UINT_MAX by default)
 	while(!failed && i + 1 <= *cycles)
 	{
-		for(; i + 1 <= *cycles; ++i)
+		do
 		{
 			cycle();
 			if(failed || top.cpu_halted) [[unlikely]]
 			{
+				goto halt_or_fail;
+			}
+		} while(++i + 1 <= *cycles);
+
+		break;
+
+halt_or_fail:
+		top.step = 0;
+		top.halt = 0;
+
+		do_reg_dump();
+		std::fprintf(ctrl, "=== %s ===\n", failed ? "fault" : "halted");
+
+		char *line = nullptr;
+		std::size_t buf_size = 0;
+
+		while(true)
+		{
+			ssize_t read = getline(&line, &buf_size, ctrl);
+			if(read == -1)
+			{
+				if(!std::feof(ctrl))
+				{
+					std::perror("getline()");
+					failed = true;
+				}
+
 				break;
 			}
-		}
 
-		if(top.cpu_halted)
-		{
-			top.step = 0;
-			top.halt = 0;
-
-			do_reg_dump();
-			std::fputs("=== halted ===\n", ctrl);
-
-			char *line = nullptr;
-			std::size_t buf_size = 0;
-
-			while(true)
+			if(read > 0 && line[read - 1] == '\n')
 			{
-				ssize_t read = getline(&line, &buf_size, ctrl);
-				if(read == -1)
-				{
-					if(!std::feof(ctrl))
-					{
-						std::perror("getline()");
-						failed = true;
-					}
-
-					break;
-				}
-
-				if(read > 0 && line[read - 1] == '\n')
-				{
-					line[read - 1] = '\0';
-				}
-
-				const char *cmd = std::strtok(line, " ");
-				if(!std::strcmp(cmd, "continue"))
-				{
-					break;
-				} else if(!std::strcmp(cmd, "step"))
-				{
-					top.step = 1;
-					break;
-				} else if(!std::strcmp(cmd, "dump-mem"))
-				{
-					mem_region dump = {};
-					std::sscanf(std::strtok(nullptr, " "), "%zu", &dump.start);
-					std::sscanf(std::strtok(nullptr, " "), "%zu", &dump.length);
-					do_mem_dump(&dump, 1);
-				} else if(!std::strcmp(cmd, "patch-mem"))
-				{
-					std::uint32_t addr;
-					std::sscanf(std::strtok(nullptr, " "), "%u", &addr);
-
-					const char *data = std::strtok(nullptr, " ");
-					std::size_t length = std::strlen(data);
-
-					while(data && length >= 8)
-					{
-						std::uint32_t word;
-						std::sscanf(data, "%08x", &word);
-
-						data += 8;
-						length -= 8;
-
-						word = (word & 0xff) << 24
-							 | ((word >> 8) & 0xff) << 16
-							 | ((word >> 16) & 0xff) << 8
-							 | ((word >> 24) & 0xff);
-
-						avl.patch(addr++, word);
-					}
-				}
+				line[read - 1] = '\0';
 			}
 
-			std::free(line);
+			const char *cmd = std::strtok(line, " ");
+			if(!std::strcmp(cmd, "continue"))
+			{
+				break;
+			} else if(!std::strcmp(cmd, "step"))
+			{
+				top.step = 1;
+				break;
+			} else if(!std::strcmp(cmd, "dump-mem"))
+			{
+				mem_region dump = {};
+				std::sscanf(std::strtok(nullptr, " "), "%zu", &dump.start);
+				std::sscanf(std::strtok(nullptr, " "), "%zu", &dump.length);
+				do_mem_dump(&dump, 1);
+			} else if(!std::strcmp(cmd, "patch-mem"))
+			{
+				std::uint32_t addr;
+				std::sscanf(std::strtok(nullptr, " "), "%u", &addr);
+
+				const char *data = std::strtok(nullptr, " ");
+				std::size_t length = std::strlen(data);
+
+				while(data && length >= 8)
+				{
+					std::uint32_t word;
+					std::sscanf(data, "%08x", &word);
+
+					data += 8;
+					length -= 8;
+
+					word = (word & 0xff) << 24
+						 | ((word >> 8) & 0xff) << 16
+						 | ((word >> 16) & 0xff) << 8
+						 | ((word >> 24) & 0xff);
+
+					avl.patch(addr++, word);
+				}
+			}
 		}
+
+		std::free(line);
+		async_halt = 0;
 	}
 
 	if(!no_tty)
@@ -543,7 +554,7 @@ int main(int argc, char **argv)
 		trace.close();
 	}
 
-	if(dump_regs || failed)
+	if(dump_regs)
 	{
 		do_reg_dump();
 	}

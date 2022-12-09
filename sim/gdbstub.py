@@ -3,29 +3,53 @@ import sys, socket
 cycles = None
 enable_tty = True
 start_halted = True
+sock, client = None, None
 
 def init():
-    global client
+    global sock
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.bind(('127.0.0.1', 1234))
     sock.listen()
-    print('Listening for gdb on', sock.getsockname(), file=sys.stderr)
-
-    client, peer = sock.accept()
-    sock.close()
-    print('Accepted connection from', peer, file=sys.stderr)
-
-buffer = b''
-haltFromStop = False
 
 def halt():
-    global buffer, haltFromStop
+    return yield_to_gdb()
 
-    if haltFromStop:
-        reply(b'S05')
+def fatal():
+    global stop_reason
+    stop_reason = 'fatal'
+    yield_to_gdb()
 
-    haltFromStop = True
+buffer = b''
+stop_reason = None
+
+def yield_to_gdb():
+    global client, buffer, stop_reason
+
+    if not client:
+        print('Listening for gdb on', sock.getsockname(), file=sys.stderr)
+
+        client, peer = sock.accept()
+        print('Accepted connection from', peer, file=sys.stderr)
+
+        register_interrupt(client)
+        stop_reason = 'reset'
+
+    dead = stop_reason == 'fatal'
+    sendStop = True
+
+    if stop_reason == 'break':
+        stop_reply = b'S05'
+    elif stop_reason == 'reset':
+        stop_reply = b'S05'
+        stop_reason = 'break'
+        sendStop = False
+    elif stop_reason == 'fatal':
+        stop_reply = b'S0a'
+
+    if sendStop:
+        reply(stop_reply)
+
     while True:
         data = client.recv(4096)
         if not data:
@@ -53,8 +77,8 @@ def halt():
         client.send(b'+')
 
         if data == b'?':
-            out = b'S05'
-        elif data == b'c':
+            out = stop_reply
+        elif data == b'c' and not dead:
             return 'continue'
         elif data == b'D':
             out = b'OK'
@@ -75,7 +99,7 @@ def halt():
         elif data[0] == b'p'[0]:
             reg = gdb_reg(int(data[1:], 16))
             out = hexout(read_reg(reg) if reg is not None else None)
-        elif data == b's':
+        elif data == b's' and not dead:
             return 'step'
         else:
             out = b''
