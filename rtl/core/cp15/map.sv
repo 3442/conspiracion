@@ -14,4 +14,67 @@
 `define CP15_CRN_DMA       4'd11
 `define CP15_CRN_PID       4'd13
 
+typedef struct packed
+{
+	logic[31:24] implementor;
+	logic[23:20] variant;
+	logic[19:16] architecture;
+	logic[15:4]  part_number;
+	logic[3:0]   revision;
+} cp15_cpuid_main;
+
+`define CP15_CPUID_CACHE 3'b001
+
+typedef struct packed
+{
+	logic[11:11] p;
+	logic[10:10] mbz;
+	logic[9:6]   size;
+	logic[5:3]   assoc;
+	logic[2:2]   m;
+	logic[1:0]   len;
+} cp15_cpuid_cache_size;
+
+typedef struct packed
+{
+	logic[31:29]          mbz;
+	logic[28:25]          ctype;
+	logic[24:24]          s;
+	cp15_cpuid_cache_size dsize,
+	                      isize;
+} cp15_cpuid_cache;
+
+`define CP15_CPUID_TCM 3'b010
+
+typedef struct packed
+{
+	logic[31:29] mbz;
+	logic[28:19] sbz0;
+	logic[18:16] dtcm;
+	logic[15:3]  sbz1;
+	logic[2:0]   itcm;
+} cp15_cpuid_tcm;
+
+`define CP15_CPUID_TLB 3'b011
+
+typedef struct packed
+{
+	logic[31:24] sbz0;
+	logic[23:16] ilsize;
+	logic[15:8]  dlsize;
+	logic[7:1]   sbz1;
+	logic[0:0]   s;
+} cp15_cpuid_tlb;
+
+`define CP15_CPUID_MPU 3'b100
+
+typedef struct packed
+{
+	logic[31:24] sbz0;
+	logic[23:16] iregion;
+	logic[15:8]  dregion;
+	logic[7:1]   sbz1;
+	logic[0:0]   s;
+} cp15_cpuid_mpu;
+
 `endif
