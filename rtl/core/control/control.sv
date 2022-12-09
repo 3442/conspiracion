@@ -24,6 +24,7 @@ module core_control
 	input  logic           mul_ready,
 	input  word            mul_q_hi,
 	                       mul_q_lo,
+	                       coproc_read,
 
 `ifdef VERILATOR
 	input  word            insn,
@@ -67,7 +68,8 @@ module core_control
 	                       psr_write,
 	                       psr_wr_flags,
 	                       psr_wr_control,
-	output word            psr_wr
+	output word            psr_wr,
+	output coproc_decode   coproc_ctrl
 );
 
 	ctrl_cycle cycle, next_cycle;
@@ -151,6 +153,8 @@ module core_control
 	(
 		.*
 	);
+
+	word coproc_wb;
 
 	core_control_coproc ctrl_cp
 	(

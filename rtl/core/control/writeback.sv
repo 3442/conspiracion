@@ -19,6 +19,7 @@ module core_control_writeback
 	input  word        saved_base,
 	                   vector,
 	                   psr_wb,
+	                   coproc_wb,
 	input  reg_num     ra,
 	                   popped,
 	                   mul_r_add_hi,
@@ -68,6 +69,8 @@ module core_control_writeback
 			wr_value = mul_q_lo;
 		else if(cycle.psr)
 			wr_value = psr_wb;
+		else if(cycle.coproc)
+			wr_value = coproc_wb;
 		else
 			// Ruta combinacional larga
 			wr_value = q_alu;

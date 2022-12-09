@@ -173,14 +173,15 @@ module arm810
 	);
 
 	logic coproc;
-	word coproc_read, coproc_write;
+	word coproc_read;
+	coproc_decode coproc_ctrl;
 
 	core_cp15 cp15
 	(
 		.transfer(coproc),
-		.dec(dec.coproc),
+		.dec(coproc_ctrl),
 		.read(coproc_read),
-		.write(coproc_write),
+		.write(rd_value_a),
 		.*
 	);
 

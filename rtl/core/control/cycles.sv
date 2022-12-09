@@ -9,6 +9,7 @@ module core_control_cycles
 	                  psr,
 	                  ldst,
 	                  bubble,
+	                  coproc,
 	                  exception,
 	                  mem_ready,
 	                  mul_add,
@@ -42,7 +43,8 @@ module core_control_cycles
 		MUL,
 		MUL_ACC_LD,
 		MUL_HI_WB,
-		PSR
+		PSR,
+		COPROC
 	} state, next_state;
 
 	// TODO: debe estar escrito de tal forma que Quartus infiera una FSM
@@ -58,6 +60,7 @@ module core_control_cycles
 	assign cycle.mul_acc_ld = state == MUL_ACC_LD;
 	assign cycle.mul_hi_wb = state == MUL_HI_WB;
 	assign cycle.psr = state == PSR;
+	assign cycle.coproc = state == COPROC;
 
 	assign next_cycle.issue = next_state == ISSUE;
 	assign next_cycle.rd_indirect_shift = next_state == RD_INDIRECT_SHIFT;
@@ -70,6 +73,7 @@ module core_control_cycles
 	assign next_cycle.mul_acc_ld = next_state == MUL_ACC_LD;
 	assign next_cycle.mul_hi_wb = next_state == MUL_HI_WB;
 	assign next_cycle.psr = next_state == PSR;
+	assign next_cycle.coproc = next_state == COPROC;
 
 	always_comb begin
 		next_state = ISSUE;
@@ -86,6 +90,8 @@ module core_control_cycles
 					next_state = RD_INDIRECT_SHIFT;
 				else if(!trivial_shift)
 					next_state = WITH_SHIFT;
+				else if(coproc)
+					next_state = COPROC;
 
 			RD_INDIRECT_SHIFT:
 				if(!trivial_shift)

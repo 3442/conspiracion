@@ -199,7 +199,8 @@ typedef struct packed
 	      mul,
 	      mul_acc_ld,
 	      mul_hi_wb,
-	      psr;
+	      psr,
+	      coproc;
 } ctrl_cycle;
 
 typedef struct packed
