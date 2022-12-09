@@ -1,6 +1,7 @@
 .global reset
 reset:
 	mov  r6, lr
+	msr  cpsr_c, #0xd3
 	mrs  r0, cpsr
 	udf
 	mrs  r2, cpsr
