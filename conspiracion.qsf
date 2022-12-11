@@ -223,9 +223,18 @@ set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/psr.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/select.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/stall.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/writeback.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/cache.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/cache_lockdown.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/cp15.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/cpuid.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/domain.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/far.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/fsr.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/map.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/syscfg.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/tlb.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/tlb_lockdown.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/ttbr.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/branch.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/coproc.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/data.sv
@@ -243,6 +252,7 @@ set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/snd.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/fetch/fetch.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/fetch/prefetch.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/mmu/arbiter.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/mmu/format.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/mmu/mmu.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/mul.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/porch/conds.sv

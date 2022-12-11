@@ -77,4 +77,50 @@ typedef struct packed
 	logic[0:0]   s;
 } cp15_cpuid_mpu;
 
+`define CP15_SYSCFG_CTRL 3'b000
+
+typedef struct packed
+{
+	logic[31:27] reserved;
+	logic[26:26] l2;
+	logic[25:25] ee;
+	logic[24:24] ve;
+	logic[23:23] xp;
+	logic[22:22] u;
+	logic[21:21] fi;
+	logic[20:20] st;
+	logic[19:19] sbz0;
+	logic[18:18] it;
+	logic[17:17] sbz1;
+	logic[16:16] dt;
+	logic[15:15] l4;
+	logic[14:14] rr;
+	logic[13:13] v;
+	logic[12:12] i;
+	logic[11:11] z;
+	logic[10:10] f;
+	logic[9:9]   r;
+	logic[8:8]   s;
+	logic[7:7]   b;
+	logic[6:6]   l;
+	logic[5:5]   d;
+	logic[4:4]   p;
+	logic[3:3]   w;
+	logic[2:2]   c;
+	logic[1:1]   a;
+	logic[0:0]   m;
+} cp15_syscfg_ctrl;
+
+`define CP15_SYSCFG_ACCESS 3'b010
+
+typedef struct packed
+{
+	logic[31:14] base;
+	logic[13:5]  sbz;
+	logic[4:3]   rgn;
+	logic[2:2]   imp;
+	logic[1:1]   s;
+	logic[0:0]   c;
+} cp15_ttbr;
+
 `endif
