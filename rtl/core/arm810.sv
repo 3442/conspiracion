@@ -1,3 +1,4 @@
+`include "core/mmu/format.sv"
 `include "core/uarch.sv"
 
 module arm810
@@ -172,8 +173,9 @@ module arm810
 		.*
 	);
 
-	logic coproc;
 	word coproc_read;
+	logic coproc, high_vectors, mmu_enable;
+	mmu_base mmu_ttbr;
 	coproc_decode coproc_ctrl;
 
 	core_cp15 cp15

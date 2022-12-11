@@ -11,11 +11,11 @@ module core_cp15_ttbr
 	                 transfer,
 	input  word      write,
 
-	output word      read
+	output word      read,
+	output mmu_base  mmu_ttbr
 );
 
 	logic s, c;
-	mmu_base base;
 	cp15_ttbr read_ttbr, write_ttbr;
 	logic[1:0] rgn;
 
@@ -27,19 +27,19 @@ module core_cp15_ttbr
 	assign read_ttbr.sbz = 9'd0;
 	assign read_ttbr.rgn = rgn;
 	assign read_ttbr.imp = 0;
-	assign read_ttbr.base = base;
+	assign read_ttbr.base = mmu_ttbr;
 
 	always @(posedge clk or negedge rst_n)
 		if(!rst_n) begin
 			s <= 0;
 			c <= 0;
 			rgn <= 0;
-			base <= 0;
+			mmu_ttbr <= 0;
 		end else if(transfer && !load) begin
 			s <= write_ttbr.s;
 			c <= write_ttbr.c;
 			rgn <= write_ttbr.rgn;
-			base <= write_ttbr.base;
+			mmu_ttbr <= write_ttbr.base;
 		end
 
 endmodule

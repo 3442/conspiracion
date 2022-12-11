@@ -1,5 +1,6 @@
-`include "core/uarch.sv"
 `include "core/cp15/map.sv"
+`include "core/mmu/format.sv"
+`include "core/uarch.sv"
 
 module core_cp15
 (
@@ -9,7 +10,10 @@ module core_cp15
 	input  coproc_decode dec,
 	input  word          write,
 
-	output word          read
+	output word          read,
+	output logic         high_vectors,
+	                     mmu_enable,
+	output mmu_base      mmu_ttbr
 );
 
 	logic load;

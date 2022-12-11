@@ -25,6 +25,7 @@ module core_control
 	input  word            mul_q_hi,
 	                       mul_q_lo,
 	                       coproc_read,
+	input  logic           high_vectors,
 
 `ifdef VERILATOR
 	input  word            insn,
