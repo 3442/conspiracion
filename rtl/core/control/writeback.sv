@@ -17,7 +17,7 @@ module core_control_writeback
 	input  ctrl_cycle  cycle,
 	                   next_cycle,
 	input  word        saved_base,
-	                   vector,
+	                   exception_vector,
 	                   psr_wb,
 	                   coproc_wb,
 	input  reg_num     ra,
@@ -81,7 +81,7 @@ module core_control_writeback
 		end else if(next_cycle.base_writeback)
 			wr_value = ldst_read;
 		else if(next_cycle.exception)
-			wr_value = vector;
+			wr_value = exception_vector;
 		else if(next_cycle.mul_hi_wb)
 			wr_value = mul_q_hi;
 

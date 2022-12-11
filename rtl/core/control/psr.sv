@@ -10,6 +10,7 @@ module core_control_psr
 	                   spsr_rd,
 	                   alu_b,
 	input  psr_mode    mode,
+	                   exception_mode,
 
 	input  ctrl_cycle  cycle,
 	                   next_cycle,
@@ -44,8 +45,8 @@ module core_control_psr
 			psr_write = 1;
 
 		if(cycle.escalate)
-			//TODO: otros modos, y además F (FIQ) no cambia siempre
-			psr_wr = {24'b0, 3'b110, `MODE_UND};
+			//TODO: F (FIQ) no cambia siempre
+			psr_wr = {24'b0, 3'b110, exception_mode};
 		else if(cycle.exception)
 			psr_wr = exception_spsr;
 		else

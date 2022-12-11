@@ -12,6 +12,7 @@ module core_control_cycles
 	                  coproc,
 	                  exception,
 	                  mem_ready,
+	                  mem_fault,
 	                  mul_add,
 	                  mul_long,
 	                  mul_ready,
@@ -100,11 +101,15 @@ module core_control_cycles
 			ESCALATE:
 				next_state = EXCEPTION;
 
-			TRANSFER:
+			TRANSFER: begin
 				if(!mem_ready || pop_valid)
 					next_state = TRANSFER;
 				else if(ldst_writeback)
 					next_state = BASE_WRITEBACK;
+
+				if(mem_ready && mem_fault)
+					next_state = ESCALATE;
+			end
 
 			MUL:
 				if(!mul_ready)

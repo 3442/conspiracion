@@ -10,6 +10,9 @@ module core_cp15
 	input  coproc_decode dec,
 	input  word          write,
 
+	input  logic         fault_register,
+	input  ptr           fault_addr,
+
 	output word          read,
 	output logic         high_vectors,
 	                     mmu_enable,
@@ -61,7 +64,7 @@ module core_cp15
 		.*
 	);
 
-	core_cp15_far fsr
+	core_cp15_fsr fsr
 	(
 		.read(read_fsr),
 		.transfer(transfer && crn == `CP15_CRN_FSR),

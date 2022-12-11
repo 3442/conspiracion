@@ -25,7 +25,9 @@ module core_mmu_pagewalk
 	                  bus_write,
 
 	output logic      core_ready,
-	output word       core_data_rd
+	                  core_fault,
+	output word       core_data_rd,
+	output ptr        core_fault_addr
 );
 
 	enum int unsigned
@@ -71,13 +73,18 @@ module core_mmu_pagewalk
 			bus_data_wr <= 0;
 
 			core_ready <= 0;
+			core_fault <= 0;
 			core_data_rd <= 0;
+			core_fault_addr <= 0;
 		end else begin
 			if(bus_start)
 				bus_start <= 0;
 
 			if(core_ready)
 				core_ready <= 0;
+
+			if(core_fault)
+				core_fault <= 0;
 
 			unique case(state)
 				IDLE:
@@ -157,8 +164,12 @@ module core_mmu_pagewalk
 						core_data_rd <= bus_data_rd;
 					end
 
-				//TODO
-				FAULT: ;
+				FAULT: begin
+					state <= IDLE;
+					core_fault <= 1;
+					core_ready <= 1;
+					core_fault_addr <= target;
+				end
 			endcase
 		end
 

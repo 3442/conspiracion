@@ -11,6 +11,9 @@ module core_cp15_far
 	input  cp_opcode op2,
 	input  word      write,
 
+	input  logic     fault_register,
+	input  ptr       fault_addr,
+
 	output word      read
 );
 
@@ -21,6 +24,8 @@ module core_cp15_far
 	always @(posedge clk or negedge rst_n)
 		if(!rst_n)
 			far <= 0;
+		else if(fault_register)
+			far <= {fault_addr, 2'b00};
 		else if(transfer && !load)
 			far <= write;
 

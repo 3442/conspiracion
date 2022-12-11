@@ -20,6 +20,7 @@ module core_control
 	                       q_shifter,
 	input  logic           c_shifter,
 	                       mem_ready,
+	                       mem_fault,
 	input  word            mem_data_rd,
 	input  logic           mul_ready,
 	input  word            mul_q_hi,
@@ -147,8 +148,9 @@ module core_control
 		.*
 	);
 
-	word vector;
-	logic exception;
+	word exception_vector;
+	logic exception, exception_offset_pc;
+	psr_mode exception_mode;
 
 	core_control_exception ctrl_exc
 	(

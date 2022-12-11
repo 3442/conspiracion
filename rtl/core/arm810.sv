@@ -76,6 +76,7 @@ module arm810
 		.mem_start(data_start),
 		.mem_write(data_write),
 		.mem_ready(data_ready),
+		.mem_fault(data_fault),
 		.mem_data_rd(data_data_rd),
 		.mem_data_wr(data_data_wr),
 		.mem_data_be(data_data_be),
@@ -165,7 +166,7 @@ module arm810
 
 	ptr data_addr;
 	word data_data_rd, data_data_wr, insn_data_rd;
-	logic data_start, data_write, data_ready, insn_ready;
+	logic data_start, data_write, data_ready, insn_ready, data_fault;
 	logic[3:0] data_data_be;
 
 	core_mmu mmu
@@ -173,8 +174,9 @@ module arm810
 		.*
 	);
 
+	ptr fault_addr;
 	word coproc_read;
-	logic coproc, high_vectors, mmu_enable;
+	logic coproc, high_vectors, mmu_enable, fault_register;
 	mmu_base mmu_ttbr;
 	coproc_decode coproc_ctrl;
 

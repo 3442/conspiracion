@@ -26,8 +26,12 @@ module core_mmu
 	                  bus_write,
 	                  insn_ready,
 	                  data_ready,
+	                  data_fault,
 	output word       insn_data_rd,
-	                  data_data_rd
+	                  data_data_rd,
+
+	output logic      fault_register,
+	output ptr        fault_addr
 );
 
 	ptr iphys_addr, dphys_addr;
@@ -35,15 +39,19 @@ module core_mmu
 	logic iphys_start, dphys_start, iphys_ready, dphys_ready, dphys_write;
 	logic[3:0] dphys_data_be;
 
+	assign fault_register = data_fault;
+
 	core_mmu_pagewalk iwalk
 	(
 		.core_addr(insn_addr),
 		.core_start(insn_start),
 		.core_write(0),
 		.core_ready(insn_ready),
+		.core_fault(),
 		.core_data_wr(0),
 		.core_data_be(0),
 		.core_data_rd(insn_data_rd),
+		.core_fault_addr(),
 
 		.bus_addr(iphys_addr),
 		.bus_start(iphys_start),
@@ -62,9 +70,11 @@ module core_mmu
 		.core_start(data_start),
 		.core_write(data_write),
 		.core_ready(data_ready),
+		.core_fault(data_fault),
 		.core_data_wr(data_data_wr),
 		.core_data_be(data_data_be),
 		.core_data_rd(data_data_rd),
+		.core_fault_addr(fault_addr),
 
 		.bus_addr(dphys_addr),
 		.bus_start(dphys_start),

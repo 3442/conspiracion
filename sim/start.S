@@ -7,19 +7,19 @@ __undefined:
 	b undefined
 
 __swi:
-	b __data_abort
+	b .
 
 __prefetch_abort:
-	b __prefetch_abort
+	b .
 
 __data_abort:
-	b __data_abort
+	b data_abort
 
 __irq:
-	b __irq
+	b .
 
 __fiq:
-	b __fiq
+	b .
 
 .text
 
@@ -27,8 +27,12 @@ __fiq:
 _start:
 	ldr sp, =_stack_end
 	bl  reset
+
+.global halt
+halt:
+exc_default:
 	b   .
 
-.weak undefined
-undefined:
-	b undefined
+.weak undefined, data_abort
+.set undefined, exc_default
+.set data_abort, exc_default

@@ -77,7 +77,8 @@ module core_control_ldst
 			mem_start <= 0;
 			mem_offset <= 0;
 		end else begin
-			mem_start <= 0;
+			if(mem_start)
+				mem_start <= 0;
 
 			if(next_cycle.issue) begin
 				// TODO: dec.ldst.unprivileged

@@ -17,11 +17,12 @@ module core_control_data
 
 	input  ctrl_cycle      cycle,
 	                       next_cycle,
-	input  ptr             pc,
+	input  ptr             pc_visible,
 	input  logic           ldst_next,
 	input  logic[1:0]      ldst_shift,
 	input  word            mem_offset,
 	input  psr_flags       flags,
+	input  logic           exception_offset_pc,
 
 	output alu_op          alu,
 	output word            alu_a,
@@ -52,7 +53,7 @@ module core_control_data
 		if(cycle.transfer)
 			alu_a = saved_base;
 		else if(cycle.exception)
-			alu_a = {pc, 2'b00};
+			alu_a = {pc_visible, 2'b00};
 		else
 			alu_a = rd_value_a;
 
@@ -107,8 +108,9 @@ module core_control_data
 			shifter.ror <= 0;
 			shifter.shr <= !mem_write;
 		end else if(next_cycle.exception) begin
-			alu <= `ALU_ADD;
-			data_imm <= 12'd4;
+			alu <= `ALU_SUB;
+			// Either pc_visible - 0 (pc + 8) or pc_visible - 4 (pc + 4)
+			data_imm <= {9'd0, exception_offset_pc, 2'b00};
 			data_snd_is_imm <= 1;
 		end
 
