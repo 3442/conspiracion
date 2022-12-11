@@ -8,7 +8,6 @@ module core_cp15_far
 
 	input  logic     load,
 	                 transfer,
-	input  cp_opcode op2,
 	input  word      write,
 
 	input  logic     fault_register,

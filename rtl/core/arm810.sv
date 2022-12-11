@@ -175,10 +175,12 @@ module arm810
 	);
 
 	ptr fault_addr;
-	word coproc_read;
-	logic coproc, high_vectors, mmu_enable, fault_register;
+	word coproc_read, mmu_dac;
+	logic coproc, high_vectors, mmu_enable, fault_register, fault_page;
 	mmu_base mmu_ttbr;
+	mmu_domain fault_domain;
 	coproc_decode coproc_ctrl;
+	mmu_fault_type fault_type;
 
 	core_cp15 cp15
 	(

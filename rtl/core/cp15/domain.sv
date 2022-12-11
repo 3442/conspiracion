@@ -9,16 +9,16 @@ module core_cp15_domain
 	                 transfer,
 	input  word      write,
 
-	output word      read
+	output word      read,
+	                 mmu_dac
 );
 
-	word dac;
-	assign read = dac;
+	assign read = mmu_dac;
 
 	always @(posedge clk or negedge rst_n)
 		if(!rst_n)
-			dac <= 0;
+			mmu_dac <= 0;
 		else if(transfer && !load)
-			dac <= write;
+			mmu_dac <= write;
 
 endmodule

@@ -2,6 +2,8 @@
 data_abort:
 	mrc  p15, 0, r2, c6, c0, 0
 	mrc  p15, 0, r3, c5, c0, 0
+	# Domain field is invalid for section translation faults
+	and  r3, r3, #0b1111
 	mov  pc, r4
 
 .global reset
@@ -30,8 +32,10 @@ reset:
 	ldr  r2, =0x00003002
 	str  r2, [r1], #4
 
-	# Set translation base and enable MMU
+	# Set translation base, domain control register and enable MMU
 	mov  r1, #(1 << 0)
+	mov  r2, #-1
+	mcr  p15, 0, r2, c3, c0, 0
 	mcr  p15, 0, r0, c2, c0, 0
 	mcr  p15, 0, r1, c1, c0, 0
 

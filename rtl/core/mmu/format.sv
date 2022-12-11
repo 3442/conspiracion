@@ -2,11 +2,22 @@
 `define CORE_MMU_FORMAT_SV
 
 typedef logic[17:0] mmu_base;
+typedef logic[3:0]  mmu_domain;
 
 `define MMU_L1_INDEX     [29:18]
 `define MMU_L1_FAULT     2'b00
 `define MMU_L1_PAGETABLE 2'b01
 `define MMU_L1_SECTION   2'b10
+
+typedef struct packed
+{
+	logic[31:10] field10;
+	logic[9:9]   imp;
+	logic[8:5]   domain;
+	logic[4:4]   sbz;
+	logic[3:2]   field2;
+	logic[1:0]   typ;
+} mmu_l1_entry;
 
 typedef struct packed
 {
@@ -65,9 +76,30 @@ typedef struct packed
 	logic[1:0]   typ;
 } mmu_l2_small;
 
-//TODO: struct mmu_l2_smallext
+typedef struct packed
+{
+	logic[31:12] base;
+	logic[11:9]  sbz;
+	logic[8:6]   tex;
+	logic[5:4]   ap;
+	logic[3:3]   c;
+	logic[2:2]   b;
+	logic[1:0]   typ;
+} mmu_l2_smallext;
 
 `define MMU_LARGE_INDEX [13:0]
 `define MMU_SMALL_INDEX [9:0]
+
+typedef logic[1:0] mmu_fault_type;
+
+`define MMU_FAULT_WALK   2'b01
+`define MMU_FAULT_DOMAIN 2'b10
+`define MMU_FAULT_ACCESS 2'b11
+
+typedef struct packed
+{
+	logic manager,
+	      allowed;
+} mmu_domain_ctrl;
 
 `endif

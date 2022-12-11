@@ -4,19 +4,23 @@
 
 module core_cp15
 (
-	input  logic         clk,
-	                     rst_n,
-	                     transfer,
-	input  coproc_decode dec,
-	input  word          write,
+	input  logic          clk,
+	                      rst_n,
+	                      transfer,
+	input  coproc_decode  dec,
+	input  word           write,
 
-	input  logic         fault_register,
-	input  ptr           fault_addr,
+	input  logic          fault_register,
+	                      fault_page,
+	input  ptr            fault_addr,
+	input  mmu_fault_type fault_type,
+	input  mmu_domain     fault_domain,
 
-	output word          read,
-	output logic         high_vectors,
-	                     mmu_enable,
-	output mmu_base      mmu_ttbr
+	output word           read,
+	                      mmu_dac,
+	output logic          high_vectors,
+	                      mmu_enable,
+	output mmu_base       mmu_ttbr
 );
 
 	logic load;

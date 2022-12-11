@@ -3,35 +3,39 @@
 
 module core_mmu
 (
-	input  logic      clk,
-	                  rst_n,
+	input  logic          clk,
+	                      rst_n,
 
-	input  logic      mmu_enable /*verilator public*/,
-	input  mmu_base   mmu_ttbr /*verilator public*/,
+	input  logic          mmu_enable /*verilator public*/,
+	input  mmu_base       mmu_ttbr /*verilator public*/,
+	input  word           mmu_dac,
 
-	input  logic      bus_ready,
-	input  word       bus_data_rd,
-	                  data_data_wr,
-	input  ptr        insn_addr,
-	                  data_addr,
-	input  logic      insn_start,
-	                  data_start,
-	                  data_write,
-	input  logic[3:0] data_data_be,
+	input  logic          bus_ready,
+	input  word           bus_data_rd,
+	                      data_data_wr,
+	input  ptr            insn_addr,
+	                      data_addr,
+	input  logic          insn_start,
+	                      data_start,
+	                      data_write,
+	input  logic[3:0]     data_data_be,
 
-	output word       bus_data_wr,
-	output logic[3:0] bus_data_be,
-	output ptr        bus_addr,
-	output logic      bus_start,
-	                  bus_write,
-	                  insn_ready,
-	                  data_ready,
-	                  data_fault,
-	output word       insn_data_rd,
-	                  data_data_rd,
+	output word           bus_data_wr,
+	output logic[3:0]     bus_data_be,
+	output ptr            bus_addr,
+	output logic          bus_start,
+	                      bus_write,
+	                      insn_ready,
+	                      data_ready,
+	                      data_fault,
+	output word           insn_data_rd,
+	                      data_data_rd,
 
-	output logic      fault_register,
-	output ptr        fault_addr
+	output logic          fault_register,
+	                      fault_page,
+	output ptr            fault_addr,
+	output mmu_fault_type fault_type,
+	output mmu_domain     fault_domain
 );
 
 	ptr iphys_addr, dphys_addr;
@@ -52,6 +56,9 @@ module core_mmu
 		.core_data_be(0),
 		.core_data_rd(insn_data_rd),
 		.core_fault_addr(),
+		.core_fault_page(),
+		.core_fault_type(),
+		.core_fault_domain(),
 
 		.bus_addr(iphys_addr),
 		.bus_start(iphys_start),
@@ -75,6 +82,9 @@ module core_mmu
 		.core_data_be(data_data_be),
 		.core_data_rd(data_data_rd),
 		.core_fault_addr(fault_addr),
+		.core_fault_page(fault_page),
+		.core_fault_type(fault_type),
+		.core_fault_domain(fault_domain),
 
 		.bus_addr(dphys_addr),
 		.bus_start(dphys_start),
