@@ -80,7 +80,7 @@ namespace taller::avalon
 			void attach(slave &dev);
 			void bail() noexcept;
 
-			std::uint32_t dump(std::uint32_t addr);
+			bool dump(std::uint32_t addr, std::uint32_t &word);
 			void patch(std::uint32_t addr, std::uint32_t readdata);
 
 		private:
@@ -100,7 +100,7 @@ namespace taller::avalon
 			bool                 avl_read       = false;
 			bool                 avl_write      = false;
 
-			slave &resolve_external(std::uint32_t avl_address);
+			slave *resolve_external(std::uint32_t avl_address);
 	};
 }
 

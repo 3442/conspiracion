@@ -38,7 +38,7 @@ namespace taller::avalon
 	bool mem<Cell>::read(std::uint32_t addr, std::uint32_t &data)
 	{
 		data = block[addr];
-		return ready();
+		return true;/*ready();*/
 	}
 
 	template<typename Cell>
@@ -67,7 +67,7 @@ namespace taller::avalon
 		}
 
 		block[addr] = (data & bytes) | (block[addr] & ~bytes);
-		return ready();
+		return true;/*ready();*/
 	}
 
 	template<typename Cell>

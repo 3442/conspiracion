@@ -86,7 +86,7 @@ def yield_to_gdb():
             out = hexout(read_reg(gdb_reg(r)) for r in range(16))
         elif data[0] == b'm'[0]:
             addr, length = (int(x, 16) for x in data[1:].split(b','))
-            out = hexout(read_mem(addr, length))
+            out = hexout(read_mem(addr, length, may_fail = True))
         elif data[0] == b'M'[0]:
             addrlen, data = data[1:].split(b':')
             addr, length = (int(x, 16) for x in addrlen.split(b','))

@@ -254,6 +254,7 @@ set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/fetch/prefetch.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/mmu/arbiter.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/mmu/format.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/mmu/mmu.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/mmu/pagewalk.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/mul.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/porch/conds.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/porch/porch.sv

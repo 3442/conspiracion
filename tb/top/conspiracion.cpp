@@ -17,6 +17,7 @@
 #include "Vconspiracion_platform.h"
 #include "Vconspiracion_vga_domain.h"
 #include "Vconspiracion_core_control.h"
+#include "Vconspiracion_core_mmu.h"
 #include "Vconspiracion_core_psr.h"
 #include "Vconspiracion_core_regs.h"
 #include "Vconspiracion_core_reg_file.h"
@@ -431,6 +432,57 @@ int main(int argc, char **argv)
 
 	auto do_mem_dump = [&](const mem_region *dumps, std::size_t count)
 	{
+		bool mmu_enabled = top.conspiracion->core->mmu->mmu_enable;
+		std::uint32_t ttbr = top.conspiracion->core->mmu->mmu_ttbr;
+
+		auto pagewalk = [&](std::uint32_t &addr)
+		{
+			if(!mmu_enabled)
+			{
+				return true;
+			}
+
+			std::uint32_t entry;
+			if(!avl.dump(ttbr << 12 | addr >> 18, entry))
+			{
+				return false;
+			}
+
+			switch(entry & 0b11)
+			{
+				case 0b01:
+					break;
+
+				case 0b10:
+					addr = (entry & ~((1 << 20) - 1)) >> 2 | (addr & ((1 << 18) - 1));
+					return true;
+
+				default:
+					return false;
+			}
+
+			std::uint32_t entryaddr = (entry & ~((1 << 10) - 1)) >> 2 | ((addr >> 10) & ((1 << 8) - 1));
+			if(!avl.dump(entryaddr, entry))
+			{
+				return false;
+			}
+
+			switch(entry & 0b11)
+			{
+				case 0b01:
+					addr = (entry & ~((1 << 16) - 1)) >> 2 | (addr & ((1 << 14) - 1));
+					return true;
+
+				case 0b10:
+				case 0b11:
+					addr = (entry & ~((1 << 12) - 1)) >> 2 | (addr & ((1 << 10) - 1));
+					return true;
+
+				default:
+					return false;
+			}
+		};
+
 		std::fputs("=== dump-mem ===\n", ctrl);
 		for(std::size_t i = 0; i < count; ++i)
 		{
@@ -439,7 +491,18 @@ int main(int argc, char **argv)
 			std::fprintf(ctrl, "%08x ", static_cast<std::uint32_t>(dump.start));
 			for(std::size_t i = 0; i < dump.length; ++i)
 			{
-				auto word = avl.dump(dump.start + i);
+				std::uint32_t at = dump.start + i;
+				if(!pagewalk(at))
+				{
+					break;
+				}
+
+				std::uint32_t word;
+				if(!avl.dump(at, word))
+				{
+					break;
+				}
+
 				word = (word & 0xff) << 24
 					 | ((word >> 8) & 0xff) << 16
 					 | ((word >> 16) & 0xff) << 8

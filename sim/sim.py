@@ -85,10 +85,14 @@ def recv_mem_dump():
         elif line == '=== end-mem ===':
             break
 
-        base, data = line.split()
-        dumped.append((int(base, 16) << 2, bytes.fromhex(data)))
+        try:
+            base, data = line.split()
+            dumped.append((int(base, 16) << 2, bytes.fromhex(data)))
+        except ValueError:
+            while_running()
+            print(f'{COLOR_BLUE}{line}{COLOR_RESET}')
 
-def read_mem(base, length):
+def read_mem(base, length, *, may_fail = False):
     fragments = []
     i = 0
 
@@ -97,6 +101,9 @@ def read_mem(base, length):
         recv_mem_dump()
 
     while length > 0:
+        if i >= len(dumped) and may_fail:
+            return None
+
         assert i < len(dumped), f'memory at 0x{base:08x} not dumped'
         start, data = dumped[i]
         delta = base - start

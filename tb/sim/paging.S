@@ -1,0 +1,42 @@
+.global reset
+reset:
+	# Copy code to page 3
+	ldr  r0, =virtual_start
+	ldr  r1, =0x3000
+	ldr  r2, =256
+	.copy_virtual:
+	ldr  r3, [r0], #4
+	str  r3, [r1], #4
+	subs r2, r2, #4
+	bne  .copy_virtual
+
+	# Translation tables
+	mov r0, #0x4000
+	ldr r1, =0x00005001
+	str r1, [r0]
+
+	mov r1, #0x5000
+	ldr r2, =0x00000002
+	str r2, [r1], #4
+	str r2, [r1], #4
+	str r2, [r1], #4
+	str r2, [r1], #4
+	ldr r2, =0x00003002
+	str r2, [r1], #4
+
+	# Set translation base and enable MMU
+	mov r1, #(1 << 0)
+	mcr p15, 0, r0, c2, c0, 0
+	mcr p15, 0, r1, c1, c0, 0
+
+	# Self-relocate to 0x2000 (mirror of 0x0000)
+	ldr r1, =#(0x2000 - 4)
+	add pc, pc, r1
+
+	# Jump to virtual_start (phys: 0x3000, virt: 0x4000)
+	ldr r0, =0x01234567
+	ldr pc, =0x4000
+
+virtual_start:
+	ldr r1, =0x89abcdef
+	mov pc, lr

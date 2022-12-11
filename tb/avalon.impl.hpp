@@ -125,49 +125,55 @@ namespace taller::avalon
 	}
 
 	template<class Platform>
-	std::uint32_t interconnect<Platform>::dump(std::uint32_t addr)
+	bool interconnect<Platform>::dump(std::uint32_t addr, std::uint32_t &word)
 	{
 		std::uint32_t avl_address = addr << 2;
-		auto &dev = resolve_external(avl_address);
 
-		auto pos = (avl_address & ~dev.address_mask()) >> dev.word_bits();
+		auto *dev = resolve_external(avl_address);
+		if(!dev)
+		{
+			return false;
+		}
 
-		std::uint32_t readdata;
-		while(!dev.read(pos, readdata))
+		auto pos = (avl_address & ~dev->address_mask()) >> dev->word_bits();
+
+		while(!dev->read(pos, word))
 		{
 			continue;
 		}
 
-		return readdata;
+		return true;
 	}
 
 	template<class Platform>
 	void interconnect<Platform>::patch(std::uint32_t addr, std::uint32_t writedata)
 	{
 		std::uint32_t avl_address = addr << 2;
-		auto &dev = resolve_external(avl_address);
 
-		auto pos = (avl_address & ~dev.address_mask()) >> dev.word_bits();
+		auto *dev = resolve_external(avl_address);
+		assert(dev);
 
-		while(!dev.write(pos, writedata, 0b1111))
+		auto pos = (avl_address & ~dev->address_mask()) >> dev->word_bits();
+
+		while(!dev->write(pos, writedata, 0b1111))
 		{
 			continue;
 		}
 	}
 
 	template<class Platform>
-	slave& interconnect<Platform>::resolve_external(std::uint32_t avl_address)
+	slave* interconnect<Platform>::resolve_external(std::uint32_t avl_address)
 	{
 		for(auto &binding : devices)
 		{
 			if((avl_address & binding.mask) == binding.base)
 			{
-				return binding.dev;
+				return &binding.dev;
 			}
 		}
 
 		fprintf(stderr, "[avl] attempt to access hole at 0x%08x\n", avl_address);
-		assert(false);
+		return nullptr;
 	}
 }
 
