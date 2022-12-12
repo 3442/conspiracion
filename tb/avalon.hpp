@@ -81,7 +81,7 @@ namespace taller::avalon
 			void bail() noexcept;
 
 			bool dump(std::uint32_t addr, std::uint32_t &word);
-			void patch(std::uint32_t addr, std::uint32_t readdata);
+			bool patch(std::uint32_t addr, std::uint32_t readdata);
 
 		private:
 			struct binding

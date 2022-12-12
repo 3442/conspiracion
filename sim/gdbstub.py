@@ -84,6 +84,9 @@ def yield_to_gdb():
             out = b'OK'
         elif data == b'g':
             out = hexout(read_reg(gdb_reg(r)) for r in range(16))
+        elif data[0] == b'G':
+            for reg, value in enumerate(hexin(data[1:])):
+                write_reg(reg, value)
         elif data[0] == b'm'[0]:
             addr, length = (int(x, 16) for x in data[1:].split(b','))
             out = hexout(read_mem(addr, length, may_fail = True))
@@ -99,6 +102,9 @@ def yield_to_gdb():
         elif data[0] == b'p'[0]:
             reg = gdb_reg(int(data[1:], 16))
             out = hexout(read_reg(reg) if reg is not None else None)
+        elif data[0] == b'P'[0]:
+            reg, value = data[1:].split(b'=')
+            write_reg(gdb_reg(int(reg, 16)), hexin(value, single=True))
         elif data == b's' and not dead:
             return 'step'
         else:
@@ -107,7 +113,7 @@ def yield_to_gdb():
         reply(out)
 
 def reply(out):
-    client.send(b'$' + out + b'#' + hexout(sum(out) & 0xff, 1))
+    client.send(b'$' + out + b'#' + hexout(sum(out) & 0xff, size=1))
 
 def gdb_reg(n):
     if 0 <= n < 8:
@@ -147,7 +153,20 @@ def gdb_reg(n):
     print('bad gdb regnum:', n, file=sys.stderr)
     return None
 
-def hexout(data, size=4):
+def hexin(data, *, single=False):
+    if type(data) is bytes:
+        data = str(data, 'ascii')
+
+    output = []
+    for i in range(len(data) >> 3):
+        output.append(int.from_bytes(bytes.fromhex(data[i << 3:(i + 1) << 3]), 'little'))
+
+    if single:
+        output, = output
+
+    return output
+
+def hexout(data, *, size=4):
     if data is None:
         return b''
     elif type(data) is bytes:

@@ -146,12 +146,15 @@ namespace taller::avalon
 	}
 
 	template<class Platform>
-	void interconnect<Platform>::patch(std::uint32_t addr, std::uint32_t writedata)
+	bool interconnect<Platform>::patch(std::uint32_t addr, std::uint32_t writedata)
 	{
 		std::uint32_t avl_address = addr << 2;
 
 		auto *dev = resolve_external(avl_address);
-		assert(dev);
+		if(!dev)
+		{
+			return false;
+		}
 
 		auto pos = (avl_address & ~dev->address_mask()) >> dev->word_bits();
 
@@ -159,6 +162,8 @@ namespace taller::avalon
 		{
 			continue;
 		}
+
+		return true;
 	}
 
 	template<class Platform>

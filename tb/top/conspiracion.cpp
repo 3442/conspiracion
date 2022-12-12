@@ -17,6 +17,7 @@
 #include "Vconspiracion_platform.h"
 #include "Vconspiracion_vga_domain.h"
 #include "Vconspiracion_core_control.h"
+#include "Vconspiracion_core_fetch.h"
 #include "Vconspiracion_core_mmu.h"
 #include "Vconspiracion_core_psr.h"
 #include "Vconspiracion_core_regs.h"
@@ -347,11 +348,11 @@ int main(int argc, char **argv)
 		std::fclose(img_file);
 	}
 
+	auto &core = *top.conspiracion->core;
 	for(const auto &init : init_regs)
 	{
-		auto &regs = *top.conspiracion->core->regs;
-		regs.a->file[init.index] = init.value;
-		regs.b->file[init.index] = init.value;
+		core.regs->a->file[init.index] = init.value;
+		core.regs->b->file[init.index] = init.value;
 	}
 
 	int time = 0;
@@ -411,7 +412,6 @@ int main(int argc, char **argv)
 	{
 		std::fputs("=== dump-regs ===\n", ctrl);
 
-		const auto &core = *top.conspiracion->core;
 		const auto &regfile = core.regs->a->file;
 
 		int i = 0;
@@ -432,8 +432,8 @@ int main(int argc, char **argv)
 
 	auto do_mem_dump = [&](const mem_region *dumps, std::size_t count)
 	{
-		bool mmu_enabled = top.conspiracion->core->mmu->mmu_enable;
-		std::uint32_t ttbr = top.conspiracion->core->mmu->mmu_ttbr;
+		bool mmu_enabled = core.mmu->mmu_enable;
+		std::uint32_t ttbr = core.mmu->mmu_ttbr;
 
 		auto pagewalk = [&](std::uint32_t &addr)
 		{
@@ -519,6 +519,8 @@ int main(int argc, char **argv)
 
 	std::signal(SIGUSR1, async_halt_handler);
 
+	core.fetch->explicit_branch__VforceVal = 1;
+
 	unsigned i = 0;
 	// Abuse unsigned overflow (cycles is UINT_MAX by default)
 	while(!failed && i + 1 <= *cycles)
@@ -536,7 +538,7 @@ int main(int argc, char **argv)
 
 halt_or_fail:
 		top.step = 0;
-		top.halt = 0;
+		core.fetch->target__VforceVal = core.control->pc;
 
 		do_reg_dump();
 		std::fprintf(ctrl, "=== %s ===\n", failed ? "fault" : "halted");
@@ -600,11 +602,44 @@ halt_or_fail:
 
 					avl.patch(addr++, word);
 				}
+			} else if(!std::strcmp(cmd, "patch-reg"))
+			{
+				std::uint32_t value;
+				std::sscanf(std::strtok(nullptr, " "), "%u", &value);
+
+				const char *name = std::strtok(nullptr, " ");
+				if(!std::strcmp(name, "pc"))
+				{
+					core.fetch->target__VforceVal = value >> 2;
+				} else
+				{
+					std::size_t index = 0;
+					for(const char *reg : gp_regs)
+					{
+						if(!strcmp(name, reg))
+						{
+							core.regs->a->file[index] = value;
+							core.regs->b->file[index] = value;
+							break;
+						}
+
+						++index;
+					}
+				}
 			}
 		}
 
 		std::free(line);
 		async_halt = 0;
+
+		core.fetch->target__VforceEn = 0xffff'ffff;
+		core.fetch->explicit_branch__VforceEn = 1;
+
+		cycle();
+		top.halt = 0;
+
+		core.fetch->target__VforceEn = 0;
+		core.fetch->explicit_branch__VforceEn = 0;
 	}
 
 	if(!no_tty)

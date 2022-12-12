@@ -73,6 +73,14 @@ all_regs = [
 regs = {}
 read_reg = lambda r: regs.setdefault(r, 0)
 
+def write_reg(reg, value):
+    assert halted
+
+    value = unsigned(value)
+    regs[reg] = value
+
+    print('patch-reg', value, reg, file=sim_end, flush=True)
+
 dumped = []
 halted = False
 
@@ -278,6 +286,7 @@ module = importlib.util.module_from_spec(spec)
 
 prelude = {
     'read_reg':           read_reg,
+    'write_reg':          write_reg,
     'read_mem':           read_mem,
     'write_mem':          write_mem,
     'assert_reg':         assert_reg,

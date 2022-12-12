@@ -7,7 +7,7 @@ module core_fetch
 	             rst_n,
 	             stall,
 	             fetched,
-	             explicit_branch,
+	             explicit_branch /*verilator public*/ /*verilator forceable*/,
 	             wr_pc,
 	             prefetch_flush,
 	input  ptr   branch_target,
@@ -24,7 +24,7 @@ module core_fetch
 	             fetch_head
 );
 
-	ptr hold_addr, target;
+	ptr target /*verilator public*/ /*verilator forceable*/, hold_addr;
 	logic branch, prefetch_ready, fetched_valid, discard, pending, next_pending;
 
 	assign fetch = prefetch_ready && !discard;
