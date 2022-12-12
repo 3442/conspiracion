@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import importlib.util, os, pathlib, random, selectors, signal, socket, subprocess, sys
+import importlib.util, io, os, pathlib, random, selectors, signal, socket, subprocess, sys
 
 module_path, verilated, image = sys.argv[1:]
 test_name = pathlib.Path(module_path).stem
@@ -77,6 +77,34 @@ all_regs = [
 regs = {}
 read_reg = lambda r: regs.setdefault(r, 0)
 
+output_buffer = None
+def out(*args, **kwargs):
+    global output_buffer
+
+    if do_output:
+        if output_buffer is None:
+            output_buffer = io.StringIO()
+
+        print(*args, **kwargs, file=output_buffer)
+        if do_output(None):
+            flush_out()
+    else:
+        print(*args, **kwargs, file=sys.stderr)
+
+def flush_out():
+    global do_output, output_buffer
+    if output_buffer and output_buffer:
+        text = output_buffer.getvalue()
+        output_buffer.close()
+        output_buffer = None
+
+        try:
+            if do_output(text):
+                return
+        except:
+            do_output = None
+            print(text, file=sys.stderr)
+
 def write_reg(reg, value):
     assert halted
 
@@ -102,7 +130,7 @@ def recv_mem_dump():
             dumped.append((int(base, 16) << 2, bytes.fromhex(data)))
         except ValueError:
             while_running()
-            print(f'{COLOR_BLUE}{line}{COLOR_RESET}')
+            out(f'{COLOR_BLUE}{line}{COLOR_RESET}')
 
 def read_mem(base, length, *, may_fail = False):
     fragments = []
@@ -180,12 +208,12 @@ def exit(*, success):
     if not success:
         while_running()
         if exec_args:
-            print('cmdline:', subprocess.list2cmdline(exec_args), file=sys.stderr)
+            out('cmdline:', subprocess.list2cmdline(exec_args))
 
     status, color = ('passed', COLOR_GREEN) if success else (f'failed (seed: {seed})', COLOR_RED)
-    print( \
+    out( \
         f'{color}Test \'{COLOR_YELLOW}{test_name}{COLOR_RESET}{color}\' ' +
-        f'{status}{COLOR_RESET}', file=sys.stderr)
+        f'{status}{COLOR_RESET}')
 
     sys.exit(0 if success else 1)
 
@@ -195,24 +223,24 @@ def dump_regs():
 
     for reg, value in sorted(regs.items(), key=lambda item: order[item[0]]):
         if next_col > 0:
-            print('   ', end='', file=sys.stderr)
+            out('   ', end='')
 
-        print(f'{reg:<8} = 0x{value:08x}', end='', file=sys.stderr)
+        out(f'{reg:<8} = 0x{value:08x}', end='')
         if next_col == 3:
-            print(file=sys.stderr)
+            out()
             next_col = 0
         else:
             next_col += 1
 
     if next_col != 0:
-        print(file=sys.stderr)
+        out()
 
 printed_while_running = False
 def while_running():
     global printed_while_running
 
     if not printed_while_running:
-        print(
+        out(
             f'{COLOR_BLUE}While running test \'{COLOR_YELLOW}{test_name}' + \
             f'{COLOR_RESET}{COLOR_BLUE}\'{COLOR_RESET}')
 
@@ -221,7 +249,7 @@ def while_running():
 def test_assert(condition, message):
     if not condition:
         while_running()
-        print(f'{COLOR_RED}{message()}{COLOR_RESET}', file=sys.stderr)
+        out(f'{COLOR_RED}{message()}{COLOR_RESET}')
 
         if regs:
             dump_regs()
@@ -271,9 +299,9 @@ def init_reg(r, value):
     init_regs[r] = unsigned(value)
 
 if test_name in os.getenv('SIM_SKIP', '').split(','):
-    print( \
+    out( \
         f'{COLOR_BLUE}Test \'{COLOR_YELLOW}{test_name}{COLOR_RESET}' +
-        f'{COLOR_BLUE}\' skipped{COLOR_RESET}', file=sys.stderr)
+        f'{COLOR_BLUE}\' skipped{COLOR_RESET}')
 
     exit(success=True)
 
@@ -289,6 +317,9 @@ spec = importlib.util.spec_from_file_location('sim', module_path)
 module = importlib.util.module_from_spec(spec)
 
 prelude = {
+    'out':                out,
+    'flush_out':          flush_out,
+    'is_halted':          lambda: halted,
     'read_reg':           read_reg,
     'write_reg':          write_reg,
     'read_mem':           read_mem,
@@ -296,6 +327,7 @@ prelude = {
     'assert_reg':         assert_reg,
     'assert_mem':         assert_mem,
     'init_reg':           init_reg,
+    'dump_regs':          dump_regs,
     'split_dword':        split_dword,
     'register_interrupt': register_interrupt,
     }
@@ -305,6 +337,7 @@ module.__dict__.update(prelude)
 spec.loader.exec_module(module)
 
 mem_dumps = module_get('mem_dumps', [])
+do_output = module_get('do_output')
 
 if init := module_get('init'):
     init()
@@ -391,7 +424,7 @@ def read_ctrl():
                 regs[reg] = int(value, 16)
             else:
                 while_running()
-                print(f'{COLOR_BLUE}{line}{COLOR_RESET}')
+                out(f'{COLOR_BLUE}{line}{COLOR_RESET}')
 
 sel.register(sim_end_sock, selectors.EVENT_READ, read_ctrl)
 while not done:
@@ -410,6 +443,8 @@ while not done:
             mode = halt()
 
         print('step' if mode == 'step' else 'continue', file=sim_end, flush=True)
+        flush_out()
+
         if not halt:
             break
 
@@ -425,7 +460,7 @@ if final := module_get('final'):
 if os.getenv('SIM_DUMP', ''):
     dump_regs()
     for rng in mem_dumps:
-        print(f'Memory range 0x{rng.start:08x}..0x{rng.stop:08x}')
-        print(hexdump(rng.start, read_mem(rng.start, rng.stop - rng.start)))
+        out(f'Memory range 0x{rng.start:08x}..0x{rng.stop:08x}')
+        out(hexdump(rng.start, read_mem(rng.start, rng.stop - rng.start)))
 
 exit(success=True)

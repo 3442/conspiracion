@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 
+#include <unistd.h>
+
 #include <verilated.h>
 #include <verilated_vcd_c.h>
 
@@ -268,10 +270,15 @@ int main(int argc, char **argv)
 	}
 
 	FILE *ctrl = stdout;
-	if(*control_fd != -1 && (ctrl = fdopen(*control_fd, "r+")) == nullptr)
+	if(*control_fd != -1)
 	{
-		std::perror("fdopen()");
-		return EXIT_FAILURE;
+		if((ctrl = fdopen(*control_fd, "r+")) == nullptr)
+		{
+			std::perror("fdopen()");
+			return EXIT_FAILURE;
+		}
+
+		dup2(*control_fd, STDERR_FILENO);
 	}
 
 	Vconspiracion top;

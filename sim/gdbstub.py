@@ -1,4 +1,4 @@
-import sys, socket
+import sys, socket, traceback
 
 cycles = None
 enable_tty = True
@@ -20,6 +20,15 @@ def fatal():
     stop_reason = 'fatal'
     yield_to_gdb()
 
+def do_output(text):
+    if text is None:
+        return not is_halted()
+    elif not client:
+        return False
+
+    reply(b'O' + hexout(text.encode('ascii')))
+    return True
+
 buffer = b''
 stop_reason = None
 
@@ -27,11 +36,7 @@ def yield_to_gdb():
     global client, buffer, stop_reason
 
     if not client:
-        print('Listening for gdb on', sock.getsockname(), file=sys.stderr)
-
         client, peer = sock.accept()
-        print('Accepted connection from', peer, file=sys.stderr)
-
         register_interrupt(client)
         stop_reason = 'reset'
 
@@ -77,19 +82,19 @@ def yield_to_gdb():
         client.send(b'+')
 
         if data == b'?':
-            out = stop_reply
+            replyout = stop_reply
         elif data == b'c' and not dead:
             return 'continue'
         elif data == b'D':
-            out = b'OK'
+            replyout = b'OK'
         elif data == b'g':
-            out = hexout(read_reg(gdb_reg(r)) for r in range(16))
+            replyout = hexout(read_reg(gdb_reg(r)) for r in range(16))
         elif data[0] == b'G':
             for reg, value in enumerate(hexin(data[1:])):
                 write_reg(reg, value)
         elif data[0] == b'm'[0]:
             addr, length = (int(x, 16) for x in data[1:].split(b','))
-            out = hexout(read_mem(addr, length, may_fail = True))
+            replyout = hexout(read_mem(addr, length, may_fail = True))
         elif data[0] == b'M'[0]:
             addrlen, data = data[1:].split(b':')
             addr, length = (int(x, 16) for x in addrlen.split(b','))
@@ -98,22 +103,34 @@ def yield_to_gdb():
             assert len(data) == length
 
             write_mem(addr, data)
-            out = b'OK'
+            replyout = b'OK'
         elif data[0] == b'p'[0]:
             reg = gdb_reg(int(data[1:], 16))
-            out = hexout(read_reg(reg) if reg is not None else None)
+            replyout = hexout(read_reg(reg) if reg is not None else None)
         elif data[0] == b'P'[0]:
             reg, value = data[1:].split(b'=')
             write_reg(gdb_reg(int(reg, 16)), hexin(value, single=True))
         elif data == b's' and not dead:
             return 'step'
+        elif data.startswith(b'qRcmd,'):
+            try:
+                result = eval(bytes.fromhex(str(data.removeprefix(b'qRcmd,'), 'ascii')))
+            except Exception:
+                result = None
+                out(traceback.format_exc())
+
+            if result is not None:
+                out(repr(result))
+
+            flush_out()
+            replyout = b'OK'
         else:
-            out = b''
+            replyout = b''
 
-        reply(out)
+        reply(replyout)
 
-def reply(out):
-    client.send(b'$' + out + b'#' + hexout(sum(out) & 0xff, size=1))
+def reply(replyout):
+    client.send(b'$' + replyout + b'#' + hexout(sum(replyout) & 0xff, size=1))
 
 def gdb_reg(n):
     if 0 <= n < 8:
