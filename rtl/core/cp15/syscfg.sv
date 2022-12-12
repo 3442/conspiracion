@@ -11,14 +11,14 @@ module core_cp15_syscfg
 	input  cp_opcode op2,
 	input  word      write,
 
-	output word      read /*verilator public*/,
+	output word      read,
 	output logic     high_vectors,
 	                 mmu_enable
 );
 
 	logic dcache_enable, icache_enable;
 
-	cp15_syscfg_ctrl ctrl, write_ctrl;
+	cp15_syscfg_ctrl ctrl /*verilator public*/, write_ctrl;
 
 	assign write_ctrl = write;
 

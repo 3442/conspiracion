@@ -439,7 +439,7 @@ int main(int argc, char **argv)
 		std::fprintf(ctrl, "%08x spsr_und\n", core.psr->spsr_und_word);
 		std::fprintf(ctrl, "%08x spsr_fiq\n", core.psr->spsr_fiq_word);
 		std::fprintf(ctrl, "%08x spsr_irq\n", core.psr->spsr_irq_word);
-		std::fprintf(ctrl, "%08x sysctrl\n", core.cp15->syscfg->read);
+		std::fprintf(ctrl, "%08x sysctrl\n", core.cp15->syscfg->ctrl);
 		std::fprintf(ctrl, "%08x ttbr\n", core.cp15->ttbr->read);
 		std::fprintf(ctrl, "%08x far\n", core.cp15->far_->read);
 		std::fprintf(ctrl, "%08x fsr\n", core.cp15->fsr->read);
