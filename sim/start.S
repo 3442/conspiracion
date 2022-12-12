@@ -10,7 +10,7 @@ __swi:
 	b .
 
 __prefetch_abort:
-	b .
+	b prefetch_abort
 
 __data_abort:
 	b data_abort
@@ -33,6 +33,7 @@ halt:
 exc_default:
 	b   .
 
-.weak undefined, data_abort
+.weak undefined, data_abort, prefetch_abort
 .set undefined, exc_default
 .set data_abort, exc_default
+.set prefetch_abort, exc_default

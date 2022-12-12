@@ -23,7 +23,7 @@ module arm810
 
 	ptr fetch_insn_pc, fetch_head, insn_addr;
 	word fetch_insn;
-	logic fetch_nop, stall, flush, prefetch_flush, insn_start;
+	logic fetch_nop, fetch_abort, stall, flush, prefetch_flush, insn_start;
 
 	//TODO
 	assign prefetch_flush = halt;
@@ -34,8 +34,10 @@ module arm810
 		.addr(insn_addr),
 		.insn(fetch_insn),
 		.fetch(insn_start),
+		.fault(insn_fault),
 		.fetched(insn_ready),
 		.insn_pc(fetch_insn_pc),
+		.insn_abort(fetch_abort),
 		.fetch_data(insn_data_rd),
 		.porch_insn_pc(insn_pc),
 		.*
@@ -51,10 +53,12 @@ module arm810
 
 	ptr insn_pc;
 	word insn;
+	logic issue_abort;
 	insn_decode dec;
 
 	core_porch porch
 	(
+		.abort(issue_abort),
 		.*
 	);
 
@@ -166,7 +170,7 @@ module arm810
 
 	ptr data_addr;
 	word data_data_rd, data_data_wr, insn_data_rd;
-	logic data_start, data_write, data_ready, insn_ready, data_fault;
+	logic data_start, data_write, data_ready, insn_ready, data_fault, insn_fault;
 	logic[3:0] data_data_be;
 
 	core_mmu mmu

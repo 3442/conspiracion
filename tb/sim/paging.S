@@ -1,11 +1,3 @@
-.global data_abort
-data_abort:
-	mrc  p15, 0, r2, c6, c0, 0
-	mrc  p15, 0, r3, c5, c0, 0
-	# Domain field is invalid for section translation faults
-	and  r3, r3, #0b1111
-	mov  pc, r4
-
 .global reset
 reset:
 	# Copy code to page 3
@@ -55,3 +47,17 @@ reset:
 	mov  r5, lr
 	# This triggers a page fault
 	ldr  r4, [r6]
+
+.global data_abort
+data_abort:
+	mrc  p15, 0, r2, c6, c0, 0
+	mrc  p15, 0, r3, c5, c0, 0
+	# Domain field is invalid for section translation faults
+	and  r3, r3, #0b1111
+	# Results in a prefetch abort
+	mov  pc, r2
+
+.global prefetch_abort
+prefetch_abort:
+	mov  r6, lr
+	mov  pc, r4

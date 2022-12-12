@@ -6,6 +6,7 @@ module core_fetch
 	input  logic clk,
 	             rst_n,
 	             stall,
+	             fault,
 	             fetched,
 	             explicit_branch /*verilator public*/ /*verilator forceable*/,
 	             wr_pc,
@@ -21,7 +22,8 @@ module core_fetch
 	output word  insn,
 	output ptr   insn_pc,
 	             addr,
-	             fetch_head
+	             fetch_head,
+	output logic insn_abort
 );
 
 	ptr target /*verilator public*/ /*verilator forceable*/, hold_addr;

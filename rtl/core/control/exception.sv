@@ -8,6 +8,7 @@ module core_control_exception
 	input  ctrl_cycle next_cycle,
 	input  logic      high_vectors,
 	                  undefined,
+	                  prefetch_abort,
 	                  mem_fault,
 
 	output logic      exception,
@@ -20,7 +21,7 @@ module core_control_exception
 
 	//TODO: irq, fiq, prefetch abort, swi
 
-	assign exception = undefined || mem_fault;
+	assign exception = undefined || prefetch_abort || mem_fault;
 	assign exception_vector = {{16{high_vectors}}, 11'b0, vector_offset, 2'b00};
 
 	always @(posedge clk or negedge rst_n) begin
@@ -30,6 +31,9 @@ module core_control_exception
 			exception_offset_pc <= 0;
 		end else if(mem_fault) begin
 			vector_offset <= 3'b100;
+			exception_mode <= `MODE_ABT;
+		end else if(prefetch_abort) begin
+			vector_offset <= 3'b011;
 			exception_mode <= `MODE_ABT;
 		end else if(undefined) begin
 			vector_offset <= 3'b001;

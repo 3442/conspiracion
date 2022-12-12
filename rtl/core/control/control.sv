@@ -9,6 +9,7 @@ module core_control
 
 	input  insn_decode     dec,
 	input  ptr             insn_pc,
+	input  logic           issue_abort,
 	input  psr_mode        mode,
 	input  psr_flags       flags,
 	                       alu_flags,
@@ -89,7 +90,7 @@ module core_control
 	);
 
 	ptr pc /*verilator public*/, next_pc_visible;
-	logic issue, undefined;
+	logic issue, undefined, prefetch_abort;
 
 	core_control_issue ctrl_issue
 	(

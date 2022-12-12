@@ -6,3 +6,4 @@ def final():
     assert_reg(r2, 0x89abcde0)
     assert_reg(r3, 0b0101) # Section translation fault, p. 720
     assert_reg(r4, read_reg(r5))
+    assert_reg(r6, 0x89abcde4)
