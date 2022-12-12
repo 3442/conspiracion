@@ -68,6 +68,10 @@ all_regs = [
     ('spsr_und', 'spsr_und'),
     ('spsr_irq', 'spsr_irq'),
     ('spsr_fiq', 'spsr_fiq'),
+    ('sysctrl', 'sysctrl'),
+    ('ttbr', 'ttbr'),
+    ('far', 'far'),
+    ('fsr', 'fsr'),
     ]
 
 regs = {}

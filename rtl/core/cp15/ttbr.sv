@@ -11,7 +11,7 @@ module core_cp15_ttbr
 	                 transfer,
 	input  word      write,
 
-	output word      read,
+	output word      read /*verilator public*/,
 	output mmu_base  mmu_ttbr
 );
 

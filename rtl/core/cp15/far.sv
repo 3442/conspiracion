@@ -13,7 +13,7 @@ module core_cp15_far
 	input  logic     fault_register,
 	input  ptr       fault_addr,
 
-	output word      read
+	output word      read /*verilator public*/
 );
 
 	word far;

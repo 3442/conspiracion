@@ -61,7 +61,7 @@ module core_cp15
 		.*
 	);
 
-	core_cp15_far far
+	core_cp15_far far_
 	(
 		.read(read_far),
 		.transfer(transfer && crn == `CP15_CRN_FAR),

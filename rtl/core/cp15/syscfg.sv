@@ -11,7 +11,7 @@ module core_cp15_syscfg
 	input  cp_opcode op2,
 	input  word      write,
 
-	output word      read,
+	output word      read /*verilator public*/,
 	output logic     high_vectors,
 	                 mmu_enable
 );

@@ -16,7 +16,7 @@ module core_cp15_fsr
 	input  mmu_fault_type fault_type,
 	input  mmu_domain     fault_domain,
 
-	output word           read
+	output word           read /*verilator public*/
 );
 
 	logic fsr_page;

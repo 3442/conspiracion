@@ -17,6 +17,11 @@
 #include "Vconspiracion_platform.h"
 #include "Vconspiracion_vga_domain.h"
 #include "Vconspiracion_core_control.h"
+#include "Vconspiracion_core_cp15_far.h"
+#include "Vconspiracion_core_cp15_fsr.h"
+#include "Vconspiracion_core_cp15_syscfg.h"
+#include "Vconspiracion_core_cp15_ttbr.h"
+#include "Vconspiracion_core_cp15.h"
 #include "Vconspiracion_core_fetch.h"
 #include "Vconspiracion_core_mmu.h"
 #include "Vconspiracion_core_psr.h"
@@ -427,6 +432,10 @@ int main(int argc, char **argv)
 		std::fprintf(ctrl, "%08x spsr_und\n", core.psr->spsr_und_word);
 		std::fprintf(ctrl, "%08x spsr_fiq\n", core.psr->spsr_fiq_word);
 		std::fprintf(ctrl, "%08x spsr_irq\n", core.psr->spsr_irq_word);
+		std::fprintf(ctrl, "%08x sysctrl\n", core.cp15->syscfg->read);
+		std::fprintf(ctrl, "%08x ttbr\n", core.cp15->ttbr->read);
+		std::fprintf(ctrl, "%08x far\n", core.cp15->far_->read);
+		std::fprintf(ctrl, "%08x fsr\n", core.cp15->fsr->read);
 		std::fputs("=== end-regs ===\n", ctrl);
 	};
 
