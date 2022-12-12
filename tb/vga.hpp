@@ -8,6 +8,8 @@
 #include <SDL2/SDL_surface.h>
 #include <SDL2/SDL_video.h>
 
+#include "avalon.hpp"
+
 namespace taller::vga
 {
 	struct timings
@@ -26,14 +28,19 @@ namespace taller::vga
 	};
 
 	template<class Crtc>
-	class display
+	class display : public avalon::slave
 	{
 		public:
-			display(Crtc &crtc, std::uint32_t clock_hz) noexcept;
+			display(Crtc &crtc, std::uint32_t base, std::uint32_t clock_hz, std::uint32_t bus_hz = 0) noexcept;
 
 			~display() noexcept;
 
-			void tick(bool clk) noexcept;
+			virtual void tick() noexcept final override;
+
+			virtual bool read(std::uint32_t addr, std::uint32_t &data) noexcept final override;
+			virtual bool write(std::uint32_t addr, std::uint32_t data, unsigned byte_enable) noexcept final override;
+
+			void signal_tick(bool clk) noexcept;
 
 			inline bool key(std::size_t index)
 			{
@@ -41,6 +48,9 @@ namespace taller::vga
 			}
 
 		private:
+			unsigned            ticks         = 0;
+			unsigned            refresh_ticks = 0;
+			unsigned            max_addr      = 0;
 			Crtc&               crtc;
 			SDL_Window         *window     = nullptr;
 			const video_mode   *mode       = nullptr;

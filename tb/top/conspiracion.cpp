@@ -210,6 +210,11 @@ int main(int argc, char **argv)
 		parser, "headless", "Disable video output", {"headless"}
 	);
 
+	args::Flag accurate_video
+	(
+		parser, "accurate-video", "Enable signal-level video emulation", {"accurate-video"}
+	);
+
 	args::Flag no_tty
 	(
 		parser, "no-tty", "Disable TTY takeoveer", {"no-tty"}
@@ -292,16 +297,21 @@ int main(int argc, char **argv)
 		trace.open("trace.vcd");
 	}
 
-	interconnect<Vconspiracion_platform> avl(*top.conspiracion->plat);
-	interconnect<Vconspiracion_vga_domain> avl_vga(*top.conspiracion->plat->vga);
-
 	mem<std::uint32_t> hps_ddr3(0x0000'0000, 512 << 20);
 	jtag_uart ttyJ0(0x3000'0000);
 	interval_timer timer(0x3002'0000);
 	mem<std::uint32_t> vram(0x3800'0000, 64 << 20);
 	null vram_null(0x3800'0000, 64 << 20, 2);
 	window vram_window(vram, 0x0000'0000);
-	display<Vconspiracion_vga_domain> vga(*top.conspiracion->plat->vga, 25'175'000);
+
+	display<Vconspiracion_vga_domain> vga
+	(
+		*top.conspiracion->plat->vga,
+		0x3800'0000, 25'175'000, 50'000'000
+	);
+
+	interconnect<Vconspiracion_platform> avl(*top.conspiracion->plat);
+	interconnect<Vconspiracion_vga_domain> avl_vga(*top.conspiracion->plat->vga);
 
 	std::vector<const_map> consts;
 	for(const auto &init : *const_)
@@ -309,7 +319,8 @@ int main(int argc, char **argv)
 		consts.emplace_back(init.addr, init.value);
 	}
 
-	bool enable_video = !headless;
+	bool enable_fast_video = !headless && !accurate_video;
+	bool enable_accurate_video = !headless && accurate_video;
 
 	avl.attach(hps_ddr3);
 	avl.attach(ttyJ0);
@@ -320,7 +331,10 @@ int main(int argc, char **argv)
 		avl.attach(slave);
 	}
 
-	if(enable_video)
+	if(enable_fast_video)
+	{
+		avl.attach(vga);
+	} else if(enable_accurate_video)
 	{
 		avl.attach(vram);
 		avl_vga.attach(vram_window);
@@ -382,14 +396,14 @@ int main(int argc, char **argv)
 			failed = true;
 		}
 
-		if(enable_video)
+		if(enable_accurate_video)
 		{
 			if(!avl_vga.tick(top.clk_clk))
 			{
 				failed = true;
 			}
 
-			vga.tick(top.clk_clk);
+			vga.signal_tick(top.clk_clk);
 		}
 
 		if(enable_trace)

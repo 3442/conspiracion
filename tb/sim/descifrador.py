@@ -7,6 +7,7 @@ loads = {START: FILE}
 consts = {0x30050000: 1, 0x30060000: 0}
 cycles = 23000000
 mem_dumps = [range(START, START + SIZE)]
+enable_video = True
 
 def final():
     words = []

@@ -11,6 +11,8 @@
 #include <SDL2/SDL_surface.h>
 #include <SDL2/SDL_video.h>
 
+#include "avalon.hpp"
+
 namespace
 {
 	// https://web.mit.edu/6.111/www/s2004/NEWKIT/vga.shtml
@@ -35,10 +37,26 @@ namespace
 namespace taller::vga
 {
 	template<class Crtc>
-	display<Crtc>::display(Crtc &crtc, std::uint32_t clock_hz) noexcept
-	: crtc(crtc),
+	display<Crtc>::display(Crtc &crtc, std::uint32_t base, std::uint32_t clock_hz, std::uint32_t bus_hz) noexcept
+	: avalon::slave(base, 64 << 20, 4),
+	  crtc(crtc),
 	  clock_hz(clock_hz)
-	{}
+	{
+		if(bus_hz > 0)
+		{
+			mode = &MODES[0];
+			max_addr = mode->h.active * mode->v.active;
+
+			refresh_ticks =
+				static_cast<float>(bus_hz)
+				/ mode->pixel_clk
+				* (mode->h.active + mode->h.front_porch + mode->h.sync + mode->h.back_porch)
+				* (mode->v.active + mode->v.front_porch + mode->v.sync + mode->v.back_porch);
+
+			ticks = refresh_ticks - 1;
+			update_window();
+		}
+	}
 
 	template<class Crtc>
 	display<Crtc>::~display() noexcept
@@ -48,7 +66,54 @@ namespace taller::vga
 	}
 
 	template<class Crtc>
-	void display<Crtc>::tick(bool clk) noexcept
+	void display<Crtc>::tick() noexcept
+	{
+		if(++ticks == refresh_ticks)
+		{
+			ticks = 0;
+			if(!window)
+			{
+				update_window();
+			}
+
+			if(window)
+			{
+				::SDL_UpdateWindowSurface(window);
+			}
+		}
+	}
+
+	template<class Crtc>
+	bool display<Crtc>::read(std::uint32_t addr, std::uint32_t &data) noexcept
+	{
+		return true;
+	}
+
+	template<class Crtc>
+	bool display<Crtc>::write(std::uint32_t addr, std::uint32_t data, unsigned byte_enable) noexcept
+	{
+		if(!window || !mode)
+		{
+			return true;
+		}
+
+		auto *surface = ::SDL_GetWindowSurface(window);
+		if(!surface)
+		{
+			return true;
+		}
+
+		auto *pixels = static_cast<std::uint32_t*>(surface->pixels);
+		if(addr < max_addr)
+		{
+			pixels[addr] = data;
+		}
+
+		return true;
+	}
+
+	template<class Crtc>
+	void display<Crtc>::signal_tick(bool clk) noexcept
 	{
 		if(!clk)
 		{

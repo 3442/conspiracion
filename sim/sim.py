@@ -342,7 +342,7 @@ do_output = module_get('do_output')
 if init := module_get('init'):
     init()
 
-exec_args = [verilated, '--headless', '--dump-regs']
+exec_args = [verilated, '--dump-regs']
 
 cycles = module_get('cycles', 1024)
 if cycles is not None:
@@ -350,6 +350,9 @@ if cycles is not None:
 
 if not module_get('enable_tty', False):
     exec_args.append('--no-tty')
+
+if not module_get('enable_video', False):
+    exec_args.append('--headless')
 
 for rng in mem_dumps:
     length = rng.stop - rng.start
