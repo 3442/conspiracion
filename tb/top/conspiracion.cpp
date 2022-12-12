@@ -446,59 +446,58 @@ int main(int argc, char **argv)
 		std::fputs("=== end-regs ===\n", ctrl);
 	};
 
-	auto do_mem_dump = [&](const mem_region *dumps, std::size_t count)
+	auto pagewalk = [&](std::uint32_t &addr)
 	{
-		bool mmu_enabled = core.mmu->mmu_enable;
+		if(!core.mmu->mmu_enable)
+		{
+			return true;
+		}
+
 		std::uint32_t ttbr = core.mmu->mmu_ttbr;
 
-		auto pagewalk = [&](std::uint32_t &addr)
+		std::uint32_t entry;
+		if(!avl.dump(ttbr << 12 | addr >> 18, entry))
 		{
-			if(!mmu_enabled)
-			{
+			return false;
+		}
+
+		switch(entry & 0b11)
+		{
+			case 0b01:
+				break;
+
+			case 0b10:
+				addr = (entry & ~((1 << 20) - 1)) >> 2 | (addr & ((1 << 18) - 1));
 				return true;
-			}
 
-			std::uint32_t entry;
-			if(!avl.dump(ttbr << 12 | addr >> 18, entry))
-			{
+			default:
 				return false;
-			}
+		}
 
-			switch(entry & 0b11)
-			{
-				case 0b01:
-					break;
+		std::uint32_t entryaddr = (entry & ~((1 << 10) - 1)) >> 2 | ((addr >> 10) & ((1 << 8) - 1));
+		if(!avl.dump(entryaddr, entry))
+		{
+			return false;
+		}
 
-				case 0b10:
-					addr = (entry & ~((1 << 20) - 1)) >> 2 | (addr & ((1 << 18) - 1));
-					return true;
+		switch(entry & 0b11)
+		{
+			case 0b01:
+				addr = (entry & ~((1 << 16) - 1)) >> 2 | (addr & ((1 << 14) - 1));
+				return true;
 
-				default:
-					return false;
-			}
+			case 0b10:
+			case 0b11:
+				addr = (entry & ~((1 << 12) - 1)) >> 2 | (addr & ((1 << 10) - 1));
+				return true;
 
-			std::uint32_t entryaddr = (entry & ~((1 << 10) - 1)) >> 2 | ((addr >> 10) & ((1 << 8) - 1));
-			if(!avl.dump(entryaddr, entry))
-			{
+			default:
 				return false;
-			}
+		}
+	};
 
-			switch(entry & 0b11)
-			{
-				case 0b01:
-					addr = (entry & ~((1 << 16) - 1)) >> 2 | (addr & ((1 << 14) - 1));
-					return true;
-
-				case 0b10:
-				case 0b11:
-					addr = (entry & ~((1 << 12) - 1)) >> 2 | (addr & ((1 << 10) - 1));
-					return true;
-
-				default:
-					return false;
-			}
-		};
-
+	auto do_mem_dump = [&](const mem_region *dumps, std::size_t count)
+	{
 		std::fputs("=== dump-mem ===\n", ctrl);
 		for(std::size_t i = 0; i < count; ++i)
 		{
@@ -616,7 +615,13 @@ halt_or_fail:
 						 | ((word >> 16) & 0xff) << 8
 						 | ((word >> 24) & 0xff);
 
-					avl.patch(addr++, word);
+					std::uint32_t phys = addr++;
+					if(!pagewalk(phys))
+					{
+						break;
+					}
+
+					avl.patch(phys, word);
 				}
 			} else if(!std::strcmp(cmd, "patch-reg"))
 			{
