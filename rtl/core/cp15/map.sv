@@ -13,6 +13,7 @@
 `define CP15_CRN_TLB_LCK   4'd10
 `define CP15_CRN_DMA       4'd11
 `define CP15_CRN_PID       4'd13
+`define CP15_CRN_CYCLECNT  4'd15
 
 typedef struct packed
 {

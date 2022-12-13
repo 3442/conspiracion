@@ -227,6 +227,7 @@ set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/cache.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/cache_lockdown.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/cp15.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/cpuid.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/cyclecnt.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/domain.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/far.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/fsr.sv

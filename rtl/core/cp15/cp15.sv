@@ -10,7 +10,8 @@ module core_cp15
 	input  coproc_decode  dec,
 	input  word           write,
 
-	input  logic          fault_register,
+	input  logic          halt,
+	                      fault_register,
 	                      fault_page,
 	input  ptr            fault_addr,
 	input  mmu_fault_type fault_type,
@@ -31,8 +32,8 @@ module core_cp15
 	assign {op1, op2} = {dec.op1, dec.op2};
 	assign load = dec.load;
 
-	word read_cpuid, read_syscfg, read_ttbr, read_domain,
-	     read_far, read_fsr, read_cache_lockdown, read_tlb_lockdown;
+	word read_cpuid, read_syscfg, read_ttbr, read_domain, read_far,
+	     read_fsr, read_cache_lockdown, read_tlb_lockdown, read_cyclecnt;
 
 	core_cp15_cpuid cpuid
 	(
@@ -101,6 +102,12 @@ module core_cp15
 		.*
 	);
 
+	core_cp15_cyclecnt cyclecnt
+	(
+		.read(read_cyclecnt),
+		.*
+	);
+
 	always_comb
 		unique case(crn)
 			`CP15_CRN_CPUID:
@@ -126,6 +133,9 @@ module core_cp15
 
 			`CP15_CRN_TLB_LCK:
 				read = read_tlb_lockdown;
+
+			`CP15_CRN_CYCLECNT:
+				read = read_cyclecnt;
 
 			default:
 				read = {$bits(read){1'bx}};
