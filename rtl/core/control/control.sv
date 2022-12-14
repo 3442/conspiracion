@@ -4,6 +4,8 @@ module core_control
 (
 	input  logic           clk,
 	                       rst_n,
+
+	input  logic           irq,
 	                       halt,
 	                       step,
 
@@ -11,6 +13,7 @@ module core_control
 	input  ptr             insn_pc,
 	input  logic           issue_abort,
 	input  psr_mode        mode,
+	input  psr_intmask     intmask,
 	input  psr_flags       flags,
 	                       alu_flags,
 	input  word            cpsr_rd,

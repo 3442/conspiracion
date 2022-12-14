@@ -5,7 +5,8 @@ module arm810
 (
 	input  logic      clk,
 	                  rst_n,
-	                  irq,
+
+	input  logic      irq,
 	                  halt,
 	                  step,
 
