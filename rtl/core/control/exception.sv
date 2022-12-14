@@ -35,8 +35,8 @@ module core_control_exception
 			exception_mode <= 0;
 			exception_offset_pc <= 0;
 		end begin
-			if(issue)
-				pending_irq <= irq && !intmask.i;
+			if(next_cycle.issue)
+				pending_irq <= issue && irq && !intmask.i;
 
 			// A2.6.10 Exception priorities
 			if(mem_fault) begin

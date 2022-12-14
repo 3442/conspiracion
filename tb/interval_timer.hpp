@@ -17,6 +17,8 @@ namespace taller::avalon
 			virtual bool read(std::uint32_t addr, std::uint32_t &data) noexcept final override;
 			virtual bool write(std::uint32_t addr, std::uint32_t data, unsigned byte_enable) noexcept final override;
 
+			virtual bool irq() noexcept final override;
+
 		private:
 			std::uint32_t count;
 			std::uint32_t period;

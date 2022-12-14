@@ -15,8 +15,11 @@ __prefetch_abort:
 __data_abort:
 	b data_abort
 
-__irq:
+__reserved:
 	b .
+
+__irq:
+	b irq
 
 __fiq:
 	b .
@@ -33,7 +36,8 @@ halt:
 exc_default:
 	b   .
 
-.weak undefined, data_abort, prefetch_abort
+.weak undefined, data_abort, prefetch_abort, irq
 .set undefined, exc_default
 .set data_abort, exc_default
 .set prefetch_abort, exc_default
+.set irq, exc_default

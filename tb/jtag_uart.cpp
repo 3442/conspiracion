@@ -124,6 +124,11 @@ namespace taller::avalon
 		return true;
 	}
 
+	bool jtag_uart::irq() noexcept
+	{
+		return ctrl_we || (ctrl_re && rx_avail > 0);
+	}
+
 	void jtag_uart::takeover() noexcept
 	{
 		if(took_over)

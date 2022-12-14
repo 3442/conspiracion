@@ -96,4 +96,9 @@ namespace taller::avalon
 
 		return true;
 	}
+
+	bool interval_timer::irq() noexcept
+	{
+		return control_ito && status_to;
+	}
 }
