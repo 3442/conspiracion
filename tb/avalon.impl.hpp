@@ -22,16 +22,28 @@ namespace taller::avalon
 	}
 
 	template<class Platform>
+	void interconnect<Platform>::attach_intc(interrupt_controller &intc)
+	{
+		assert(root_intc == nullptr);
+
+		attach(intc.as_slave());
+		root_intc = &intc;
+	}
+
+	template<class Platform>
 	bool interconnect<Platform>::tick(bool clk)
 	{
 		if(!plat.reset_reset_n) [[unlikely]]
 		{
 			active = nullptr;
+			plat.avl_irq = 0;
+
 			avl_read = false;
 			avl_write = false;
 			avl_address = 0;
 			avl_writedata = 0;
 			avl_byteenable = 0;
+
 			return true;
 		}
 
@@ -57,6 +69,11 @@ namespace taller::avalon
 		for(auto &binding : devices)
 		{
 			binding.dev.tick();
+		}
+
+		if(root_intc)
+		{
+			plat.avl_irq = root_intc->irq();
 		}
 
 		if(!active)

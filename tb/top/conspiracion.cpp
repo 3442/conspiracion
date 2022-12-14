@@ -300,6 +300,12 @@ int main(int argc, char **argv)
 	mem<std::uint32_t> hps_ddr3(0x0000'0000, 512 << 20);
 	jtag_uart ttyJ0(0x3000'0000);
 	interval_timer timer(0x3002'0000);
+	interrupt_controller intc(0x3007'0000);
+
+	auto &irq_lines = intc.lines();
+	irq_lines.jtaguart = &ttyJ0;
+	irq_lines.timer = &timer;
+
 	mem<std::uint32_t> vram(0x3800'0000, 64 << 20);
 	null vram_null(0x3800'0000, 64 << 20, 2);
 	window vram_window(vram, 0x0000'0000);
@@ -323,8 +329,9 @@ int main(int argc, char **argv)
 	bool enable_accurate_video = !headless && accurate_video;
 
 	avl.attach(hps_ddr3);
-	avl.attach(ttyJ0);
 	avl.attach(timer);
+	avl.attach(ttyJ0);
+	avl.attach_intc(intc);
 
 	for(auto &slave : consts)
 	{

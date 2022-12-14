@@ -11,7 +11,7 @@ namespace taller::avalon
 	class slave
 	{
 		public:
-			inline slave(std::uint32_t base, std::uint32_t size, std::size_t word_size)
+			inline slave(std::uint32_t base, std::uint32_t size, std::size_t word_size) noexcept
 			: base(base),
 			  mask(~(size - 1)),
 			  word(log2i(word_size))
@@ -59,6 +59,11 @@ namespace taller::avalon
 			virtual bool read(std::uint32_t addr, std::uint32_t &data) = 0;
 			virtual bool write(std::uint32_t addr, std::uint32_t data, unsigned byte_enable) = 0;
 
+			inline virtual bool irq() noexcept
+			{
+				return false;
+			}
+
 		private:
 			std::uint32_t base;
 			std::uint32_t mask;
@@ -70,6 +75,39 @@ namespace taller::avalon
 			}
 	};
 
+	struct irq_lines
+	{
+		slave *timer    = nullptr;
+		slave *jtaguart = nullptr;
+	};
+
+	class interrupt_controller : private slave
+	{
+		public:
+			interrupt_controller(std::uint32_t base) noexcept;
+
+			virtual bool read(std::uint32_t addr, std::uint32_t &data) noexcept final override;
+			virtual bool write(std::uint32_t addr, std::uint32_t data, unsigned byte_enable) noexcept final override;
+
+			virtual bool irq() noexcept;
+
+			inline slave &as_slave() noexcept
+			{
+				return *this;
+			}
+
+			inline irq_lines &lines() noexcept
+			{
+				return irqs;
+			}
+
+		private:
+			irq_lines     irqs;
+			std::uint32_t mask = 0;
+
+			std::uint32_t status() noexcept;
+	};
+
 	template<class Platform>
 	class interconnect
 	{
@@ -78,6 +116,7 @@ namespace taller::avalon
 
 			bool tick(bool clk);
 			void attach(slave &dev);
+			void attach_intc(interrupt_controller &intc);
 			void bail() noexcept;
 
 			bool dump(std::uint32_t addr, std::uint32_t &word);
@@ -91,14 +130,15 @@ namespace taller::avalon
 				slave         &dev;
 			};
 
-			Platform            &plat;
-			slave*               active = nullptr;
-			std::vector<binding> devices;
-			std::uint32_t        avl_address    = 0;
-			std::uint32_t        avl_writedata  = 0;
-			unsigned             avl_byteenable = 0;
-			bool                 avl_read       = false;
-			bool                 avl_write      = false;
+			Platform             &plat;
+			slave*                active = nullptr;
+			std::vector<binding>  devices;
+			interrupt_controller *root_intc      = nullptr;
+			std::uint32_t         avl_address    = 0;
+			std::uint32_t         avl_writedata  = 0;
+			unsigned              avl_byteenable = 0;
+			bool                  avl_read       = false;
+			bool                  avl_write      = false;
 
 			slave *resolve_external(std::uint32_t avl_address);
 	};

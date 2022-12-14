@@ -7,6 +7,7 @@ module vga_domain
 	logic[25:0] avl_address /*verilator public*/;
 	logic       avl_read /*verilator public*/;
 	logic       avl_write /*verilator public*/;
+	logic       avl_irq /*verilator public_flat_rw @(negedge clk_clk)*/;
 	logic[15:0] avl_readdata /*verilator public_flat_rw @(negedge clk_clk)*/;
 	logic[31:0] avl_writedata /*verilator public*/;
 	logic       avl_waitrequest /*verilator public_flat_rw @(negedge clk_clk)*/;
