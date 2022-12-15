@@ -29,14 +29,14 @@ module core_control_exception
 	assign exception = undefined || syscall || prefetch_abort || mem_fault || pending_irq;
 	assign exception_vector = {{16{high_vectors}}, 11'b0, vector_offset, 2'b00};
 
-	always @(posedge clk or negedge rst_n) begin
+	always @(posedge clk or negedge rst_n)
 		if(!rst_n) begin
 			syscall <= 0;
 			pending_irq <= 0;
 			vector_offset <= 0;
 			exception_mode <= 0;
 			exception_offset_pc <= 0;
-		end begin
+		end else begin
 			if(next_cycle.issue) begin
 				syscall <= issue && dec.ctrl.swi;
 				pending_irq <= issue && irq && !intmask.i;
@@ -59,10 +59,9 @@ module core_control_exception
 				vector_offset <= 3'b010;
 				exception_mode <= `MODE_SVC;
 			end
-		end
 
-		if(next_cycle.escalate)
-			exception_offset_pc <= !mem_fault;
-	end
+			if(next_cycle.escalate)
+				exception_offset_pc <= !mem_fault;
+		end
 
 endmodule
