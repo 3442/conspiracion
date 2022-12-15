@@ -105,6 +105,7 @@ module core_control_ldst
 				end
 
 				mem_start <= !cycle.transfer || (mem_ready && pop_valid);
-			end
+			end else if(cycle.escalate)
+				ldst <= 0;
 		end
 endmodule

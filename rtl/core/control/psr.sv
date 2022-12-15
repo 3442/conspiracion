@@ -77,6 +77,7 @@ module core_control_psr
 			psr_wr_control <= 1;
 			exception_spsr <= cpsr_rd;
 		end else if(next_cycle.exception) begin
+			psr <= 0;
 			psr_saved <= 1;
 			psr_wr_flags <= 1;
 		end else if(next_cycle.psr)
