@@ -4,7 +4,9 @@ module core_control_issue
 (
 	input  logic       clk,
 	                   rst_n,
-	                   halt,
+
+	input  logic       halt,
+	                   irq,
 
 	input  insn_decode dec,
 	input  ptr         insn_pc,
@@ -27,6 +29,13 @@ module core_control_issue
 
 	logic valid;
 
+`ifdef VERILATOR
+	word bh0 /*verilator public*/,
+	     bh1 /*verilator public*/,
+	     bh2 /*verilator public*/,
+	     bh3 /*verilator public*/;
+`endif
+
 	assign valid = !next_bubble && !halt;
 	assign issue = next_cycle.issue && dec.ctrl.execute && valid;
 	assign next_pc_visible = insn_pc + 2;
@@ -37,6 +46,13 @@ module core_control_issue
 			undefined <= 0;
 			pc_visible <= 2;
 			prefetch_abort <= 0;
+
+`ifdef VERILATOR
+			bh0 <= 0;
+			bh1 <= 0;
+			bh2 <= 0;
+			bh3 <= 0;
+`endif
 		end else if(next_cycle.issue) begin
 			if(valid) begin
 				undefined <= dec.ctrl.undefined;
@@ -50,6 +66,15 @@ module core_control_issue
 
 			pc <= insn_pc;
 			pc_visible <= next_pc_visible;
+
+`ifdef VERILATOR
+			if(insn_pc != pc && insn_pc != pc + 1) begin
+				bh0 <= {pc, 2'b00};
+				bh1 <= bh0;
+				bh2 <= bh1;
+				bh3 <= bh2;
+			end
+`endif
 		end
 
 endmodule

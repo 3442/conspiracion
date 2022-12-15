@@ -73,12 +73,18 @@ all_regs = [
     ('far', 'far'),
     ('fsr', 'fsr'),
     ('dacr', 'dacr'),
+    ('bh0', 'bh0'),
+    ('bh1', 'bh1'),
+    ('bh2', 'bh2'),
+    ('bh3', 'bh3'),
     ]
 
 regs = {}
 read_reg = lambda r: regs.setdefault(r, 0)
 
+do_output = None
 output_buffer = None
+
 def out(*args, **kwargs):
     global output_buffer
 
