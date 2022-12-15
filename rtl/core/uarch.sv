@@ -88,6 +88,7 @@ typedef struct packed
 	      ldst,
 	      mul,
 	      psr,
+	      swi,
 	      nop,
 	      bkpt;
 } ctrl_decode;

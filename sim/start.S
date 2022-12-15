@@ -7,7 +7,7 @@ __undefined:
 	b undefined
 
 __swi:
-	b .
+	b swi
 
 __prefetch_abort:
 	b prefetch_abort
@@ -30,14 +30,11 @@ __fiq:
 _start:
 	ldr sp, =_stack_end
 	bl  reset
-
-.global halt
-halt:
-exc_default:
 	b   .
 
-.weak undefined, data_abort, prefetch_abort, irq
-.set undefined, exc_default
-.set data_abort, exc_default
-.set prefetch_abort, exc_default
-.set irq, exc_default
+.weak undefined, swi, data_abort, prefetch_abort, irq
+.set swi, __swi
+.set undefined, __undefined
+.set data_abort, __data_abort
+.set prefetch_abort, __prefetch_abort
+.set irq, __irq

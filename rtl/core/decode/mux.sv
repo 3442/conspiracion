@@ -56,6 +56,7 @@ module core_decode_mux
 	                     ldst,
 	                     mul,
 	                     psr,
+	                     swi,
 	                     coproc,
 	                     bkpt,
 	                     psr_saved,
@@ -71,6 +72,8 @@ module core_decode_mux
 
 	always_comb begin
 		mul = 0;
+		swi = 0;
+		psr = 0;
 		ldst = 0;
 		bkpt = 0;
 		branch = 0;
@@ -81,7 +84,6 @@ module core_decode_mux
 		conditional = 0;
 		restore_spsr = 0;
 
-		psr = 0;
 		psr_saved = 0;
 		psr_write = 0;
 		update_flags = 0;
@@ -215,8 +217,13 @@ module core_decode_mux
 				psr_wr_control = msr_fields.c;
 			end
 
-			/*`GROUP_SWP: ;
-			`INSN_SWI: ;*/
+			// WONTFIX: <https://gcc.gnu.org/bugzilla/show_bug.cgi?id=9757>
+			//`GROUP_SWP: ;
+
+			`INSN_SWI: begin
+				swi = 1;
+				dec_data.uses_rn = 0;
+			end
 
 		   /* No es parte de ARMv4 pero U-Boot lo necesita. esto se
 		    * decodifica igual que `mov pc, lr` ya que no tenemos Thumb.

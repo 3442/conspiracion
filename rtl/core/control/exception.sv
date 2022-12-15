@@ -6,6 +6,7 @@ module core_control_exception
 	                  rst_n,
 
 	input  ctrl_cycle  next_cycle,
+	input  insn_decode dec,
 	input  psr_intmask intmask,
 	input  logic       issue,
 	                   irq,
@@ -20,23 +21,26 @@ module core_control_exception
 	output word       exception_vector
 );
 
-	logic pending_irq;
+	logic pending_irq, syscall;
 	logic[2:0] vector_offset;
 
-	//TODO: irq, fiq, prefetch abort, swi
+	//TODO: fiq
 
-	assign exception = undefined || prefetch_abort || mem_fault || pending_irq;
+	assign exception = undefined || syscall || prefetch_abort || mem_fault || pending_irq;
 	assign exception_vector = {{16{high_vectors}}, 11'b0, vector_offset, 2'b00};
 
 	always @(posedge clk or negedge rst_n) begin
 		if(!rst_n) begin
+			syscall <= 0;
 			pending_irq <= 0;
 			vector_offset <= 0;
 			exception_mode <= 0;
 			exception_offset_pc <= 0;
 		end begin
-			if(next_cycle.issue)
+			if(next_cycle.issue) begin
+				syscall <= issue && dec.ctrl.swi;
 				pending_irq <= issue && irq && !intmask.i;
+			end
 
 			// A2.6.10 Exception priorities
 			if(mem_fault) begin
@@ -51,6 +55,9 @@ module core_control_exception
 			end else if(undefined) begin
 				vector_offset <= 3'b001;
 				exception_mode <= `MODE_UND;
+			end else if(syscall) begin
+				vector_offset <= 3'b010;
+				exception_mode <= `MODE_SVC;
 			end
 		end
 
