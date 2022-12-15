@@ -19,6 +19,7 @@
 #include "Vconspiracion_platform.h"
 #include "Vconspiracion_vga_domain.h"
 #include "Vconspiracion_core_control.h"
+#include "Vconspiracion_core_cp15_domain.h"
 #include "Vconspiracion_core_cp15_far.h"
 #include "Vconspiracion_core_cp15_fsr.h"
 #include "Vconspiracion_core_cp15_syscfg.h"
@@ -464,6 +465,7 @@ int main(int argc, char **argv)
 		std::fprintf(ctrl, "%08x ttbr\n", core.cp15->ttbr->read);
 		std::fprintf(ctrl, "%08x far\n", core.cp15->far_->read);
 		std::fprintf(ctrl, "%08x fsr\n", core.cp15->fsr->read);
+		std::fprintf(ctrl, "%08x dacr\n", core.cp15->domain->mmu_dac);
 		std::fputs("=== end-regs ===\n", ctrl);
 	};
 

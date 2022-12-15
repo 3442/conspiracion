@@ -75,7 +75,7 @@ namespace taller::avalon
 				control_ito = !!(data & (1 << 0));
 				control_cont = !!(data & (1 << 1));
 
-				status_run = (status_run && !!(data << (1 << 3))) || !!(data << (1 << 2));
+				status_run = (status_run && !!(data & (1 << 3))) || !!(data & (1 << 2));
 				break;
 
 			case 2:

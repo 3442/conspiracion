@@ -10,7 +10,7 @@ module core_cp15_domain
 	input  word      write,
 
 	output word      read,
-	                 mmu_dac
+	                 mmu_dac /*verilator public*/
 );
 
 	assign read = mmu_dac;

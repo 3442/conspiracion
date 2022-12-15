@@ -72,6 +72,7 @@ all_regs = [
     ('ttbr', 'ttbr'),
     ('far', 'far'),
     ('fsr', 'fsr'),
+    ('dacr', 'dacr'),
     ]
 
 regs = {}

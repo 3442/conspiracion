@@ -53,8 +53,10 @@ module core_mmu_pagewalk
 
 	core_mmu_fault access_check
 	(
+		.write(hold_write),
 		.fault(access_fault),
 		.domain(entry_domain),
+		.privileged(1), //TODO
 		.fault_type(access_fault_type),
 		.*
 	);
