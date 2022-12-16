@@ -55,7 +55,8 @@ def yield_to_gdb():
     if sendStop:
         reply(stop_reply)
 
-    while True:
+    detached = False
+    while not detached:
         data = client.recv(4096)
         if not data:
             break
@@ -87,6 +88,7 @@ def yield_to_gdb():
             return 'continue'
         elif data == b'D':
             replyout = b'OK'
+            detached = True
         elif data == b'g':
             replyout = hexout(read_reg(gdb_reg(r)) for r in range(16))
         elif data[0] == b'G':
@@ -128,6 +130,10 @@ def yield_to_gdb():
             replyout = b''
 
         reply(replyout)
+
+    if detached:
+        client.close()
+        client = None
 
 def reply(replyout):
     client.send(b'$' + replyout + b'#' + hexout(sum(replyout) & 0xff, size=1))
