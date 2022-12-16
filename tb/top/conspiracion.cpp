@@ -229,7 +229,7 @@ int main(int argc, char **argv)
 
 	args::ValueFlag<unsigned> cycles
 	(
-		parser, "cycles", "Max number of core cycles to run", {"cycles"}, UINT_MAX
+		parser, "cycles", "Max number of core cycles to run", {"cycles"}, 0
 	);
 
 	args::ValueFlag<int> control_fd
@@ -425,11 +425,6 @@ int main(int argc, char **argv)
 	{
 		tick();
 		tick();
-
-		if(top.breakpoint || (!(time & ((1 << 8) - 1)) && async_halt)) [[unlikely]]
-		{
-			top.halt = 1;
-		}
 	};
 
 	if(!no_tty)
@@ -564,22 +559,69 @@ int main(int argc, char **argv)
 
 	core.fetch->explicit_branch__VforceVal = 1;
 
+	auto maybe_halt = [&]()
+	{
+		if(top.breakpoint || async_halt)
+		{
+			top.halt = 1;
+		}
+
+		return top.halt;
+	};
+
+	auto loop_fast = [&]()
+	{
+		do
+		{
+			for(unsigned iters = 0; iters < 1024 && !top.breakpoint; ++iters)
+			{
+				top.clk_clk = 0;
+				top.eval();
+				avl.tick_falling();
+
+				top.clk_clk = 1;
+				top.eval();
+
+				// This is free most of the time
+				try
+				{
+					avl.tick_rising();
+				} catch(const avl_bus_error&)
+				{
+					failed = true;
+					break;
+				}
+			}
+		} while(!maybe_halt());
+	};
+
 	unsigned i = 0;
-	// Abuse unsigned overflow (cycles is UINT_MAX by default)
-	while(!failed && i + 1 <= *cycles)
+	auto loop_accurate = [&]()
 	{
 		do
 		{
 			cycle();
-			if(failed || top.cpu_halted) [[unlikely]]
-			{
-				goto halt_or_fail;
-			}
-		} while(++i + 1 <= *cycles);
+			maybe_halt();
+		} while(!failed && !top.cpu_halted && (*cycles == 0 || ++i < *cycles));
+	};
 
-		break;
+	const bool slow_path = *cycles > 0 || enable_accurate_video || enable_trace;
 
-halt_or_fail:
+	while(true)
+	{
+		if(slow_path || top.halt || top.step)
+		{
+			loop_accurate();
+		} else
+		{
+			loop_fast();
+		}
+
+		if(failed || (*cycles > 0 && i >= *cycles))
+		{
+			break;
+		}
+
 		top.step = 0;
 		core.fetch->target__VforceVal = core.control->pc;
 

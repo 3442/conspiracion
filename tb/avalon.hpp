@@ -4,6 +4,7 @@
 #include <cassert>
 #include <cstdint>
 #include <cstdio>
+#include <stdexcept>
 #include <vector>
 
 namespace taller::avalon
@@ -108,13 +109,22 @@ namespace taller::avalon
 			std::uint32_t status() noexcept;
 	};
 
+	class avl_bus_error : public std::runtime_error
+	{
+		public:
+			using std::runtime_error::runtime_error;
+	};
+
 	template<class Platform>
 	class interconnect
 	{
 		public:
 			interconnect(Platform &plat) noexcept;
 
-			bool tick(bool clk);
+			bool tick(bool clk) noexcept;
+			void tick_rising();
+			void tick_falling() noexcept;
+
 			void attach(slave &dev);
 			void attach_intc(interrupt_controller &intc);
 			void bail() noexcept;

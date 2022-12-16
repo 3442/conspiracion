@@ -31,9 +31,9 @@ namespace taller::avalon
 	}
 
 	template<class Platform>
-	bool interconnect<Platform>::tick(bool clk)
+	bool interconnect<Platform>::tick(bool clk) noexcept
 	{
-		if(!plat.reset_reset_n) [[unlikely]]
+		if(!plat.reset_reset_n)
 		{
 			active = nullptr;
 			plat.avl_irq = 0;
@@ -58,14 +58,26 @@ namespace taller::avalon
 
 		if(!clk)
 		{
-			if(!plat.avl_waitrequest)
-			{
-				active = nullptr;
-			}
-
+			tick_falling();
 			return true;
+		} else if(!active)
+		{
+			assert(!avl_read || !avl_write);
 		}
 
+		try
+		{
+			tick_rising();
+			return true;
+		} catch(const avl_bus_error&)
+		{
+			return false;
+		}
+	}
+
+	template<class Platform>
+	void interconnect<Platform>::tick_rising()
+	{
 		for(auto &binding : devices)
 		{
 			binding.dev.tick();
@@ -84,10 +96,9 @@ namespace taller::avalon
 			avl_writedata = plat.avl_writedata;
 			avl_byteenable = plat.avl_byteenable;
 
-			assert(!avl_read || !avl_write);
 			if(!avl_read && !avl_write)
 			{
-				return true;
+				return;
 			}
 
 			for(auto &binding : devices)
@@ -99,21 +110,20 @@ namespace taller::avalon
 				}
 			}
 
-			if(!active)
+			if(!active) [[unlikely]]
 			{
 				bail();
 
 				const char *op = avl_read ? "read" : "write";
 				fprintf(stderr, "[avl] attempt to %s memory hole at 0x%08x\n", op, avl_address);
-				return false;
-			}
 
-			if(avl_address & active->word_mask())
+				throw avl_bus_error{"memory hole addressed"};
+			} else if(avl_address & active->word_mask()) [[unlikely]]
 			{
 				bail();
-
 				fprintf(stderr, "[avl] unaligned address: 0x%08x\n", avl_address);
-				return false;
+
+				throw avl_bus_error{"unaligned address"};
 			}
 		}
 
@@ -128,8 +138,15 @@ namespace taller::avalon
 		{
 			plat.avl_waitrequest = !active->write(pos, avl_writedata, avl_byteenable);
 		}
+	}
 
-		return true;
+	template<class Platform>
+	void interconnect<Platform>::tick_falling() noexcept
+	{
+		if(!plat.avl_waitrequest)
+		{
+			active = nullptr;
+		}
 	}
 
 	template<class Platform>
