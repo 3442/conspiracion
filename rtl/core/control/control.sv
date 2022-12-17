@@ -70,6 +70,7 @@ module core_control
 	                       mul_start,
 	                       mul_signed,
 	                       coproc,
+	                       escalating,
 	                       psr_saved,
 	                       psr_write,
 	                       psr_wr_flags,

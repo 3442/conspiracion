@@ -2,10 +2,11 @@
 
 module core_control_exception
 (
-	input  logic      clk,
-	                  rst_n,
+	input  logic       clk,
+	                   rst_n,
 
-	input  ctrl_cycle  next_cycle,
+	input  ctrl_cycle  cycle,
+	                   next_cycle,
 	input  insn_decode dec,
 	input  psr_intmask intmask,
 	input  logic       issue,
@@ -15,10 +16,11 @@ module core_control_exception
 	                   prefetch_abort,
 	                   mem_fault,
 
-	output logic      exception,
-	                  exception_offset_pc,
-	output psr_mode   exception_mode,
-	output word       exception_vector
+	output logic       escalating,
+	                   exception,
+	                   exception_offset_pc,
+	output psr_mode    exception_mode,
+	output word        exception_vector
 );
 
 	logic pending_irq, syscall;
@@ -27,6 +29,7 @@ module core_control_exception
 	//TODO: fiq
 
 	assign exception = undefined || syscall || prefetch_abort || mem_fault || pending_irq;
+	assign escalating = cycle.escalate;
 	assign exception_vector = {{16{high_vectors}}, 11'b0, vector_offset, 2'b00};
 
 	always @(posedge clk or negedge rst_n)

@@ -8,6 +8,7 @@ module core_psr
 	                   saved,
 	                   wr_flags,
 	                   wr_control,
+	                   escalating,
 	                   update_flags,
 	                   alu_v_valid,
 	input  psr_flags   alu_flags,
@@ -133,7 +134,7 @@ module core_psr
 			wr_clean.mode = mode;
 		end
 
-		if(mode == `MODE_USR) begin
+		if(mode == `MODE_USR && !escalating) begin
 			wr_clean.mask = mask;
 			wr_clean.mode = `MODE_USR;
 		end
