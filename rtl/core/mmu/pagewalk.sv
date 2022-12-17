@@ -6,7 +6,8 @@ module core_mmu_pagewalk
 	input  logic          clk,
 	                      rst_n,
 
-	input  logic          mmu_enable,
+	input  logic          privileged,
+	                      mmu_enable,
 	input  mmu_base       mmu_ttbr,
 	input  word           mmu_dac,
 
@@ -56,7 +57,6 @@ module core_mmu_pagewalk
 		.write(hold_write),
 		.fault(access_fault),
 		.domain(entry_domain),
-		.privileged(1), //TODO
 		.fault_type(access_fault_type),
 		.*
 	);

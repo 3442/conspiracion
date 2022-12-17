@@ -6,7 +6,8 @@ module core_mmu
 	input  logic          clk,
 	                      rst_n,
 
-	input  logic          mmu_enable /*verilator public*/,
+	input  logic          privileged,
+	                      mmu_enable /*verilator public*/,
 	input  mmu_base       mmu_ttbr /*verilator public*/,
 	input  word           mmu_dac,
 

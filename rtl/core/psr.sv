@@ -17,7 +17,8 @@ module core_psr
 	output psr_intmask mask,
 	output psr_mode    mode,
 	output word        cpsr_rd,
-	                   spsr_rd
+	                   spsr_rd,
+	output logic       privileged
 );
 
 	typedef struct packed
@@ -54,6 +55,7 @@ module core_psr
 	assign wr_word = psr_wr;
 	assign cpsr_rd = cpsr_word;
 	assign spsr_rd = spsr_word;
+	assign privileged = |mode[3:0]; // Not user
 	assign {wr_state.flags, wr_state.mask, wr_state.mode} = {wr_word.nzcv, wr_word.if_, wr_word.m};
 
 `ifdef VERILATOR
