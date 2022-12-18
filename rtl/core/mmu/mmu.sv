@@ -19,6 +19,7 @@ module core_mmu
 	input  logic          insn_start,
 	                      data_start,
 	                      data_write,
+	                      data_user,
 	input  logic[3:0]     data_data_be,
 
 	output word           bus_data_wr,
@@ -96,6 +97,7 @@ module core_mmu
 		.bus_data_be(dphys_data_be),
 		.bus_data_rd(dphys_data_rd),
 
+		.privileged(privileged && !data_user),
 		.*
 	);
 

@@ -24,6 +24,8 @@ module core_porch
 	logic execute, conditional, undefined, nop;
 	insn_decode hold_dec;
 
+	//FIXME: User mode puede hacer msr o mcr y saltare cualquier límite de seguridad
+
 	always_comb begin
 		dec = hold_dec;
 		dec.ctrl.nop = nop;

@@ -77,6 +77,7 @@ module arm810
 		.branch(explicit_branch),
 		.shifter(shifter_ctrl),
 		.mem_addr(data_addr),
+		.mem_user(data_user),
 		.mem_start(data_start),
 		.mem_write(data_write),
 		.mem_ready(data_ready),
@@ -174,8 +175,10 @@ module arm810
 
 	ptr data_addr;
 	word data_data_rd, data_data_wr, insn_data_rd;
-	logic data_start, data_write, data_ready, insn_ready, data_fault, insn_fault;
 	logic[3:0] data_data_be;
+
+	logic data_start, data_write, data_ready, insn_ready,
+	      data_fault, insn_fault, data_user;
 
 	core_mmu mmu
 	(

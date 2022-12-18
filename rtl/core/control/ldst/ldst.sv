@@ -23,6 +23,7 @@ module core_control_ldst
 	                   mem_offset,
 	output logic       mem_start,
 	                   mem_write,
+	                   mem_user,
 	                   pop_valid,
 	                   ldst,
 	                   ldst_next,
@@ -73,6 +74,7 @@ module core_control_ldst
 
 			base <= {$bits(base){1'b0}};
 			mem_regs <= {$bits(mem_regs){1'b0}};
+			mem_user <= 0;
 			mem_write <= 0;
 			mem_start <= 0;
 			mem_offset <= 0;
@@ -81,9 +83,10 @@ module core_control_ldst
 				mem_start <= 0;
 
 			if(next_cycle.issue) begin
-				// TODO: dec.ldst.unprivileged
-				if(issue)
+				if(issue) begin
 					ldst <= dec.ctrl.ldst;
+					mem_user <= dec.ldst.unprivileged;
+				end
 
 				pre <= dec.ldst.pre_indexed;
 				size <= dec.ldst.size;

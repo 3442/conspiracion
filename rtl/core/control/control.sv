@@ -61,6 +61,7 @@ module core_control
 	output logic[3:0]      mem_data_be,
 	output logic           mem_start,
 	                       mem_write,
+	                       mem_user,
 	output word            mul_a,
 	                       mul_b,
 	                       mul_c_hi,
