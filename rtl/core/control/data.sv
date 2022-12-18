@@ -31,7 +31,7 @@ module core_control_data
 	output shifter_control shifter,
 	output word            shifter_base,
 	output logic[7:0]      shifter_shift,
-	output logic           c_in,
+	output logic           c_logic,
 	                       trivial_shift,
 	                       data_snd_shift_by_reg
 );
@@ -75,7 +75,7 @@ module core_control_data
 	always_ff @(posedge clk or negedge rst_n)
 		if(!rst_n) begin
 			alu <= {$bits(alu){1'b0}};
-			c_in <= 0;
+			c_logic <= 0;
 			shifter <= {$bits(shifter){1'b0}};
 			data_imm <= {$bits(data_imm){1'b0}};
 			saved_base <= 0;
@@ -84,7 +84,7 @@ module core_control_data
 			data_snd_shift_by_reg <= 0;
 		end else if(next_cycle.issue) begin
 			alu <= dec.data.op;
-			c_in <= flags.c;
+			c_logic <= 0;
 
 			data_imm <= dec.snd.imm;
 			data_shift_imm <= dec.snd.shift_imm;
@@ -99,7 +99,7 @@ module core_control_data
 			saved_base <= rd_value_b;
 			data_snd_shift_by_reg <= 0;
 		end else if(next_cycle.with_shift) begin
-			c_in <= c_shifter;
+			c_logic <= c_shifter;
 			saved_base <= q_shifter;
 		end else if(next_cycle.transfer) begin
 			if(ldst_next)

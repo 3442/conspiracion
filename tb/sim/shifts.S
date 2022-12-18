@@ -17,4 +17,7 @@ reset:
 	ldr r4, =(512 << 20)
 	ldr r5, =#60
 	lsr r4, r4, r5
+	mov r5, #0
+	ldr r12, =-123456
+	adc r5, r5, r12, asr #18
 	mov pc, lr

@@ -64,18 +64,17 @@ module arm810
 	);
 
 	reg_num rd, ra, rb;
-	logic explicit_branch, writeback, c_in;
+	logic explicit_branch, writeback;
 	ptr branch_target, pc_visible;
 	psr_mode reg_mode;
-	alu_op alu_ctrl;
 	shifter_control shifter_ctrl;
-	word alu_a, alu_b, wr_value;
+	word wr_value;
 	logic[7:0] shifter_shift;
 
 	core_control control
 	(
-		.branch(explicit_branch),
 		.alu(alu_ctrl),
+		.branch(explicit_branch),
 		.shifter(shifter_ctrl),
 		.mem_addr(data_addr),
 		.mem_start(data_start),
@@ -121,9 +120,10 @@ module arm810
 		.*
 	);
 
+	word alu_a, alu_b, q_alu;
+	logic c_logic, alu_v_valid;
+	alu_op alu_ctrl;
 	psr_flags alu_flags;
-	logic alu_v_valid;
-	word q_alu;
 
 	core_alu #(.W(32)) alu
 	(
@@ -131,6 +131,7 @@ module arm810
 		.a(alu_a),
 		.b(alu_b),
 		.q(q_alu),
+		.c_in(flags.c),
 		.nzcv(alu_flags),
 		.v_valid(alu_v_valid),
 		.*

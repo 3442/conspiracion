@@ -8,6 +8,7 @@ module core_alu
 	input  logic[W - 1:0] a,
 	                      b,
 	input  logic          c_in,
+	                      c_logic,
 
 	output logic[W - 1:0] q,
 	output psr_flags      nzcv,
@@ -106,7 +107,7 @@ module core_alu
 		v = 1'bx;
 		unique case(op)
 			`ALU_AND, `ALU_EOR, `ALU_TST, `ALU_TEQ, `ALU_ORR, `ALU_MOV, `ALU_BIC, `ALU_MVN:
-				c = c_in;
+				c = c_logic;
 
 			`ALU_ADD, `ALU_ADC, `ALU_CMN: begin
 				c = c_add;

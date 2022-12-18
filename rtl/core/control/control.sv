@@ -42,7 +42,7 @@ module core_control
 	                       writeback,
 	                       breakpoint,
 	                       update_flags,
-	                       c_in,
+	                       c_logic,
 	output reg_num         rd,
 	                       ra,
 	                       rb,
