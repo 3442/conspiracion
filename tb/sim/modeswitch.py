@@ -7,4 +7,6 @@ def final():
     assert_reg(r5, 0x6000_0190)
     assert_reg(cpsr, 0x0000_0190)
     assert_reg(r13_svc, 0x2000_0000)
+    assert_reg(r13_usr, 0x2000_0000)
+    assert_reg(r12_usr, 0xfee1_dead)
     assert_reg(r13_und, 0x0000_01db)

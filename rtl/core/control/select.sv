@@ -8,7 +8,9 @@ module core_control_select
 	input  insn_decode dec,
 
 	input  ctrl_cycle  next_cycle,
-	input  logic       mem_ready,
+	input  psr_mode    mode,
+	input  logic       issue,
+	                   mem_ready,
 	                   pop_valid,
 	                   ldst_next,
 	input  reg_num     popped,
@@ -17,10 +19,17 @@ module core_control_select
 	                   mul_r_add_hi,
 
 	output reg_num     ra,
-	                   rb
+	                   rb,
+	output psr_mode    rd_mode,
+	                   wr_mode,
+	output logic       rd_user
 );
 
+	logic wr_user;
 	reg_num r_shift, last_ra, last_rb;
+
+	assign rd_mode = rd_user ? `MODE_USR : mode;
+	assign wr_mode = wr_user ? `MODE_USR : mode;
 
 	always_comb begin
 		ra = last_ra;
@@ -46,12 +55,26 @@ module core_control_select
 			last_ra <= {$bits(ra){1'b0}};
 			last_rb <= {$bits(rb){1'b0}};
 			r_shift <= {$bits(r_shift){1'b0}};
+
+			rd_user <= 0;
+			wr_user <= 0;
 		end else begin
 			last_ra <= ra;
 			last_rb <= rb;
 
-			if(next_cycle.issue)
+			if(rd_user && next_cycle.transfer)
+				wr_user <= 1;
+
+			if(rd_user && !next_cycle.transfer)
+				rd_user <= 0;
+
+			if(wr_user && !next_cycle.transfer)
+				wr_user <= 0;
+
+			if(next_cycle.issue) begin
 				r_shift <= dec.snd.r_shift;
+				rd_user <= issue && dec.ctrl.ldst && dec.ldst.user_regs;
+			end
 		end
 
 endmodule

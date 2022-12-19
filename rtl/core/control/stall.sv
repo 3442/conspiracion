@@ -9,7 +9,8 @@ module core_control_stall
 	input  insn_decode dec,
 
 	input  ctrl_cycle  next_cycle,
-	input  logic       final_update_flags,
+	input  logic       rd_user,
+	                   final_update_flags,
 	                   final_restore_spsr,
 	                   final_psr_write,
 	                   final_writeback,
@@ -25,7 +26,7 @@ module core_control_stall
 
 	assign stall = !next_cycle.issue || next_bubble || halt;
 	assign halted = halt && !next_bubble && next_cycle.issue;
-	assign next_bubble = pc_rd_hazard || pc_wr_hazard || flags_hazard || psr_hazard;
+	assign next_bubble = pc_rd_hazard || pc_wr_hazard || flags_hazard || psr_hazard || rd_user;
 
 	//FIXME: pc_rd_hazard no debería definirse sin final_writeback?
 	assign psr_hazard = final_psr_write || final_restore_spsr;

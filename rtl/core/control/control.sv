@@ -48,7 +48,8 @@ module core_control
 	                       rb,
 	output ptr             branch_target,
 	                       pc_visible,
-	output psr_mode        reg_mode,
+	output psr_mode        rd_mode,
+	                       wr_mode,
 	output alu_op          alu,
 	output word            alu_a,
 	                       alu_b,
@@ -101,6 +102,8 @@ module core_control
 	(
 		.*
 	);
+
+	logic rd_user;
 
 	core_control_select ctrl_select
 	(

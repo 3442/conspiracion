@@ -9,8 +9,7 @@ module core_control_psr
 	input  word        cpsr_rd,
 	                   spsr_rd,
 	                   alu_b,
-	input  psr_mode    mode,
-	                   exception_mode,
+	input  psr_mode    exception_mode,
 
 	input  ctrl_cycle  cycle,
 	                   next_cycle,
@@ -24,16 +23,12 @@ module core_control_psr
 	                   final_psr_write,
 	                   final_restore_spsr,
 	output word        psr_wb,
-	                   psr_wr,
-	output psr_mode    reg_mode
+	                   psr_wr
 );
 
 	word exception_spsr;
 
 	assign psr_wb = psr_saved ? spsr_rd : cpsr_rd;
-
-	//TODO: casos donde esto no es cierto
-	assign reg_mode = mode;
 
 	always_comb begin
 		psr_write = 0;

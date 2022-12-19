@@ -22,9 +22,10 @@ module arm810
 	                  breakpoint
 );
 
-	ptr fetch_insn_pc, fetch_head, insn_addr;
+	ptr branch_target, fetch_insn_pc, fetch_head, insn_addr;
 	word fetch_insn;
-	logic fetch_nop, fetch_abort, stall, flush, prefetch_flush, insn_start;
+	logic explicit_branch, fetch_nop, fetch_abort, stall,
+		  flush, prefetch_flush, insn_start;
 
 	//TODO
 	assign prefetch_flush = halt;
@@ -63,14 +64,6 @@ module arm810
 		.*
 	);
 
-	reg_num rd, ra, rb;
-	logic explicit_branch, writeback;
-	ptr branch_target, pc_visible;
-	psr_mode reg_mode;
-	shifter_control shifter_ctrl;
-	word wr_value;
-	logic[7:0] shifter_shift;
-
 	core_control control
 	(
 		.alu(alu_ctrl),
@@ -106,15 +99,16 @@ module arm810
 		.*
 	);
 
-	logic wr_pc;
-	word rd_value_a, rd_value_b, wr_current;
+	ptr pc_visible;
+	word rd_value_a, rd_value_b, wr_current, wr_value;
+	logic wr_pc, writeback;
+	reg_num rd, ra, rb;
+	psr_mode rd_mode, wr_mode;
 
 	core_regs regs
 	(
 		.rd_r_a(ra),
 		.rd_r_b(rb),
-		.rd_mode(reg_mode),
-		.wr_mode(reg_mode),
 		.wr_r(rd),
 		.wr_enable(writeback),
 		.branch(wr_pc),
@@ -140,6 +134,8 @@ module arm810
 
 	word shifter_base, q_shifter;
 	logic c_shifter;
+	logic[7:0] shifter_shift;
+	shifter_control shifter_ctrl;
 
 	core_shifter #(.W(32)) shifter
 	(
