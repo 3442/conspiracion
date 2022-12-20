@@ -174,6 +174,7 @@ module core_mmu_pagewalk
 
 							state <= L1;
 							bus_addr <= {mmu_ttbr, core_addr `MMU_L1_INDEX};
+							bus_write <= 0;
 						end else begin
 							state <= DATA;
 							bus_addr <= core_addr;
@@ -227,7 +228,6 @@ module core_mmu_pagewalk
 				DATA:
 					if(bus_ready) begin
 						state <= IDLE;
-						bus_write <= 0;
 						core_ready <= 1;
 						core_data_rd <= bus_data_rd;
 					end
