@@ -22,7 +22,7 @@ module core_mul
 	             ready     // 1 cuando la multiplicación está lista
 );
 
-	logic wait_state;
+	logic[1:0] wait_state;
 	dword c, q;
 
 	assign ready = !start && wait_state == {$bits(wait_state){1'b0}};
@@ -34,7 +34,7 @@ module core_mul
 	dsp_mul it
 	(
 		.clock0(clk),
-		.aclr0(rst_n),
+		.aclr0(0), //TODO: parece ser active-high, así que no puede ir a rst_n
 		.ena0(start || !ready),
 		.dataa_0(a),
 		.datab_0(b),
@@ -58,6 +58,6 @@ module core_mul
 		else if(wait_state > {$bits(wait_state){1'b0}})
 			wait_state <= wait_state - 1;
 		else if(start)
-			wait_state <= 1;
+			wait_state <= {$bits(wait_state){1'b1}};
 
 endmodule

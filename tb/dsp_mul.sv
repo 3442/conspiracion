@@ -26,8 +26,8 @@ module dsp_mul
 			2'b11: product = $signed(ext_a) * $signed(ext_b);
 		endcase
 
-	always @(posedge clock0 or negedge aclr0)
-		if(!aclr0) begin
+	always @(posedge clock0 or posedge aclr0)
+		if(aclr0) begin
 			result <= {64{1'bx}};
 			hold_a <= {32{1'bx}};
 			hold_b <= {32{1'bx}};
