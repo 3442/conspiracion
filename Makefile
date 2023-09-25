@@ -7,8 +7,8 @@ SIM_DIR       := sim
 TB_SIM_DIR    := $(TB_DIR)/sim
 SIM_OBJ_DIR   := $(OBJ_DIR)/$(TOP)/sim
 VERILATOR     := verilator
-CROSS_CC      := arm-none-eabi-gcc
-CROSS_OBJCOPY := arm-none-eabi-objcopy
+CROSS_CC      := $(CROSS_COMPILE)gcc
+CROSS_OBJCOPY := $(CROSS_COMPILE)objcopy
 CROSS_CFLAGS  := -O3 -Wall -Wextra -Werror
 CROSS_LDFLAGS :=
 
@@ -35,7 +35,7 @@ sim/%: $(SIM_DIR)/sim.py $(TB_SIM_DIR)/%.py exe/$(TOP) $(SIM_OBJ_DIR)/%.bin
 	@$< $(TB_SIM_DIR)/$*.py $(OBJ_DIR)/$(TOP)/V$(TOP) $(SIM_OBJ_DIR)/$*.bin
 
 vmlaunch: $(SIM_DIR)/sim.py $(SIM_DIR)/gdbstub.py exe/$(TOP)
-	@$< $(SIM_DIR)/gdbstub.py $(OBJ_DIR)/$(TOP)/V$(TOP) u-boot/build/u-boot-dtb.bin
+	@$< $(SIM_DIR)/gdbstub.py $(OBJ_DIR)/$(TOP)/V$(TOP) u-boot/build/taller/u-boot-dtb.bin
 
 $(SIM_OBJ_DIR)/%.bin: $(SIM_OBJ_DIR)/%
 	$(CROSS_OBJCOPY) -O binary --only-section=._img $< $@

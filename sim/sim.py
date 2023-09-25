@@ -222,6 +222,7 @@ def exit(*, success):
         f'{color}Test \'{COLOR_YELLOW}{test_name}{COLOR_RESET}{color}\' ' +
         f'{status}{COLOR_RESET}')
 
+    flush_out()
     sys.exit(0 if success else 1)
 
 def dump_regs():
@@ -393,7 +394,7 @@ exec_args.append(f'+verilator+seed+{seed}')
 if not os.getenv('SIM_PULLX', 0):
     exec_args.append('+verilator+rand+reset+2')
 
-process = subprocess.Popen(exec_args, pass_fds=(target_fd,))
+process = subprocess.Popen(exec_args, pass_fds=(target_fd,), stderr=subprocess.PIPE)
 target_end.close()
 
 in_regs = False
@@ -462,6 +463,7 @@ while not done:
 
 process.wait(timeout=1)
 if process.returncode != 0:
+    out(f'{COLOR_RED}{verilated} exited with status {process.returncode}{COLOR_RESET}')
     exit(success=False)
 
 if final := module_get('final'):

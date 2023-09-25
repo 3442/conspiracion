@@ -23,7 +23,10 @@ def fatal():
 def do_output(text):
     if text is None:
         return not is_halted()
-    elif not client:
+
+    print(text, file=sys.stderr, end='')
+
+    if not client:
         return False
 
     reply(b'O' + hexout(text.encode('ascii')))

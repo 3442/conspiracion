@@ -121,6 +121,7 @@
           ];
 
           shellHook = ''
+            export CROSS_COMPILE=arm-unknown-linux-gnueabi-
             export MAKEFLAGS="AR=gcc-ar"
             export CXXFLAGS="-O3 -flto $(pkg-config --cflags sdl2 ncursesw)"
             export LDFLAGS="-O3 -flto $(pkg-config --libs sdl2 ncursesw)"
@@ -149,7 +150,7 @@
           ];
 
           shellHook = ''
-            export CROSS_COMPILE=arm-none-eabi-
+            export CROSS_COMPILE=arm-unknown-linux-gnueabi-
             export MAKEFLAGS="ARCH=arm O=build/taller LOADADDR=0x8000"
           '';
         };
