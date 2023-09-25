@@ -4,10 +4,15 @@
 // Decodifica como andeq r0, r0, r0
 `define NOP 32'd0
 
+// Choca con typedef en cache/defs.sv
+`ifndef WORD_DEFINED
+typedef logic[31:0] word;
+`define WORD_DEFINED
+`endif
+
 typedef logic[3:0]  reg_num;
 typedef logic[2:0]  cp_opcode;
 typedef logic[15:0] reg_list;
-typedef logic[31:0] word;
 typedef logic[63:0] dword;
 typedef logic[29:0] ptr;
 
