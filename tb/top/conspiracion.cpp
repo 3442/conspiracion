@@ -299,7 +299,7 @@ int main(int argc, char **argv)
 		trace.open("trace.vcd");
 	}
 
-	mem<std::uint32_t> hps_ddr3(0x0000'0000, 512 << 20);
+	mem hps_ddr3(0x0000'0000, 512 << 20);
 	jtag_uart ttyJ0(0x3000'0000);
 	interval_timer timer(0x3002'0000);
 	interrupt_controller intc(0x3007'0000);
@@ -308,7 +308,7 @@ int main(int argc, char **argv)
 	irq_lines.jtaguart = &ttyJ0;
 	irq_lines.timer = &timer;
 
-	mem<std::uint32_t> vram(0x3800'0000, 64 << 20);
+	mem vram(0x3800'0000, 64 << 20);
 	null vram_null(0x3800'0000, 64 << 20, 2);
 	window vram_window(vram, 0x0000'0000);
 
@@ -355,13 +355,13 @@ int main(int argc, char **argv)
 	FILE *img_file = std::fopen(image->c_str(), "rb");
 	if(!img_file)
 	{
-		std::perror("fopen()");
+		std::fprintf(stderr, "fopen(\"%s\"): %m\n", image->c_str());
 		return EXIT_FAILURE;
 	}
 
-	hps_ddr3.load([&](std::uint32_t *buffer, std::size_t words)
+	hps_ddr3.load([&](line *buffer, std::size_t lines)
 	{
-		return std::fread(buffer, 4, words, img_file);
+		return std::fread(buffer, sizeof *buffer, lines, img_file);
 	});
 
 	std::fclose(img_file);
@@ -371,13 +371,13 @@ int main(int argc, char **argv)
 		FILE *img_file = std::fopen(load.filename.c_str(), "rb");
 		if(!img_file)
 		{
-			std::perror("fopen()");
+			std::fprintf(stderr, "fopen(\"%s\"): %m\n", load.filename.c_str());
 			return EXIT_FAILURE;
 		}
 
-		hps_ddr3.load([&](std::uint32_t *buffer, std::size_t words)
+		hps_ddr3.load([&](line *buffer, std::size_t lines)
 		{
-			return std::fread(buffer, 4, words, img_file);
+			return std::fread(buffer, sizeof *buffer, lines, img_file);
 		}, load.addr);
 
 		std::fclose(img_file);

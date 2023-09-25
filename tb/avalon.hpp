@@ -9,6 +9,21 @@
 
 namespace taller::avalon
 {
+	union line
+	{
+		__int128 qword;
+
+		struct
+		{
+			std::uint64_t lo, hi;
+		};
+
+		struct
+		{
+			std::uint32_t words[4];
+		};
+	};
+
 	class slave
 	{
 		public:
@@ -57,8 +72,50 @@ namespace taller::avalon
 			inline virtual void bail() noexcept
 			{}
 
-			virtual bool read(std::uint32_t addr, std::uint32_t &data) = 0;
-			virtual bool write(std::uint32_t addr, std::uint32_t data, unsigned byte_enable) = 0;
+			virtual bool read(std::uint32_t addr, std::uint32_t &data)
+			{
+				line line_data;
+				if (!this->read_line(addr >> 2, line_data))
+					return false;
+
+				data = line_data.words[addr & 0b11];
+				return true;
+			}
+
+			virtual bool read_line(std::uint32_t addr, line &data)
+			{
+				data.hi = 0;
+				data.lo = 0;
+
+				return this->read(addr << 2, data.words[0]);
+			}
+
+			virtual bool write
+			(
+			 	std::uint32_t addr, std::uint32_t data, unsigned byte_enable = 0b1111
+			) {
+				line line_data;
+				line_data.words[addr & 0b11] = data;
+
+				return this->write_line(addr >> 2, line_data, byte_enable << ((addr & 0b11) * 4));
+			}
+
+			virtual bool write_line(std::uint32_t addr, const line &data, unsigned byte_enable) {
+				unsigned offset = 0;
+				if (byte_enable & 0x00f0)
+					offset = 1;
+				else if (byte_enable & 0x0f00)
+					offset = 2;
+				else if (byte_enable & 0xf000)
+					offset = 3;
+
+				return this->write
+				(
+					(addr << 2) + offset,
+					data.words[offset],
+					(byte_enable >> (offset * 4)) & 0b1111
+				);
+			}
 
 			inline virtual bool irq() noexcept
 			{
