@@ -103,7 +103,8 @@
         nativeBuildInputs = [
           binutils
           gcc
-          gcc-arm-embedded
+          cross.stdenv.cc.cc
+          cross.stdenv.cc.bintools
           gdb
           gnumake
           gtkwave
@@ -134,7 +135,8 @@
           bison
           flex
           gcc
-          gcc-arm-embedded
+          cross.stdenv.cc.cc
+          cross.stdenv.cc.bintools
           gnumake
           openssl # Splash de u-boot
           ubootTools
