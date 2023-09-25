@@ -84,13 +84,13 @@ module cache_control
 
 	assign may_send = may_send_if_token_held && in_token_valid;
 	assign may_send_if_token_held
-		 = (!in_token.e2.valid || in_token.e2.index != core_index || in_token.e2.tag != core_tag)
-		&& (!in_token.e1.valid || in_token.e1.index != core_index || in_token.e1.tag != core_tag)
-		&& (!in_token.e0.valid || in_token.e0.index != core_index || in_token.e0.tag != core_tag);
+	     = (!in_token.e2.valid || in_token.e2.index != core_index || in_token.e2.tag != core_tag)
+	    && (!in_token.e1.valid || in_token.e1.index != core_index || in_token.e1.tag != core_tag)
+	    && (!in_token.e0.valid || in_token.e0.index != core_index || in_token.e0.tag != core_tag);
 
 	assign out_data = out_stall ? stall_data : out_data_next;
 	assign out_data_next = send ? send_data : fwd_data;
-	assign out_data_valid = out_stall || send || (in_hold_valid && !last_hop);
+	assign out_data_valid = out_stall || send || (in_hold_valid && !last_hop && in_data_ready);
 
 	assign send_data.tag = core_tag;
 	assign send_data.ttl = `TTL_MAX;

@@ -26,7 +26,9 @@ namespace taller::avalon
 			std::uint32_t words[4];
 		};
 
-		line() noexcept = default;
+		inline line() noexcept
+		: lo{0}, hi{0}
+		{}
 
 		inline line(VlWide<4> verilated) noexcept
 		: verilated(verilated)

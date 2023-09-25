@@ -1,7 +1,7 @@
 BASE = 0x0001_0000
 COUNT = 20
 
-cycles = 1024
+cycles = 1024 + 512
 mem_dumps = [range(BASE, BASE + 4 * COUNT)]
 
 def final():

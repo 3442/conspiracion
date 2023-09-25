@@ -100,7 +100,7 @@ module cache_routing
 		if (transition) begin
 			mem_address <= cache_mem ? cache_mem_address : core_address_line;
 			mem_writedata <= cache_mem ? cache_mem_writedata : core_writedata_line;
-			mem_byteenable <= cache_mem ? 16'hff : core_byteenable_line;
+			mem_byteenable <= cache_mem ? 16'hffff : core_byteenable_line;
 		end
 
 endmodule
