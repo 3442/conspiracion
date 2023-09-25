@@ -1,5 +1,7 @@
 N = 20
 
+cycles = 1024 + 512
+
 mem_dumps = [range(0x100, 0x108), range(0x200, 0x200 + 4 * N)]
 
 def init():

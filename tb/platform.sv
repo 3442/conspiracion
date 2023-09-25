@@ -1,3 +1,5 @@
+`include "cache/defs.sv"
+
 module platform
 (
 	input  wire        clk_clk,                          //                       clk.clk
@@ -52,14 +54,22 @@ module platform
 	output wire [7:0]  vga_dac_B                        //                          .B
 );
 
-	logic[31:0] avl_address /*verilator public*/;
-	logic       avl_read /*verilator public*/;
-	logic       avl_write /*verilator public*/;
-	logic       avl_irq /*verilator public_flat_rw @(negedge clk_clk)*/;
-	logic[31:0] avl_readdata /*verilator public_flat_rw @(negedge clk_clk)*/;
-	logic[31:0] avl_writedata /*verilator public*/;
-	logic       avl_waitrequest /*verilator public_flat_rw @(negedge clk_clk)*/;
-	logic[3:0]  avl_byteenable /*verilator public*/;
+	logic[31:0]  avl_address /*verilator public*/;
+	logic        avl_read /*verilator public*/;
+	logic        avl_write /*verilator public*/;
+	logic        avl_irq /*verilator public_flat_rw @(negedge clk_clk)*/;
+	logic[127:0] avl_readdata /*verilator public_flat_rw @(negedge clk_clk)*/;
+	logic[127:0] avl_writedata /*verilator public*/;
+	logic        avl_waitrequest /*verilator public_flat_rw @(negedge clk_clk)*/;
+	logic[15:0]  avl_byteenable /*verilator public*/;
+
+	logic[31:0] core_avl_address;
+	logic       core_avl_read;
+	logic       core_avl_write;
+	logic[31:0] core_avl_readdata;
+	logic[31:0] core_avl_writedata;
+	logic       core_avl_waitrequest;
+	logic[3:0]  core_avl_byteenable;
 
 	bus_master master_0
 	(
@@ -75,12 +85,194 @@ module platform
 		.cpu_clk(master_0_core_cpu_clk),
 		.cpu_rst_n(master_0_core_cpu_rst_n),
 		.irq(master_0_core_irq),
+		.avl_address(core_avl_address),
+		.avl_read(core_avl_read),
+		.avl_write(core_avl_write),
+		.avl_readdata(core_avl_readdata),
+		.avl_writedata(core_avl_writedata),
+		.avl_waitrequest(core_avl_waitrequest),
+		.avl_byteenable(core_avl_byteenable),
 		.*
 	);
 
 	vga_domain vga
 	(
 		.*
+	);
+
+	ring_req data_0, data_1, data_2, data_3;
+	ring_token token_0, token_1, token_2, token_3;
+
+	logic data_valid_0, data_valid_1, data_valid_2, data_valid_3,
+	      data_ready_0, data_ready_1, data_ready_2, data_ready_3,
+	      token_valid_0, token_valid_1, token_valid_2, token_valid_3;
+
+	cache #(.TOKEN_AT_RESET(0)) c0
+	(
+		.clk(clk_clk),
+		.rst_n(reset_reset_n),
+		.core_address(core_avl_address[31:2]),
+		.core_read(core_avl_read),
+		.core_write(core_avl_write),
+		.core_writedata(core_avl_writedata),
+		.core_byteenable(core_avl_byteenable),
+		.core_waitrequest(core_avl_waitrequest),
+		.core_readdata(core_avl_readdata),
+
+		//.dbg_address(),
+		.dbg_read(0),
+		.dbg_write(0),
+		.dbg_writedata(),
+		.dbg_waitrequest(),
+		.dbg_readdata(),
+
+		.mem_waitrequest(avl_waitrequest),
+		.mem_readdata(avl_readdata),
+		.mem_address(avl_address),
+		.mem_read(avl_read),
+		.mem_write(avl_write),
+		.mem_writedata(avl_writedata),
+		.mem_byteenable(avl_byteenable),
+
+		.in_data_valid(data_valid_3),
+		.in_data(data_3),
+		.in_data_ready(data_ready_0),
+
+		.out_data_valid(data_valid_0),
+		.out_data(data_0),
+		.out_data_ready(data_ready_1),
+
+		.in_token(token_3),
+		.in_token_valid(token_valid_3),
+
+		.out_token(token_0),
+		.out_token_valid(token_valid_0)
+	);
+
+	cache #(.TOKEN_AT_RESET(0)) c1
+	(
+		.clk(clk_clk),
+		.rst_n(reset_reset_n),
+		.core_address(),
+		.core_read(0),
+		.core_write(0),
+		.core_writedata(),
+		.core_byteenable(),
+		.core_waitrequest(),
+		.core_readdata(),
+
+		//.dbg_address(),
+		.dbg_read(0),
+		.dbg_write(0),
+		.dbg_writedata(),
+		.dbg_waitrequest(),
+		.dbg_readdata(),
+
+		.mem_waitrequest(1),
+		.mem_readdata(),
+		.mem_address(),
+		.mem_read(),
+		.mem_write(),
+		.mem_writedata(),
+		.mem_byteenable(),
+
+		.in_data_valid(data_valid_0),
+		.in_data(data_0),
+		.in_data_ready(data_ready_1),
+
+		.out_data_valid(data_valid_1),
+		.out_data(data_1),
+		.out_data_ready(data_ready_2),
+
+		.in_token(token_0),
+		.in_token_valid(token_valid_0),
+
+		.out_token(token_1),
+		.out_token_valid(token_valid_1)
+	);
+
+	cache #(.TOKEN_AT_RESET(0)) c2
+	(
+		.clk(clk_clk),
+		.rst_n(reset_reset_n),
+		.core_address(),
+		.core_read(0),
+		.core_write(0),
+		.core_writedata(),
+		.core_byteenable(),
+		.core_waitrequest(),
+		.core_readdata(),
+
+		//.dbg_address(),
+		.dbg_read(0),
+		.dbg_write(0),
+		.dbg_writedata(),
+		.dbg_waitrequest(),
+		.dbg_readdata(),
+
+		.mem_waitrequest(1),
+		.mem_readdata(),
+		.mem_address(),
+		.mem_read(),
+		.mem_write(),
+		.mem_writedata(),
+		.mem_byteenable(),
+
+		.in_data_valid(data_valid_1),
+		.in_data(data_1),
+		.in_data_ready(data_ready_2),
+
+		.out_data_valid(data_valid_2),
+		.out_data(data_2),
+		.out_data_ready(data_ready_3),
+
+		.in_token(token_1),
+		.in_token_valid(token_valid_1),
+
+		.out_token(token_2),
+		.out_token_valid(token_valid_2)
+	);
+
+	cache #(.TOKEN_AT_RESET(1)) c3
+	(
+		.clk(clk_clk),
+		.rst_n(reset_reset_n),
+		.core_address(),
+		.core_read(0),
+		.core_write(0),
+		.core_writedata(),
+		.core_byteenable(),
+		.core_waitrequest(),
+		.core_readdata(),
+
+		//.dbg_address(),
+		.dbg_read(0),
+		.dbg_write(0),
+		.dbg_writedata(),
+		.dbg_waitrequest(),
+		.dbg_readdata(),
+
+		.mem_waitrequest(1),
+		.mem_readdata(),
+		.mem_address(),
+		.mem_read(),
+		.mem_write(),
+		.mem_writedata(),
+		.mem_byteenable(),
+
+		.in_data_valid(data_valid_2),
+		.in_data(data_2),
+		.in_data_ready(data_ready_3),
+
+		.out_data_valid(data_valid_3),
+		.out_data(data_3),
+		.out_data_ready(data_ready_0),
+
+		.in_token(token_2),
+		.in_token_valid(token_valid_2),
+
+		.out_token(token_3),
+		.out_token_valid(token_valid_3)
 	);
 
 endmodule

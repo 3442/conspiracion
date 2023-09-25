@@ -31,6 +31,9 @@
 #include "Vconspiracion_core_psr.h"
 #include "Vconspiracion_core_regs.h"
 #include "Vconspiracion_core_reg_file.h"
+#include "Vconspiracion_cache.h"
+#include "Vconspiracion_cache__T1.h"
+#include "Vconspiracion_cache_sram.h"
 
 #include "../args.hxx"
 
@@ -312,14 +315,14 @@ int main(int argc, char **argv)
 	null vram_null(0x3800'0000, 64 << 20, 2);
 	window vram_window(vram, 0x0000'0000);
 
+	Vconspiracion_platform &plat = *top.conspiracion->plat;
 	display<Vconspiracion_vga_domain> vga
 	(
-		*top.conspiracion->plat->vga,
-		0x3800'0000, 25'175'000, 50'000'000
+		*plat.vga, 0x3800'0000, 25'175'000, 50'000'000
 	);
 
-	interconnect<Vconspiracion_platform> avl(*top.conspiracion->plat);
-	interconnect<Vconspiracion_vga_domain> avl_vga(*top.conspiracion->plat->vga);
+	interconnect<Vconspiracion_platform> avl(plat);
+	//interconnect<Vconspiracion_vga_domain> avl_vga(plat->vga);
 
 	std::vector<const_map> consts;
 	for(const auto &init : *const_)
@@ -346,7 +349,7 @@ int main(int argc, char **argv)
 	} else if(enable_accurate_video)
 	{
 		avl.attach(vram);
-		avl_vga.attach(vram_window);
+		//avl_vga.attach(vram_window);
 	} else
 	{
 		avl.attach(vram_null);
@@ -407,10 +410,10 @@ int main(int argc, char **argv)
 
 		if(enable_accurate_video)
 		{
-			if(!avl_vga.tick(top.clk_clk))
+			/*if(!avl_vga.tick(top.clk_clk))
 			{
 				failed = true;
-			}
+			}*/
 
 			vga.signal_tick(top.clk_clk);
 		}
@@ -469,6 +472,34 @@ int main(int argc, char **argv)
 		std::fputs("=== end-regs ===\n", ctrl);
 	};
 
+	Vconspiracion_cache_sram *const caches[] = {
+		plat.c0->sram,
+		plat.c1->sram,
+		plat.c2->sram,
+		plat.c3->sram
+	};
+
+	auto dump_coherent = [&](std::uint32_t addr, std::uint32_t &data)
+	{
+		bool ok = avl.dump(addr, data);
+		if (!ok || (ok >> 29))
+			return ok;
+
+		unsigned tag = (addr >> 11) & ((1 << 16) - 1);
+		unsigned index = (addr >> 2) & ((1 << 9) - 1);
+
+		for (std::size_t i = 0; i < sizeof caches / sizeof caches[0]; ++i) {
+			const auto *cache = caches[i];
+
+			if (cache->state_file[index] != 0b00 && cache->tag_file[index] == tag) {
+				line line_data = cache->data_file[index];
+				data = line_data.words[addr & 0b11];
+			}
+		}
+
+		return true;
+	};
+
 	auto pagewalk = [&](std::uint32_t &addr)
 	{
 		if(!core.mmu->mmu_enable)
@@ -479,13 +510,10 @@ int main(int argc, char **argv)
 		std::uint32_t ttbr = core.mmu->mmu_ttbr;
 
 		std::uint32_t entry;
-		if(!avl.dump(ttbr << 12 | addr >> 18, entry))
-		{
+		if (!dump_coherent(ttbr << 12 | addr >> 18, entry))
 			return false;
-		}
 
-		switch(entry & 0b11)
-		{
+		switch (entry & 0b11) {
 			case 0b01:
 				break;
 
@@ -498,13 +526,10 @@ int main(int argc, char **argv)
 		}
 
 		std::uint32_t entryaddr = (entry & ~((1 << 10) - 1)) >> 2 | ((addr >> 10) & ((1 << 8) - 1));
-		if(!avl.dump(entryaddr, entry))
-		{
+		if (!dump_coherent(entryaddr, entry))
 			return false;
-		}
 
-		switch(entry & 0b11)
-		{
+		switch (entry & 0b11) {
 			case 0b01:
 				addr = (entry & ~((1 << 16) - 1)) >> 2 | (addr & ((1 << 14) - 1));
 				return true;
@@ -536,10 +561,8 @@ int main(int argc, char **argv)
 				}
 
 				std::uint32_t word;
-				if(!avl.dump(at, word))
-				{
+				if (!dump_coherent(at, word))
 					break;
-				}
 
 				word = (word & 0xff) << 24
 					 | ((word >> 8) & 0xff) << 16

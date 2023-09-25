@@ -7,11 +7,14 @@
 #include <stdexcept>
 #include <vector>
 
+#include <verilated.h>
+
 namespace taller::avalon
 {
 	union line
 	{
-		__int128 qword;
+		__int128  qword;
+		VlWide<4> verilated;
 
 		struct
 		{
@@ -22,7 +25,25 @@ namespace taller::avalon
 		{
 			std::uint32_t words[4];
 		};
+
+		line() noexcept = default;
+
+		inline line(VlWide<4> verilated) noexcept
+		: verilated(verilated)
+		{}
+
+		inline operator VlWide<4>() const noexcept
+		{
+			return this->verilated;
+		}
+
+		inline bool operator==(VlWide<4> verilated) const noexcept
+		{
+			return this->verilated == verilated;
+		}
 	};
+
+	static_assert(sizeof(line) == 16);
 
 	class slave
 	{
@@ -202,7 +223,7 @@ namespace taller::avalon
 			std::vector<binding>  devices;
 			interrupt_controller *root_intc      = nullptr;
 			std::uint32_t         avl_address    = 0;
-			std::uint32_t         avl_writedata  = 0;
+			line                  avl_writedata;
 			unsigned              avl_byteenable = 0;
 			bool                  avl_read       = false;
 			bool                  avl_write      = false;
