@@ -55,9 +55,9 @@ module cache_control
 		REPLY
 	} state, next_state;
 
-	logic accept_snoop, in_hold_valid, last_hop, lock_line, locked, may_send,
-	      may_send_if_token_held, mem_begin, mem_end, mem_end_read, mem_wait,
-	      out_stall, reply_wait, replace, retry, send, send_inval, send_read,
+	logic accept_snoop, in_hold_valid, inval_reply, last_hop, lock_line, locked,
+	      may_send, may_send_if_token_held, mem_begin, mem_end, mem_read_end, mem_wait,
+	      out_stall, wait_reply, replace, retry, send, send_inval, send_read,
 	      snoop_hit, set_reply, unlock_line, writeback;
 
 	ring_req in_hold, send_data, fwd_data, stall_data, out_data_next;
@@ -68,7 +68,7 @@ module cache_control
 	assign mem_end = (mem_read || mem_write) && !mem_waitrequest;
 	assign mem_wait = (mem_read || mem_write) && mem_waitrequest;
 	assign mem_address = {3'b000, mem_tag, mem_index, 4'b0000};
-	assign mem_end_read = mem_read && !mem_waitrequest;
+	assign mem_read_end = mem_read && !mem_waitrequest;
 
 	/* Desbloquear la línea hasta que la request del core termine garantiza
 	 * avance del sistema completo, en lockstep en el peor caso posible,
@@ -105,7 +105,7 @@ module cache_control
 		data_wr = core_data_wr;
 		index_rd = core_index;
 
-		state_wr = INVALID;
+		state_wr = INVALID; //FIXME: debería ser 'bx
 		write_data = 0;
 		write_state = 0;
 
@@ -117,14 +117,17 @@ module cache_control
 		send_inval = 0;
 
 		set_reply = 0;
+		inval_reply = 0;
 		core_waitrequest = 1;
 
 		in_data_ready = !in_hold_valid;
 
 		unique case (state)
 			ACCEPT: begin
-				if (last_hop && !in_hold.read)
+				if (last_hop && !in_hold.read) begin
+					inval_reply = in_hold_valid;
 					in_data_ready = 1;
+				end
 
 				if (accept_snoop)
 					index_rd = in_hold.index;
@@ -239,7 +242,7 @@ module cache_control
 			mem_begin = 1;
 
 		// Colisiones de bus 
-		retry = (mem_end_read && (write_data || write_state)) || (mem_wait && mem_begin);
+		retry = (mem_read_end && (write_data || write_state)) || (mem_wait && mem_begin);
 
 		// Nótese la diferencia con un assign, ya que send puede cambiar más abajo
 		lock_line = send;
@@ -258,7 +261,7 @@ module cache_control
 		end
 
 		index_wr = index_rd;
-		if (mem_end_read) begin
+		if (mem_read_end) begin
 			tag_wr = mem_tag;
 			index_wr = mem_index;
 
@@ -289,8 +292,7 @@ module cache_control
 					next_state = SNOOP;
 				else if (in_hold_valid && last_hop && in_hold.read)
 					next_state = REPLY;
-				else if ((core_read || core_write) && !reply_wait
-				          && (!locked || (may_send && !unlock_line)))
+				else if ((core_read || core_write) && !wait_reply && (!locked || may_send))
 					next_state = CORE;
 
 				if (out_stall && !out_data_ready)
@@ -313,6 +315,7 @@ module cache_control
 			out_stall <= 0;
 
 			locked <= 0;
+			wait_reply <= 0;
 
 			mem_read <= 0;
 			mem_write <= 0;
@@ -335,6 +338,12 @@ module cache_control
 
 			if (unlock_line)
 				locked <= 0;
+
+			if (send)
+				wait_reply <= 1;
+
+			if (inval_reply || mem_read_end)
+				wait_reply <= 0;
 
 			if (mem_end) begin
 				mem_read <= 0;

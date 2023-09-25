@@ -6,7 +6,7 @@ module cache
 	input  logic    clk,
 	                rst_n,
 
-	input  word     core_address,
+	input  ptr      core_address,
 	input  logic    core_read,
 	                core_write,
 	input  word     core_writedata,

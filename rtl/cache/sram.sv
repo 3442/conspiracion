@@ -23,9 +23,9 @@ module cache_sram
 
 	localparam DEPTH = 1 << $bits(addr_index);
 
-	line data_file[DEPTH];
-	addr_tag tag_file[DEPTH];
-	line_state state_file[DEPTH];
+	line data_file[DEPTH] /*verilator public*/;
+	addr_tag tag_file[DEPTH] /*verilator public*/;
+	line_state state_file[DEPTH] /*verilator public*/;
 
 	always_ff @(posedge clk) begin
 		if (write_data) begin

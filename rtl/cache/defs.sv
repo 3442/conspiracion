@@ -7,7 +7,8 @@ typedef logic[127:0] line;
 
 // Choca con typedef en core/uarch.sv
 `ifndef WORD_DEFINED
-typedef logic[31:0]  word;
+typedef logic[29:0] ptr;
+typedef logic[31:0] word;
 `define WORD_DEFINED
 `endif
 

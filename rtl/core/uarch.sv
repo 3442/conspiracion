@@ -6,6 +6,7 @@
 
 // Choca con typedef en cache/defs.sv
 `ifndef WORD_DEFINED
+typedef logic[29:0] ptr;
 typedef logic[31:0] word;
 `define WORD_DEFINED
 `endif
@@ -14,7 +15,6 @@ typedef logic[3:0]  reg_num;
 typedef logic[2:0]  cp_opcode;
 typedef logic[15:0] reg_list;
 typedef logic[63:0] dword;
-typedef logic[29:0] ptr;
 
 `define R14 4'b1110
 `define R15 4'b1111

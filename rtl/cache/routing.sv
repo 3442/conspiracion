@@ -5,7 +5,7 @@ module cache_routing
 	input  logic       clk,
 	                   rst_n,
 
-	input  word        core_address,
+	input  ptr         core_address,
 	input  logic       core_read,
 	                   core_write,
 	input  line        core_writedata_line,
@@ -39,7 +39,6 @@ module cache_routing
 
 	word core_address_line;
 	logic cached, cache_mem, transition;
-	addr_mbz mbz;
 	addr_io_region io;
 
 	enum int unsigned
@@ -52,7 +51,7 @@ module cache_routing
 	assign cached = io == 3'b000;
 	assign cache_mem = cache_mem_read || cache_mem_write;
 
-	assign {io, core_tag, core_index, core_offset, mbz} = core_address;
+	assign {io, core_tag, core_index, core_offset} = core_address;
 	assign core_address_line = {io, core_tag, core_index, 4'b0000};
 	assign core_readdata_line = cached ? data_rd : mem_readdata;
 
