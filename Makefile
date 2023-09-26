@@ -74,4 +74,4 @@ $(OBJ_DIR)/%.mk: \
 	$(VERILATOR) \
 		-O3 --cc --exe --trace -y $(RTL_DIR) --Mdir $(dir $@) \
 		--top $(word 1,$(subst /, ,$*)) $(patsubst tb/%,../tb/%,$^) \
-		--x-assign unique --x-initial unique
+		--x-assign unique --x-initial unique --threads $(shell nproc)
