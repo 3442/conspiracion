@@ -261,6 +261,11 @@ int main(int argc, char **argv)
 		parser, "image", "Executable image to run", args::Options::Required
 	);
 
+	args::Positional<std::string> coverage_out
+	(
+		parser, "coverage-out", "Coverage output file"
+	);
+
 	try
 	{
 		parser.ParseCLI(argc, argv);
@@ -757,32 +762,25 @@ int main(int argc, char **argv)
 		core.fetch->explicit_branch__VforceEn = 0;
 	}
 
-	if(!no_tty)
-	{
+	if (!no_tty)
 		ttyJ0.release();
-	}
 
-	if(enable_trace)
-	{
+	if (enable_trace)
 		trace.close();
-	}
 
-	if(dump_regs)
-	{
+	if (dump_regs)
 		do_reg_dump();
-	}
 
 	const auto &dumps = *dump_mem;
-	if(!dumps.empty())
-	{
+	if (!dumps.empty())
 		do_mem_dump(dumps.data(), dumps.size());
-	}
 
 	top.final();
-	if(ctrl != stdout)
-	{
+	if (ctrl != stdout)
 		std::fclose(ctrl);
-	}
+
+	if (coverage_out)
+		Verilated::threadContextp()->coveragep()->write(coverage_out->c_str());
 
 	return failed ? EXIT_FAILURE : EXIT_SUCCESS;
 }

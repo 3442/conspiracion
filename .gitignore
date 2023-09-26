@@ -34,6 +34,7 @@ __pycache__
 
 hps_sdram_p0_summary.csv
 vcd/
+cov/
 obj/
 .qsys_edit/
 platform/

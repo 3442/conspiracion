@@ -114,6 +114,7 @@
             gdb
             gnumake
             gtkwave
+            lcov
             pkg-config
             (python3.withPackages (py: [ py.numpy py.pillow py.matplotlib ]))
             (quartus-prime-lite.override { supportedDevices = [ "Cyclone V" ]; })
