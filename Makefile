@@ -1,6 +1,7 @@
 TOP           := conspiracion
 VCD_DIR       := vcd
 OBJ_DIR       := obj
+COV_DIR       := cov
 RTL_DIR       := rtl
 TB_DIR        := tb
 SIM_DIR       := sim
@@ -27,7 +28,7 @@ SIMS := $(patsubst $(TB_SIM_DIR)/%.py,%,$(wildcard $(TB_SIM_DIR)/*.py))
 all: sim
 
 clean:
-	rm -rf $(OBJ_DIR) $(VCD_DIR)
+	rm -rf $(OBJ_DIR) $(VCD_DIR) $(COV_DIR)
 
 trace: trace/$(TOP)
 
@@ -48,11 +49,11 @@ vmlaunch: $(SIM_DIR)/sim.py $(SIM_DIR)/gdbstub.py exe/$(TOP)
 	@$< $(SIM_DIR)/gdbstub.py $(OBJ_DIR)/$(TOP)/V$(TOP) u-boot/build/taller/u-boot-dtb.bin
 
 ifndef DISABLE_COV
-cov: $(OBJ_DIR)/$(TOP)/cov.info
+$(COV_DIR): $(OBJ_DIR)/$(TOP)/cov.info
 	@rm -rf $@
 	$(GENHTML) $< --output-dir=$@
 
-cov/%: $(SIM_OBJ_DIR)/%.cov
+$(COV_DIR)/%: $(SIM_OBJ_DIR)/%.cov
 
 $(SIM_OBJ_DIR)/%.cov: sim/%
 
