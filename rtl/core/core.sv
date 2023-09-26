@@ -1,28 +1,31 @@
-module bus_master
+`include "core/uarch.sv"
+
+module core
 (
-	input  logic       clk,
-	                   rst_n,
+	input  logic      clk,
+	                  rst_n,
 
-	input  logic[29:0] addr,
-	input  logic       start,
-	                   write,
-	output logic       ready,
-	output logic[31:0] data_rd,
-	input  logic[31:0] data_wr,
-	input  logic[3:0]  data_be,
-	output logic       cpu_clk,
-	                   cpu_rst_n,
-	                   irq,
+	input  wire       step,
+	input  wire       cpu_halt,
+	output wire       cpu_halted,
+	output wire       breakpoint,
 
-	output logic[31:0] avl_address,
-	output logic       avl_read,
-	                   avl_write,
-	input  logic[31:0] avl_readdata,
-	output logic[31:0] avl_writedata,
-	input  logic       avl_waitrequest,
-	output logic[3:0]  avl_byteenable,
-	input  logic       avl_irq
+	output word       avl_address,
+	output logic      avl_read,
+	                  avl_write,
+	input  word       avl_readdata,
+	output word       avl_writedata,
+	input  logic      avl_waitrequest,
+	output logic[3:0] avl_byteenable,
+
+	input  logic      avl_irq
 );
+
+	logic ready, write, start;
+
+	logic[3:0] data_be;
+	logic[29:0] addr;
+	logic[31:0] data_rd, data_wr;
 
 	enum int unsigned
 	{
@@ -30,9 +33,24 @@ module bus_master
 		WAIT
 	} state;
 
-	assign irq = avl_irq;
-	assign cpu_clk = clk;
-	assign cpu_rst_n = rst_n;
+	arm810 cpu
+	(
+		.irq(avl_irq),
+		.halt(cpu_halt),
+		.halted(cpu_halted),
+		.bus_addr(addr),
+		.bus_data_rd(data_rd),
+		.bus_data_wr(data_wr),
+		.bus_data_be(data_be),
+		.bus_ready(ready),
+		.bus_write(write),
+		.bus_start(start),
+`ifndef VERILATOR
+		.step(0),
+		.breakpoint(),
+`endif
+		.*
+	);
 
 	assign data_rd = avl_readdata;
 

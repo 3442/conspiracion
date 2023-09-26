@@ -201,72 +201,6 @@ set_location_assignment PIN_AA13 -to vram_wire_we_n
 
 set_global_assignment -name SEARCH_PATH rtl
 
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/alu/add.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/alu/and.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/alu/alu.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/alu/orr.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/alu/xor.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/arm810.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/branch.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/control.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/coproc.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/cycles.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/data.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/debug.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/exception.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/issue.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/mul.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/ldst/ldst.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/ldst/pop.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/ldst/sizes.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/psr.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/select.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/stall.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/control/writeback.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/cache.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/cache_lockdown.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/cp15.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/cpuid.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/cyclecnt.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/domain.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/far.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/fsr.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/map.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/syscfg.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/tlb.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/tlb_lockdown.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/cp15/ttbr.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/branch.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/coproc.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/data.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/decode.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/isa.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/mrs.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/msr.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/mul.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/mux.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/ldst/addr.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/ldst/misc.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/ldst/multiple.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/ldst/single.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/decode/snd.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/fetch/fetch.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/fetch/prefetch.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/mmu/arbiter.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/mmu/fault.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/mmu/format.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/mmu/mmu.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/mmu/pagewalk.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/mul.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/porch/conds.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/porch/porch.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/psr.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/regs/file.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/regs/regs.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/regs/map.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/shifter.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/core/uarch.sv
-
 set_global_assignment -name QSYS_FILE platform.qsys
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/top/conspiracion.sv
 set_global_assignment -name QIP_FILE platform/synthesis/platform.qip
@@ -375,6 +309,7 @@ set_global_assignment -name SIP_FILE ip/dsp_mul.sip
 set_global_assignment -name ENABLE_SIGNALTAP OFF
 set_global_assignment -name USE_SIGNALTAP_FILE bus_test.stp
 set_global_assignment -name SIGNALTAP_FILE bus_test.stp
+
 
 
 

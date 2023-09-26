@@ -2,6 +2,7 @@ module conspiracion
 (
 	input  wire        clk_clk,
 	input  wire        rst_n,
+
 	input  wire        halt,
 `ifdef VERILATOR
 	input  wire        step,
@@ -48,12 +49,7 @@ module conspiracion
 	output wire [7:0]  vga_dac_b
 );
 
-	logic button;
-	logic[3:0] data_be;
-	logic[29:0] addr;
-	logic[31:0] data_rd, data_wr;
-	logic reset_reset_n, cpu_clk, cpu_rst_n, cpu_halt,
-	      ready, write, start, irq;
+	logic button, cpu_halt, reset_reset_n;
 
 `ifdef VERILATOR
 	assign cpu_halt = halt;
@@ -82,38 +78,17 @@ module conspiracion
 	);
 `endif
 
-	arm810 core
-	(
-		.clk(cpu_clk),
-		.rst_n(cpu_rst_n),
-		.halt(cpu_halt),
-		.halted(cpu_halted),
-		.bus_addr(addr),
-		.bus_data_rd(data_rd),
-		.bus_data_wr(data_wr),
-		.bus_data_be(data_be),
-		.bus_ready(ready),
-		.bus_write(write),
-		.bus_start(start),
-`ifndef VERILATOR
-		.step(0),
-		.breakpoint(),
-`endif
-		.*
-	);
-
 	platform plat
 	(
-		.master_0_core_cpu_clk(cpu_clk),
-		.master_0_core_cpu_rst_n(cpu_rst_n),
-		.master_0_core_addr(addr),
-		.master_0_core_data_rd(data_rd),
-		.master_0_core_data_wr(data_wr),
-		.master_0_core_data_be(data_be),
-		.master_0_core_ready(ready),
-		.master_0_core_write(write),
-		.master_0_core_start(start),
-		.master_0_core_irq(irq),
+`ifdef VERILATOR
+		.cpu_0_mp_step(step),
+		.cpu_0_mp_breakpoint(breakpoint),
+`else
+		.cpu_0_mp_step(0),
+		.cpu_0_mp_breakpoint(),
+`endif
+		.cpu_0_mp_cpu_halt(cpu_halt),
+		.cpu_0_mp_cpu_halted(cpu_halted),
 		.pll_0_reset_reset(0), //TODO: reset controller, algún día
 		.pio_0_external_connection_export(pio_leds),
 		.switches_external_connection_export({2'b00, pio_switches}),

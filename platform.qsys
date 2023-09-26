@@ -13,7 +13,7 @@
    {
       datum _sortIndex
       {
-         value = "3";
+         value = "2";
          type = "int";
       }
    }
@@ -21,7 +21,7 @@
    {
       datum _sortIndex
       {
-         value = "17";
+         value = "16";
          type = "int";
       }
    }
@@ -29,7 +29,15 @@
    {
       datum _sortIndex
       {
-         value = "1";
+         value = "0";
+         type = "int";
+      }
+   }
+   element cpu_0
+   {
+      datum _sortIndex
+      {
+         value = "19";
          type = "int";
       }
    }
@@ -37,7 +45,7 @@
    {
       datum _sortIndex
       {
-         value = "2";
+         value = "1";
          type = "int";
       }
    }
@@ -45,7 +53,7 @@
    {
       datum _sortIndex
       {
-         value = "18";
+         value = "17";
          type = "int";
       }
    }
@@ -53,7 +61,7 @@
    {
       datum _sortIndex
       {
-         value = "9";
+         value = "8";
          type = "int";
       }
    }
@@ -61,15 +69,15 @@
    {
       datum _sortIndex
       {
-         value = "6";
+         value = "5";
          type = "int";
       }
    }
-   element master_0
+   element mm_bridge_1
    {
       datum _sortIndex
       {
-         value = "0";
+         value = "18";
          type = "int";
       }
    }
@@ -77,7 +85,7 @@
    {
       datum _sortIndex
       {
-         value = "8";
+         value = "7";
          type = "int";
       }
    }
@@ -85,7 +93,7 @@
    {
       datum _sortIndex
       {
-         value = "13";
+         value = "12";
          type = "int";
       }
    }
@@ -93,7 +101,7 @@
    {
       datum _sortIndex
       {
-         value = "15";
+         value = "14";
          type = "int";
       }
    }
@@ -101,12 +109,12 @@
    {
       datum _sortIndex
       {
-         value = "14";
+         value = "13";
          type = "int";
       }
       datum sopceditor_expanded
       {
-         value = "0";
+         value = "1";
          type = "boolean";
       }
    }
@@ -146,7 +154,7 @@
    {
       datum _sortIndex
       {
-         value = "4";
+         value = "3";
          type = "int";
       }
    }
@@ -154,7 +162,7 @@
    {
       datum _sortIndex
       {
-         value = "16";
+         value = "15";
          type = "int";
       }
    }
@@ -162,7 +170,7 @@
    {
       datum _sortIndex
       {
-         value = "10";
+         value = "9";
          type = "int";
       }
    }
@@ -170,7 +178,7 @@
    {
       datum _sortIndex
       {
-         value = "7";
+         value = "6";
          type = "int";
       }
    }
@@ -178,7 +186,7 @@
    {
       datum _sortIndex
       {
-         value = "12";
+         value = "11";
          type = "int";
       }
       datum sopceditor_expanded
@@ -191,7 +199,7 @@
    {
       datum _sortIndex
       {
-         value = "11";
+         value = "10";
          type = "int";
       }
    }
@@ -199,7 +207,7 @@
    {
       datum _sortIndex
       {
-         value = "5";
+         value = "4";
          type = "int";
       }
    }
@@ -230,12 +238,8 @@
    type="conduit"
    dir="end" />
  <interface name="clk" internal="clk_0.clk_in" type="clock" dir="end" />
- <interface name="master_0_conduit_end" internal="master_0.conduit_end" />
- <interface
-   name="master_0_core"
-   internal="master_0.core"
-   type="conduit"
-   dir="end" />
+ <interface name="cpu_0_mp" internal="cpu_0.mp" type="conduit" dir="end" />
+ <interface name="cpu_0_mp_1" internal="cpu_0.mp_1" />
  <interface name="memory" internal="hps_0.memory" type="conduit" dir="end" />
  <interface
    name="pio_0_external_connection"
@@ -294,6 +298,9 @@
   <parameter name="clockFrequencyKnown" value="true" />
   <parameter name="inputClockFrequency" value="0" />
   <parameter name="resetSynchronousEdges" value="NONE" />
+ </module>
+ <module name="cpu_0" kind="core" version="1.0" enabled="1">
+  <parameter name="AUTO_INTERRUPT_RECEIVER_INTERRUPTS_USED" value="1" />
  </module>
  <module name="hps_0" kind="altera_hps" version="20.1" enabled="1">
   <parameter name="ABSTRACT_REAL_COMPARE_TEST" value="false" />
@@ -863,11 +870,22 @@
   <parameter name="writeIRQThreshold" value="8" />
  </module>
  <module
-   name="master_0"
-   kind="conspiracion_bus_master"
-   version="1.0"
+   name="mm_bridge_1"
+   kind="altera_avalon_mm_bridge"
+   version="20.1"
    enabled="1">
-  <parameter name="AUTO_IRQ_INTERRUPTS_USED" value="1" />
+  <parameter name="ADDRESS_UNITS" value="SYMBOLS" />
+  <parameter name="ADDRESS_WIDTH" value="32" />
+  <parameter name="DATA_WIDTH" value="32" />
+  <parameter name="LINEWRAPBURSTS" value="0" />
+  <parameter name="MAX_BURST_SIZE" value="1" />
+  <parameter name="MAX_PENDING_RESPONSES" value="4" />
+  <parameter name="PIPELINE_COMMAND" value="1" />
+  <parameter name="PIPELINE_RESPONSE" value="1" />
+  <parameter name="SYMBOL_WIDTH" value="8" />
+  <parameter name="SYSINFO_ADDR_WIDTH" value="30" />
+  <parameter name="USE_AUTO_ADDRESS_WIDTH" value="0" />
+  <parameter name="USE_RESPONSE" value="0" />
  </module>
  <module name="pio_0" kind="altera_avalon_pio" version="20.1" enabled="1">
   <parameter name="bitClearingEdgeCapReg" value="false" />
@@ -1224,96 +1242,6 @@
  <connection
    kind="avalon"
    version="20.1"
-   start="master_0.avalon_master_1_1"
-   end="pixdma.avalon_control_slave">
-  <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x30030000" />
-  <parameter name="defaultConnection" value="false" />
- </connection>
- <connection
-   kind="avalon"
-   version="20.1"
-   start="master_0.avalon_master_1_1"
-   end="jtag_uart_0.avalon_jtag_slave">
-  <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x30000000" />
-  <parameter name="defaultConnection" value="false" />
- </connection>
- <connection
-   kind="avalon"
-   version="20.1"
-   start="master_0.avalon_master_1_1"
-   end="pixfmt.avalon_rgb_slave">
-  <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x30040000" />
-  <parameter name="defaultConnection" value="false" />
- </connection>
- <connection
-   kind="avalon"
-   version="20.1"
-   start="master_0.avalon_master_1_1"
-   end="intc_0.avalon_slave">
-  <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x30070000" />
-  <parameter name="defaultConnection" value="false" />
- </connection>
- <connection
-   kind="avalon"
-   version="20.1"
-   start="master_0.avalon_master_1_1"
-   end="pio_0.s1">
-  <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x30010000" />
-  <parameter name="defaultConnection" value="false" />
- </connection>
- <connection
-   kind="avalon"
-   version="20.1"
-   start="master_0.avalon_master_1_1"
-   end="timer_0.s1">
-  <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x30020000" />
-  <parameter name="defaultConnection" value="false" />
- </connection>
- <connection
-   kind="avalon"
-   version="20.1"
-   start="master_0.avalon_master_1_1"
-   end="vram.s1">
-  <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x38000000" />
-  <parameter name="defaultConnection" value="false" />
- </connection>
- <connection
-   kind="avalon"
-   version="20.1"
-   start="master_0.avalon_master_1_1"
-   end="switches.s1">
-  <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x30060000" />
-  <parameter name="defaultConnection" value="false" />
- </connection>
- <connection
-   kind="avalon"
-   version="20.1"
-   start="master_0.avalon_master_1_1"
-   end="buttons.s1">
-  <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x30050000" />
-  <parameter name="defaultConnection" value="false" />
- </connection>
- <connection
-   kind="avalon"
-   version="20.1"
-   start="master_0.avalon_master_1_1"
-   end="address_span_extender_0.windowed_slave">
-  <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x0000" />
-  <parameter name="defaultConnection" value="false" />
- </connection>
- <connection
-   kind="avalon"
-   version="20.1"
    start="pixdma.avalon_pixel_dma_master"
    end="vram.s1">
   <parameter name="arbitrationPriority" value="1" />
@@ -1332,7 +1260,7 @@
  <connection
    kind="avalon"
    version="20.1"
-   start="jtag_dbg.master"
+   start="mm_bridge_1.m0"
    end="pixdma.avalon_control_slave">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x30030000" />
@@ -1341,7 +1269,7 @@
  <connection
    kind="avalon"
    version="20.1"
-   start="jtag_dbg.master"
+   start="mm_bridge_1.m0"
    end="jtag_uart_0.avalon_jtag_slave">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x30000000" />
@@ -1350,7 +1278,7 @@
  <connection
    kind="avalon"
    version="20.1"
-   start="jtag_dbg.master"
+   start="mm_bridge_1.m0"
    end="pixfmt.avalon_rgb_slave">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x30040000" />
@@ -1359,23 +1287,33 @@
  <connection
    kind="avalon"
    version="20.1"
-   start="jtag_dbg.master"
+   start="mm_bridge_1.m0"
    end="intc_0.avalon_slave">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x30070000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
- <connection kind="avalon" version="20.1" start="jtag_dbg.master" end="pio_0.s1">
+ <connection kind="avalon" version="20.1" start="mm_bridge_1.m0" end="buttons.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x30050000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection kind="avalon" version="20.1" start="mm_bridge_1.m0" end="pio_0.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x30010000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
- <connection kind="avalon" version="20.1" start="jtag_dbg.master" end="timer_0.s1">
+ <connection kind="avalon" version="20.1" start="mm_bridge_1.m0" end="switches.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x30060000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection kind="avalon" version="20.1" start="mm_bridge_1.m0" end="timer_0.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x30020000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
- <connection kind="avalon" version="20.1" start="jtag_dbg.master" end="vram.s1">
+ <connection kind="avalon" version="20.1" start="mm_bridge_1.m0" end="vram.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x38000000" />
   <parameter name="defaultConnection" value="false" />
@@ -1383,22 +1321,26 @@
  <connection
    kind="avalon"
    version="20.1"
-   start="jtag_dbg.master"
-   end="switches.s1">
+   start="mm_bridge_1.m0"
+   end="address_span_extender_0.windowed_slave">
   <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x30060000" />
-  <parameter name="defaultConnection" value="false" />
- </connection>
- <connection kind="avalon" version="20.1" start="jtag_dbg.master" end="buttons.s1">
-  <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x30050000" />
+  <parameter name="baseAddress" value="0x0000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
    kind="avalon"
    version="20.1"
    start="jtag_dbg.master"
-   end="address_span_extender_0.windowed_slave">
+   end="mm_bridge_1.s0">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="20.1"
+   start="cpu_0.master"
+   end="mm_bridge_1.s0">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x0000" />
   <parameter name="defaultConnection" value="false" />
@@ -1458,7 +1400,12 @@
    kind="clock"
    version="20.1"
    start="pll_0.outclk1"
-   end="master_0.clock" />
+   end="mm_bridge_1.clk" />
+ <connection
+   kind="clock"
+   version="20.1"
+   start="pll_0.outclk1"
+   end="cpu_0.clock_sink" />
  <connection
    kind="clock"
    version="20.1"
@@ -1495,15 +1442,15 @@
  <connection
    kind="interrupt"
    version="20.1"
-   start="intc_0.interrupt_timer"
-   end="timer_0.irq">
+   start="cpu_0.interrupt_receiver"
+   end="intc_0.interrupt_sender">
   <parameter name="irqNumber" value="0" />
  </connection>
  <connection
    kind="interrupt"
    version="20.1"
-   start="master_0.irq"
-   end="intc_0.interrupt_sender">
+   start="intc_0.interrupt_timer"
+   end="timer_0.irq">
   <parameter name="irqNumber" value="0" />
  </connection>
  <connection
@@ -1551,12 +1498,17 @@
    kind="reset"
    version="20.1"
    start="clk_0.clk_reset"
-   end="master_0.reset_sink" />
+   end="mm_bridge_1.reset" />
  <connection
    kind="reset"
    version="20.1"
    start="clk_0.clk_reset"
    end="intc_0.reset_sink" />
+ <connection
+   kind="reset"
+   version="20.1"
+   start="clk_0.clk_reset"
+   end="cpu_0.reset_sink" />
  <connection
    kind="reset"
    version="20.1"

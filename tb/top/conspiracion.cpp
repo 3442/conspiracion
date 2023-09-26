@@ -18,6 +18,7 @@
 #include "Vconspiracion_conspiracion.h"
 #include "Vconspiracion_platform.h"
 #include "Vconspiracion_vga_domain.h"
+#include "Vconspiracion_core.h"
 #include "Vconspiracion_core_control.h"
 #include "Vconspiracion_core_control_issue.h"
 #include "Vconspiracion_core_cp15_domain.h"
@@ -386,7 +387,7 @@ int main(int argc, char **argv)
 		std::fclose(img_file);
 	}
 
-	auto &core = *top.conspiracion->core;
+	auto &core = *plat.cpu0->cpu;
 	for(const auto &init : init_regs)
 	{
 		core.regs->a->file[init.index] = init.value;
@@ -473,10 +474,10 @@ int main(int argc, char **argv)
 	};
 
 	Vconspiracion_cache_sram *const caches[] = {
-		plat.c0->sram,
-		plat.c1->sram,
-		plat.c2->sram,
-		plat.c3->sram
+		plat.cache0->sram,
+		plat.cache1->sram,
+		plat.cache2->sram,
+		plat.cache3->sram
 	};
 
 	auto dump_coherent = [&](std::uint32_t addr, std::uint32_t &data)
