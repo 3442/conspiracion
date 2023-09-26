@@ -263,4 +263,33 @@ module platform
 		.out_token_valid(token_valid_3)
 	);
 
+	mp_ctrl mp
+	(
+		.clk(),
+		.rst_n(),
+
+		.avl_read(0),
+		.avl_write(0),
+		.avl_writedata(),
+		.avl_readdata(),
+
+		.cpu_halted_0(0),
+		.cpu_halted_1(0),
+		.cpu_halted_2(0),
+		.cpu_halted_3(0),
+		.breakpoint_0(0),
+		.breakpoint_1(0),
+		.breakpoint_2(0),
+		.breakpoint_3(0),	
+
+		.halt_0(),
+		.halt_1(),
+		.halt_2(),
+		.halt_3(),
+		.step_0(),
+		.step_1(),
+		.step_2(),
+		.step_3()
+	);
+
 endmodule
