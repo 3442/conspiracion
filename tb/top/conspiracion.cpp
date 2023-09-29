@@ -298,15 +298,19 @@ int main(int argc, char **argv)
 	}
 
 	Vconspiracion top;
+
+#if VM_TRACE
 	VerilatedVcdC trace;
 
 	bool enable_trace = std::getenv("TRACE");
-	if(enable_trace)
-	{
+	if (enable_trace) {
 		Verilated::traceEverOn(true);
 		top.trace(&trace, 0);
 		trace.open("trace.vcd");
 	}
+#else
+	bool enable_trace = false;
+#endif
 
 	mem hps_ddr3(0x0000'0000, 512 << 20);
 	jtag_uart ttyJ0(0x3000'0000);
@@ -424,10 +428,12 @@ int main(int argc, char **argv)
 			vga.signal_tick(top.clk_clk);
 		}
 
+#if VM_TRACE
 		if(enable_trace)
 		{
 			trace.dump(time++);
 		}
+#endif
 	};
 
 	auto cycle = [&]()
@@ -765,8 +771,10 @@ int main(int argc, char **argv)
 	if (!no_tty)
 		ttyJ0.release();
 
+#if VM_TRACE
 	if (enable_trace)
 		trace.close();
+#endif
 
 	if (dump_regs)
 		do_reg_dump();
@@ -779,8 +787,10 @@ int main(int argc, char **argv)
 	if (ctrl != stdout)
 		std::fclose(ctrl);
 
+#if VM_COVERAGE
 	if (coverage_out)
 		Verilated::threadContextp()->coveragep()->write(coverage_out->c_str());
+#endif
 
 	return failed ? EXIT_FAILURE : EXIT_SUCCESS;
 }

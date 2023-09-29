@@ -14,9 +14,18 @@ CROSS_OBJCOPY := $(CROSS_COMPILE)objcopy
 CROSS_CFLAGS  := -O3 -Wall -Wextra -Werror
 CROSS_LDFLAGS :=
 
+ifdef FASTER_IS_BETTER
+	DISABLE_COV := 1
+	DISABLE_RAND := 1
+	DISABLE_TRACE := 1
+endif
+
+X_MODE := $(if $(DISABLE_RAND),fast,unique)
+
 VFLAGS ?= \
-	--x-assign unique --x-initial unique \
-	--threads $(shell nproc) \
+	--x-assign $(X_MODE) --x-initial $(X_MODE) \
+	$(if $(DISABLE_THREADS),,--threads $(shell nproc)) \
+	$(if $(DISABLE_TRACE),,--trace) \
 	$(if $(DISABLE_COV),,--coverage)
 
 RTL_FILES  = $(shell find $(RTL_DIR)/ ! -path '$(RTL_DIR)/top/*' -type f -name '*.sv')
@@ -96,6 +105,6 @@ $(OBJ_DIR)/%.mk: \
 
 	mkdir -p $(dir $@)
 	$(VERILATOR) \
-		-O3 --cc --exe --trace -y $(RTL_DIR) --Mdir $(dir $@) \
+		-O3 --cc --exe -y $(RTL_DIR) --Mdir $(dir $@) \
 		--top $(word 1,$(subst /, ,$*)) $(patsubst tb/%,../tb/%,$^) \
 		$(VFLAGS)
