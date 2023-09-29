@@ -54,7 +54,6 @@ namespace taller::vga
 				* (mode->v.active + mode->v.front_porch + mode->v.sync + mode->v.back_porch);
 
 			ticks = refresh_ticks - 1;
-			update_window();
 		}
 	}
 
