@@ -104,19 +104,26 @@ namespace taller::avalon
 			virtual bool read(std::uint32_t addr, std::uint32_t &data)
 			{
 				line line_data;
-				if (!this->read_line(addr >> 2, line_data))
+				if (!this->read_line(addr >> 2, line_data, 0b1111 << ((addr & 0b11) * 4)))
 					return false;
 
 				data = line_data.words[addr & 0b11];
 				return true;
 			}
 
-			virtual bool read_line(std::uint32_t addr, line &data)
+			virtual bool read_line(std::uint32_t addr, line &data, unsigned byte_enable)
 			{
-				data.hi = 0;
-				data.lo = 0;
+				//XXX: Realmente es esto lo que genera qsys? Avalon spec no es clara
+				if (byte_enable & 0x000f)
+					return this->read(addr << 2, data.words[0]);
+				else if (byte_enable & 0x00f0)
+				    return this->read((addr << 2) + 1, data.words[1]);
+				else if (byte_enable & 0x0f00)
+				    return this->read((addr << 2) + 2, data.words[2]);
+				else if (byte_enable & 0xf000)
+				    return this->read((addr << 2) + 3, data.words[3]);
 
-				return this->read(addr << 2, data.words[0]);
+				return true;
 			}
 
 			virtual bool write
@@ -129,7 +136,8 @@ namespace taller::avalon
 				return this->write_line(addr >> 2, line_data, byte_enable << ((addr & 0b11) * 4));
 			}
 
-			virtual bool write_line(std::uint32_t addr, const line &data, unsigned byte_enable) {
+			virtual bool write_line(std::uint32_t addr, const line &data, unsigned byte_enable)
+			{
 				unsigned offset = 0;
 				if (byte_enable & 0x00f0)
 					offset = 1;

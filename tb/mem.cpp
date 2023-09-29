@@ -12,7 +12,7 @@ namespace taller::avalon
 	  block(std::make_unique<line[]>(size >> 4))
 	{}
 
-	bool mem::read_line(std::uint32_t addr, line &data)
+	bool mem::read_line(std::uint32_t addr, line &data, unsigned byte_enable [[maybe_unused]])
 	{
 		data = block[addr];
 		return true;/*ready();*/

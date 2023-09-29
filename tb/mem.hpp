@@ -13,7 +13,10 @@ namespace taller::avalon
 		public:
 			mem(std::uint32_t base, std::uint32_t size);
 
-			virtual bool read_line(std::uint32_t addr, line &data) final override;
+			virtual bool read_line
+			(
+				std::uint32_t addr, line &data, unsigned byte_enable
+			) final override;
 
 			virtual bool write_line
 			(

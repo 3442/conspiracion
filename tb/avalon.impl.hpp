@@ -111,7 +111,7 @@ namespace taller::avalon
 
 		if (avl_read) {
 			line readdata;
-			plat.avl_waitrequest = !active->read_line(pos, readdata);
+			plat.avl_waitrequest = !active->read_line(pos, readdata, avl_byteenable);
 			plat.avl_readdata = readdata;
 		} else if (avl_write)
 			plat.avl_waitrequest = !active->write_line(pos, avl_writedata, avl_byteenable);
