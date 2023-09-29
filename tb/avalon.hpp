@@ -39,9 +39,15 @@ namespace taller::avalon
 			return this->verilated;
 		}
 
-		inline bool operator==(VlWide<4> verilated) const noexcept
+		inline bool operator==(const VlWide<4> &verilated) const noexcept
 		{
-			return this->verilated == verilated;
+			line verilated_line{verilated};
+			return this->hi == verilated_line.hi && this->lo == verilated_line.lo;
+		}
+
+		inline bool operator!=(const VlWide<4> &verilated) const noexcept
+		{
+			return !(*this == verilated);
 		}
 	};
 

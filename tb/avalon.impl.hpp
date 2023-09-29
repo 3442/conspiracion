@@ -62,7 +62,7 @@ namespace taller::avalon
 		try {
 			tick_rising();
 			return true;
-		} catch(const avl_bus_error&) {
+		} catch (const avl_bus_error&) {
 			return false;
 		}
 	}
