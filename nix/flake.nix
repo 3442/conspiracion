@@ -111,6 +111,7 @@
             gcc
             cross.stdenv.cc.cc
             cross.stdenv.cc.bintools
+            gcc-arm-embedded
             gdb
             gnumake
             gtkwave
