@@ -114,6 +114,7 @@
             gdb
             gnumake
             gtkwave
+            kermit
             lcov
             pkg-config
             (python3.withPackages (py: [ py.numpy py.pillow py.matplotlib ]))
