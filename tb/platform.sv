@@ -4,10 +4,6 @@ module platform
 (
 	input  wire [7:0]  buttons_external_connection_export,  //  buttons_external_connection.export
 	input  wire        clk_clk,                             //                          clk.clk
-	input  wire        cpu_0_mp_step,                       //                     cpu_0_mp.step
-	input  wire        cpu_0_mp_cpu_halt,                   //                             .cpu_halt
-	output wire        cpu_0_mp_cpu_halted,                 //                             .cpu_halted
-	output wire        cpu_0_mp_breakpoint,                 //                             .breakpoint
 	output wire [12:0] memory_mem_a,                        //                       memory.mem_a
 	output wire [2:0]  memory_mem_ba,                       //                             .mem_ba
 	output wire        memory_mem_ck,                       //                             .mem_ck
@@ -48,6 +44,10 @@ module platform
 	output wire        vram_wire_we_n                       //                             .we_n
 );
 
+	logic clk, rst_n;
+	assign clk = clk_clk;
+	assign rst_n = reset_reset_n;
+
 	logic[31:0]  avl_address /*verilator public*/;
 	logic        avl_read /*verilator public*/;
 	logic        avl_write /*verilator public*/;
@@ -57,29 +57,86 @@ module platform
 	logic        avl_waitrequest /*verilator public_flat_rw @(negedge clk_clk)*/;
 	logic[15:0]  avl_byteenable /*verilator public*/;
 
-	logic[31:0] core_avl_address;
-	logic       core_avl_read;
-	logic       core_avl_write;
-	logic[31:0] core_avl_readdata;
-	logic[31:0] core_avl_writedata;
-	logic       core_avl_waitrequest;
-	logic[3:0]  core_avl_byteenable;
+	logic[31:0]  mem_0_address, mem_1_address, mem_2_address, mem_3_address;
+	logic        mem_0_read, mem_1_read, mem_2_read, mem_3_read;
+	logic        mem_0_write, mem_1_write, mem_2_write, mem_3_write;
+	logic[127:0] mem_0_readdata, mem_1_readdata, mem_2_readdata, mem_3_readdata;
+	logic[127:0] mem_0_writedata, mem_1_writedata, mem_2_writedata, mem_3_writedata;
+	logic        mem_0_waitrequest, mem_1_waitrequest, mem_2_waitrequest, mem_3_waitrequest;
+	logic[15:0]  mem_0_byteenable, mem_1_byteenable, mem_2_byteenable, mem_3_byteenable;
 
-	core cpu0
+	logic[31:0] cpu_0_address, cpu_1_address, cpu_2_address, cpu_3_address;
+	logic       cpu_0_read, cpu_1_read, cpu_2_read, cpu_3_read;
+	logic       cpu_0_write, cpu_1_write, cpu_2_write, cpu_3_write;
+	logic[31:0] cpu_0_readdata, cpu_1_readdata, cpu_2_readdata, cpu_3_readdata;
+	logic[31:0] cpu_0_writedata, cpu_1_writedata, cpu_2_writedata, cpu_3_writedata;
+	logic       cpu_0_waitrequest, cpu_1_waitrequest, cpu_2_waitrequest, cpu_3_waitrequest;
+	logic[3:0]  cpu_0_byteenable, cpu_1_byteenable, cpu_2_byteenable, cpu_3_byteenable;
+
+	core cpu_0
 	(
-		.clk(clk_clk),
-		.rst_n(reset_reset_n),
-		.step(cpu_0_mp_step),
-		.breakpoint(cpu_0_mp_breakpoint),
-		.cpu_halt(cpu_0_mp_cpu_halt),
-		.cpu_halted(cpu_0_mp_cpu_halted),
-		.avl_address(core_avl_address),
-		.avl_read(core_avl_read),
-		.avl_write(core_avl_write),
-		.avl_readdata(core_avl_readdata),
-		.avl_writedata(core_avl_writedata),
-		.avl_waitrequest(core_avl_waitrequest),
-		.avl_byteenable(core_avl_byteenable),
+		.step(step_0),
+		.breakpoint(breakpoint_0),
+		.cpu_halt(halt_0),
+		.cpu_halted(cpu_halted_0),
+		.avl_address(cpu_0_address),
+		.avl_read(cpu_0_read),
+		.avl_write(cpu_0_write),
+		.avl_readdata(cpu_0_readdata),
+		.avl_writedata(cpu_0_writedata),
+		.avl_waitrequest(cpu_0_waitrequest),
+		.avl_byteenable(cpu_0_byteenable),
+		.*
+	);
+
+	core cpu_1
+	(
+		.step(step_1),
+		.breakpoint(breakpoint_1),
+		.cpu_halt(halt_1),
+		.cpu_halted(cpu_halted_1),
+		.avl_address(cpu_1_address),
+		.avl_read(cpu_1_read),
+		.avl_write(cpu_1_write),
+		.avl_readdata(cpu_1_readdata),
+		.avl_writedata(cpu_1_writedata),
+		.avl_waitrequest(cpu_1_waitrequest),
+		.avl_byteenable(cpu_1_byteenable),
+		.avl_irq(0),
+		.*
+	);
+
+	core cpu_2
+	(
+		.step(step_2),
+		.breakpoint(breakpoint_2),
+		.cpu_halt(halt_2),
+		.cpu_halted(cpu_halted_2),
+		.avl_address(cpu_2_address),
+		.avl_read(cpu_2_read),
+		.avl_write(cpu_2_write),
+		.avl_readdata(cpu_2_readdata),
+		.avl_writedata(cpu_2_writedata),
+		.avl_waitrequest(cpu_2_waitrequest),
+		.avl_byteenable(cpu_2_byteenable),
+		.avl_irq(0),
+		.*
+	);
+
+	core cpu_3
+	(
+		.step(step_3),
+		.breakpoint(breakpoint_3),
+		.cpu_halt(halt_3),
+		.cpu_halted(cpu_halted_3),
+		.avl_address(cpu_3_address),
+		.avl_read(cpu_3_read),
+		.avl_write(cpu_3_write),
+		.avl_readdata(cpu_3_readdata),
+		.avl_writedata(cpu_3_writedata),
+		.avl_waitrequest(cpu_3_waitrequest),
+		.avl_byteenable(cpu_3_byteenable),
+		.avl_irq(0),
 		.*
 	);
 
@@ -95,32 +152,23 @@ module platform
 	      data_ready_0, data_ready_1, data_ready_2, data_ready_3,
 	      token_valid_0, token_valid_1, token_valid_2, token_valid_3;
 
-	cache #(.TOKEN_AT_RESET(0)) cache0
+	cache cache_0
 	(
-		.clk(clk_clk),
-		.rst_n(reset_reset_n),
-		.core_address(core_avl_address[31:2]),
-		.core_read(core_avl_read),
-		.core_write(core_avl_write),
-		.core_writedata(core_avl_writedata),
-		.core_byteenable(core_avl_byteenable),
-		.core_waitrequest(core_avl_waitrequest),
-		.core_readdata(core_avl_readdata),
+		.core_address(cpu_0_address[31:2]),
+		.core_read(cpu_0_read),
+		.core_write(cpu_0_write),
+		.core_writedata(cpu_0_writedata),
+		.core_byteenable(cpu_0_byteenable),
+		.core_waitrequest(cpu_0_waitrequest),
+		.core_readdata(cpu_0_readdata),
 
-		//.dbg_address(),
-		.dbg_read(0),
-		.dbg_write(0),
-		.dbg_writedata(),
-		.dbg_waitrequest(),
-		.dbg_readdata(),
-
-		.mem_waitrequest(avl_waitrequest),
-		.mem_readdata(avl_readdata),
-		.mem_address(avl_address),
-		.mem_read(avl_read),
-		.mem_write(avl_write),
-		.mem_writedata(avl_writedata),
-		.mem_byteenable(avl_byteenable),
+		.mem_waitrequest(mem_0_waitrequest),
+		.mem_readdata(mem_0_readdata),
+		.mem_address(mem_0_address),
+		.mem_read(mem_0_read),
+		.mem_write(mem_0_write),
+		.mem_writedata(mem_0_writedata),
+		.mem_byteenable(mem_0_byteenable),
 
 		.in_data_valid(data_valid_3),
 		.in_data(data_3),
@@ -134,35 +182,28 @@ module platform
 		.in_token_valid(token_valid_3),
 
 		.out_token(token_0),
-		.out_token_valid(token_valid_0)
+		.out_token_valid(token_valid_0),
+
+		.*
 	);
 
-	cache #(.TOKEN_AT_RESET(0)) cache1
+	cache cache_1
 	(
-		.clk(clk_clk),
-		.rst_n(reset_reset_n),
-		.core_address(),
-		.core_read(0),
-		.core_write(0),
-		.core_writedata(),
-		.core_byteenable(),
-		.core_waitrequest(),
-		.core_readdata(),
+		.core_address(cpu_1_address[31:2]),
+		.core_read(cpu_1_read),
+		.core_write(cpu_1_write),
+		.core_writedata(cpu_1_writedata),
+		.core_byteenable(cpu_1_byteenable),
+		.core_waitrequest(cpu_1_waitrequest),
+		.core_readdata(cpu_1_readdata),
 
-		//.dbg_address(),
-		.dbg_read(0),
-		.dbg_write(0),
-		.dbg_writedata(),
-		.dbg_waitrequest(),
-		.dbg_readdata(),
-
-		.mem_waitrequest(1),
-		.mem_readdata(),
-		.mem_address(),
-		.mem_read(),
-		.mem_write(),
-		.mem_writedata(),
-		.mem_byteenable(),
+		.mem_waitrequest(mem_1_waitrequest),
+		.mem_readdata(mem_1_readdata),
+		.mem_address(mem_1_address),
+		.mem_read(mem_1_read),
+		.mem_write(mem_1_write),
+		.mem_writedata(mem_1_writedata),
+		.mem_byteenable(mem_1_byteenable),
 
 		.in_data_valid(data_valid_0),
 		.in_data(data_0),
@@ -176,35 +217,28 @@ module platform
 		.in_token_valid(token_valid_0),
 
 		.out_token(token_1),
-		.out_token_valid(token_valid_1)
+		.out_token_valid(token_valid_1),
+
+		.*
 	);
 
-	cache #(.TOKEN_AT_RESET(0)) cache2
+	cache cache_2
 	(
-		.clk(clk_clk),
-		.rst_n(reset_reset_n),
-		.core_address(),
-		.core_read(0),
-		.core_write(0),
-		.core_writedata(),
-		.core_byteenable(),
-		.core_waitrequest(),
-		.core_readdata(),
+		.core_address(cpu_2_address[31:2]),
+		.core_read(cpu_2_read),
+		.core_write(cpu_2_write),
+		.core_writedata(cpu_2_writedata),
+		.core_byteenable(cpu_2_byteenable),
+		.core_waitrequest(cpu_2_waitrequest),
+		.core_readdata(cpu_2_readdata),
 
-		//.dbg_address(),
-		.dbg_read(0),
-		.dbg_write(0),
-		.dbg_writedata(),
-		.dbg_waitrequest(),
-		.dbg_readdata(),
-
-		.mem_waitrequest(1),
-		.mem_readdata(),
-		.mem_address(),
-		.mem_read(),
-		.mem_write(),
-		.mem_writedata(),
-		.mem_byteenable(),
+		.mem_waitrequest(mem_2_waitrequest),
+		.mem_readdata(mem_2_readdata),
+		.mem_address(mem_2_address),
+		.mem_read(mem_2_read),
+		.mem_write(mem_2_write),
+		.mem_writedata(mem_2_writedata),
+		.mem_byteenable(mem_2_byteenable),
 
 		.in_data_valid(data_valid_1),
 		.in_data(data_1),
@@ -218,35 +252,28 @@ module platform
 		.in_token_valid(token_valid_1),
 
 		.out_token(token_2),
-		.out_token_valid(token_valid_2)
+		.out_token_valid(token_valid_2),
+
+		.*
 	);
 
-	cache #(.TOKEN_AT_RESET(1)) cache3
+	cache #(.TOKEN_AT_RESET(1)) cache_3
 	(
-		.clk(clk_clk),
-		.rst_n(reset_reset_n),
-		.core_address(),
-		.core_read(0),
-		.core_write(0),
-		.core_writedata(),
-		.core_byteenable(),
-		.core_waitrequest(),
-		.core_readdata(),
+		.core_address(cpu_3_address[31:2]),
+		.core_read(cpu_3_read),
+		.core_write(cpu_3_write),
+		.core_writedata(cpu_3_writedata),
+		.core_byteenable(cpu_3_byteenable),
+		.core_waitrequest(cpu_3_waitrequest),
+		.core_readdata(cpu_3_readdata),
 
-		//.dbg_address(),
-		.dbg_read(0),
-		.dbg_write(0),
-		.dbg_writedata(),
-		.dbg_waitrequest(),
-		.dbg_readdata(),
-
-		.mem_waitrequest(1),
-		.mem_readdata(),
-		.mem_address(),
-		.mem_read(),
-		.mem_write(),
-		.mem_writedata(),
-		.mem_byteenable(),
+		.mem_waitrequest(mem_3_waitrequest),
+		.mem_readdata(mem_3_readdata),
+		.mem_address(mem_3_address),
+		.mem_read(mem_3_read),
+		.mem_write(mem_3_write),
+		.mem_writedata(mem_3_writedata),
+		.mem_byteenable(mem_3_byteenable),
 
 		.in_data_valid(data_valid_2),
 		.in_data(data_2),
@@ -260,36 +287,29 @@ module platform
 		.in_token_valid(token_valid_2),
 
 		.out_token(token_3),
-		.out_token_valid(token_valid_3)
+		.out_token_valid(token_valid_3),
+
+		.*
 	);
+
+	logic step_0, step_1, step_2, step_3,
+	      halt_0, halt_1, halt_2, halt_3,
+	      breakpoint_0, breakpoint_1, breakpoint_2, breakpoint_3,
+	      cpu_halted_0, cpu_halted_1, cpu_halted_2, cpu_halted_3;
 
 	smp_ctrl smp
 	(
-		.clk(),
-		.rst_n(),
-
 		.avl_read(0),
 		.avl_write(0),
 		.avl_writedata(),
 		.avl_readdata(),
 
-		.cpu_halted_0(0),
-		.cpu_halted_1(0),
-		.cpu_halted_2(0),
-		.cpu_halted_3(0),
-		.breakpoint_0(0),
-		.breakpoint_1(0),
-		.breakpoint_2(0),
-		.breakpoint_3(0),	
+		.*
+	);
 
-		.halt_0(),
-		.halt_1(),
-		.halt_2(),
-		.halt_3(),
-		.step_0(),
-		.step_1(),
-		.step_2(),
-		.step_3()
+	mem_interconnect mem
+	(
+		.*
 	);
 
 endmodule

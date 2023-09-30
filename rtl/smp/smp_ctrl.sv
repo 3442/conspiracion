@@ -37,7 +37,7 @@ module smp_ctrl
 	// No hay addresses
 	assign write = avl_write;
 
-	mp_pe #(.IS_BSP(1)) pe_0
+	smp_pe #(.IS_BSP(1)) pe_0
 	(
 		.step(step_0),
 		.halt(halt_0),
@@ -48,7 +48,7 @@ module smp_ctrl
 		.*
 	);
 
-	mp_pe pe_1
+	smp_pe pe_1
 	(
 		.step(step_1),
 		.halt(halt_1),
@@ -59,7 +59,7 @@ module smp_ctrl
 		.*
 	);
 
-	mp_pe pe_2
+	smp_pe pe_2
 	(
 		.step(step_2),
 		.halt(halt_2),
@@ -70,7 +70,7 @@ module smp_ctrl
 		.*
 	);
 
-	mp_pe pe_3
+	smp_pe pe_3
 	(
 		.step(step_3),
 		.halt(halt_3),

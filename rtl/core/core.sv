@@ -45,10 +45,6 @@ module core
 		.bus_ready(ready),
 		.bus_write(write),
 		.bus_start(start),
-`ifndef VERILATOR
-		.step(0),
-		.breakpoint(),
-`endif
 		.*
 	);
 

@@ -396,11 +396,23 @@ int main(int argc, char **argv)
 		std::fclose(img_file);
 	}
 
-	auto &core = *plat.cpu0->cpu;
-	for(const auto &init : init_regs)
-	{
-		core.regs->a->file[init.index] = init.value;
-		core.regs->b->file[init.index] = init.value;
+	Vconspiracion_arm810 *const cores[] = {
+		plat.cpu_0->cpu,
+		plat.cpu_1->cpu,
+		plat.cpu_2->cpu,
+		plat.cpu_3->cpu
+	};
+
+	Vconspiracion_cache_sram *const caches[] = {
+		plat.cache_0->sram,
+		plat.cache_1->sram,
+		plat.cache_2->sram,
+		plat.cache_3->sram
+	};
+
+	for (const auto &init : init_regs) {
+		cores[0]->regs->a->file[init.index] = init.value;
+		cores[0]->regs->b->file[init.index] = init.value;
 	}
 
 	int time = 0;
@@ -442,13 +454,17 @@ int main(int argc, char **argv)
 		tick();
 	};
 
-	if(!no_tty)
-	{
+	if (!no_tty)
 		ttyJ0.takeover();
+
+	for (auto *core : cores) {
+		// No toman efecto hasta que no se levante VforceEn
+		core->fetch->explicit_branch__VforceVal = 1;
+		core->halt__VforceVal = 1;
+		core->step__VforceVal = 1;
 	}
 
-	top.step = 0;
-	top.halt = start_halted;
+	cores[0]->halt__VforceEn = start_halted;
 	top.rst_n = 0;
 	cycle();
 	top.rst_n = 1;
@@ -457,13 +473,13 @@ int main(int argc, char **argv)
 	{
 		std::fputs("=== dump-regs ===\n", ctrl);
 
+		// TODO: cores[i]
+		const auto &core = *cores[0];
 		const auto &regfile = core.regs->a->file;
 
 		int i = 0;
-		for(const auto *name : gp_regs)
-		{
+		for (const auto *name : gp_regs)
 			std::fprintf(ctrl, "%08x %s\n", regfile[i++], name);
-		}
 
 		std::fprintf(ctrl, "%08x pc\n", core.control->pc << 2);
 		std::fprintf(ctrl, "%08x cpsr\n", core.psr->cpsr_word);
@@ -482,13 +498,6 @@ int main(int argc, char **argv)
 		std::fprintf(ctrl, "%08x bh2\n", core.control->ctrl_issue->bh2);
 		std::fprintf(ctrl, "%08x bh3\n", core.control->ctrl_issue->bh3);
 		std::fputs("=== end-regs ===\n", ctrl);
-	};
-
-	Vconspiracion_cache_sram *const caches[] = {
-		plat.cache0->sram,
-		plat.cache1->sram,
-		plat.cache2->sram,
-		plat.cache3->sram
 	};
 
 	auto dump_coherent = [&](std::uint32_t addr, std::uint32_t &data)
@@ -514,10 +523,10 @@ int main(int argc, char **argv)
 
 	auto pagewalk = [&](std::uint32_t &addr)
 	{
-		if(!core.mmu->mmu_enable)
-		{
+		// TODO: core[i]
+		const auto &core = *cores[0];
+		if (!core.mmu->mmu_enable)
 			return true;
-		}
 
 		std::uint32_t ttbr = core.mmu->mmu_ttbr;
 
@@ -592,73 +601,77 @@ int main(int argc, char **argv)
 
 	std::signal(SIGUSR1, async_halt_handler);
 
-	core.fetch->explicit_branch__VforceVal = 1;
-
 	auto maybe_halt = [&]()
 	{
-		if(top.breakpoint || async_halt)
-		{
-			top.halt = 1;
+		bool has_halted = false;
+		for (auto *core : cores) {
+			if (core->breakpoint || async_halt)
+				core->halt__VforceEn = 1;
+
+			has_halted = has_halted || core->halt__VforceEn;
 		}
 
-		return top.halt;
+		return has_halted;
 	};
 
 	auto loop_fast = [&]()
 	{
-		do
-		{
-			for(unsigned iters = 0; iters < 1024 && !top.breakpoint; ++iters)
-			{
+		do {
+			for (unsigned iters = 0; iters < 4096; ++iters) {
 				top.clk_clk = 0;
 				top.eval();
 				avl.tick_falling();
 
 				top.clk_clk = 1;
 				top.eval();
-
-				// This is free most of the time
-				try
-				{
-					avl.tick_rising();
-				} catch(const avl_bus_error&)
-				{
-					failed = true;
-					break;
-				}
+				avl.tick_rising();
 			}
-		} while(!maybe_halt());
+		} while (!maybe_halt());
 	};
 
 	unsigned i = 0;
 	auto loop_accurate = [&]()
 	{
-		do
-		{
+		do {
 			cycle();
 			maybe_halt();
-		} while(!failed && !top.cpu_halted && (*cycles == 0 || ++i < *cycles));
+
+			for (const auto *core : cores)
+				if (core->halted)
+					break;
+		} while (!failed && (*cycles == 0 || ++i < *cycles));
 	};
 
 	const bool slow_path = *cycles > 0 || enable_accurate_video || enable_trace;
 
-	while(true)
-	{
-		if(slow_path || top.halt || top.step)
-		{
-			loop_accurate();
-		} else
-		{
-			loop_fast();
-		}
+	while (true) {
+		bool needs_accurate = false;
+		for (const auto *core : cores)
+			if (core->halt__VforceEn || core->step__VforceEn) {
+				needs_accurate = true;
+				break;
+			}
 
-		if(failed || (*cycles > 0 && i >= *cycles))
-		{
+		try {
+			if (slow_path || needs_accurate)
+				loop_accurate();
+			else
+				loop_fast();
+		} catch (const avl_bus_error&) {
+			failed = true;
 			break;
 		}
 
-		top.step = 0;
-		core.fetch->target__VforceVal = core.control->pc;
+		if (failed || (*cycles > 0 && i >= *cycles))
+			break;
+
+		for (auto *core : cores) {
+			core->fetch->target__VforceVal = core->control->pc;
+			core->step__VforceEn = 0;
+		}
+
+		// TODO: cores[i]
+		auto *current_core = cores[0];
 
 		do_reg_dump();
 		std::fprintf(ctrl, "=== %s ===\n", failed ? "fault" : "halted");
@@ -666,13 +679,10 @@ int main(int argc, char **argv)
 		char *line = nullptr;
 		std::size_t buf_size = 0;
 
-		while(true)
-		{
+		while (true) {
 			ssize_t read = getline(&line, &buf_size, ctrl);
-			if(read == -1)
-			{
-				if(!std::feof(ctrl))
-				{
+			if (read == -1) {
+				if (!std::feof(ctrl)) {
 					std::perror("getline()");
 					failed = true;
 				}
@@ -680,35 +690,28 @@ int main(int argc, char **argv)
 				break;
 			}
 
-			if(read > 0 && line[read - 1] == '\n')
-			{
+			if (read > 0 && line[read - 1] == '\n')
 				line[read - 1] = '\0';
-			}
 
 			const char *cmd = std::strtok(line, " ");
-			if(!std::strcmp(cmd, "continue"))
-			{
+			if (!std::strcmp(cmd, "continue"))
 				break;
-			} else if(!std::strcmp(cmd, "step"))
-			{
-				top.step = 1;
+			else if(!std::strcmp(cmd, "step")) {
+				current_core->step__VforceEn = 1;
 				break;
-			} else if(!std::strcmp(cmd, "dump-mem"))
-			{
+			} else if (!std::strcmp(cmd, "dump-mem")) {
 				mem_region dump = {};
 				std::sscanf(std::strtok(nullptr, " "), "%zu", &dump.start);
 				std::sscanf(std::strtok(nullptr, " "), "%zu", &dump.length);
 				do_mem_dump(&dump, 1);
-			} else if(!std::strcmp(cmd, "patch-mem"))
-			{
+			} else if (!std::strcmp(cmd, "patch-mem")) {
 				std::uint32_t addr;
 				std::sscanf(std::strtok(nullptr, " "), "%u", &addr);
 
 				const char *data = std::strtok(nullptr, " ");
 				std::size_t length = std::strlen(data);
 
-				while(data && length >= 8)
-				{
+				while (data && length >= 8) {
 					std::uint32_t word;
 					std::sscanf(data, "%08x", &word);
 
@@ -721,31 +724,24 @@ int main(int argc, char **argv)
 						 | ((word >> 24) & 0xff);
 
 					std::uint32_t phys = addr++;
-					if(!pagewalk(phys))
-					{
+					if (!pagewalk(phys))
 						break;
-					}
 
 					avl.patch(phys, word);
 				}
-			} else if(!std::strcmp(cmd, "patch-reg"))
-			{
+			} else if  (!std::strcmp(cmd, "patch-reg")) {
 				std::uint32_t value;
 				std::sscanf(std::strtok(nullptr, " "), "%u", &value);
 
 				const char *name = std::strtok(nullptr, " ");
-				if(!std::strcmp(name, "pc"))
-				{
-					core.fetch->target__VforceVal = value >> 2;
-				} else
-				{
+				if (!std::strcmp(name, "pc"))
+					current_core->fetch->target__VforceVal = value >> 2;
+				else {
 					std::size_t index = 0;
-					for(const char *reg : gp_regs)
-					{
-						if(!strcmp(name, reg))
-						{
-							core.regs->a->file[index] = value;
-							core.regs->b->file[index] = value;
+					for (const char *reg : gp_regs) {
+						if (!strcmp(name, reg)) {
+							current_core->regs->a->file[index] = value;
+							current_core->regs->b->file[index] = value;
 							break;
 						}
 
@@ -758,14 +754,18 @@ int main(int argc, char **argv)
 		std::free(line);
 		async_halt = 0;
 
-		core.fetch->target__VforceEn = 0xffff'ffff;
-		core.fetch->explicit_branch__VforceEn = 1;
+		for (auto *core : cores) {
+			core->fetch->target__VforceEn = 0xffff'ffff;
+			core->fetch->explicit_branch__VforceEn = 1;
+		}
 
 		cycle();
-		top.halt = 0;
 
-		core.fetch->target__VforceEn = 0;
-		core.fetch->explicit_branch__VforceEn = 0;
+		for (auto *core : cores) {
+			core->fetch->target__VforceEn = 0;
+			core->fetch->explicit_branch__VforceEn = 0;
+			core->halt__VforceEn = 0;
+		}
 	}
 
 	if (!no_tty)

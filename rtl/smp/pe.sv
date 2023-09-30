@@ -1,4 +1,4 @@
-module mp_pe
+module smp_pe
 #(parameter IS_BSP=0)
 (
 	input  logic	  clk,

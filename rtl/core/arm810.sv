@@ -7,8 +7,8 @@ module arm810
 	                  rst_n,
 
 	input  logic      irq,
-	                  halt,
-	                  step,
+	                  halt /*verilator public*/ /*verilator forceable*/,
+	                  step /*verilator public*/ /*verilator forceable*/,
 
 	output ptr        bus_addr,
 	output logic      bus_start,
@@ -18,8 +18,8 @@ module arm810
 	output word       bus_data_wr,
 	output logic[3:0] bus_data_be,
 
-	output logic      halted,
-	                  breakpoint
+	output logic      halted /*verilator public*/,
+	                  breakpoint /*verilator public*/
 );
 
 	ptr branch_target, fetch_insn_pc, fetch_head, insn_addr;
