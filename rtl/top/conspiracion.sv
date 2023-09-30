@@ -3,13 +3,6 @@ module conspiracion
 	input  wire        clk_clk,
 	input  wire        rst_n,
 
-	input  wire        halt,
-`ifdef VERILATOR
-	input  wire        step,
-	output wire        breakpoint,
-`endif
-	output wire        cpu_halted,
-
 	output wire [12:0] memory_mem_a,
 	output wire [2:0]  memory_mem_ba,
 	output wire        memory_mem_ck,
@@ -49,10 +42,9 @@ module conspiracion
 	output wire [7:0]  vga_dac_b
 );
 
-	logic button, cpu_halt, reset_reset_n;
+	logic button, reset_reset_n;
 
 `ifdef VERILATOR
-	assign cpu_halt = halt;
 	assign reset_reset_n = rst_n;
 	assign button = pio_buttons;
 `else
@@ -61,13 +53,6 @@ module conspiracion
 		.clk(clk_clk),
 		.dirty(rst_n),
 		.clean(reset_reset_n)
-	);
-
-	debounce halt_debounce
-	(
-		.clk(cpu_clk),
-		.dirty(halt),
-		.clean(cpu_halt)
 	);
 
 	debounce button_debounce
@@ -80,19 +65,10 @@ module conspiracion
 
 	platform plat
 	(
-`ifdef VERILATOR
-		.cpu_0_mp_step(step),
-		.cpu_0_mp_breakpoint(breakpoint),
-`else
-		.cpu_0_mp_step(0),
-		.cpu_0_mp_breakpoint(),
-`endif
-		.cpu_0_mp_cpu_halt(cpu_halt),
-		.cpu_0_mp_cpu_halted(cpu_halted),
 		.pll_0_reset_reset(0), //TODO: reset controller, algún día
 		.pio_0_external_connection_export(pio_leds),
 		.switches_external_connection_export({2'b00, pio_switches}),
-		//TODO: glitch rst
+		//FIXME: el glitch de reset
 		.buttons_external_connection_export({7'b0000000, !button}),
 		.sys_sdram_pll_0_sdram_clk_clk(vram_wire_clk),
 		.vga_dac_CLK(vga_dac_clk),

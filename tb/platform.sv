@@ -263,7 +263,7 @@ module platform
 		.out_token_valid(token_valid_3)
 	);
 
-	mp_ctrl mp
+	smp_ctrl smp
 	(
 		.clk(),
 		.rst_n(),

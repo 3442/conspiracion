@@ -1,4 +1,4 @@
-module mp_ctrl
+module smp_ctrl
 (
 	input  logic	   clk,
 	                   rst_n,
@@ -36,6 +36,17 @@ module mp_ctrl
 
 	// No hay addresses
 	assign write = avl_write;
+
+	mp_pe #(.IS_BSP(1)) pe_0
+	(
+		.step(step_0),
+		.halt(halt_0),
+		.cpu_halted(cpu_halted_0),
+		.breakpoint(breakpoint_0),
+		.readdata(readdata_0),
+		.writedata(writedata_0),
+		.*
+	);
 
 	mp_pe pe_1
 	(
