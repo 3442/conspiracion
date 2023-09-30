@@ -25,6 +25,38 @@
          type = "int";
       }
    }
+   element cache_0
+   {
+      datum _sortIndex
+      {
+         value = "20";
+         type = "int";
+      }
+   }
+   element cache_1
+   {
+      datum _sortIndex
+      {
+         value = "22";
+         type = "int";
+      }
+   }
+   element cache_2
+   {
+      datum _sortIndex
+      {
+         value = "24";
+         type = "int";
+      }
+   }
+   element cache_3
+   {
+      datum _sortIndex
+      {
+         value = "26";
+         type = "int";
+      }
+   }
    element clk_0
    {
       datum _sortIndex
@@ -38,6 +70,30 @@
       datum _sortIndex
       {
          value = "19";
+         type = "int";
+      }
+   }
+   element cpu_1
+   {
+      datum _sortIndex
+      {
+         value = "21";
+         type = "int";
+      }
+   }
+   element cpu_2
+   {
+      datum _sortIndex
+      {
+         value = "23";
+         type = "int";
+      }
+   }
+   element cpu_3
+   {
+      datum _sortIndex
+      {
+         value = "25";
          type = "int";
       }
    }
@@ -73,7 +129,7 @@
          type = "int";
       }
    }
-   element mm_bridge_1
+   element mm_bridge
    {
       datum _sortIndex
       {
@@ -293,6 +349,18 @@
   <parameter name="simDrivenValue" value="0" />
   <parameter name="width" value="8" />
  </module>
+ <module name="cache_0" kind="cache" version="1.0" enabled="1">
+  <parameter name="TOKEN_AT_RESET" value="0" />
+ </module>
+ <module name="cache_1" kind="cache" version="1.0" enabled="1">
+  <parameter name="TOKEN_AT_RESET" value="0" />
+ </module>
+ <module name="cache_2" kind="cache" version="1.0" enabled="1">
+  <parameter name="TOKEN_AT_RESET" value="0" />
+ </module>
+ <module name="cache_3" kind="cache" version="1.0" enabled="1">
+  <parameter name="TOKEN_AT_RESET" value="1" />
+ </module>
  <module name="clk_0" kind="clock_source" version="20.1" enabled="1">
   <parameter name="clockFrequency" value="50000000" />
   <parameter name="clockFrequencyKnown" value="true" />
@@ -301,6 +369,15 @@
  </module>
  <module name="cpu_0" kind="core" version="1.0" enabled="1">
   <parameter name="AUTO_INTERRUPT_RECEIVER_INTERRUPTS_USED" value="1" />
+ </module>
+ <module name="cpu_1" kind="core" version="1.0" enabled="0">
+  <parameter name="AUTO_INTERRUPT_RECEIVER_INTERRUPTS_USED" value="0" />
+ </module>
+ <module name="cpu_2" kind="core" version="1.0" enabled="0">
+  <parameter name="AUTO_INTERRUPT_RECEIVER_INTERRUPTS_USED" value="0" />
+ </module>
+ <module name="cpu_3" kind="core" version="1.0" enabled="0">
+  <parameter name="AUTO_INTERRUPT_RECEIVER_INTERRUPTS_USED" value="0" />
  </module>
  <module name="hps_0" kind="altera_hps" version="20.1" enabled="1">
   <parameter name="ABSTRACT_REAL_COMPARE_TEST" value="false" />
@@ -870,13 +947,13 @@
   <parameter name="writeIRQThreshold" value="8" />
  </module>
  <module
-   name="mm_bridge_1"
+   name="mm_bridge"
    kind="altera_avalon_mm_bridge"
    version="20.1"
    enabled="1">
   <parameter name="ADDRESS_UNITS" value="SYMBOLS" />
   <parameter name="ADDRESS_WIDTH" value="32" />
-  <parameter name="DATA_WIDTH" value="32" />
+  <parameter name="DATA_WIDTH" value="128" />
   <parameter name="LINEWRAPBURSTS" value="0" />
   <parameter name="MAX_BURST_SIZE" value="1" />
   <parameter name="MAX_PENDING_RESPONSES" value="4" />
@@ -1260,7 +1337,7 @@
  <connection
    kind="avalon"
    version="20.1"
-   start="mm_bridge_1.m0"
+   start="mm_bridge.m0"
    end="pixdma.avalon_control_slave">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x30030000" />
@@ -1269,7 +1346,7 @@
  <connection
    kind="avalon"
    version="20.1"
-   start="mm_bridge_1.m0"
+   start="mm_bridge.m0"
    end="jtag_uart_0.avalon_jtag_slave">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x30000000" />
@@ -1278,7 +1355,7 @@
  <connection
    kind="avalon"
    version="20.1"
-   start="mm_bridge_1.m0"
+   start="mm_bridge.m0"
    end="pixfmt.avalon_rgb_slave">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x30040000" />
@@ -1287,33 +1364,33 @@
  <connection
    kind="avalon"
    version="20.1"
-   start="mm_bridge_1.m0"
+   start="mm_bridge.m0"
    end="intc_0.avalon_slave">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x30070000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
- <connection kind="avalon" version="20.1" start="mm_bridge_1.m0" end="buttons.s1">
+ <connection kind="avalon" version="20.1" start="mm_bridge.m0" end="buttons.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x30050000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
- <connection kind="avalon" version="20.1" start="mm_bridge_1.m0" end="pio_0.s1">
+ <connection kind="avalon" version="20.1" start="mm_bridge.m0" end="pio_0.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x30010000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
- <connection kind="avalon" version="20.1" start="mm_bridge_1.m0" end="switches.s1">
+ <connection kind="avalon" version="20.1" start="mm_bridge.m0" end="switches.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x30060000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
- <connection kind="avalon" version="20.1" start="mm_bridge_1.m0" end="timer_0.s1">
+ <connection kind="avalon" version="20.1" start="mm_bridge.m0" end="timer_0.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x30020000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
- <connection kind="avalon" version="20.1" start="mm_bridge_1.m0" end="vram.s1">
+ <connection kind="avalon" version="20.1" start="mm_bridge.m0" end="vram.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x38000000" />
   <parameter name="defaultConnection" value="false" />
@@ -1321,8 +1398,13 @@
  <connection
    kind="avalon"
    version="20.1"
-   start="mm_bridge_1.m0"
+   start="mm_bridge.m0"
    end="address_span_extender_0.windowed_slave">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection kind="avalon" version="20.1" start="cpu_0.master" end="cache_0.core">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x0000" />
   <parameter name="defaultConnection" value="false" />
@@ -1331,16 +1413,27 @@
    kind="avalon"
    version="20.1"
    start="jtag_dbg.master"
-   end="mm_bridge_1.s0">
+   end="mm_bridge.s0">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x0000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
- <connection
-   kind="avalon"
-   version="20.1"
-   start="cpu_0.master"
-   end="mm_bridge_1.s0">
+ <connection kind="avalon" version="20.1" start="cache_0.mem" end="mm_bridge.s0">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection kind="avalon" version="20.1" start="cache_1.mem" end="mm_bridge.s0">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection kind="avalon" version="20.1" start="cache_2.mem" end="mm_bridge.s0">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection kind="avalon" version="20.1" start="cache_3.mem" end="mm_bridge.s0">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x0000" />
   <parameter name="defaultConnection" value="false" />
@@ -1360,6 +1453,46 @@
    version="20.1"
    start="pixfmt.avalon_rgb_source"
    end="pixfifo.avalon_dc_buffer_sink" />
+ <connection
+   kind="avalon_streaming"
+   version="20.1"
+   start="cache_0.out_data"
+   end="cache_1.in_data" />
+ <connection
+   kind="avalon_streaming"
+   version="20.1"
+   start="cache_3.out_data"
+   end="cache_0.in_data" />
+ <connection
+   kind="avalon_streaming"
+   version="20.1"
+   start="cache_1.out_data"
+   end="cache_2.in_data" />
+ <connection
+   kind="avalon_streaming"
+   version="20.1"
+   start="cache_2.out_data"
+   end="cache_3.in_data" />
+ <connection
+   kind="avalon_streaming"
+   version="20.1"
+   start="cache_0.out_token"
+   end="cache_1.in_token" />
+ <connection
+   kind="avalon_streaming"
+   version="20.1"
+   start="cache_3.out_token"
+   end="cache_0.in_token" />
+ <connection
+   kind="avalon_streaming"
+   version="20.1"
+   start="cache_1.out_token"
+   end="cache_2.in_token" />
+ <connection
+   kind="avalon_streaming"
+   version="20.1"
+   start="cache_2.out_token"
+   end="cache_3.in_token" />
  <connection
    kind="clock"
    version="20.1"
@@ -1396,16 +1529,32 @@
    version="20.1"
    start="pll_0.outclk0"
    end="hps_0.f2h_sdram0_clock" />
- <connection
-   kind="clock"
-   version="20.1"
-   start="pll_0.outclk1"
-   end="mm_bridge_1.clk" />
+ <connection kind="clock" version="20.1" start="pll_0.outclk1" end="mm_bridge.clk" />
  <connection
    kind="clock"
    version="20.1"
    start="pll_0.outclk1"
    end="cpu_0.clock_sink" />
+ <connection
+   kind="clock"
+   version="20.1"
+   start="pll_0.outclk1"
+   end="cache_0.clock_sink" />
+ <connection
+   kind="clock"
+   version="20.1"
+   start="pll_0.outclk1"
+   end="cache_1.clock_sink" />
+ <connection
+   kind="clock"
+   version="20.1"
+   start="pll_0.outclk1"
+   end="cache_2.clock_sink" />
+ <connection
+   kind="clock"
+   version="20.1"
+   start="pll_0.outclk1"
+   end="cache_3.clock_sink" />
  <connection
    kind="clock"
    version="20.1"
@@ -1498,7 +1647,7 @@
    kind="reset"
    version="20.1"
    start="clk_0.clk_reset"
-   end="mm_bridge_1.reset" />
+   end="mm_bridge.reset" />
  <connection
    kind="reset"
    version="20.1"
@@ -1509,6 +1658,26 @@
    version="20.1"
    start="clk_0.clk_reset"
    end="cpu_0.reset_sink" />
+ <connection
+   kind="reset"
+   version="20.1"
+   start="clk_0.clk_reset"
+   end="cache_0.reset_sink" />
+ <connection
+   kind="reset"
+   version="20.1"
+   start="clk_0.clk_reset"
+   end="cache_1.reset_sink" />
+ <connection
+   kind="reset"
+   version="20.1"
+   start="clk_0.clk_reset"
+   end="cache_2.reset_sink" />
+ <connection
+   kind="reset"
+   version="20.1"
+   start="clk_0.clk_reset"
+   end="cache_3.reset_sink" />
  <connection
    kind="reset"
    version="20.1"

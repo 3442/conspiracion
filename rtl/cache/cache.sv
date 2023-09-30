@@ -3,40 +3,40 @@
 module cache
 #(parameter TOKEN_AT_RESET=0)
 (
-	input  logic    clk,
-	                rst_n,
+	input  logic      clk,
+	                  rst_n,
 
-	input  ptr      core_address,
-	input  logic    core_read,
-	                core_write,
-	input  word     core_writedata,
-	input  word_be  core_byteenable,
-	output logic    core_waitrequest,
-	output word     core_readdata,
+	input  ptr        core_address,
+	input  logic      core_read,
+	                  core_write,
+	input  word       core_writedata,
+	input  word_be    core_byteenable,
+	output logic      core_waitrequest,
+	output word       core_readdata,
 
 	//TODO
-	//input  /*TODO*/    dbg_address,
-	input  logic    dbg_read,
-	                dbg_write,
-	input  word     dbg_writedata,
-	output logic    dbg_waitrequest,
-	output word     dbg_readdata,
+	/*input  TODO/      dbg_address,
+	input  logic      dbg_read,
+	                  dbg_write,
+	input  word       dbg_writedata,
+	output logic      dbg_waitrequest,
+	output word       dbg_readdata,*/
 
-	input  logic    mem_waitrequest,
-	input  line     mem_readdata,
-	output word     mem_address,
-	output logic    mem_read,
-	                mem_write,
-	output line     mem_writedata,
-	output line_be  mem_byteenable,
+	input  logic      mem_waitrequest,
+	input  line       mem_readdata,
+	output word       mem_address,
+	output logic      mem_read,
+	                  mem_write,
+	output line       mem_writedata,
+	output line_be    mem_byteenable,
 
-	input  logic    in_data_valid,
-	input  ring_req in_data,
-	output logic    in_data_ready,
+	input  logic      in_data_valid,
+	input  ring_req   in_data,
+	output logic      in_data_ready,
 
-	input  logic    out_data_ready,
-	output ring_req out_data,
-	output logic    out_data_valid,
+	input  logic      out_data_ready,
+	output ring_req   out_data,
+	output logic      out_data_valid,
 
 	input  ring_token in_token,
 	input  logic      in_token_valid,
@@ -46,7 +46,7 @@ module cache
 );
 
 	//TODO
-	assign dbg_waitrequest = 1;
+	//assign dbg_waitrequest = 1;
 
 	logic write_data, write_state;
 	line data_wr, data_rd;

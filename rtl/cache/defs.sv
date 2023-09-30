@@ -38,6 +38,10 @@ typedef enum logic[1:0]
 
 typedef struct packed
 {
+`ifndef VERILATOR
+	// Error: data width (158) must be a multiple of bitsPerSymbol (8)
+	logic[1:0] padding;
+`endif
 	logic[1:0] ttl;
 	logic      read,
 	           inval,
@@ -59,6 +63,10 @@ typedef struct packed
 
 typedef struct packed
 {
+`ifndef VERILATOR
+	// Error: data width (78) must be a multiple of bitsPerSymbol (8)
+	logic[1:0] padding;
+`endif
 	token_lock e2, e1, e0;
 } ring_token;
 

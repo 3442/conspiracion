@@ -66,7 +66,7 @@ add_fileset_file writeback.sv SYSTEM_VERILOG PATH rtl/core/control/writeback.sv
 add_fileset_file ldst.sv SYSTEM_VERILOG PATH rtl/core/control/ldst/ldst.sv
 add_fileset_file pop.sv SYSTEM_VERILOG PATH rtl/core/control/ldst/pop.sv
 add_fileset_file sizes.sv SYSTEM_VERILOG PATH rtl/core/control/ldst/sizes.sv
-add_fileset_file cache.sv SYSTEM_VERILOG PATH rtl/core/cp15/cache.sv
+add_fileset_file cache_ops.sv SYSTEM_VERILOG PATH rtl/core/cp15/cache_ops.sv
 add_fileset_file cache_lockdown.sv SYSTEM_VERILOG PATH rtl/core/cp15/cache_lockdown.sv
 add_fileset_file cp15.sv SYSTEM_VERILOG PATH rtl/core/cp15/cp15.sv
 add_fileset_file cpuid.sv SYSTEM_VERILOG PATH rtl/core/cp15/cpuid.sv
