@@ -1,7 +1,12 @@
 import sys, socket, traceback
 
+loads = {0x0100000: 'build/uImage',
+         0x1000000: 'build/initrd.img',
+        }
+
 cycles = None
 enable_tty = True
+enable_video = True
 start_halted = True
 sock, client = None, None
 
@@ -23,10 +28,7 @@ def fatal():
 def do_output(text):
     if text is None:
         return not is_halted()
-
-    print(text, file=sys.stderr, end='')
-
-    if not client:
+    elif not client:
         return False
 
     reply(b'O' + hexout(text.encode('ascii')))

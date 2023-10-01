@@ -36,6 +36,7 @@ hps_sdram_p0_summary.csv
 vcd/
 cov/
 obj/
+build/
 .qsys_edit/
 platform/
 platform.sopcinfo
