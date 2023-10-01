@@ -78,7 +78,7 @@ lineout "run mmcload"
 input 1 "SOCFPGA_CYCLONE5 #"
 lineout "setenv bootargs console=ttyS0,115200 root=${mmcroot} rw rootwait mem=512M"
 input 1 "SOCFPGA_CYCLONE5 #"
-#lineout "bootz ${loadaddr} - ${fdtaddr}"
+lineout "bootz ${loadaddr} - ${fdtaddr}"
 
 # This command drops you into a console where you can interact
 # with the kernel.
