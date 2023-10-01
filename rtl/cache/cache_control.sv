@@ -55,7 +55,7 @@ module cache_control
 		REPLY
 	} state, next_state;
 
-	logic accept_snoop, in_hold_valid, inval_reply, last_hop, lock_line, locked,
+	logic accept_snoop, end_reply, in_hold_valid, last_hop, lock_line, locked,
 	      may_send, may_send_if_token_held, mem_begin, mem_end, mem_read_end, mem_wait,
 	      out_stall, wait_reply, replace, retry, send, send_inval, send_read,
 	      snoop_hit, set_reply, unlock_line, writeback;
@@ -116,8 +116,8 @@ module cache_control
 		send_read = 0;
 		send_inval = 0;
 
+		end_reply = 0;
 		set_reply = 0;
-		inval_reply = 0;
 		core_waitrequest = 1;
 
 		in_data_ready = !in_hold_valid;
@@ -125,9 +125,12 @@ module cache_control
 		unique case (state)
 			ACCEPT: begin
 				if (last_hop && !in_hold.read) begin
-					inval_reply = in_hold_valid;
+					end_reply = in_hold_valid;
 					in_data_ready = 1;
 				end
+
+				if (!last_hop && in_hold.reply)
+					in_data_ready = 1;
 
 				if (accept_snoop)
 					index_rd = in_hold.index;
@@ -228,9 +231,11 @@ module cache_control
 
 				if (in_hold.reply) begin
 					data_wr = in_hold.data;
-					state_wr = SHARED;
+					state_wr = in_hold.inval ? EXCLUSIVE : SHARED;
 					write_data = 1;
 					write_state = 1;
+
+					end_reply = 1;
 				end else
 					mem_begin = 1;
 			end
@@ -342,7 +347,7 @@ module cache_control
 			if (send)
 				wait_reply <= 1;
 
-			if (inval_reply || mem_read_end)
+			if (end_reply || mem_read_end)
 				wait_reply <= 0;
 
 			if (mem_end) begin
