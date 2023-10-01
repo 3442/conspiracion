@@ -1,4 +1,6 @@
 {
+  inputs.nixpkgs.url = "github:nixos/nixpkgs/release-23.05";
+
   outputs = { self, nixpkgs }:
     let
       system = "x86_64-linux";
