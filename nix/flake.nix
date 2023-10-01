@@ -32,6 +32,21 @@
             baseConfig = "taller_defconfig";
           };
         };
+
+        # Tomó mucho conseguir esta expresión: horas de leer nixpkgs, prueba y error
+        crossOverlays = [
+          (final: prev: {
+            stdenv = prev.stdenvAdapters.overrideCC prev.stdenv (prev.stdenv.cc.override {
+              bintools = prev.stdenv.cc.bintools.override {
+                bintools = prev.stdenv.cc.bintools.bintools.overrideAttrs (prev: {
+                  patches = prev.patches ++ [
+                    ./gas-config-tc-arm-disable-instruction-support-check.patch
+                  ];
+                });
+              };
+            });
+          })
+        ];
       };
     in
     {

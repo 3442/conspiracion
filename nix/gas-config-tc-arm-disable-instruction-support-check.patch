@@ -1,0 +1,33 @@
+From c756563bacfad1f88e9b3ed5d63f5208a0637e57 Mon Sep 17 00:00:00 2001
+From: Alejandro Soto <alejandro@34project.org>
+Date: Sun, 1 Oct 2023 08:16:52 -0600
+Subject: [PATCH] gas/config/tc-arm: disable instruction support check in ARM
+ mode
+
+---
+ gas/config/tc-arm.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/gas/config/tc-arm.c b/gas/config/tc-arm.c
+index a5687ba0..ea727195 100644
+--- a/gas/config/tc-arm.c
++++ b/gas/config/tc-arm.c
+@@ -23710,6 +23710,7 @@ md_assemble (char *str)
+       /* bx is allowed on v5 cores, and sometimes on v4 cores.  */
+       is_bx = (opcode->aencode == do_bx);
+ 
++#if 0
+       /* Check that this instruction is supported for this CPU.  */
+       if (!(is_bx && fix_v4bx)
+ 	  && !(opcode->avariant &&
+@@ -23718,6 +23719,7 @@ md_assemble (char *str)
+ 	  as_bad (_("selected processor does not support `%s' in ARM mode"), str);
+ 	  return;
+ 	}
++#endif
+       if (inst.size_req)
+ 	{
+ 	  as_bad (_("width suffixes are invalid in ARM mode -- `%s'"), str);
+-- 
+2.40.1
+
