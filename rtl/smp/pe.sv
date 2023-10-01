@@ -8,7 +8,7 @@ module smp_pe
 	input  logic[7:0] writedata,
 	output logic[7:0] readdata,
 
-	input logic       cpu_halted,
+	input  logic      cpu_halted,
 	                  breakpoint,
 
 	output logic      halt,
@@ -39,7 +39,7 @@ module smp_pe
 
 			//Se hace halt hasta el siguiente ciclo después de que se 
 			//solicita el breakpoint
-			step <= !breakpoint || (req.step && write);
+			step <= (step && !breakpoint) || (req.step && write);
 			halt <= (halt || breakpoint || (req.halt && write))
 			     && !((req.run || req.step) && write);
 		end
