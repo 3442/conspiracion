@@ -68,9 +68,11 @@ module platform
 	logic[31:0] cpu_0_address, cpu_1_address, cpu_2_address, cpu_3_address;
 	logic       cpu_0_read, cpu_1_read, cpu_2_read, cpu_3_read;
 	logic       cpu_0_write, cpu_1_write, cpu_2_write, cpu_3_write;
+	logic       cpu_0_lock, cpu_1_lock, cpu_2_lock, cpu_3_lock;
 	logic[31:0] cpu_0_readdata, cpu_1_readdata, cpu_2_readdata, cpu_3_readdata;
 	logic[31:0] cpu_0_writedata, cpu_1_writedata, cpu_2_writedata, cpu_3_writedata;
 	logic       cpu_0_waitrequest, cpu_1_waitrequest, cpu_2_waitrequest, cpu_3_waitrequest;
+	logic[1:0]  cpu_0_response, cpu_1_response, cpu_2_response, cpu_3_response;
 	logic[3:0]  cpu_0_byteenable, cpu_1_byteenable, cpu_2_byteenable, cpu_3_byteenable;
 
 	core cpu_0
@@ -82,9 +84,11 @@ module platform
 		.avl_address(cpu_0_address),
 		.avl_read(cpu_0_read),
 		.avl_write(cpu_0_write),
+		.avl_lock(cpu_0_lock),
 		.avl_readdata(cpu_0_readdata),
 		.avl_writedata(cpu_0_writedata),
 		.avl_waitrequest(cpu_0_waitrequest),
+		.avl_response(cpu_0_response),
 		.avl_byteenable(cpu_0_byteenable),
 		.*
 	);
@@ -98,9 +102,11 @@ module platform
 		.avl_address(cpu_1_address),
 		.avl_read(cpu_1_read),
 		.avl_write(cpu_1_write),
+		.avl_lock(cpu_1_lock),
 		.avl_readdata(cpu_1_readdata),
 		.avl_writedata(cpu_1_writedata),
 		.avl_waitrequest(cpu_1_waitrequest),
+		.avl_response(cpu_1_response),
 		.avl_byteenable(cpu_1_byteenable),
 		.avl_irq(0),
 		.*
@@ -115,9 +121,11 @@ module platform
 		.avl_address(cpu_2_address),
 		.avl_read(cpu_2_read),
 		.avl_write(cpu_2_write),
+		.avl_lock(cpu_2_lock),
 		.avl_readdata(cpu_2_readdata),
 		.avl_writedata(cpu_2_writedata),
 		.avl_waitrequest(cpu_2_waitrequest),
+		.avl_response(cpu_2_response),
 		.avl_byteenable(cpu_2_byteenable),
 		.avl_irq(0),
 		.*
@@ -132,9 +140,11 @@ module platform
 		.avl_address(cpu_3_address),
 		.avl_read(cpu_3_read),
 		.avl_write(cpu_3_write),
+		.avl_lock(cpu_3_lock),
 		.avl_readdata(cpu_3_readdata),
 		.avl_writedata(cpu_3_writedata),
 		.avl_waitrequest(cpu_3_waitrequest),
+		.avl_response(cpu_3_response),
 		.avl_byteenable(cpu_3_byteenable),
 		.avl_irq(0),
 		.*
@@ -157,9 +167,11 @@ module platform
 		.core_address(cpu_0_address[31:2]),
 		.core_read(cpu_0_read),
 		.core_write(cpu_0_write),
+		.core_lock(cpu_0_lock),
 		.core_writedata(cpu_0_writedata),
 		.core_byteenable(cpu_0_byteenable),
 		.core_waitrequest(cpu_0_waitrequest),
+		.core_response(cpu_0_response),
 		.core_readdata(cpu_0_readdata),
 
 		.mem_waitrequest(mem_0_waitrequest),
@@ -192,9 +204,11 @@ module platform
 		.core_address(cpu_1_address[31:2]),
 		.core_read(cpu_1_read),
 		.core_write(cpu_1_write),
+		.core_lock(cpu_1_lock),
 		.core_writedata(cpu_1_writedata),
 		.core_byteenable(cpu_1_byteenable),
 		.core_waitrequest(cpu_1_waitrequest),
+		.core_response(cpu_1_response),
 		.core_readdata(cpu_1_readdata),
 
 		.mem_waitrequest(mem_1_waitrequest),
@@ -227,9 +241,11 @@ module platform
 		.core_address(cpu_2_address[31:2]),
 		.core_read(cpu_2_read),
 		.core_write(cpu_2_write),
+		.core_lock(cpu_2_lock),
 		.core_writedata(cpu_2_writedata),
 		.core_byteenable(cpu_2_byteenable),
 		.core_waitrequest(cpu_2_waitrequest),
+		.core_response(cpu_2_response),
 		.core_readdata(cpu_2_readdata),
 
 		.mem_waitrequest(mem_2_waitrequest),
@@ -262,9 +278,11 @@ module platform
 		.core_address(cpu_3_address[31:2]),
 		.core_read(cpu_3_read),
 		.core_write(cpu_3_write),
+		.core_lock(cpu_3_lock),
 		.core_writedata(cpu_3_writedata),
 		.core_byteenable(cpu_3_byteenable),
 		.core_waitrequest(cpu_3_waitrequest),
+		.core_response(cpu_3_response),
 		.core_readdata(cpu_3_readdata),
 
 		.mem_waitrequest(mem_3_waitrequest),

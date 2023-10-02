@@ -9,9 +9,11 @@ module cache
 	input  ptr        core_address,
 	input  logic      core_read,
 	                  core_write,
+	                  core_lock,
 	input  word       core_writedata,
 	input  word_be    core_byteenable,
 	output logic      core_waitrequest,
+	output logic[1:0] core_response,
 	output word       core_readdata,
 
 	//TODO

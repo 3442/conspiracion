@@ -12,6 +12,7 @@ module core_mmu
 	input  word           mmu_dac,
 
 	input  logic          bus_ready,
+	                      bus_ex_fail,
 	input  word           bus_data_rd,
 	                      data_data_wr,
 	input  ptr            insn_addr,
@@ -19,6 +20,7 @@ module core_mmu
 	input  logic          insn_start,
 	                      data_start,
 	                      data_write,
+	                      data_ex_lock,
 	                      data_user,
 	input  logic[3:0]     data_data_be,
 
@@ -27,10 +29,12 @@ module core_mmu
 	output ptr            bus_addr,
 	output logic          bus_start,
 	                      bus_write,
+	                      bus_ex_lock,
 	                      insn_ready,
 	                      insn_fault,
 	                      data_ready,
 	                      data_fault,
+	                      data_ex_fail,
 	output word           insn_data_rd,
 	                      data_data_rd,
 
@@ -43,8 +47,10 @@ module core_mmu
 
 	ptr iphys_addr, dphys_addr;
 	word iphys_data_rd, dphys_data_rd, dphys_data_wr;
-	logic iphys_start, dphys_start, iphys_ready, dphys_ready, dphys_write;
 	logic[3:0] dphys_data_be;
+
+	logic iphys_start, dphys_start, iphys_ready, dphys_ready, dphys_write,
+	      dphys_ex_fail, dphys_ex_lock;
 
 	assign fault_register = data_fault;
 
@@ -54,10 +60,13 @@ module core_mmu
 		.core_start(insn_start),
 		.core_write(0),
 		.core_ready(insn_ready),
-		.core_fault(insn_fault),
 		.core_data_wr(0),
 		.core_data_be(0),
 		.core_data_rd(insn_data_rd),
+		.core_ex_fail(),
+		.core_ex_lock(0),
+
+		.core_fault(insn_fault),
 		.core_fault_addr(),
 		.core_fault_page(),
 		.core_fault_type(),
@@ -70,6 +79,8 @@ module core_mmu
 		.bus_data_wr(),
 		.bus_data_be(),
 		.bus_data_rd(iphys_data_rd),
+		.bus_ex_fail(0),
+		.bus_ex_lock(),
 
 		.*
 	);
@@ -80,10 +91,13 @@ module core_mmu
 		.core_start(data_start),
 		.core_write(data_write),
 		.core_ready(data_ready),
-		.core_fault(data_fault),
 		.core_data_wr(data_data_wr),
 		.core_data_be(data_data_be),
 		.core_data_rd(data_data_rd),
+		.core_ex_fail(data_ex_fail),
+		.core_ex_lock(data_ex_lock),
+
+		.core_fault(data_fault),
 		.core_fault_addr(fault_addr),
 		.core_fault_page(fault_page),
 		.core_fault_type(fault_type),
@@ -96,6 +110,8 @@ module core_mmu
 		.bus_data_wr(dphys_data_wr),
 		.bus_data_be(dphys_data_be),
 		.bus_data_rd(dphys_data_rd),
+		.bus_ex_fail(dphys_ex_fail),
+		.bus_ex_lock(dphys_ex_lock),
 
 		.privileged(privileged && !data_user),
 		.*
@@ -115,6 +131,8 @@ module core_mmu
 		.data_data_wr(dphys_data_wr),
 		.data_data_be(dphys_data_be),
 		.data_data_rd(dphys_data_rd),
+		.data_ex_fail(dphys_ex_fail),
+		.data_ex_lock(dphys_ex_lock),
 
 		.*
 	);

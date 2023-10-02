@@ -13,7 +13,9 @@ module arm810
 	output ptr        bus_addr,
 	output logic      bus_start,
 	                  bus_write,
+	                  bus_ex_lock,
 	input  logic      bus_ready,
+	                  bus_ex_fail,
 	input  word       bus_data_rd,
 	output word       bus_data_wr,
 	output logic[3:0] bus_data_be,
@@ -24,8 +26,7 @@ module arm810
 
 	ptr branch_target, fetch_insn_pc, fetch_head, insn_addr;
 	word fetch_insn;
-	logic explicit_branch, fetch_nop, fetch_abort, stall,
-		  flush, prefetch_flush, insn_start;
+	logic explicit_branch, fetch_nop, fetch_abort, stall, flush, prefetch_flush;
 
 	//TODO
 	assign prefetch_flush = halt;
@@ -75,6 +76,8 @@ module arm810
 		.mem_write(data_write),
 		.mem_ready(data_ready),
 		.mem_fault(data_fault),
+		.mem_ex_lock(data_ex_lock),
+		.mem_ex_fail(data_ex_fail),
 		.mem_data_rd(data_data_rd),
 		.mem_data_wr(data_data_wr),
 		.mem_data_be(data_data_be),
@@ -173,8 +176,8 @@ module arm810
 	word data_data_rd, data_data_wr, insn_data_rd;
 	logic[3:0] data_data_be;
 
-	logic data_start, data_write, data_ready, insn_ready,
-	      data_fault, insn_fault, data_user;
+	logic data_start, insn_start, data_write, data_ready, insn_ready,
+	      data_fault, insn_fault, data_user, data_ex_lock, data_ex_fail;
 
 	core_mmu mmu
 	(

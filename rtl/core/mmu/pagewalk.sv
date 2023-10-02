@@ -12,6 +12,7 @@ module core_mmu_pagewalk
 	input  word           mmu_dac,
 
 	input  logic          bus_ready,
+	                      bus_ex_fail,
 	input  word           bus_data_rd,
 
 	input  ptr            core_addr,
@@ -19,15 +20,18 @@ module core_mmu_pagewalk
 	input  logic[3:0]     core_data_be,
 	input  logic          core_start,
 	                      core_write,
+	                      core_ex_lock,
 
 	output ptr            bus_addr,
 	output word           bus_data_wr,
 	output logic[3:0]     bus_data_be,
 	output logic          bus_start,
 	                      bus_write,
+	                      bus_ex_lock,
 
 	output word           core_data_rd,
 	output logic          core_ready,
+	                      core_ex_fail,
 	                      core_fault,
 	                      core_fault_page,
 	output ptr            core_fault_addr,
@@ -81,7 +85,7 @@ module core_mmu_pagewalk
 
 	ptr target;
 	word hold_data;
-	logic hold_write;
+	logic hold_write, hold_ex_lock;
 	logic[3:0] hold_be;
 
 	always_comb begin
@@ -138,15 +142,18 @@ module core_mmu_pagewalk
 			hold_be <= 0;
 			hold_data <= 0;
 			hold_write <= 0;
+			hold_ex_lock <= 0;
 
 			bus_addr <= 0;
 			bus_start <= 0;
 			bus_write <= 0;
+			bus_ex_lock <= 0;
 			bus_data_be <= 0;
 			bus_data_wr <= 0;
 
 			core_ready <= 0;
 			core_fault <= 0;
+			core_ex_fail <= 0;
 			core_data_rd <= 0;
 			core_fault_page <= 0;
 			core_fault_addr <= 0;
@@ -171,14 +178,17 @@ module core_mmu_pagewalk
 							hold_be <= core_data_be;
 							hold_data <= core_data_wr;
 							hold_write <= core_write;
+							hold_ex_lock <= core_ex_lock;
 
 							state <= L1;
 							bus_addr <= {mmu_ttbr, core_addr `MMU_L1_INDEX};
 							bus_write <= 0;
+							bus_ex_lock <= 0;
 						end else begin
 							state <= DATA;
 							bus_addr <= core_addr;
 							bus_write <= core_write;
+							bus_ex_lock <= core_ex_lock;
 							bus_data_wr <= core_data_wr;
 							bus_data_be <= core_data_be;
 						end
@@ -198,6 +208,7 @@ module core_mmu_pagewalk
 								state <= DATA;
 								bus_addr <= {section.base, target `MMU_SECTION_INDEX};
 								bus_write <= hold_write;
+								bus_ex_lock <= hold_ex_lock;
 								bus_data_wr <= hold_data;
 								bus_data_be <= hold_be;
 							end
@@ -211,6 +222,7 @@ module core_mmu_pagewalk
 						state <= DATA;
 
 						bus_write <= hold_write;
+						bus_ex_lock <= hold_ex_lock;
 						bus_data_wr <= hold_data;
 						bus_data_be <= hold_be;
 
@@ -229,6 +241,7 @@ module core_mmu_pagewalk
 					if(bus_ready) begin
 						state <= IDLE;
 						core_ready <= 1;
+						core_ex_fail <= bus_ex_fail;
 						core_data_rd <= bus_data_rd;
 					end
 

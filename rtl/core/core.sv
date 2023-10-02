@@ -13,15 +13,17 @@ module core
 	output word       avl_address,
 	output logic      avl_read,
 	                  avl_write,
+	                  avl_lock,
 	input  word       avl_readdata,
 	output word       avl_writedata,
 	input  logic      avl_waitrequest,
+	input  logic[1:0] avl_response,
 	output logic[3:0] avl_byteenable,
 
 	input  logic      avl_irq
 );
 
-	logic ready, write, start;
+	logic ex_fail, ex_lock, start, ready, write;
 
 	logic[3:0] data_be;
 	logic[29:0] addr;
@@ -45,10 +47,13 @@ module core
 		.bus_ready(ready),
 		.bus_write(write),
 		.bus_start(start),
+		.bus_ex_fail(ex_fail),
+		.bus_ex_lock(ex_lock),
 		.*
 	);
 
 	assign data_rd = avl_readdata;
+	assign ex_fail = |avl_response;
 
 	always_comb
 		unique case(state)
@@ -66,6 +71,7 @@ module core
 		 */
 		if(!rst_n) begin
 			state <= IDLE;
+			avl_lock <= 0;
 			avl_read <= 0;
 			avl_write <= 0;
 			avl_address <= 0;
@@ -73,6 +79,7 @@ module core
 			avl_byteenable <= 0;
 		end else if((state == IDLE || !avl_waitrequest) && start) begin
 			state <= WAIT;
+			avl_lock <= ex_lock;
 			avl_read <= ~write;
 			avl_write <= write;
 			avl_address <= {addr, 2'b00};

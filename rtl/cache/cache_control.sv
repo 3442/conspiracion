@@ -10,8 +10,10 @@ module cache_control
 	input  addr_index core_index,
 	input  logic      core_read,
 	                  core_write,
+	                  core_lock,
 	input  line       core_data_wr,
 	output logic      core_waitrequest,
+	output logic[1:0] core_response,
 
 	input  ring_req   in_data,
 	input  logic      in_data_valid,
@@ -57,13 +59,22 @@ module cache_control
 
 	logic accept_snoop, end_reply, in_hold_valid, last_hop, lock_line, locked,
 	      may_send, may_send_if_token_held, mem_begin, mem_end, mem_read_end, mem_wait,
-	      out_stall, wait_reply, replace, retry, send, send_inval, send_read,
-	      snoop_hit, set_reply, unlock_line, writeback;
+	      monitor_acquire, monitor_commit, monitor_fail, out_stall, wait_reply, replace,
+	      retry, send, send_inval, send_read, snoop_hit, set_reply, unlock_line, writeback;
 
 	ring_req in_hold, send_data, fwd_data, stall_data, out_data_next;
 
-	addr_tag mem_tag;
-	addr_index mem_index;
+	line monitor_data_rd, monitor_data_wr;
+	addr_tag mem_tag, monitor_tag;
+	addr_index mem_index, monitor_index;
+
+	/* Avalon p. 15:
+	 * - 00: OKAY - Successful response for a transaction.
+	 * - 10: SLVERR - Error from an endpoint agent. Indicates an unsuccessful transaction.
+	 */
+	assign core_response = {monitor_fail, 1'b0};
+	assign monitor_commit = !core_lock || (monitor_tag == core_tag && monitor_index == core_index
+	                                    && monitor_data_rd == data_rd);
 
 	assign mem_end = (mem_read || mem_write) && !mem_waitrequest;
 	assign mem_wait = (mem_read || mem_write) && mem_waitrequest;
@@ -118,6 +129,9 @@ module cache_control
 
 		end_reply = 0;
 		set_reply = 0;
+
+		monitor_fail = 0;
+		monitor_acquire = 0;
 		core_waitrequest = 1;
 
 		in_data_ready = !in_hold_valid;
@@ -136,7 +150,9 @@ module cache_control
 					index_rd = in_hold.index;
 			end
 
-			CORE:
+			CORE: begin
+				monitor_acquire = core_read && core_lock;
+
 				if (replace) begin
 					state_wr = INVALID;
 					write_state = 1;
@@ -177,8 +193,10 @@ module cache_control
 
 					{EXCLUSIVE, 1'b1}: begin
 						state_wr = MODIFIED;
-						write_data = 1;
-						write_state = 1;
+						write_data = monitor_commit;
+						write_state = monitor_commit;
+
+						monitor_fail = !monitor_commit;
 						core_waitrequest = 0;
 					end
 
@@ -186,10 +204,13 @@ module cache_control
 						core_waitrequest = 0;
 
 					{MODIFIED, 1'b1}: begin
-						write_data = 1;
+						write_data = monitor_commit;
+
+						monitor_fail = !monitor_commit;
 						core_waitrequest = 0;
 					end
 				endcase
+			end
 
 			SNOOP: begin
 				index_rd = in_hold.index;
@@ -372,6 +393,14 @@ module cache_control
 			mem_tag <= writeback ? tag_rd : core_tag;
 			mem_index <= index_wr;
 			mem_writedata <= data_rd;
+		end
+
+		if (monitor_acquire && !core_waitrequest) begin
+			monitor_tag <= core_tag;
+			monitor_index <= core_index;
+
+			monitor_data_rd <= data_rd;
+			monitor_data_wr <= data_rd;
 		end
 	end
 
