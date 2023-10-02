@@ -162,7 +162,18 @@
 `define FIELD_LDST_MULT_RN   [19:16]
 `define FIELD_LDST_MULT_LIST [15:0]
 
-// Instrucciones atómicas de intercambio registro-memoria
+// Instrucciones para operaciones atómicas optimistas (monitor exclusivo)
+
+`define INSN_LDREX    28'b0001100_1_????_????_1111_1001_1111
+`define INSN_STREX    28'b0001100_0_????_????_1111_1001_????
+`define GROUP_LDST_EX `INSN_LDREX, `INSN_STREX
+
+`define FIELD_LDST_EX_LD   [20]
+`define FIELD_LDST_EX_RN   [19:16]
+`define FIELD_LDST_EX_RD   [15:12]
+`define FIELD_LDST_EX_R_OK [3:0]
+
+// Instrucciones atómicas de intercambio registro-memoria (deprecadas)
 
 `define INSN_SWP  28'b00010000_????_????_0000_1001_????
 `define INSN_SWPB 28'b00010100_????_????_0000_1001_????

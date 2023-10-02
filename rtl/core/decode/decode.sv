@@ -127,6 +127,16 @@ module core_decode
 		.*
 	);
 
+	reg_num ldst_ex_snd_r;
+	ldst_decode ldst_exclusive;
+
+	core_decode_ldst_exclusive group_ldst_ex
+	(
+		.snd_r(ldst_ex_snd_r),
+		.decode(ldst_exclusive),
+		.*
+	);
+
 	ldst_decode ldst_addr;
 	data_decode data_ldst;
 

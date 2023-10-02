@@ -19,6 +19,7 @@ module core_decode_ldst_misc
 	assign decode.load = insn `FIELD_LDST_LD;
 	assign decode.increment = insn `FIELD_LDST_MISC_U;
 	assign decode.writeback = !p || w;
+	assign decode.exclusive = 0;
 	assign decode.sign_extend = insn `FIELD_LDST_MISC_S;
 	assign decode.pre_indexed = p;
 	assign decode.unprivileged = 0;

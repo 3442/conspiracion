@@ -18,12 +18,14 @@ module core_decode_mux
 	                     data_is_imm,
 	                     data_shift_by_reg_if_reg,
 
-	input  ldst_decode   ldst_single,
-	                     ldst_misc,
+	input  ldst_decode   ldst_misc,
+	                     ldst_single,
 	                     ldst_multiple,
+	                     ldst_exclusive,
 	input  logic         ldst_single_is_imm,
 	                     ldst_misc_off_is_imm,
-	input  reg_num       ldst_misc_off_reg,
+	input  reg_num       ldst_ex_snd_r,
+	                     ldst_misc_off_reg,
 	input  logic[7:0]    ldst_misc_off_imm,
 	input  logic         ldst_mult_restore_spsr,
 	input  data_decode   data_ldst,
@@ -133,6 +135,14 @@ module core_decode_mux
 
 				writeback = 1;
 				update_flags = mul_update_flags;
+			end
+
+			`GROUP_LDST_EX: begin
+				dec_ldst = ldst_exclusive;
+				ldst_addr = ldst_exclusive;
+
+				dec_snd.r = ldst_ex_snd_r;
+				dec_snd.is_imm = ldst_exclusive.load;
 			end
 
 			`GROUP_LDST_MISC: begin
@@ -255,10 +265,10 @@ module core_decode_mux
 			// Codificación coincide con ldst
 			`GROUP_MUL: ;
 
-			`GROUP_LDST_SINGLE, `GROUP_LDST_MISC, `GROUP_LDST_MULT: begin
+			`GROUP_LDST_SINGLE, `GROUP_LDST_MISC, `GROUP_LDST_MULT, `GROUP_LDST_EX: begin
 				ldst = 1;
 				dec_data = data_ldst;
-				writeback = dec_ldst.writeback || dec_ldst.load;
+				writeback = dec_ldst.writeback || dec_ldst.load || dec_ldst.exclusive;
 			end
 
 			default: ;

@@ -150,6 +150,7 @@ typedef struct packed
 	logic       load,
 	            increment,
 	            writeback,
+	            exclusive,
 	            sign_extend,
 	            pre_indexed,
 	            unprivileged,
