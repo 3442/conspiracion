@@ -98,6 +98,9 @@ namespace taller::avalon
 			inline virtual void tick() noexcept
 			{}
 
+			inline virtual void tick_falling() noexcept
+			{}
+
 			inline virtual void bail() noexcept
 			{}
 

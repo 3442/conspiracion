@@ -310,6 +310,21 @@ module platform
 		.*
 	);
 
+	word smp_readdata, smp_writedata;
+	logic smp_read, smp_write;
+
+	sim_slave smp_sim
+	(
+		.read(smp_read),
+		.write(smp_write),
+		.address(),
+		.readdata(smp_readdata),
+		.writedata(smp_writedata),
+		.waitrequest(0),
+
+		.*
+	);
+
 	logic step_0, step_1, step_2, step_3,
 	      halt_0, halt_1, halt_2, halt_3,
 	      breakpoint_0, breakpoint_1, breakpoint_2, breakpoint_3,
@@ -317,10 +332,10 @@ module platform
 
 	smp_ctrl smp
 	(
-		.avl_read(0),
-		.avl_write(0),
-		.avl_writedata(),
-		.avl_readdata(),
+		.avl_read(smp_read),
+		.avl_write(smp_write),
+		.avl_writedata(smp_writedata),
+		.avl_readdata(smp_readdata),
 
 		.*
 	);

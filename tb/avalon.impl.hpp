@@ -120,6 +120,9 @@ namespace taller::avalon
 	template<class Platform>
 	void interconnect<Platform>::tick_falling() noexcept
 	{
+		for (auto &binding : devices)
+			binding.dev.tick_falling();
+
 		if (!plat.avl_waitrequest)
 			active = nullptr;
 	}

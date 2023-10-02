@@ -17,6 +17,7 @@
 #include "Vconspiracion_arm810.h"
 #include "Vconspiracion_conspiracion.h"
 #include "Vconspiracion_platform.h"
+#include "Vconspiracion_sim_slave.h"
 #include "Vconspiracion_vga_domain.h"
 #include "Vconspiracion_core.h"
 #include "Vconspiracion_core_control.h"
@@ -44,6 +45,7 @@
 #include "../jtag_uart.hpp"
 #include "../interval_timer.hpp"
 #include "../null.hpp"
+#include "../sim_slave.hpp"
 #include "../window.hpp"
 #include "../vga.hpp"
 
@@ -331,6 +333,8 @@ int main(int argc, char **argv)
 		*plat.vga, 0x3800'0000, 25'175'000, 50'000'000
 	);
 
+	sim_slave smp_ctrl(*plat.smp_sim, 0x3014'0000, 4);
+
 	interconnect<Vconspiracion_platform> avl(plat);
 	//interconnect<Vconspiracion_vga_domain> avl_vga(plat->vga);
 
@@ -346,24 +350,19 @@ int main(int argc, char **argv)
 	avl.attach(hps_ddr3);
 	avl.attach(timer);
 	avl.attach(ttyJ0);
+	avl.attach(smp_ctrl);
 	avl.attach_intc(intc);
 
-	for(auto &slave : consts)
-	{
+	for (auto &slave : consts)
 		avl.attach(slave);
-	}
 
-	if(enable_fast_video)
-	{
+	if (enable_fast_video)
 		avl.attach(vga);
-	} else if(enable_accurate_video)
-	{
+	else if(enable_accurate_video) {
 		avl.attach(vram);
 		//avl_vga.attach(vram_window);
 	} else
-	{
 		avl.attach(vram_null);
-	}
 
 	FILE *img_file = std::fopen(image->c_str(), "rb");
 	if(!img_file)
