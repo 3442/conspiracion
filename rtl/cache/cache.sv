@@ -97,4 +97,12 @@ module cache
 		.*
 	);
 
+	line monitor_update;
+	logic monitor_acquire, monitor_commit, monitor_fail, monitor_release;
+
+	cache_monitor monitor
+	(
+		.*
+	);
+
 endmodule

@@ -3,50 +3,55 @@
 module cache_control
 #(parameter TOKEN_AT_RESET=0)
 (
-	input  logic      clk,
-	                  rst_n,
+	input  logic       clk,
+	                   rst_n,
 
-	input  addr_tag   core_tag,
-	input  addr_index core_index,
-	input  logic      core_read,
-	                  core_write,
-	                  core_lock,
-	input  line       core_data_wr,
-	output logic      core_waitrequest,
-	output logic[1:0] core_response,
+	input  addr_tag    core_tag,
+	input  addr_index  core_index,
+	input  logic       core_read,
+	                   core_write,
+	                   core_lock,
+	input  line        core_data_wr,
+	output logic       core_waitrequest,
 
-	input  ring_req   in_data,
-	input  logic      in_data_valid,
-	output logic      in_data_ready,
+	input  ring_req    in_data,
+	input  logic       in_data_valid,
+	output logic       in_data_ready,
 
-	input  logic      out_data_ready,
-	output ring_req   out_data,
-	output logic      out_data_valid,
+	input  logic       out_data_ready,
+	output ring_req    out_data,
+	output logic       out_data_valid,
 
-	input  ring_token in_token,
-	input  logic      in_token_valid,
+	input  ring_token  in_token,
+	input  logic       in_token_valid,
 
-	output ring_token out_token,
-	output logic      out_token_valid,
+	output ring_token  out_token,
+	output logic       out_token_valid,
 
-	input  addr_tag   tag_rd,
-	input  line       data_rd,
-	input  line_state state_rd,
+	input  addr_tag    tag_rd,
+	input  line        data_rd,
+	input  line_state  state_rd,
 
-	output addr_index index_rd,
-	                  index_wr,
-	output logic      write_data,
-	                  write_state,
-	output addr_tag   tag_wr,
-	output line       data_wr,
-	output line_state state_wr,
+	input  line        monitor_update,
+	input  logic       monitor_commit,
+	output logic       monitor_acquire,
+	                   monitor_fail,
+	                   monitor_release,
 
-	input  logic      mem_waitrequest,
-	input  line       mem_readdata,
-	output word       mem_address,
-	output logic      mem_read,
-	                  mem_write,
-	output line       mem_writedata
+	output addr_index  index_rd,
+	                   index_wr,
+	output logic       write_data,
+	                   write_state,
+	output addr_tag    tag_wr,
+	output line        data_wr,
+	output line_state  state_wr,
+
+	input  logic       mem_waitrequest,
+	input  line        mem_readdata,
+	output word        mem_address,
+	output logic       mem_read,
+	                   mem_write,
+	output line        mem_writedata
 );
 
 	enum int unsigned
@@ -58,23 +63,14 @@ module cache_control
 	} state, next_state;
 
 	logic accept_snoop, end_reply, in_hold_valid, last_hop, lock_line, locked,
-	      may_send, may_send_if_token_held, mem_begin, mem_end, mem_read_end, mem_wait,
-	      monitor_acquire, monitor_commit, monitor_fail, out_stall, wait_reply, replace,
-	      retry, send, send_inval, send_read, snoop_hit, set_reply, unlock_line, writeback;
+	      may_send, may_send_if_token_held, mem_begin, mem_end, mem_read_end,
+	      mem_wait, out_stall, wait_reply, replace, retry, send, send_inval,
+	      send_read, snoop_hit, set_reply, unlock_line, writeback;
 
 	ring_req in_hold, send_data, fwd_data, stall_data, out_data_next;
 
-	line monitor_data_rd, monitor_data_wr;
-	addr_tag mem_tag, monitor_tag;
-	addr_index mem_index, monitor_index;
-
-	/* Avalon p. 15:
-	 * - 00: OKAY - Successful response for a transaction.
-	 * - 10: SLVERR - Error from an endpoint agent. Indicates an unsuccessful transaction.
-	 */
-	assign core_response = {monitor_fail, 1'b0};
-	assign monitor_commit = !core_lock || (monitor_tag == core_tag && monitor_index == core_index
-	                                    && monitor_data_rd == data_rd);
+	addr_tag mem_tag;
+	addr_index mem_index;
 
 	assign mem_end = (mem_read || mem_write) && !mem_waitrequest;
 	assign mem_wait = (mem_read || mem_write) && mem_waitrequest;
@@ -132,6 +128,7 @@ module cache_control
 
 		monitor_fail = 0;
 		monitor_acquire = 0;
+		monitor_release = 0;
 		core_waitrequest = 1;
 
 		in_data_ready = !in_hold_valid;
@@ -151,8 +148,6 @@ module cache_control
 			end
 
 			CORE: begin
-				monitor_acquire = core_read && core_lock;
-
 				if (replace) begin
 					state_wr = INVALID;
 					write_state = 1;
@@ -171,8 +166,10 @@ module cache_control
 						send_inval = 1;
 					end
 
-					{SHARED, 1'b0}:
+					{SHARED, 1'b0}: begin
+						monitor_acquire = core_lock;
 						core_waitrequest = 0;
+					end
 
 					{SHARED, 1'b1}: begin
 						/* No hacemos write_data ya que reintentaremos el
@@ -188,8 +185,10 @@ module cache_control
 						send_inval = 1;
 					end
 
-					{EXCLUSIVE, 1'b0}:
+					{EXCLUSIVE, 1'b0}: begin
+						monitor_acquire = core_lock;
 						core_waitrequest = 0;
+					end
 
 					{EXCLUSIVE, 1'b1}: begin
 						state_wr = MODIFIED;
@@ -197,19 +196,28 @@ module cache_control
 						write_state = monitor_commit;
 
 						monitor_fail = !monitor_commit;
+						monitor_release = core_lock;
+
 						core_waitrequest = 0;
 					end
 
-					{MODIFIED, 1'b0}:
+					{MODIFIED, 1'b0}: begin
+						monitor_acquire = core_lock;
 						core_waitrequest = 0;
+					end
 
 					{MODIFIED, 1'b1}: begin
 						write_data = monitor_commit;
 
 						monitor_fail = !monitor_commit;
+						monitor_release = core_lock;
+
 						core_waitrequest = 0;
 					end
 				endcase
+
+				if (monitor_release)
+					data_wr = monitor_update;
 			end
 
 			SNOOP: begin
@@ -281,6 +289,9 @@ module cache_control
 			mem_begin = 0;
 			write_data = 0;
 			write_state = 0;
+
+			monitor_acquire = 0;
+			monitor_release = 0;
 
 			in_data_ready = !in_hold_valid;
 			core_waitrequest = 1;
@@ -393,14 +404,6 @@ module cache_control
 			mem_tag <= writeback ? tag_rd : core_tag;
 			mem_index <= index_wr;
 			mem_writedata <= data_rd;
-		end
-
-		if (monitor_acquire && !core_waitrequest) begin
-			monitor_tag <= core_tag;
-			monitor_index <= core_index;
-
-			monitor_data_rd <= data_rd;
-			monitor_data_wr <= data_rd;
 		end
 	end
 
