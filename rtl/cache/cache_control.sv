@@ -143,7 +143,7 @@ module cache_control
 					in_data_ready = 1;
 				end
 
-				if (!last_hop && in_hold.reply)
+				if (!last_hop && in_hold.reply && !in_hold.inval)
 					in_data_ready = 1;
 
 				if (accept_snoop)
