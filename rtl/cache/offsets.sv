@@ -2,7 +2,7 @@
 
 module cache_offsets
 (
-	input  addr_offset core_offset,
+	input  addr_offset core_offset,		// El offset es un input pero no un output porque se mapea
 	input  word_be     core_byteenable,
 	input  word        core_writedata,
 	input  line        core_readdata_line,
@@ -10,21 +10,24 @@ module cache_offsets
 
 	output line        core_data_wr,
 	                   core_writedata_line,
-	output word        core_readdata,
+	output word        core_readdata,	// Readdata pasa de ser una line en el input a una word por el offset
 	output line_be     core_byteenable_line
 );
-	//Simplificar offsets
+	// Simplificar offset, para que sea transparente para la cache
 	line line_mask;
+
+	// El byteenable se utiliza para leer o escribir en cache algo diferente a una word
 	word be_extend, mask3, mask2, mask1, mask0;
 	word_be be3, be2, be1, be0;
 
 	assign core_writedata_line = {4{core_writedata}};
 	assign core_byteenable_line = {be3, be2, be1, be0};
 
+	// Concatenar para extender a una word ([31:0]) según el valor de byteenable que es [3:0]
 	assign be_extend = {{8{core_byteenable[3]}}, {8{core_byteenable[2]}},
 	                    {8{core_byteenable[1]}}, {8{core_byteenable[0]}}};
 
-	assign line_mask = {mask3, mask2, mask1, mask0};
+	assign line_mask = {mask3, mask2, mask1, mask0};		// Máscara para toda la línea
 	assign core_data_wr = (core_writedata_line & line_mask) | (data_rd & ~line_mask);
 
 	always_comb begin
@@ -38,6 +41,7 @@ module cache_offsets
 		be1 = 0;
 		be0 = 0;
 
+		// Elegir la word que se va a retornar según el valor de offset 
 		unique case (core_offset)
 			2'b00: begin
 				be0 = core_byteenable;

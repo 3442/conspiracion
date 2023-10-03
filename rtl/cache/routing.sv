@@ -49,9 +49,18 @@ module cache_routing
 	} state;
 
 	//Arbitrar el bus del lado de la cache
+
+	/* Se sabe si el address es cache o no evaluando los bits de IO.
+	 * Esto es posible porque se cumple lo siguiente:
+	 *	- La memoria tiene un tamaño que es una potencia de 2
+	 *	- Sus direcciones inician en 0
+	 * Entonces si los bits de IO son distintos de 0, se sabe que no es
+	 * una dirección cached
+	 */
 	assign cached = io == 3'b000;
 	assign cache_mem = cache_mem_read || cache_mem_write;
 
+	// Acá se divide el core_address para analizarse por separado
 	assign {io, core_tag, core_index, core_offset} = core_address;
 	assign core_address_line = {io, core_tag, core_index, 4'b0000};
 	assign core_readdata_line = cached ? data_rd : mem_readdata;
