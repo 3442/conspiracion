@@ -48,6 +48,7 @@ module cache_routing
 		BYPASS
 	} state;
 
+	//Arbitrar el bus del lado de la cache
 	assign cached = io == 3'b000;
 	assign cache_mem = cache_mem_read || cache_mem_write;
 
@@ -61,6 +62,7 @@ module cache_routing
 	always_comb begin
 		transition = 0;
 		core_waitrequest = cache_core_waitrequest;
+		// Desde el punto de vista de cache, mem le hace waitreq a cache
 		cache_mem_waitrequest = 1;
 
 		unique case (state)

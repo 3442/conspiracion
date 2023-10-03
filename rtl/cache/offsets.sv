@@ -13,7 +13,7 @@ module cache_offsets
 	output word        core_readdata,
 	output line_be     core_byteenable_line
 );
-
+	//Simplificar offsets
 	line line_mask;
 	word be_extend, mask3, mask2, mask1, mask0;
 	word_be be3, be2, be1, be0;

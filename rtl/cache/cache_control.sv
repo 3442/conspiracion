@@ -29,6 +29,7 @@ module cache_control
 	output ring_token out_token,
 	output logic      out_token_valid,
 
+	// Señales para la SRAM
 	input  addr_tag   tag_rd,
 	input  line       data_rd,
 	input  line_state state_rd,
