@@ -112,8 +112,8 @@ module core_control
 		.*
 	);
 
-	word mem_offset, ldst_read;
-	logic ldst, ldst_next, ldst_writeback, pop_valid;
+	word mem_offset, ldst_read, strex_ok;
+	logic ldst, ldst_next, ldst_reject, ldst_writeback, pop_valid;
 	reg_num popped;
 	logic[1:0] ldst_shift;
 

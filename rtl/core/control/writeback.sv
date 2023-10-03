@@ -10,11 +10,11 @@ module core_control_writeback
 	input  word        q_alu,
 	                   ldst_read,
 	input  logic       mem_ready,
-	                   mem_ex_fail,
 	                   mem_ex_lock,
 	                   mem_write,
 	input  word        mul_q_hi,
 	                   mul_q_lo,
+	                   strex_ok,
 
 	input  ctrl_cycle  cycle,
 	                   next_cycle,
@@ -28,6 +28,7 @@ module core_control_writeback
 	input  logic       issue,
 	                   pop_valid,
 	                   ldst_next,
+	                   ldst_reject,
 
 	output reg_num     rd,
 	                   final_rd,
@@ -64,7 +65,7 @@ module core_control_writeback
 			writeback = 0;
 
 		if(cycle.transfer)
-			wr_value = (mem_ex_lock && mem_write) ? {31'd0, mem_ex_fail} : ldst_read;
+			wr_value = (mem_ex_lock && mem_write) ? strex_ok : ldst_read;
 		else if(cycle.base_writeback)
 			wr_value = saved_base;
 		else if(cycle.mul || cycle.mul_hi_wb)

@@ -18,6 +18,7 @@ module core_control_cycles
 	                  mul_ready,
 	                  pop_valid,
 	                  trivial_shift,
+	                  ldst_reject,
 	                  ldst_writeback,
 	                  data_snd_shift_by_reg,
 
@@ -109,6 +110,9 @@ module core_control_cycles
 
 				if(mem_ready && mem_fault)
 					next_state = ESCALATE;
+
+				if(ldst_reject)
+					next_state = ISSUE;
 			end
 
 			MUL:

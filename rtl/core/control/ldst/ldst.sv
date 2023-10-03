@@ -8,6 +8,7 @@ module core_control_ldst
 	input  insn_decode dec,
 	input  logic       issue,
 	                   mem_ready,
+	                   mem_ex_fail,
 	input  word        rd_value_b,
 	                   q_alu,
 	                   q_shifter,
@@ -28,14 +29,16 @@ module core_control_ldst
 	                   pop_valid,
 	                   ldst,
 	                   ldst_next,
+	                   ldst_reject,
 	                   ldst_writeback,
 	output logic[1:0]  ldst_shift,
 	output word        ldst_read,
+	                   strex_ok,
 	output reg_num     popped
 );
 
 	word base;
-	logic pre, increment, sign_extend;
+	logic block_strex, increment, pre, sign_extend;
 	reg_num popped_upper, popped_lower;
 	reg_list mem_regs, next_regs_upper, next_regs_lower;
 	ldst_size size;
@@ -43,6 +46,9 @@ module core_control_ldst
 	assign popped = increment ? popped_lower : popped_upper;
 	assign ldst_next = !cycle.transfer || mem_ready;
 	assign mem_data_wr = mem_ex_lock ? alu_b : q_shifter;
+
+	assign strex_ok = {31'd0, mem_ex_fail || block_strex};
+	assign ldst_reject = mem_ex_lock && mem_write && block_strex;
 
 	core_control_ldst_pop pop
 	(
@@ -65,11 +71,12 @@ module core_control_ldst
 	);
 
 	always_ff @(posedge clk or negedge rst_n)
-		if(!rst_n) begin
+		if (!rst_n) begin
 			pre <= 0;
 			ldst <= 0;
 			size <= LDST_WORD;
 			increment <= 0;
+			block_strex <= 1;
 			sign_extend <= 0;
 			ldst_writeback <= 0;
 
@@ -81,11 +88,11 @@ module core_control_ldst
 			mem_offset <= 0;
 			mem_ex_lock <= 0;
 		end else begin
-			if(mem_start)
+			if (mem_start)
 				mem_start <= 0;
 
-			if(next_cycle.issue) begin
-				if(issue) begin
+			if (next_cycle.issue) begin
+				if (issue) begin
 					ldst <= dec.ctrl.ldst;
 					mem_user <= dec.ldst.unprivileged;
 				end
@@ -99,19 +106,24 @@ module core_control_ldst
 				mem_regs <= dec.ldst.regs;
 				mem_write <= !dec.ldst.load;
 				mem_ex_lock <= dec.ldst.exclusive;
-			end else if(next_cycle.transfer) begin
-				if(!cycle.transfer) begin
+			end else if (next_cycle.transfer) begin
+				if (!cycle.transfer) begin
 					ldst <= 0;
 					mem_offset <= alu_b;
 				end
 
-				if(ldst_next) begin
+				if (ldst_next) begin
 					base <= pre ? q_alu : alu_a;
 					mem_regs <= increment ? next_regs_lower : next_regs_upper;
 				end
 
-				mem_start <= !cycle.transfer || (mem_ready && pop_valid);
-			end else if(cycle.escalate)
+				mem_start <= (!cycle.transfer || (mem_ready && pop_valid)) && !ldst_reject;
+
+				if (block_strex)
+					block_strex <= !mem_ex_lock || mem_write;
+			end else if (cycle.escalate) begin
 				ldst <= 0;
+				block_strex <= 1;
+			end
 		end
 endmodule
