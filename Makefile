@@ -18,7 +18,12 @@ ifdef FASTER_IS_BETTER
 	DISABLE_COV := 1
 	DISABLE_RAND := 1
 	DISABLE_TRACE := 1
+
+	CXXFLAGS += -O3 -flto
+	LDFLAGS += -O3 -flto
 endif
+
+export CXXFLAGS LDFLAGS
 
 X_MODE := $(if $(DISABLE_RAND),fast,unique)
 
