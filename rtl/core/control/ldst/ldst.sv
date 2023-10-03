@@ -8,7 +8,6 @@ module core_control_ldst
 	input  insn_decode dec,
 	input  logic       issue,
 	                   mem_ready,
-	                   mem_ex_fail,
 	input  word        rd_value_b,
 	                   q_alu,
 	                   q_shifter,
@@ -43,10 +42,7 @@ module core_control_ldst
 
 	assign popped = increment ? popped_lower : popped_upper;
 	assign ldst_next = !cycle.transfer || mem_ready;
-	assign mem_data_wr = q_shifter;
-
-	//TODO
-	assign mem_ex_lock = 0;
+	assign mem_data_wr = mem_ex_lock ? alu_b : q_shifter;
 
 	core_control_ldst_pop pop
 	(
@@ -83,6 +79,7 @@ module core_control_ldst
 			mem_write <= 0;
 			mem_start <= 0;
 			mem_offset <= 0;
+			mem_ex_lock <= 0;
 		end else begin
 			if(mem_start)
 				mem_start <= 0;
@@ -101,6 +98,7 @@ module core_control_ldst
 
 				mem_regs <= dec.ldst.regs;
 				mem_write <= !dec.ldst.load;
+				mem_ex_lock <= dec.ldst.exclusive;
 			end else if(next_cycle.transfer) begin
 				if(!cycle.transfer) begin
 					ldst <= 0;
