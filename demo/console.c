@@ -48,7 +48,8 @@ static void print_hex(unsigned val, unsigned bits)
 	if (bits > 32)
 		bits = 32;
 
-	bits = bits & ~3;
+	bits = (bits + 3) & ~3;
+
 	do
 		print_char(hex_digits[(val >> (bits -= 4)) & 0xf]);
 	while (bits);

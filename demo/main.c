@@ -22,7 +22,7 @@ static void cmd_halt(char **tokens)
 	halt_cpus(mask);
 }
 
-static void cmd_rd(char **tokens)
+static void cmd_read(char **tokens)
 {
 	void *ptr;
 	if (parse_aligned(tokens, &ptr) < 0 || expect_end(tokens) < 0)
@@ -31,7 +31,7 @@ static void cmd_rd(char **tokens)
 	print("%p: %x", ptr, *(volatile unsigned *)ptr);
 }
 
-static void cmd_wr(char **tokens)
+static void cmd_write(char **tokens)
 {
 	void *ptr;
 	unsigned val;
@@ -40,6 +40,17 @@ static void cmd_wr(char **tokens)
 		return;
 
 	*(volatile unsigned *)ptr = val;
+}
+
+static void cmd_cache(char **tokens)
+{
+	void *ptr;
+	unsigned cpu;
+
+	if (parse_cpu(tokens, &cpu) < 0 || parse_ptr(tokens, &ptr) < 0)
+		return;
+
+	cache_debug(cpu, ptr);
 }
 
 void bsp_main(void)
@@ -63,10 +74,12 @@ void bsp_main(void)
 			cmd_run(&tokens);
 		else if (!strcmp(cmd, "halt"))
 			cmd_halt(&tokens);
-		else if (!strcmp(cmd, "rd"))
-			cmd_rd(&tokens);
-		else if (!strcmp(cmd, "wr"))
-			cmd_wr(&tokens);
+		else if (!strcmp(cmd, "read"))
+			cmd_read(&tokens);
+		else if (!strcmp(cmd, "write"))
+			cmd_write(&tokens);
+		else if (!strcmp(cmd, "cache"))
+			cmd_cache(&tokens);
 		else
 			print("unknown command '%s'", cmd);
 	}

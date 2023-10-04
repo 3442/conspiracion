@@ -333,10 +333,10 @@ int main(int argc, char **argv)
 		*plat.vga, 0x3800'0000, 25'175'000, 50'000'000
 	);
 
-	sim_slave dbg_0(*plat.smp_dbg_0, 0x3010'0000, 8);
-	sim_slave dbg_1(*plat.smp_dbg_1, 0x3011'0000, 8);
-	sim_slave dbg_2(*plat.smp_dbg_2, 0x3012'0000, 8);
-	sim_slave dbg_3(*plat.smp_dbg_3, 0x3013'0000, 8);
+	sim_slave dbg_0(*plat.smp_dbg_0, 0x3010'0000, 32);
+	sim_slave dbg_1(*plat.smp_dbg_1, 0x3011'0000, 32);
+	sim_slave dbg_2(*plat.smp_dbg_2, 0x3012'0000, 32);
+	sim_slave dbg_3(*plat.smp_dbg_3, 0x3013'0000, 32);
 	sim_slave smp_ctrl(*plat.smp_sim, 0x3014'0000, 4);
 
 	interconnect<Vconspiracion_platform> avl(plat);

@@ -12,6 +12,18 @@ static void unexpected_eof(void)
 	print("unexpected end-of-input");
 }
 
+static int parse_cpu_token(const char *token, unsigned *cpu)
+{
+	if (token[0] != 'c' || token[1] != 'p' || token[2] != 'u'
+	|| !('0' <= token[3] && token[3] < '0' + NUM_CPUS) || token[4]) {
+		bad_input();
+		return -1;
+	}
+
+	*cpu = token[3] - '0';
+	return 0;
+}
+
 int strcmp(const char *s1, const char *s2)
 {
     while (*s1 && *s1 == *s2)
@@ -41,19 +53,28 @@ char *strtok_input(char **tokens)
 	return start;
 }
 
+int parse_cpu(char **tokens, unsigned *cpu)
+{
+	char *token = strtok_input(tokens);
+	if (!token) {
+		unexpected_eof();
+		return -1;
+	}
+
+	return parse_cpu_token(token, cpu);
+}
+
 int parse_cpu_mask(char **tokens, unsigned *mask)
 {
 	*mask = 0;
 
 	char *token;
 	while ((token = strtok_input(tokens))) {
-		if (token[0] != 'c' || token[1] != 'p' || token[2] != 'u'
-		|| !('0' <= token[3] && token[3] < '0' + NUM_CPUS) || token[4]) {
-			bad_input();
+		unsigned cpu;
+		if (parse_cpu_token(token, &cpu) < 0)
 			return -1;
-		}
 
-		*mask |= 1 << (token[3] - '0');
+		*mask |= 1 << cpu;
 	}
 
 	if (!*mask) {
