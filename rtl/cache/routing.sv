@@ -37,6 +37,12 @@ module cache_routing
 	output line_be     mem_byteenable
 );
 
+	/* Módulo para enrutar las operaciones a cache o memoria 
+	 * Esto porque hay escrituras que definitivamente no pueden quedar en cache
+	 * como el caso de periféricos, para los cuales si se guarda "su valor" en 
+	 * cache y no en memoria se harían lecturas incorrectas
+	 */
+
 	word core_address_line;
 	logic cached, cache_mem, transition;
 	addr_io_region io;
@@ -58,13 +64,17 @@ module cache_routing
 	 * una dirección cached
 	 */
 	assign cached = io == 3'b000;
+	// Se afirma si cache quiere hacer un read o write de memoria
 	assign cache_mem = cache_mem_read || cache_mem_write;
 
 	// Acá se divide el core_address para analizarse por separado
 	assign {io, core_tag, core_index, core_offset} = core_address;
 	assign core_address_line = {io, core_tag, core_index, 4'b0000};
+	// Si está cached se asigna a lectura de cache, sino a lectura de memoria
 	assign core_readdata_line = cached ? data_rd : mem_readdata;
 
+	// Se afirma si el core quiere leer/escribir a cache y efectivamente es una 
+	// dirección de cache
 	assign cache_core_read = core_read && cached;
 	assign cache_core_write = core_write && cached;
 
@@ -76,12 +86,18 @@ module cache_routing
 
 		unique case (state)
 			IDLE:
+				/* Transition se afirma si cache quiere hacer un read o write de 
+				 * memoria, o si el address no es cache y el core quiere leer
+				 * o escribir a cache
+				 */
 				transition = cache_mem || (!cached && (core_read || core_write));
 
 			CACHE:
+				// Cache le hace waitreq a memoria
 				cache_mem_waitrequest = mem_waitrequest;
 
 			BYPASS:
+				// Se le hace waitreq al core si la memoria también lo hace
 				core_waitrequest = mem_waitrequest;
 		endcase
 	end
@@ -94,6 +110,8 @@ module cache_routing
 		end else unique case (state)
 			IDLE:
 				if (transition) begin
+					// Si cache quiere hacer una operación con memoria, se pasa 
+					// a CACHE, sino hay que hacer BYPASS 
 					state <= cache_mem ? CACHE : BYPASS;
 					mem_read <= cache_mem ? cache_mem_read : core_read;
 					mem_write <= cache_mem ? cache_mem_write : core_write;
@@ -109,6 +127,8 @@ module cache_routing
 
 	always_ff @(posedge clk)
 		if (transition) begin
+			// Si cache no quiere hacer una operación con memoria, se asignan  
+			// las señales del core
 			mem_address <= cache_mem ? cache_mem_address : core_address_line;
 			mem_writedata <= cache_mem ? cache_mem_writedata : core_writedata_line;
 			mem_byteenable <= cache_mem ? 16'hffff : core_byteenable_line;

@@ -89,9 +89,11 @@ module cache_control
 	 */
 	assign unlock_line = !core_waitrequest;
 
+	// Replace si no coinciden las tags y el estado no es INVALID
 	assign replace = tag_rd != core_tag && state_rd != INVALID;
-	assign last_hop = in_hold.ttl == `TTL_END;
-	assign snoop_hit = tag_rd == in_hold.tag;
+	assign last_hop = in_hold.ttl == `TTL_END;	//Indica si es el último salto
+	assign snoop_hit = tag_rd == in_hold.tag;	//Snoop hit si coinciden las tags
+	// Aceptar snoop si no es el último nodo y se tiene un mensaje válido
 	assign accept_snoop = in_hold_valid && !last_hop && (in_hold.inval || !in_hold.reply);
 
 	assign may_send = may_send_if_token_held && in_token_valid;
@@ -105,7 +107,7 @@ module cache_control
 	assign out_data_valid = out_stall || send || (in_hold_valid && !last_hop && in_data_ready);
 
 	assign send_data.tag = core_tag;
-	assign send_data.ttl = `TTL_MAX;
+	assign send_data.ttl = `TTL_MAX;	   // Acá se inicializa el valor máximo de TTL
 	assign send_data.data = fwd_data.data; // Esto evita muchos muxes
 	assign send_data.read = send_read;
 	assign send_data.index = core_index;
@@ -139,11 +141,12 @@ module cache_control
 
 		unique case (state)
 			ACCEPT: begin
+				// Si es el último nodo en recibir el mensaje y la request no es de lectura
 				if (last_hop && !in_hold.read) begin
-					end_reply = in_hold_valid;
+					end_reply = in_hold_valid;	// Se termina el paso de ese mensaje
 					in_data_ready = 1;
 				end
-
+				// Si no es el último salto y hay reply
 				if (!last_hop && in_hold.reply)
 					in_data_ready = 1;
 
