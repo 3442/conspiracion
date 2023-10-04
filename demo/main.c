@@ -12,6 +12,16 @@ void bsp_main(void)
 	print("booted %u cpus", NUM_CPUS);
 
 	while (1) {
+		char input[64];
+		read_line(input, sizeof input);
+
+		char *tokens = input;
+
+		char *cmd = strtok_input(&tokens);
+		if (!cmd)
+			continue;
+
+		print("unknown command '%s'", cmd);
 	}
 }
 

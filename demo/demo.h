@@ -24,11 +24,15 @@ void spin_unlock(struct lock *lock, unsigned irq_save);
 
 void console_init(void);
 void print(const char *fmt, ...);
+void read_line(char *vuf, unsigned size);
 
 int cpus_ready(void);
 void run_cpu(unsigned num);
 void run_cpus(unsigned mask);
 void halt_cpu(unsigned num);
 void halt_cpus(unsigned mask);
+
+int strcmp(const char *s1, const char *s2);
+char *strtok_input(char **tokens);
 
 #endif

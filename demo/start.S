@@ -19,7 +19,7 @@ __reserved:
 	b .
 
 __irq:
-	b irq
+	b _irq_entry
 
 __fiq:
 	b .
@@ -47,10 +47,14 @@ _start:
 _boot_num:
 	.word 0
 
-irq:
+_irq_entry:
+	ldr  sp, =_irq_stack
+	push {r0-r11, lr}
+	bl   irq
+	pop  {r0-r11, lr}
 	subs pc, lr, #4
 
-.weak undefined, swi, data_abort, prefetch_abort, irq
+.weak undefined, swi, data_abort, prefetch_abort
 .set swi, __swi
 .set undefined, __undefined
 .set data_abort, __data_abort
