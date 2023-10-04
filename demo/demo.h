@@ -35,6 +35,10 @@ void halt_cpus(unsigned mask);
 int strcmp(const char *s1, const char *s2);
 char *strtok_input(char **tokens);
 
+int parse_hex(char **tokens, unsigned *val);
+int parse_ptr(char **tokens, void **ptr);
+int parse_aligned(char **tokens, void **ptr);
 int parse_cpu_mask(char **tokens, unsigned *mask);
+int expect_end(char **tokens);
 
 #endif

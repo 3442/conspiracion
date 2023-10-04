@@ -22,6 +22,26 @@ static void cmd_halt(char **tokens)
 	halt_cpus(mask);
 }
 
+static void cmd_rd(char **tokens)
+{
+	void *ptr;
+	if (parse_aligned(tokens, &ptr) < 0 || expect_end(tokens) < 0)
+		return;
+
+	print("%p: %x", ptr, *(volatile unsigned *)ptr);
+}
+
+static void cmd_wr(char **tokens)
+{
+	void *ptr;
+	unsigned val;
+
+	if (parse_aligned(tokens, &ptr) < 0 || parse_hex(tokens, &val) < 0 || expect_end(tokens) < 0)
+		return;
+
+	*(volatile unsigned *)ptr = val;
+}
+
 void bsp_main(void)
 {
 	run_cpu(1);
@@ -43,6 +63,10 @@ void bsp_main(void)
 			cmd_run(&tokens);
 		else if (!strcmp(cmd, "halt"))
 			cmd_halt(&tokens);
+		else if (!strcmp(cmd, "rd"))
+			cmd_rd(&tokens);
+		else if (!strcmp(cmd, "wr"))
+			cmd_wr(&tokens);
 		else
 			print("unknown command '%s'", cmd);
 	}

@@ -7,6 +7,11 @@ static void bad_input(void)
 	print("bad input");
 }
 
+static void unexpected_eof(void)
+{
+	print("unexpected end-of-input");
+}
+
 int strcmp(const char *s1, const char *s2)
 {
     while (*s1 && *s1 == *s2)
@@ -53,6 +58,77 @@ int parse_cpu_mask(char **tokens, unsigned *mask)
 
 	if (!*mask) {
 		print("must specify at least one cpu");
+		return -1;
+	}
+
+	return 0;
+}
+
+int parse_hex(char **tokens, unsigned *val)
+{
+	char *token = strtok_input(tokens);
+	if (!token) {
+		unexpected_eof();
+		return -1;
+	} else if (token[0] != '0' || token[1] != 'x') {
+		bad_input();
+		return -1;
+	}
+
+	*val = 0;
+
+	char *c = &token[2];
+	unsigned nibbles = 0;
+
+	while (*c) {
+		*val <<= 4;
+
+		if ('0' <= *c && *c <= '9')
+			*val |= *c - '0';
+		else if ('a' <= *c && *c <= 'f')
+			*val |= *c - 'a' + 10;
+		else if ('A' <= *c && *c <= 'F')
+			*val |= *c - 'A' + 10;
+
+		++c;
+		++nibbles;
+	}
+
+	if (!nibbles || nibbles > 8) {
+		bad_input();
+		return -1;
+	}
+
+	return 0;
+}
+
+int parse_ptr(char **tokens, void **ptr)
+{
+	unsigned ptr_val;
+	if (parse_hex(tokens, &ptr_val) < 0)
+		return -1;
+
+	*ptr = (void *)ptr_val;
+	return 0;
+}
+
+int parse_aligned(char **tokens, void **ptr)
+{
+	if (parse_ptr(tokens, ptr) < 0)
+		return -1;
+	else if ((unsigned)*ptr & 0b11) {
+		print("unaligned address: %p", *ptr);
+		return -1;
+	}
+
+	return 0;
+}
+
+int expect_end(char **tokens)
+{
+	char *token = strtok_input(tokens);
+	if (token) {
+		print("too many arguments starting from '%s'", token);
 		return -1;
 	}
 
