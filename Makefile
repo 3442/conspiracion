@@ -120,7 +120,7 @@ exe: exe/$(TOP)
 exe/%: $(OBJ_DIR)/%/V%.mk
 	$(MAKE) -C $(OBJ_DIR)/$* -f V$*.mk
 
-.PRECIOUS: $(SIM_OBJ_DIR)/% $(SIM_OBJ_DIR)/%.o $(SIM_OBJ_DIR)/%.bin $(SIM_OBJ_DIR)/%.cov
+.PRECIOUS: $(SIM_OBJ_DIR)/% $(SIM_OBJ_DIR)/%.o $(SIM_OBJ_DIR)/%.cov %.bin
 .SECONDEXPANSION:
 
 $(OBJ_DIR)/%.mk: \
