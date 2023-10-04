@@ -78,6 +78,12 @@ module cache_routing
 	assign cache_core_read = core_read && cached;
 	assign cache_core_write = core_write && cached;
 
+	// Máquina de estados:
+	// IDLE/CACHE/BYPASS
+	// Bypass: el request evita pasar por caché, para que no quede escrito el
+	// el dato. Esto sirve para periféricos, por ejemplo.
+	// Cache: el request sí pasa por caché (esto sucede para todo lo que va
+	// para RAM.
 	always_comb begin
 		transition = 0;
 		core_waitrequest = cache_core_waitrequest;
