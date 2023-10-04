@@ -51,7 +51,11 @@ module cache_control
 	output word        mem_address,
 	output logic       mem_read,
 	                   mem_write,
-	output line        mem_writedata
+	output line        mem_writedata,
+
+	input  logic       dbg_write,
+	input  addr_index  debug_index,
+	output logic       debug_ready
 );
 
 	enum int unsigned
@@ -62,8 +66,8 @@ module cache_control
 		REPLY
 	} state, next_state;
 
-	logic accept_snoop, end_reply, in_hold_valid, last_hop, lock_line, locked,
-	      may_send, may_send_if_token_held, mem_begin, mem_end, mem_read_end,
+	logic accept_snoop, debug, end_reply, in_hold_valid, last_hop, lock_line,
+	      locked, may_send, may_send_if_token_held, mem_begin, mem_end, mem_read_end,
 	      mem_wait, out_stall, wait_reply, replace, retry, send, send_inval,
 	      send_read, snoop_hit, set_reply, unlock_line, writeback;
 
@@ -145,6 +149,9 @@ module cache_control
 
 				if (accept_snoop)
 					index_rd = in_hold.index;
+
+				if (debug)
+					index_rd = debug_index;
 			end
 
 			CORE: begin
@@ -321,6 +328,7 @@ module cache_control
 	end
 
 	always_comb begin
+		debug = 0;
 		next_state = ACCEPT;
 
 		unique case (state)
@@ -329,6 +337,8 @@ module cache_control
 					next_state = SNOOP;
 				else if (in_hold_valid && last_hop && in_hold.read)
 					next_state = REPLY;
+				else if (dbg_write && !debug_ready)
+					debug = 1;
 				else if ((core_read || core_write) && !wait_reply && (!locked || may_send))
 					next_state = CORE;
 
@@ -356,6 +366,8 @@ module cache_control
 
 			mem_read <= 0;
 			mem_write <= 0;
+
+			debug_ready <= 0;
 		end else begin
 			out_token.e0.tag <= core_tag;
 			out_token.e0.index <= core_index;
@@ -391,6 +403,8 @@ module cache_control
 				mem_read <= !writeback;
 				mem_write <= writeback;
 			end
+
+			debug_ready <= debug;
 		end
 
 	always_ff @(posedge clk) begin

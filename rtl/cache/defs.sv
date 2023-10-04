@@ -28,6 +28,15 @@ typedef logic[15:0] addr_tag;
 typedef logic[2:0]  addr_io_region;
 typedef logic[26:0] addr_cacheable;
 
+typedef struct packed
+{
+	addr_io_region io;
+	addr_tag       tag;
+	addr_index     index;
+	addr_offset    offset;
+	addr_mbz       mbz;
+} addr_bits;
+
 typedef enum logic[1:0]
 {
 	INVALID,

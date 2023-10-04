@@ -65,13 +65,19 @@ module platform
 	logic        mem_0_waitrequest, mem_1_waitrequest, mem_2_waitrequest, mem_3_waitrequest;
 	logic[15:0]  mem_0_byteenable, mem_1_byteenable, mem_2_byteenable, mem_3_byteenable;
 
-	logic[31:0] cpu_0_address, cpu_1_address, cpu_2_address, cpu_3_address;
-	logic       cpu_0_read, cpu_1_read, cpu_2_read, cpu_3_read;
-	logic       cpu_0_write, cpu_1_write, cpu_2_write, cpu_3_write;
-	logic       cpu_0_lock, cpu_1_lock, cpu_2_lock, cpu_3_lock;
-	logic[31:0] cpu_0_readdata, cpu_1_readdata, cpu_2_readdata, cpu_3_readdata;
-	logic[31:0] cpu_0_writedata, cpu_1_writedata, cpu_2_writedata, cpu_3_writedata;
-	logic       cpu_0_waitrequest, cpu_1_waitrequest, cpu_2_waitrequest, cpu_3_waitrequest;
+	logic[31:0] cpu_0_address, cpu_1_address, cpu_2_address, cpu_3_address,
+	            dbg_0_address, dbg_1_address, dbg_2_address, dbg_3_address;
+	logic       cpu_0_read, cpu_1_read, cpu_2_read, cpu_3_read,
+	            dbg_0_read, dbg_1_read, dbg_2_read, dbg_3_read,
+	            cpu_0_write, cpu_1_write, cpu_2_write, cpu_3_write,
+	            dbg_0_write, dbg_1_write, dbg_2_write, dbg_3_write,
+	            cpu_0_lock, cpu_1_lock, cpu_2_lock, cpu_3_lock;
+	logic[31:0] cpu_0_readdata, cpu_1_readdata, cpu_2_readdata, cpu_3_readdata,
+	            dbg_0_readdata, dbg_1_readdata, dbg_2_readdata, dbg_3_readdata;
+	logic[31:0] cpu_0_writedata, cpu_1_writedata, cpu_2_writedata, cpu_3_writedata,
+	            dbg_0_writedata, dbg_1_writedata, dbg_2_writedata, dbg_3_writedata;
+	logic       cpu_0_waitrequest, cpu_1_waitrequest, cpu_2_waitrequest, cpu_3_waitrequest,
+	            dbg_0_waitrequest, dbg_1_waitrequest, dbg_2_waitrequest, dbg_3_waitrequest;
 	logic[1:0]  cpu_0_response, cpu_1_response, cpu_2_response, cpu_3_response;
 	logic[3:0]  cpu_0_byteenable, cpu_1_byteenable, cpu_2_byteenable, cpu_3_byteenable;
 
@@ -196,6 +202,25 @@ module platform
 		.out_token(token_0),
 		.out_token_valid(token_valid_0),
 
+		.dbg_read(dbg_0_read),
+		.dbg_write(dbg_0_write),
+		.dbg_address(dbg_0_address[2:0]),
+		.dbg_readdata(dbg_0_readdata),
+		.dbg_writedata(dbg_0_writedata),
+		.dbg_waitrequest(dbg_0_waitrequest),
+
+		.*
+	);
+
+	sim_slave smp_dbg_0
+	(
+		.read(dbg_0_read),
+		.write(dbg_0_write),
+		.address(dbg_0_address),
+		.readdata(dbg_0_readdata),
+		.writedata(dbg_0_writedata),
+		.waitrequest(dbg_0_waitrequest),
+
 		.*
 	);
 
@@ -232,6 +257,25 @@ module platform
 
 		.out_token(token_1),
 		.out_token_valid(token_valid_1),
+
+		.dbg_read(dbg_1_read),
+		.dbg_write(dbg_1_write),
+		.dbg_address(dbg_1_address[2:0]),
+		.dbg_readdata(dbg_1_readdata),
+		.dbg_writedata(dbg_1_writedata),
+		.dbg_waitrequest(dbg_1_waitrequest),
+
+		.*
+	);
+
+	sim_slave smp_dbg_1
+	(
+		.read(dbg_1_read),
+		.write(dbg_1_write),
+		.address(dbg_1_address),
+		.readdata(dbg_1_readdata),
+		.writedata(dbg_1_writedata),
+		.waitrequest(dbg_1_waitrequest),
 
 		.*
 	);
@@ -270,6 +314,25 @@ module platform
 		.out_token(token_2),
 		.out_token_valid(token_valid_2),
 
+		.dbg_read(dbg_2_read),
+		.dbg_write(dbg_2_write),
+		.dbg_address(dbg_2_address[2:0]),
+		.dbg_readdata(dbg_2_readdata),
+		.dbg_writedata(dbg_2_writedata),
+		.dbg_waitrequest(dbg_2_waitrequest),
+
+		.*
+	);
+
+	sim_slave smp_dbg_2
+	(
+		.read(dbg_2_read),
+		.write(dbg_2_write),
+		.address(dbg_2_address),
+		.readdata(dbg_2_readdata),
+		.writedata(dbg_2_writedata),
+		.waitrequest(dbg_2_waitrequest),
+
 		.*
 	);
 
@@ -306,6 +369,25 @@ module platform
 
 		.out_token(token_3),
 		.out_token_valid(token_valid_3),
+
+		.dbg_read(dbg_3_read),
+		.dbg_write(dbg_3_write),
+		.dbg_address(dbg_3_address[2:0]),
+		.dbg_readdata(dbg_3_readdata),
+		.dbg_writedata(dbg_3_writedata),
+		.dbg_waitrequest(dbg_3_waitrequest),
+
+		.*
+	);
+
+	sim_slave smp_dbg_3
+	(
+		.read(dbg_3_read),
+		.write(dbg_3_write),
+		.address(dbg_3_address),
+		.readdata(dbg_3_readdata),
+		.writedata(dbg_3_writedata),
+		.waitrequest(dbg_3_waitrequest),
 
 		.*
 	);

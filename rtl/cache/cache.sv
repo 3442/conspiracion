@@ -16,13 +16,12 @@ module cache
 	output logic[1:0] core_response,
 	output word       core_readdata,
 
-	//TODO
-	/*input  TODO/      dbg_address,
+	input  logic[2:0] dbg_address,
 	input  logic      dbg_read,
 	                  dbg_write,
 	input  word       dbg_writedata,
 	output logic      dbg_waitrequest,
-	output word       dbg_readdata,*/
+	output word       dbg_readdata,
 
 	input  logic      mem_waitrequest,
 	input  line       mem_readdata,
@@ -47,9 +46,6 @@ module cache
 	output logic      out_token_valid
 );
 
-	//TODO
-	//assign dbg_waitrequest = 1;
-
 	logic write_data, write_state;
 	line data_wr, data_rd;
 	addr_tag tag_wr, tag_rd;
@@ -63,7 +59,8 @@ module cache
 
 	word cache_mem_address;
 	line cache_mem_writedata;
-	logic cache_core_waitrequest, cache_mem_waitrequest, cache_mem_read, cache_mem_write;
+	logic cache_core_waitrequest, cache_mem_waitrequest, cache_mem_read, cache_mem_write,
+	      debug_ready;
 
 	cache_control #(.TOKEN_AT_RESET(TOKEN_AT_RESET)) control
 	(
@@ -101,6 +98,13 @@ module cache
 	logic monitor_acquire, monitor_commit, monitor_fail, monitor_release;
 
 	cache_monitor monitor
+	(
+		.*
+	);
+
+	addr_index debug_index;
+
+	cache_debug debug
 	(
 		.*
 	);

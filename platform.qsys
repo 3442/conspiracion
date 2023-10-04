@@ -222,6 +222,14 @@
          type = "String";
       }
    }
+   element platform
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
    element pll_0
    {
       datum _sortIndex
@@ -1397,6 +1405,26 @@
  <connection kind="avalon" version="20.1" start="mm_bridge.m0" end="smp_0.avl">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x30140000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection kind="avalon" version="20.1" start="mm_bridge.m0" end="cache_0.dbg">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x30100000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection kind="avalon" version="20.1" start="mm_bridge.m0" end="cache_1.dbg">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x30110000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection kind="avalon" version="20.1" start="mm_bridge.m0" end="cache_2.dbg">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x30120000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection kind="avalon" version="20.1" start="mm_bridge.m0" end="cache_3.dbg">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x30130000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection kind="avalon" version="20.1" start="mm_bridge.m0" end="buttons.s1">
