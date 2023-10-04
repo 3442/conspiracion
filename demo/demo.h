@@ -13,10 +13,10 @@ struct cpu
 	unsigned num;
 };
 
-/* R12 está reservado por la ABI
+/* Esto viola la ABI, pero no importa porque no dependemos de bibliotecas
  * https://gcc.gnu.org/onlinedocs/gcc/Global-Register-Variables.html
  */
-register struct cpu *this_cpu asm("ip");
+register struct cpu *this_cpu asm("r9");
 
 void spin_init(struct lock *lock);
 void spin_lock(struct lock *lock, unsigned *irq_save);

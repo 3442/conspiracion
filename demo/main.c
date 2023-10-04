@@ -4,7 +4,7 @@ static struct cpu cpu0, cpu1, cpu2, cpu3;
 
 struct cpu *__cpus[] = { &cpu0, &cpu1, &cpu2, &cpu3 };
 
-volatile static unsigned boot_done;
+static volatile unsigned boot_done;
 
 static void cmd_run(char **tokens)
 {

@@ -34,8 +34,8 @@ _start:
 	str r2, [r0]
 	ldr r2, =__cpus
 	lsl r3, r1, #2
-	ldr ip, [r2, r3]
-	str r1, [ip]
+	ldr r9, [r2, r3]
+	str r1, [r9]
 	ldr r2, =_stack_shift
 	lsl r1, r1, r2
 	ldr sp, =_stack_begin
