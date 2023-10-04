@@ -40,7 +40,7 @@
               bintools = prev.stdenv.cc.bintools.override {
                 bintools = prev.stdenv.cc.bintools.bintools.overrideAttrs (prev: {
                   patches = prev.patches ++ [
-                    ./gas-config-tc-arm-disable-instruction-support-check.patch
+                    ./nix/gas-config-tc-arm-disable-instruction-support-check.patch
                   ];
                 });
               };
