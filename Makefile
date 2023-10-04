@@ -36,7 +36,7 @@ CC_CPU := -mcpu=arm810
 
 VFLAGS ?= \
 	--x-assign $(X_MODE) --x-initial $(X_MODE) \
-	$(if $(DISABLE_THREADS),,--threads $(shell nproc)) \
+	$(if $(ENABLE_THREADS),--threads $(shell nproc)) \
 	$(if $(DISABLE_TRACE),,--trace) \
 	$(if $(DISABLE_COV),,--coverage)
 
