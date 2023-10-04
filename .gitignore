@@ -37,6 +37,7 @@ vcd/
 cov/
 obj/
 build/
+dist/
 .qsys_edit/
 platform/
 platform.sopcinfo

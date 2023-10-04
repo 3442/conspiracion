@@ -6,9 +6,12 @@ RTL_DIR       := rtl
 TB_DIR        := tb
 SIM_DIR       := sim
 DEMO_DIR      := demo
+DIST_DIR      := dist
 TB_SIM_DIR    := $(TB_DIR)/sim
 SIM_OBJ_DIR   := $(OBJ_DIR)/$(TOP)/sim
 DEMO_OBJ_DIR  := $(OBJ_DIR)/$(TOP)/demo
+DIST_OBJ_DIR  := $(OBJ_DIR)/$(TOP)/dist
+RBF_OUT_DIR   := output_files
 VERILATOR     ?= verilator
 GENHTML       ?= genhtml
 CROSS_CC      := $(CROSS_COMPILE)gcc
@@ -46,7 +49,19 @@ SIMS := $(patsubst $(TB_SIM_DIR)/%.py,%,$(wildcard $(TB_SIM_DIR)/*.py))
 all: sim
 
 clean:
-	rm -rf $(OBJ_DIR) $(VCD_DIR) $(COV_DIR)
+	rm -rf $(DIST_DIR) $(OBJ_DIR) $(VCD_DIR) $(COV_DIR)
+
+dist: $(if $(DISABLE_COV),,cov)
+	@mkdir -p $(DIST_DIR)
+	@rm -rf $(DIST_OBJ_DIR) && mkdir -p $(DIST_OBJ_DIR)/{bin,bitstream,doc,results,src}
+	@git ls-files | xargs cp --parents -rvt $(DIST_OBJ_DIR)/src
+	@mv -vt $(DIST_OBJ_DIR) $(DIST_OBJ_DIR)/src/README.md
+	@$(if $(DISABLE_COV),,cp -rvt $(DIST_OBJ_DIR)/results $(COV_DIR))
+	@[ -f $(RBF_OUT_DIR)/$(TOP).rbf ] \
+		&& cp -vt $(DIST_OBJ_DIR)/bitstream $(RBF_OUT_DIR)/$(TOP).rbf \
+		|| echo "Warning: missing bitstream at $(RBF_OUT_DIR)/$(TOP).rbf" >&2
+	cd $(DIST_OBJ_DIR) && zip -qr \
+		$(shell pwd)/$(DIST_DIR)/$(TOP)-$(shell git rev-parse --short HEAD)-$(shell date +'%Y%m%d-%H%M%S').zip *
 
 trace: trace/$(TOP)
 
@@ -78,7 +93,7 @@ $(COV_DIR)/%: $(SIM_OBJ_DIR)/%.cov
 
 $(SIM_OBJ_DIR)/%.cov: sim/%
 
-$(OBJ_DIR)/$(TOP)/cov.info: $(patsubst %,$(SIM_OBJ_DIR)/%.cov,$(SIMS))
+$(OBJ_DIR)/$(TOP)/cov.info: $(patsubst %,sim/%,$(SIMS))
 	$(VERILATOR)_coverage -write-info $@ $(SIM_OBJ_DIR)/*.cov
 endif
 
@@ -121,6 +136,8 @@ exe/%: $(OBJ_DIR)/%/V%.mk
 	$(MAKE) -C $(OBJ_DIR)/$* -f V$*.mk
 
 .PRECIOUS: $(SIM_OBJ_DIR)/% $(SIM_OBJ_DIR)/%.o $(SIM_OBJ_DIR)/%.cov %.bin
+.PHONY: all clean dist demo sim
+
 .SECONDEXPANSION:
 
 $(OBJ_DIR)/%.mk: \
