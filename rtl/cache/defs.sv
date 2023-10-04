@@ -13,18 +13,18 @@ typedef logic[31:0] word;
 `endif
 
 /* Tenemos 512MiB de SDRAM, el resto del espacio es I/O (uncached). Usamos
- * 512 líneas direct-mapped de 16 bytes cada una. El core solo realiza
+ * 4096 líneas direct-mapped de 16 bytes cada una. El core solo realiza
  * operaciones alineadas. Por tanto, cada dirección de 32 bits consta de:
  * - 2 bits que siempre son 0 (traducidos a byteenable por core)
  * - 2 bits de offset (ya que para cache la unidad direccionable es la word)
- * - 9 bits de index
- * - 16 bits de tag
+ * - 12 bits de index
+ * - 13 bits de tag
  * - 3 bits que son == 0 si cached, != 0 si uncached
  */
 typedef logic[1:0]  addr_mbz;
 typedef logic[1:0]  addr_offset;
-typedef logic[8:0]  addr_index;
-typedef logic[15:0] addr_tag;
+typedef logic[11:0] addr_index;
+typedef logic[12:0] addr_tag;
 typedef logic[2:0]  addr_io_region;
 typedef logic[26:0] addr_cacheable;
 

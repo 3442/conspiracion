@@ -514,8 +514,8 @@ int main(int argc, char **argv)
 		if (!ok || (ok >> 29))
 			return ok;
 
-		unsigned tag = (addr >> 11) & ((1 << 16) - 1);
-		unsigned index = (addr >> 2) & ((1 << 9) - 1);
+		unsigned tag = (addr >> 14) & ((1 << 13) - 1);
+		unsigned index = (addr >> 2) & ((1 << 12) - 1);
 
 		for (std::size_t i = 0; i < sizeof caches / sizeof caches[0]; ++i) {
 			const auto *cache = caches[i];
