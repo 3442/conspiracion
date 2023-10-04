@@ -4,6 +4,24 @@ static struct cpu cpu0, cpu1, cpu2, cpu3;
 
 struct cpu *__cpus[] = { &cpu0, &cpu1, &cpu2, &cpu3 };
 
+static void cmd_run(char **tokens)
+{
+	unsigned mask;
+	if (parse_cpu_mask(tokens, &mask) < 0)
+		return;
+
+	run_cpus(mask);
+}
+
+static void cmd_halt(char **tokens)
+{
+	unsigned mask;
+	if (parse_cpu_mask(tokens, &mask) < 0)
+		return;
+
+	halt_cpus(mask);
+}
+
 void bsp_main(void)
 {
 	run_cpu(1);
@@ -21,7 +39,12 @@ void bsp_main(void)
 		if (!cmd)
 			continue;
 
-		print("unknown command '%s'", cmd);
+		if (!strcmp(cmd, "run"))
+			cmd_run(&tokens);
+		else if (!strcmp(cmd, "halt"))
+			cmd_halt(&tokens);
+		else
+			print("unknown command '%s'", cmd);
 	}
 }
 

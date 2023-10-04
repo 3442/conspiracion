@@ -2,6 +2,11 @@
 
 #include "demo.h"
 
+static void bad_input(void)
+{
+	print("bad input");
+}
+
 int strcmp(const char *s1, const char *s2)
 {
     while (*s1 && *s1 == *s2)
@@ -29,4 +34,27 @@ char *strtok_input(char **tokens)
 	*end = '\0';
 
 	return start;
+}
+
+int parse_cpu_mask(char **tokens, unsigned *mask)
+{
+	*mask = 0;
+
+	char *token;
+	while ((token = strtok_input(tokens))) {
+		if (token[0] != 'c' || token[1] != 'p' || token[2] != 'u'
+		|| !('0' <= token[3] && token[3] < '0' + NUM_CPUS) || token[4]) {
+			bad_input();
+			return -1;
+		}
+
+		*mask |= 1 << (token[3] - '0');
+	}
+
+	if (!*mask) {
+		print("must specify at least one cpu");
+		return -1;
+	}
+
+	return 0;
 }
