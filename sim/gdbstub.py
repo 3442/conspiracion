@@ -6,7 +6,6 @@ loads = {0x0100000: 'build/uImage',
 
 cycles = None
 enable_tty = True
-enable_video = True
 start_halted = True
 sock, client = None, None
 

@@ -214,6 +214,13 @@ def hexdump(base, memory):
 def module_get(attr, default=None):
     return getattr(module, attr, default) if module else None
 
+def module_or_env_bool(var):
+    value = os.getenv(var.upper())
+    if value is not None:
+        return bool(int(value))
+
+    return module_get(var, False)
+
 COLOR_RESET  = '\033[0m'
 COLOR_RED    = '\033[31;1m'
 COLOR_GREEN  = '\033[32m'
@@ -367,10 +374,10 @@ cycles = module_get('cycles', 1024)
 if cycles is not None:
     exec_args.extend(['--cycles', str(cycles)])
 
-if not module_get('enable_tty', False):
+if not module_or_env_bool('enable_tty'):
     exec_args.append('--no-tty')
 
-if not module_get('enable_video', False):
+if not module_or_env_bool('enable_video'):
     exec_args.append('--headless')
 
 for rng in mem_dumps:
@@ -389,7 +396,7 @@ for addr, const in module_get('consts', {}).items():
 for addr, filename in module_get('loads', {}).items():
     exec_args.extend(['--load', f'{addr},{filename}'])
 
-if module_get('start_halted', False):
+if module_or_env_bool('start_halted'):
     exec_args.append('--start-halted')
 
 sim_end_sock, target_end = socket.socketpair()

@@ -79,10 +79,10 @@ sim/%: $(SIM_DIR)/sim.py $(TB_SIM_DIR)/%.py exe/$(TOP) $(SIM_OBJ_DIR)/%.bin
 		$(if $(DISABLE_COV),,$(SIM_OBJ_DIR)/$*.cov)
 
 vmlaunch: $(SIM_DIR)/sim.py $(SIM_DIR)/gdbstub.py exe/$(TOP)
-	@$< $(SIM_DIR)/gdbstub.py $(OBJ_DIR)/$(TOP)/V$(TOP) build/u-boot.bin
+	@ENABLE_VIDEO=1 $< $(SIM_DIR)/gdbstub.py $(OBJ_DIR)/$(TOP)/V$(TOP) build/u-boot.bin
 
 demo: $(SIM_DIR)/sim.py $(SIM_DIR)/gdbstub.py exe/$(TOP) $(DEMO_OBJ_DIR)/demo.bin
-	@$< $(SIM_DIR)/gdbstub.py $(OBJ_DIR)/$(TOP)/V$(TOP) $(DEMO_OBJ_DIR)/demo.bin
+	@START_HALTED=0 $< $(SIM_DIR)/gdbstub.py $(OBJ_DIR)/$(TOP)/V$(TOP) $(DEMO_OBJ_DIR)/demo.bin
 
 ifndef DISABLE_COV
 $(COV_DIR): $(OBJ_DIR)/$(TOP)/cov.info
