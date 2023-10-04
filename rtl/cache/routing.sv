@@ -82,7 +82,7 @@ module cache_routing
 	// IDLE/CACHE/BYPASS
 	// Bypass: el request evita pasar por caché, para que no quede escrito el
 	// el dato. Esto sirve para periféricos, por ejemplo.
-	// Cache: el request sí pasa por caché (esto sucede para todo lo que va
+	// Cache: el request sí pasa por caché, esto sucede para todo lo que va
 	// para RAM.
 	always_comb begin
 		transition = 0;
@@ -117,7 +117,10 @@ module cache_routing
 			IDLE:
 				if (transition) begin
 					// Si cache quiere hacer una operación con memoria, se pasa 
-					// a CACHE, sino hay que hacer BYPASS 
+					// a CACHE, sino hay que hacer BYPASS. Si la operación
+					// no es directo a memoria, se hace bypasss porque esto
+					// implica que el dato no tiene que quedar cacheado. (Talvez
+					// es algo de un periférico, etc.)
 					state <= cache_mem ? CACHE : BYPASS;
 					mem_read <= cache_mem ? cache_mem_read : core_read;
 					mem_write <= cache_mem ? cache_mem_write : core_write;
