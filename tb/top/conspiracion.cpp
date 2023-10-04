@@ -463,10 +463,11 @@ int main(int argc, char **argv)
 		core->step__VforceVal = 1;
 	}
 
-	cores[0]->halt__VforceEn = start_halted;
 	top.rst_n = 0;
 	cycle();
 	top.rst_n = 1;
+
+	cores[0]->halt__VforceEn = static_cast<bool>(start_halted);
 
 	auto do_reg_dump = [&]()
 	{
@@ -631,14 +632,16 @@ int main(int argc, char **argv)
 	unsigned i = 0;
 	auto loop_accurate = [&]()
 	{
+		bool exit_loop = false;
+
 		do {
 			cycle();
-			maybe_halt();
 
-			for (const auto *core : cores)
-				if (core->halted)
-					break;
-		} while (!failed && (*cycles == 0 || ++i < *cycles));
+			if (maybe_halt())
+				for (const auto *core : cores)
+					if (core->halted)
+						exit_loop = true;
+		} while (!exit_loop && !failed && (*cycles == 0 || ++i < *cycles));
 	};
 
 	const bool slow_path = *cycles > 0 || enable_accurate_video || enable_trace;
