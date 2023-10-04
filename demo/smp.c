@@ -3,11 +3,6 @@
 #define SMP_CTRL_BASE 0x30140000
 #define SMP_CTRL      (*(volatile unsigned *)SMP_CTRL_BASE)
 
-int cpus_ready(void)
-{
-	return SMP_CTRL == 0;
-}
-
 void run_cpu(unsigned num)
 {
 	run_cpus(1 << num);
@@ -32,7 +27,7 @@ void run_cpus(unsigned mask)
 
 void halt_cpu(unsigned num)
 {
-	halt_cpu(1 << num);
+	halt_cpus(1 << num);
 }
 
 void halt_cpus(unsigned mask)

@@ -4,6 +4,8 @@ static struct cpu cpu0, cpu1, cpu2, cpu3;
 
 struct cpu *__cpus[] = { &cpu0, &cpu1, &cpu2, &cpu3 };
 
+volatile static unsigned boot_done;
+
 static void cmd_run(char **tokens)
 {
 	unsigned mask;
@@ -53,11 +55,12 @@ static void cmd_cache(char **tokens)
 	cache_debug(cpu, ptr);
 }
 
-void bsp_main(void)
+static void bsp_main(void)
 {
+	boot_done = 0;
 	run_cpu(1);
 
-	while (!cpus_ready());
+	while (!boot_done);
 	print("booted %u cpus", NUM_CPUS);
 
 	while (1) {
@@ -85,10 +88,12 @@ void bsp_main(void)
 	}
 }
 
-void ap_main(void)
+static void ap_main(void)
 {
 	if (this_cpu->num < NUM_CPUS - 1)
 		run_cpu(this_cpu->num + 1);
+	else
+		boot_done = 1;
 
 	halt_cpu(this_cpu->num);
 
@@ -98,14 +103,10 @@ void ap_main(void)
 
 void reset(void)
 {
-	if (this_cpu->num == 0) {
+	if (this_cpu->num == 0)
 		console_init();
 
-		for (struct cpu **cpu = __cpus; cpu < __cpus + NUM_CPUS; ++cpu) {
-		}
-	}
-
-	print("core taken out of reset");
+	print("exited reset");
 
 	if (this_cpu->num == 0)
 		bsp_main();
