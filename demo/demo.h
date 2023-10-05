@@ -35,6 +35,7 @@ int strcmp(const char *s1, const char *s2);
 char *strtok_input(char **tokens);
 
 int expect_end(char **tokens);
+void unexpected_eof();
 
 int parse_hex(char **tokens, unsigned *val);
 int parse_ptr(char **tokens, void **ptr);
@@ -44,5 +45,8 @@ int parse_cpu(char **tokens, unsigned *cpu);
 int parse_cpu_mask(char **tokens, unsigned *mask);
 
 void cache_debug(unsigned cpu, void *ptr);
+
+void perf_show(unsigned cpu);
+void perf_clear(unsigned cpu);
 
 #endif

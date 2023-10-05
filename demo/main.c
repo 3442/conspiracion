@@ -6,6 +6,11 @@ struct cpu *__cpus[] = { &cpu0, &cpu1, &cpu2, &cpu3 };
 
 static volatile unsigned boot_done;
 
+static void unknown_command(const char *cmd)
+{
+	print("unknown command '%s'", cmd);
+}
+
 static void cmd_run(char **tokens)
 {
 	unsigned mask;
@@ -55,6 +60,27 @@ static void cmd_cache(char **tokens)
 	cache_debug(cpu, ptr);
 }
 
+static void cmd_perf(char **tokens)
+{
+	unsigned cpu;
+	const char *cmd;
+
+	if (parse_cpu(tokens, &cpu) < 0)
+		return;
+	else if (!(cmd = strtok_input(tokens))) {
+		unexpected_eof();
+		return;
+	} else if (expect_end(tokens) < 0)
+		return;
+
+	if (!strcmp(cmd, "clear"))
+		perf_clear(cpu);
+	else if (!strcmp(cmd, "show"))
+		perf_show(cpu);
+	else
+		unknown_command(cmd);
+}
+
 static void bsp_main(void)
 {
 	boot_done = 0;
@@ -83,8 +109,10 @@ static void bsp_main(void)
 			cmd_write(&tokens);
 		else if (!strcmp(cmd, "cache"))
 			cmd_cache(&tokens);
+		else if (!strcmp(cmd, "perf"))
+			cmd_perf(&tokens);
 		else
-			print("unknown command '%s'", cmd);
+			unknown_command(cmd);
 	}
 }
 

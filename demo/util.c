@@ -7,11 +7,6 @@ static void bad_input(void)
 	print("bad input");
 }
 
-static void unexpected_eof(void)
-{
-	print("unexpected end-of-input");
-}
-
 static int parse_cpu_token(const char *token, unsigned *cpu)
 {
 	if (token[0] != 'c' || token[1] != 'p' || token[2] != 'u'
@@ -22,6 +17,11 @@ static int parse_cpu_token(const char *token, unsigned *cpu)
 
 	*cpu = token[3] - '0';
 	return 0;
+}
+
+void unexpected_eof(void)
+{
+	print("unexpected end-of-input");
 }
 
 int strcmp(const char *s1, const char *s2)
