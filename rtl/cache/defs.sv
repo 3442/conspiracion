@@ -1,8 +1,11 @@
 `ifndef CACHE_DEFS_SV
 `define CACHE_DEFS_SV
 
+// Byte enables
 typedef logic[3:0]   word_be;
 typedef logic[15:0]  line_be;
+
+// Tamaño de una línea de cache
 typedef logic[127:0] line;
 
 // Choca con typedef en core/uarch.sv
@@ -20,6 +23,11 @@ typedef logic[31:0] word;
  * - 12 bits de index
  * - 13 bits de tag
  * - 3 bits que son == 0 si cached, != 0 si uncached
+ *
+ * Registro:
+ * 
+ *  31      29 28       13 12         4 3          2 1     0
+ * |    IO    |    Tag    |    Index   |   Offset   |   0   |
  */
 typedef logic[1:0]  addr_mbz;
 typedef logic[1:0]  addr_offset;
