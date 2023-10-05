@@ -14,6 +14,7 @@ DIST_OBJ_DIR  := $(OBJ_DIR)/$(TOP)/dist
 RBF_OUT_DIR   := output_files
 VERILATOR     ?= verilator
 GENHTML       ?= genhtml
+COCOTB_CONFIG ?= cocotb-config
 CROSS_CC      := $(CROSS_COMPILE)gcc
 CROSS_OBJCOPY := $(CROSS_COMPILE)objcopy
 CROSS_CFLAGS  := -O3 -Wall -Wextra -Werror
@@ -37,7 +38,7 @@ CC_CPU := -mcpu=arm810
 VFLAGS ?= \
 	--x-assign $(X_MODE) --x-initial $(X_MODE) \
 	$(if $(ENABLE_THREADS),--threads $(shell nproc)) \
-	$(if $(DISABLE_TRACE),,--trace --trace-fst) \
+	$(if $(DISABLE_TRACE),,--trace --trace-fst --trace-structs) \
 	$(if $(DISABLE_COV),,--coverage)
 
 RTL_FILES  = $(shell find $(RTL_DIR)/ ! -path '$(RTL_DIR)/top/*' -type f -name '*.sv')
