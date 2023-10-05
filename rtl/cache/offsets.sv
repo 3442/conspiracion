@@ -21,6 +21,9 @@ module cache_offsets
 	// para la cache. El caché nunca ve la parte de offset que hay en las
 	// direccciones.
 
+	// El core trabaja en words. El caché en lines, esto es el puente entre
+	// ambos tipos de datos.
+
 	line line_mask;
 
 	// El byteenable (be) se utiliza cuando se quiere leer o escribir en cache
@@ -41,6 +44,9 @@ module cache_offsets
 
 	// Máscara para toda la línea
 	assign line_mask = {mask3, mask2, mask1, mask0};
+
+	// Se preserva lo que no hay que cambiar (data_rd & ~line_mask) y se aplica
+	// la máscara a lo que sí hay cambiar (core_writedata_line & line_mask).
 	assign core_data_wr = (core_writedata_line & line_mask) | (data_rd & ~line_mask);
 
 	always_comb begin
