@@ -240,6 +240,7 @@ module cache_control
 					if (in_hold.read) begin
 						set_reply = 1;
 
+						// MESI
 						unique case (state_rd)
 							INVALID:
 								set_reply = 0;
