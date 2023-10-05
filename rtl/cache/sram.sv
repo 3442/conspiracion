@@ -26,7 +26,12 @@ module cache_sram
 	line data_file[DEPTH] /*verilator public*/;
 	addr_tag tag_file[DEPTH] /*verilator public*/;
 	line_state state_file[DEPTH] /*verilator public*/;
-
+	
+	/* 3 funciones principales:
+	 * 	1. Si se necesita escribir un dato: escribe en los tag y data files en la posición del index de escritura
+	 *	2. Si se necesita escribir un estado: escribe en el state file en la posición del index de escritura
+	 *	3. Cada ciclo retorna siempre lo que esté en todos los files en la posición de index de lectura
+	 */
 	always_ff @(posedge clk) begin
 		if (write_data) begin
 			tag_file[index_wr] <= tag_wr;
@@ -41,6 +46,7 @@ module cache_sram
 		state_rd <= state_file[index_rd];
 	end
 
+	// Se inicializan todas las líneas del state file como INVALID
 	//FIXME: rst_n para state_file?
 	initial
 		for (int i = 0; i < DEPTH; ++i)
