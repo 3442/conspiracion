@@ -14,19 +14,19 @@ module cache_control
 	input  line        core_data_wr,
 	output logic       core_waitrequest,
 
-	input  ring_req    in_data,
-	input  logic       in_data_valid,
-	output logic       in_data_ready,
+	input  ring_req    in_data,				// lo que se recibe
+	input  logic       in_data_valid,		// este core está recibiendo
+	output logic       in_data_ready,		// este core esta listo para recibir
 
-	input  logic       out_data_ready,
-	output ring_req    out_data,
-	output logic       out_data_valid,
+	input  logic       out_data_ready,		// este core está listo para enviar
+	output ring_req    out_data,			// lo que se envía
+	output logic       out_data_valid,		// este core está enviando datos
 
-	input  ring_token  in_token,
-	input  logic       in_token_valid,
+	input  ring_token  in_token,			// input del token
+	input  logic       in_token_valid,		// se está recibiendo el token
 
-	output ring_token  out_token,
-	output logic       out_token_valid,
+	output ring_token  out_token,			// output del token
+	output logic       out_token_valid,		// se está enviando el token
 
 	// Señales para la SRAM
 	input  addr_tag    tag_rd,
@@ -72,6 +72,7 @@ module cache_control
 	      mem_wait, out_stall, wait_reply, replace, retry, send, send_inval,
 	      send_read, snoop_hit, set_reply, unlock_line, writeback;
 
+	// in_hold: el paquete actual
 	ring_req in_hold, send_data, fwd_data, stall_data, out_data_next;
 
 	addr_tag mem_tag;
@@ -96,6 +97,8 @@ module cache_control
 	// Aceptar snoop si no es el último nodo y se tiene un mensaje válido
 	assign accept_snoop = in_hold_valid && !last_hop && (in_hold.inval || !in_hold.reply);
 
+	// Solo se puede iniciar un request si se tiene el token y el token es
+	// válido
 	assign may_send = may_send_if_token_held && in_token_valid;
 	assign may_send_if_token_held
 	     = (!in_token.e2.valid || in_token.e2.index != core_index || in_token.e2.tag != core_tag)
