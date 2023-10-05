@@ -176,11 +176,16 @@ module cache_control
 
 			CORE: begin
 				if (replace) begin
+					// Para la línea actual, guardar en el state file que
+					// ahora el estado es INVALID
 					state_wr = INVALID;
 					write_state = 1;
 
 					if (state_rd == MODIFIED)
 						writeback = 1;
+				
+				// Dependiendo del estado de la línea y de si el core quiere 
+				// hacer un write
 				end else unique case ({state_rd, core_write})
 					{INVALID, 1'b0}: begin
 						send = 1;
@@ -303,12 +308,15 @@ module cache_control
 		if (writeback)
 			mem_begin = 1;
 
-		// Colisiones de bus 
+	
+		// Si el envío de un mensaje falló, el anillo intenta enviarlo de nuevo
+		// Reintentar si hay colisiones de bus 
 		retry = (mem_read_end && (write_data || write_state)) || (mem_wait && mem_begin);
 
 		// Nótese la diferencia con un assign, ya que send puede cambiar más abajo
 		lock_line = send;
 
+		// Reintentar si quiere enviar, pero no puede porque el token no lo permite
 		if (send && !may_send && !locked)
 			retry = 1;
 
