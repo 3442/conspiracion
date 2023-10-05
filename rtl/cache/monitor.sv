@@ -7,7 +7,7 @@ module cache_monitor
 
 	input  addr_tag    core_tag,
 	input  addr_index  core_index,
-	input  addr_offset core_offset,
+	input  addr_offset core_offset,		// Alguno de los 4 cores
 	input logic        core_lock,
 	input  word        core_writedata,
 	output logic[1:0]  core_response,
@@ -82,11 +82,13 @@ module cache_monitor
 			mask <= 4'b0000;
 			dirty <= 0;
 		end else begin
+			// ldrex
 			if (monitor_acquire) begin
 				mask <= hit && !known && !dirty ? mask | core_ex_mask : core_ex_mask;
 				dirty <= 0;
 			end
 
+			// strexeq
 			if (monitor_release) begin
 				mask <= hit && known ? mask_clear : 4'b0000;
 				dirty <= hit && known;
