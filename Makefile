@@ -38,7 +38,9 @@ ifdef FASTER_IS_BETTER
 	LDFLAGS += -O3 -flto
 endif
 
-CXXFLAGS += -iquote $(shell pwd)/$(TB_DIR)
+ROOT := $(shell pwd)
+
+CXXFLAGS += -iquote $(ROOT)/$(TB_DIR)
 
 export CXXFLAGS LDFLAGS
 
@@ -57,18 +59,18 @@ VFLAGS += -O3 --cc --exe -y $(RTL_DIR) --prefix Vtop
 LIBPYTHON = $(shell $(COCOTB_CONFIG) --libpython)
 
 COCOTB_LDFLAGS := $(LDFLAGS) \
-  -Wl,-rpath,$(shell $(COCOTB_CONFIG) --lib-dir) \
-  -L$(shell $(COCOTB_CONFIG) -config --lib-dir) \
-  -Wl,-rpath,$(dir $(LIBPYTHON)) \
-  -lcocotbvpi_verilator -lgpi -lcocotb -lgpilog -lcocotbutils
+	-Wl,-rpath,$(shell $(COCOTB_CONFIG) --lib-dir) \
+	-L$(shell $(COCOTB_CONFIG) -config --lib-dir) \
+	-Wl,-rpath,$(dir $(LIBPYTHON)) \
+	-lcocotbvpi_verilator -lgpi -lcocotb -lgpilog -lcocotbutils
 
 RTL_FILES := $(shell find $(RTL_DIR)/ ! -path '$(RTL_DIR)/top/*' -type f -name '*.sv')
 RTL_FILES += $(shell find $(TB_DIR)/ ! -path '$(TB_DIR)/top/*' -type f -name '*.sv')
 TB_FILES  := $(shell find $(TB_DIR)/ ! -path '$(TB_DIR)/top/*' -type f -name '*.cpp')
 
-SIMS := \
-	$(patsubst $(TB_SIM_DIR)/%.py,%,$(wildcard $(TB_SIM_DIR)/*.py)) \
-	$(patsubst $(TB_DIR)/top/%.py,%,$(wildcard $(TB_DIR)/top/*.py))
+SYS_SIMS  := $(patsubst $(TB_SIM_DIR)/%.py,%,$(wildcard $(TB_SIM_DIR)/*.py))
+COCO_SIMS := $(filter-out __init__,$(patsubst $(TB_DIR)/top/%.py,%,$(wildcard $(TB_DIR)/top/*.py)))
+SIMS      := $(SYS_SIMS) $(COCO_SIMS)
 
 GIT_REV := $(shell if [ -d .git ]; then echo -$$(git rev-parse --short HEAD); fi)
 
@@ -77,18 +79,28 @@ all: sim
 clean:
 	rm -rf $(DIST_DIR) $(OBJ_DIR) $(FST_DIR) $(COV_DIR)
 
-dist: $(if $(DISABLE_COV),,cov)
+dist: $(if $(DISABLE_COV),sim,cov)
 	@mkdir -p $(DIST_DIR)
-	@rm -rf $(DIST_OBJ_DIR) && mkdir -p $(DIST_OBJ_DIR)/{bin,bitstream,doc,results,src}
+	@rm -rf $(DIST_OBJ_DIR) && mkdir -pv $(DIST_OBJ_DIR)/{bin,bitstream,doc,results,src}
 	@git ls-files | xargs cp --parents -rvt $(DIST_OBJ_DIR)/src
 	@mv -vt $(DIST_OBJ_DIR) $(DIST_OBJ_DIR)/src/README.md
-	@$(if $(DISABLE_COV),,cp -rvt $(DIST_OBJ_DIR)/results $(COV_DIR))
-	@$(if $(DISABLE_TRACE),,cp -rvt $(DIST_OBJ_DIR)/results $(FST_DIR))
+	@$(if $(DISABLE_COV),,cp -rv $(COV_DIR) $(DIST_OBJ_DIR)/results/coverage)
+	@for SIM in $(SYS_SIMS); do \
+		mkdir -pv $(DIST_OBJ_DIR)/results/system/$$SIM; \
+		if [ -f $(SIM_OBJ_DIR)/$$SIM.fst ]; then \
+			cp -v $(SIM_OBJ_DIR)/$$SIM.fst $(DIST_OBJ_DIR)/results/system/$$SIM/trace.fst; \
+		fi; done
+	@for SIM in $(COCO_SIMS); do \
+		mkdir -pv $(DIST_OBJ_DIR)/results/block/$$SIM; \
+		cp -vt $(DIST_OBJ_DIR)/results/block/$$SIM $(OBJ_DIR)/$$SIM/results.xml; \
+		$(if $(DISABLE_TRACE),, \
+			cp -v $(OBJ_DIR)/$$SIM/dump.fst $(DIST_OBJ_DIR)/results/block/$$SIM/trace.fst); \
+		done
 	@[ -f $(RBF_OUT_DIR)/$(TOP).rbf ] \
 		&& cp -vt $(DIST_OBJ_DIR)/bitstream $(RBF_OUT_DIR)/$(TOP).rbf \
 		|| echo "Warning: missing bitstream at $(RBF_OUT_DIR)/$(TOP).rbf" >&2
 	cd $(DIST_OBJ_DIR) && zip -qr \
-		$(shell pwd)/$(DIST_DIR)/$(TOP)$(GIT_REV)-$(shell date +'%Y%m%d-%H%M%S').zip *
+		$(ROOT)/$(DIST_DIR)/$(TOP)$(GIT_REV)-$(shell date +'%Y%m%d-%H%M%S').zip *
 
 sim: $(addprefix sim/,$(SIMS))
 
@@ -96,12 +108,15 @@ sim/%: $(SIM_DIR)/sim.py $(TB_SIM_DIR)/%.py exe/$(TOP) $(SIM_OBJ_DIR)/%.bin $(FS
 	@$< $(TB_SIM_DIR)/$*.py $(OBJ_DIR)/$(TOP)/Vtop \
 		$(SIM_OBJ_DIR)/$*.bin \
 		$(if $(DISABLE_COV),,--coverage $(SIM_OBJ_DIR)/$*.cov) \
-		$(if $(DISABLE_TRACE),,--trace $(FST_DIR)/$*/trace$(GIT_REV).fst)
+		$(if $(DISABLE_TRACE),,--trace $(SIM_OBJ_DIR)/$*.fst)
+	@cp $(SIM_OBJ_DIR)/$*.fst $(FST_DIR)/$*/trace$(GIT_REV).fst
 
 sim/%: $(TB_DIR)/top/%.py exe/% $(FST_DIR)/%
-	@LIBPYTHON_LOC=$(LIBPYTHON) MODULE=tb.top.$* \
+	@cd $(OBJ_DIR)/$* && \
+		LIBPYTHON_LOC=$(LIBPYTHON) PYTHONPATH="$$PYTHONPATH:$(ROOT)" MODULE=tb.top.$* \
 		$(if $(SIM_SEED),RANDOM_SEED=$(SIM_SEED)) \
-		$(OBJ_DIR)/$*/Vtop
+		./Vtop
+	@cp $(OBJ_DIR)/$*/dump.fst $(FST_DIR)/$*/trace$(GIT_REV).fst
 
 $(FST_DIR)/%:
 	@mkdir -p $@
@@ -113,16 +128,17 @@ demo: $(SIM_DIR)/sim.py $(SIM_DIR)/gdbstub.py exe/$(TOP) $(DEMO_OBJ_DIR)/demo.bi
 	@START_HALTED=0 $< $(SIM_DIR)/gdbstub.py $(OBJ_DIR)/$(TOP)/Vtop $(DEMO_OBJ_DIR)/demo.bin
 
 ifndef DISABLE_COV
-$(COV_DIR): $(OBJ_DIR)/$(TOP)/cov.info
-	@rm -rf $@
-	$(GENHTML) $< --output-dir=$@
+cov: $(OBJ_DIR)/$(TOP)/cov.info
+	@rm -rf $(COV_DIR)
+	$(GENHTML) $< --output-dir=$(COV_DIR)
 
-$(COV_DIR)/%: $(SIM_OBJ_DIR)/%.cov
+cov/%: $(SIM_OBJ_DIR)/%.cov
 
 $(SIM_OBJ_DIR)/%.cov: sim/%
 
 $(OBJ_DIR)/$(TOP)/cov.info: $(patsubst %,sim/%,$(SIMS))
-	$(VERILATOR)_coverage -write-info $@ $(SIM_OBJ_DIR)/*.cov
+	$(VERILATOR)_coverage -write-info $@ \
+		$(SIM_OBJ_DIR)/*.cov $(patsubst %,$(OBJ_DIR)/%/coverage.dat,$(COCO_SIMS))
 endif
 
 %.bin: %
@@ -161,7 +177,7 @@ $(SIM_OBJ_DIR)/%.o: $(SIM_DIR)/%.S
 exe: exe/$(TOP)
 
 exe/%: $(OBJ_DIR)/%/Vtop.mk
-	@CXXFLAGS="$(CXXFLAGS) -iquote $(shell pwd)/$(TB_DIR)/top/$*" \
+	@CXXFLAGS="$(CXXFLAGS) -iquote $(ROOT)/$(TB_DIR)/top/$*" \
 		$(MAKE) -C $(OBJ_DIR)/$* -f Vtop.mk
 
 .PRECIOUS: $(OBJ_DIR)/%.mk $(SIM_OBJ_DIR)/% $(SIM_OBJ_DIR)/%.o $(SIM_OBJ_DIR)/%.cov %.bin
