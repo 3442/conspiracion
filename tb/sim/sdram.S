@@ -2,7 +2,7 @@
 
 reset:
 	ldr r0, =0x1004
-	ldr r1, =0x2000
+	ldr r1, =0x1100
 	mov r2, #42
 
 	.loop:
