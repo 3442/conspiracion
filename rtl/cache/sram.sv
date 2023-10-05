@@ -22,7 +22,8 @@ module cache_sram
 	// https://www.intel.com/content/www/us/en/docs/programmable/683082/21-3/ram-with-byte-enable-signals.html
 
 	// Define la cantidad de líneas de cache
-	// $bits(addr_index) = 9 --> 1 << 9 = 512
+	// Cantidad de bits en addr_index = 9, entonces se le hace left shift 9
+	// espacios 1. Osea, 512.
 	localparam DEPTH = 1 << $bits(addr_index);
 
 	line data_file[DEPTH] /*verilator public*/;
