@@ -15,12 +15,12 @@ module cache_control
 	output logic       core_waitrequest,
 
 	input  ring_req    in_data,				// lo que se recibe
-	input  logic       in_data_valid,		// este core está recibiendo
-	output logic       in_data_ready,		// este core esta listo para recibir
+	input  logic       in_data_valid,		// este caché está recibiendo
+	output logic       in_data_ready,		// este caché esta listo para recibir
 
-	input  logic       out_data_ready,		// este core está listo para enviar
+	input  logic       out_data_ready,		// este caché está listo para enviar
 	output ring_req    out_data,			// lo que se envía
-	output logic       out_data_valid,		// este core está enviando datos
+	output logic       out_data_valid,		// este caché está enviando datos
 
 	input  ring_token  in_token,			// input del token
 	input  logic       in_token_valid,		// se está recibiendo el token
@@ -149,10 +149,11 @@ module cache_control
 		// prioridad, ya que SRAM tiene un único puerto de read/write,
 		// entonces tiene que decidir si le da prioridad al core o al bus.
 		// 
-		// ACCEPT:	recibiendo mensajes
-		// CORE:	cosas relacionadas a cada core específico (monitor, etc.)
-		// SNOOP:	vigilando memoria y "ejecutando" MESI
-		// REPLY:	enviando mensajes
+		// ACCEPT:	Luego de todos los estados, se pasa a ACCEPT
+		// CORE:	Acciones relacionadas a cada core específico (monitor, etc.)
+		// SNOOP:	Vigilando memoria y "ejecutando" MESI.
+		//			Esto pasa cuando llega un mensaje y el ttl del mensaje es > 0
+		// REPLY:	Este core recibibió una respuesta
 		unique case (state)
 			ACCEPT: begin
 				// Si es el último nodo en recibir el mensaje y la request no es de lectura
@@ -171,6 +172,7 @@ module cache_control
 				if (debug)
 					index_rd = debug_index;
 			end
+
 
 			CORE: begin
 				if (replace) begin
