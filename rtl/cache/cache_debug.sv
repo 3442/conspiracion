@@ -5,12 +5,12 @@ module cache_debug
 	input  logic      clk,
 	                  rst_n,
 
-	input  logic[2:0] dbg_address,
+	input  logic[2:0] dbg_address,		// Dirección del slave
 	input  logic      dbg_read,
-	input  word       dbg_writedata,
+	input  word       dbg_writedata,	// Dirección que se quiere leer
 	output logic      dbg_waitrequest,
-	output word       dbg_readdata,
-
+	output word       dbg_readdata,		// Es cada word de la salida de la 
+										// lectura de la line
 	input  logic      debug_ready,
 	input  addr_tag   tag_rd,
 	input  line       data_rd,
@@ -18,6 +18,12 @@ module cache_debug
 	output addr_index debug_index
 );
 
+	// Módulo que a partir de un address de cache, "retorna" los datos (cada 
+	// una de las words) de la línea consultad, así como metadata de la línea
+	// (estado, si es cached, index, tad, etc)
+
+	// Este struct es lo que lee cache.c a través de las direcciones de memoria 
+	// para desplegarlo en la CLI
 	struct packed
 	{
 		logic[2:0] mbz_0;
@@ -26,7 +32,7 @@ module cache_debug
 		line_state state;
 		logic      cached,
 		           mbz_1;
-	} status;
+	} status;	// Esto representa una línea de cache
 
 	line line_dump;
 	word word_dump, word_3, word_2, word_1, word_0;
@@ -51,6 +57,7 @@ module cache_debug
 
 	assign {word_3, word_2, word_1, word_0} = line_dump;
 
+	// Acá se define cuál es la word actual de la línea que se va a leer
 	always_comb
 		unique case (dbg_address[1:0])
 			2'b00: word_dump = word_0;
