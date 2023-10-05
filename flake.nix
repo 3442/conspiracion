@@ -136,7 +136,14 @@
             kermit
             lcov
             pkg-config
-            (python3.withPackages (py: [ py.numpy py.pillow py.matplotlib ]))
+            (python3.withPackages (py: with py; [
+              cocotb
+              find-libpython # Para cocotb
+              matplotlib
+              numpy
+              pillow
+              pytest # Para cocotb
+            ]))
             (quartus-prime-lite.override { supportedDevices = [ "Cyclone V" ]; })
             verilator
           ];

@@ -16,41 +16,41 @@
 #include <verilated_fst_c.h>
 #endif
 
-#include "Vconspiracion.h"
-#include "Vconspiracion_arm810.h"
-#include "Vconspiracion_conspiracion.h"
-#include "Vconspiracion_platform.h"
-#include "Vconspiracion_sim_slave.h"
-#include "Vconspiracion_vga_domain.h"
-#include "Vconspiracion_core.h"
-#include "Vconspiracion_core_control.h"
-#include "Vconspiracion_core_control_issue.h"
-#include "Vconspiracion_core_cp15_domain.h"
-#include "Vconspiracion_core_cp15_far.h"
-#include "Vconspiracion_core_cp15_fsr.h"
-#include "Vconspiracion_core_cp15_syscfg.h"
-#include "Vconspiracion_core_cp15_ttbr.h"
-#include "Vconspiracion_core_cp15.h"
-#include "Vconspiracion_core_fetch.h"
-#include "Vconspiracion_core_mmu.h"
-#include "Vconspiracion_core_psr.h"
-#include "Vconspiracion_core_regs.h"
-#include "Vconspiracion_core_reg_file.h"
-#include "Vconspiracion_cache.h"
-#include "Vconspiracion_cache__T1.h"
-#include "Vconspiracion_cache_sram.h"
+#include "Vtop.h"
+#include "Vtop_arm810.h"
+#include "Vtop_conspiracion.h"
+#include "Vtop_platform.h"
+#include "Vtop_sim_slave.h"
+#include "Vtop_vga_domain.h"
+#include "Vtop_core.h"
+#include "Vtop_core_control.h"
+#include "Vtop_core_control_issue.h"
+#include "Vtop_core_cp15_domain.h"
+#include "Vtop_core_cp15_far.h"
+#include "Vtop_core_cp15_fsr.h"
+#include "Vtop_core_cp15_syscfg.h"
+#include "Vtop_core_cp15_ttbr.h"
+#include "Vtop_core_cp15.h"
+#include "Vtop_core_fetch.h"
+#include "Vtop_core_mmu.h"
+#include "Vtop_core_psr.h"
+#include "Vtop_core_regs.h"
+#include "Vtop_core_reg_file.h"
+#include "Vtop_cache.h"
+#include "Vtop_cache__T1.h"
+#include "Vtop_cache_sram.h"
 
-#include "../args.hxx"
+#include "args.hxx"
 
-#include "../avalon.hpp"
-#include "../const.hpp"
-#include "../mem.hpp"
-#include "../jtag_uart.hpp"
-#include "../interval_timer.hpp"
-#include "../null.hpp"
-#include "../sim_slave.hpp"
-#include "../window.hpp"
-#include "../vga.hpp"
+#include "avalon.hpp"
+#include "const.hpp"
+#include "mem.hpp"
+#include "jtag_uart.hpp"
+#include "interval_timer.hpp"
+#include "null.hpp"
+#include "sim_slave.hpp"
+#include "window.hpp"
+#include "vga.hpp"
 
 namespace
 {
@@ -307,7 +307,7 @@ int main(int argc, char **argv)
 		dup2(*control_fd, STDERR_FILENO);
 	}
 
-	Vconspiracion top;
+	Vtop top;
 
 #if VM_TRACE
 	VerilatedFstC trace;
@@ -335,8 +335,8 @@ int main(int argc, char **argv)
 	null vram_null(0x3800'0000, 64 << 20, 2);
 	window vram_window(vram, 0x0000'0000);
 
-	Vconspiracion_platform &plat = *top.conspiracion->plat;
-	display<Vconspiracion_vga_domain> vga
+	Vtop_platform &plat = *top.conspiracion->plat;
+	display<Vtop_vga_domain> vga
 	(
 		*plat.vga, 0x3800'0000, 25'175'000, 50'000'000
 	);
@@ -347,8 +347,8 @@ int main(int argc, char **argv)
 	sim_slave dbg_3(*plat.smp_dbg_3, 0x3013'0000, 32);
 	sim_slave smp_ctrl(*plat.smp_sim, 0x3014'0000, 4);
 
-	interconnect<Vconspiracion_platform> avl(plat);
-	//interconnect<Vconspiracion_vga_domain> avl_vga(plat->vga);
+	interconnect<Vtop_platform> avl(plat);
+	//interconnect<Vtop_vga_domain> avl_vga(plat->vga);
 
 	std::vector<const_map> consts;
 	for(const auto &init : *const_)
@@ -411,14 +411,14 @@ int main(int argc, char **argv)
 		std::fclose(img_file);
 	}
 
-	Vconspiracion_arm810 *const cores[] = {
+	Vtop_arm810 *const cores[] = {
 		plat.cpu_0->cpu,
 		plat.cpu_1->cpu,
 		plat.cpu_2->cpu,
 		plat.cpu_3->cpu
 	};
 
-	Vconspiracion_cache_sram *const caches[] = {
+	Vtop_cache_sram *const caches[] = {
 		plat.cache_0->sram,
 		plat.cache_1->sram,
 		plat.cache_2->sram,

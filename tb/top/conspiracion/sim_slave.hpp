@@ -3,13 +3,13 @@
 
 #include <cstdint>
 
-#include "Vconspiracion_sim_slave.h"
+#include "Vtop_sim_slave.h"
 
 #include "avalon.hpp"
 
 namespace taller::avalon
 {
-	using verilated_slave = Vconspiracion_sim_slave;
+	using verilated_slave = Vtop_sim_slave;
 
 	class sim_slave : public slave
 	{
