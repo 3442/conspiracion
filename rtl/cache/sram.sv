@@ -26,6 +26,8 @@ module cache_sram
 	// Define la cantidad de líneas de cache
 	// Cantidad de bits en addr_index = 12, entonces se le hace left shift 12
 	// espacios a 1. Osea, 4096 líneas de cache.
+	// Tenemos 4kilo-líneas de caché. Cada línea es de 128bits, osea tenemos una
+	// caché de 64KBi.
 	localparam DEPTH = 1 << $bits(addr_index);
 
 	// Estas tres secciones constituyen al caché.
