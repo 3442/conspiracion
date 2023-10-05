@@ -29,9 +29,9 @@ module cache_control
 	output logic       out_token_valid,		// se está enviando el token
 
 	// Señales para la SRAM
-	input  addr_tag    tag_rd,
-	input  line        data_rd,
-	input  line_state  state_rd,
+	input  addr_tag    tag_rd,		// valor de la tag de esa línea
+	input  line        data_rd,		// datos de la línea
+	input  line_state  state_rd,	// estado de la línnea
 
 	input  line        monitor_update,
 	input  logic       monitor_commit,
