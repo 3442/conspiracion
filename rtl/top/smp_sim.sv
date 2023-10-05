@@ -2,8 +2,9 @@ module smp_sim
 (
 	input  logic	   clk,
 	                   rst_n,
-	
-	input  logic       avl_read,
+
+	input  logic       avl_address, // No se usa, pero cocotb_bus lo requiere
+	                   avl_read,
 	                   avl_write,
 	input  logic[31:0] avl_writedata,
 	output logic[31:0] avl_readdata,

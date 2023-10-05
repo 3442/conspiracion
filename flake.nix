@@ -4,7 +4,11 @@
   outputs = { self, nixpkgs }:
     let
       system = "x86_64-linux";
-      pkgs = import nixpkgs { inherit system; config.allowUnfree = true; };
+
+      pkgs = import nixpkgs {
+        inherit system;
+        config.allowUnfree = true;
+      };
 
       crossSystem = "arm-linux";
       cross = import nixpkgs {
@@ -138,6 +142,7 @@
             pkg-config
             (python3.withPackages (py: with py; [
               cocotb
+              cocotb-bus
               find-libpython # Para cocotb
               matplotlib
               numpy
