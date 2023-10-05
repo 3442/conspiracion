@@ -80,7 +80,7 @@ module cache_control
 
 	assign mem_end = (mem_read || mem_write) && !mem_waitrequest;
 	assign mem_wait = (mem_read || mem_write) && mem_waitrequest;
-	assign mem_address = {3'b000, mem_tag, mem_index, 4'b0000};
+	assign mem_address = {`IO_CACHED, mem_tag, mem_index, 4'b0000};
 	assign mem_read_end = mem_read && !mem_waitrequest;
 
 	/* Desbloquear la línea hasta que la request del core termine garantiza

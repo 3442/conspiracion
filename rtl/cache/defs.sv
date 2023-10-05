@@ -7,11 +7,13 @@ typedef logic[15:0]  line_be;
 
 // Tamaño de una línea de cache
 typedef logic[127:0] line;
+typedef logic[27:0]  line_ptr;
 
 // Choca con typedef en core/uarch.sv
 `ifndef WORD_DEFINED
 typedef logic[29:0] ptr;
 typedef logic[31:0] word;
+typedef logic[15:0] hword;
 `define WORD_DEFINED
 `endif
 
@@ -35,6 +37,8 @@ typedef logic[11:0] addr_index;
 typedef logic[12:0] addr_tag;
 typedef logic[2:0]  addr_io_region;
 typedef logic[26:0] addr_cacheable;
+
+`define IO_CACHED 3'b000
 
 typedef struct packed
 {
@@ -67,6 +71,14 @@ typedef struct packed
 	addr_index index;
 	line       data;
 } ring_req;
+
+typedef struct packed
+{
+	logic[1:0] ttl;
+	logic      read,
+	           inval,
+	           reply;
+} perf_sample;
 
 `define TTL_END 2'b00
 `define TTL_MAX 2'b11

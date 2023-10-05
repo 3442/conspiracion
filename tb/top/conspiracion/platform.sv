@@ -57,25 +57,32 @@ module platform
 	logic        avl_waitrequest /*verilator public_flat_rw @(negedge clk_clk)*/;
 	logic[15:0]  avl_byteenable /*verilator public*/;
 
-	logic[31:0]  mem_0_address, mem_1_address, mem_2_address, mem_3_address;
-	logic        mem_0_read, mem_1_read, mem_2_read, mem_3_read;
-	logic        mem_0_write, mem_1_write, mem_2_write, mem_3_write;
-	logic[127:0] mem_0_readdata, mem_1_readdata, mem_2_readdata, mem_3_readdata;
-	logic[127:0] mem_0_writedata, mem_1_writedata, mem_2_writedata, mem_3_writedata;
-	logic        mem_0_waitrequest, mem_1_waitrequest, mem_2_waitrequest, mem_3_waitrequest;
-	logic[15:0]  mem_0_byteenable, mem_1_byteenable, mem_2_byteenable, mem_3_byteenable;
+	logic[31:0]  local_0_address, local_1_address, local_2_address, local_3_address,
+	             mem_0_address, mem_1_address, mem_2_address, mem_3_address;
+	logic        local_0_read, local_1_read, local_2_read, local_3_read,
+	             mem_0_read, mem_1_read, mem_2_read, mem_3_read;
+	logic        local_0_write, local_1_write, local_2_write, local_3_write,
+	             mem_0_write, mem_1_write, mem_2_write, mem_3_write;
+	logic[127:0] local_0_readdata, local_1_readdata, local_2_readdata, local_3_readdata,
+	             mem_0_readdata, mem_1_readdata, mem_2_readdata, mem_3_readdata;
+	logic[127:0] local_0_writedata, local_1_writedata, local_2_writedata, local_3_writedata,
+	             mem_0_writedata, mem_1_writedata, mem_2_writedata, mem_3_writedata;
+	logic        local_0_waitrequest, local_1_waitrequest, local_2_waitrequest, local_3_waitrequest,
+	             mem_0_waitrequest, mem_1_waitrequest, mem_2_waitrequest, mem_3_waitrequest;
+	logic[15:0]  local_0_byteenable, local_1_byteenable, local_2_byteenable, local_3_byteenable,
+	             mem_0_byteenable, mem_1_byteenable, mem_2_byteenable, mem_3_byteenable;
 
 	logic[31:0] cpu_0_address, cpu_1_address, cpu_2_address, cpu_3_address,
-	            dbg_0_address, dbg_1_address, dbg_2_address, dbg_3_address;
+	            dbg_0_address, dbg_1_address, dbg_2_address, dbg_3_address, perf_address;
 	logic       cpu_0_read, cpu_1_read, cpu_2_read, cpu_3_read,
-	            dbg_0_read, dbg_1_read, dbg_2_read, dbg_3_read,
-	            cpu_0_write, cpu_1_write, cpu_2_write, cpu_3_write,
-	            dbg_0_write, dbg_1_write, dbg_2_write, dbg_3_write,
-	            cpu_0_lock, cpu_1_lock, cpu_2_lock, cpu_3_lock;
+	            dbg_0_read, dbg_1_read, dbg_2_read, dbg_3_read, perf_read;
+	logic       cpu_0_write, cpu_1_write, cpu_2_write, cpu_3_write,
+	            dbg_0_write, dbg_1_write, dbg_2_write, dbg_3_write, perf_write;
+	logic       cpu_0_lock, cpu_1_lock, cpu_2_lock, cpu_3_lock;
 	logic[31:0] cpu_0_readdata, cpu_1_readdata, cpu_2_readdata, cpu_3_readdata,
-	            dbg_0_readdata, dbg_1_readdata, dbg_2_readdata, dbg_3_readdata;
+	            dbg_0_readdata, dbg_1_readdata, dbg_2_readdata, dbg_3_readdata, perf_readdata;
 	logic[31:0] cpu_0_writedata, cpu_1_writedata, cpu_2_writedata, cpu_3_writedata,
-	            dbg_0_writedata, dbg_1_writedata, dbg_2_writedata, dbg_3_writedata;
+	            dbg_0_writedata, dbg_1_writedata, dbg_2_writedata, dbg_3_writedata, perf_writedata;
 	logic       cpu_0_waitrequest, cpu_1_waitrequest, cpu_2_waitrequest, cpu_3_waitrequest,
 	            dbg_0_waitrequest, dbg_1_waitrequest, dbg_2_waitrequest, dbg_3_waitrequest;
 	logic[1:0]  cpu_0_response, cpu_1_response, cpu_2_response, cpu_3_response;
@@ -161,11 +168,13 @@ module platform
 		.*
 	);
 
-	ring_req data_0, data_1, data_2, data_3;
+	ring_req in_0, in_1, in_2, in_3, out_0, out_1, out_2, out_3;
 	ring_token token_0, token_1, token_2, token_3;
 
-	logic data_valid_0, data_valid_1, data_valid_2, data_valid_3,
-	      data_ready_0, data_ready_1, data_ready_2, data_ready_3,
+	logic in_0_valid, in_1_valid, in_2_valid, in_3_valid,
+	      in_0_ready, in_1_ready, in_2_ready, in_3_ready,
+	      out_0_valid, out_1_valid, out_2_valid, out_3_valid,
+	      out_0_ready, out_1_ready, out_2_ready, out_3_ready,
 	      token_valid_0, token_valid_1, token_valid_2, token_valid_3;
 
 	cache cache_0
@@ -180,21 +189,21 @@ module platform
 		.core_response(cpu_0_response),
 		.core_readdata(cpu_0_readdata),
 
-		.mem_waitrequest(mem_0_waitrequest),
-		.mem_readdata(mem_0_readdata),
-		.mem_address(mem_0_address),
-		.mem_read(mem_0_read),
-		.mem_write(mem_0_write),
-		.mem_writedata(mem_0_writedata),
-		.mem_byteenable(mem_0_byteenable),
+		.mem_waitrequest(local_0_waitrequest),
+		.mem_readdata(local_0_readdata),
+		.mem_address(local_0_address),
+		.mem_read(local_0_read),
+		.mem_write(local_0_write),
+		.mem_writedata(local_0_writedata),
+		.mem_byteenable(local_0_byteenable),
 
-		.in_data_valid(data_valid_3),
-		.in_data(data_3),
-		.in_data_ready(data_ready_0),
+		.in_data_valid(out_0_valid),
+		.in_data(out_0),
+		.in_data_ready(out_0_ready),
 
-		.out_data_valid(data_valid_0),
-		.out_data(data_0),
-		.out_data_ready(data_ready_1),
+		.out_data_valid(in_0_valid),
+		.out_data(in_0),
+		.out_data_ready(in_0_ready),
 
 		.in_token(token_3),
 		.in_token_valid(token_valid_3),
@@ -236,21 +245,21 @@ module platform
 		.core_response(cpu_1_response),
 		.core_readdata(cpu_1_readdata),
 
-		.mem_waitrequest(mem_1_waitrequest),
-		.mem_readdata(mem_1_readdata),
-		.mem_address(mem_1_address),
-		.mem_read(mem_1_read),
-		.mem_write(mem_1_write),
-		.mem_writedata(mem_1_writedata),
-		.mem_byteenable(mem_1_byteenable),
+		.mem_waitrequest(local_1_waitrequest),
+		.mem_readdata(local_1_readdata),
+		.mem_address(local_1_address),
+		.mem_read(local_1_read),
+		.mem_write(local_1_write),
+		.mem_writedata(local_1_writedata),
+		.mem_byteenable(local_1_byteenable),
 
-		.in_data_valid(data_valid_0),
-		.in_data(data_0),
-		.in_data_ready(data_ready_1),
+		.in_data_valid(out_1_valid),
+		.in_data(out_1),
+		.in_data_ready(out_1_ready),
 
-		.out_data_valid(data_valid_1),
-		.out_data(data_1),
-		.out_data_ready(data_ready_2),
+		.out_data_valid(in_1_valid),
+		.out_data(in_1),
+		.out_data_ready(in_1_ready),
 
 		.in_token(token_0),
 		.in_token_valid(token_valid_0),
@@ -292,21 +301,21 @@ module platform
 		.core_response(cpu_2_response),
 		.core_readdata(cpu_2_readdata),
 
-		.mem_waitrequest(mem_2_waitrequest),
-		.mem_readdata(mem_2_readdata),
-		.mem_address(mem_2_address),
-		.mem_read(mem_2_read),
-		.mem_write(mem_2_write),
-		.mem_writedata(mem_2_writedata),
-		.mem_byteenable(mem_2_byteenable),
+		.mem_waitrequest(local_2_waitrequest),
+		.mem_readdata(local_2_readdata),
+		.mem_address(local_2_address),
+		.mem_read(local_2_read),
+		.mem_write(local_2_write),
+		.mem_writedata(local_2_writedata),
+		.mem_byteenable(local_2_byteenable),
 
-		.in_data_valid(data_valid_1),
-		.in_data(data_1),
-		.in_data_ready(data_ready_2),
+		.in_data_valid(out_2_valid),
+		.in_data(out_2),
+		.in_data_ready(out_2_ready),
 
-		.out_data_valid(data_valid_2),
-		.out_data(data_2),
-		.out_data_ready(data_ready_3),
+		.out_data_valid(in_2_valid),
+		.out_data(in_2),
+		.out_data_ready(in_2_ready),
 
 		.in_token(token_1),
 		.in_token_valid(token_valid_1),
@@ -348,21 +357,21 @@ module platform
 		.core_response(cpu_3_response),
 		.core_readdata(cpu_3_readdata),
 
-		.mem_waitrequest(mem_3_waitrequest),
-		.mem_readdata(mem_3_readdata),
-		.mem_address(mem_3_address),
-		.mem_read(mem_3_read),
-		.mem_write(mem_3_write),
-		.mem_writedata(mem_3_writedata),
-		.mem_byteenable(mem_3_byteenable),
+		.mem_waitrequest(local_3_waitrequest),
+		.mem_readdata(local_3_readdata),
+		.mem_address(local_3_address),
+		.mem_read(local_3_read),
+		.mem_write(local_3_write),
+		.mem_writedata(local_3_writedata),
+		.mem_byteenable(local_3_byteenable),
 
-		.in_data_valid(data_valid_2),
-		.in_data(data_2),
-		.in_data_ready(data_ready_3),
+		.in_data_valid(out_3_valid),
+		.in_data(out_3),
+		.in_data_ready(out_3_ready),
 
-		.out_data_valid(data_valid_3),
-		.out_data(data_3),
-		.out_data_ready(data_ready_0),
+		.out_data_valid(in_3_valid),
+		.out_data(in_3),
+		.out_data_ready(in_3_ready),
 
 		.in_token(token_2),
 		.in_token_valid(token_valid_2),
@@ -422,8 +431,32 @@ module platform
 		.*
 	);
 
-	mem_interconnect mem
+	mem_interconnect mem_sim
 	(
+		.*
+	);
+
+	sim_slave perf_sim
+	(
+		.read(perf_read),
+		.write(perf_write),
+		.address(perf_address),
+		.readdata(perf_readdata),
+		.writedata(perf_writedata),
+		.waitrequest(0),
+
+		.*
+	);
+
+	perf_monitor perf
+	(
+		.perf_address(perf_address[5:0]),
+
+		.local_0_address(local_0_address[31:4]),
+		.local_1_address(local_1_address[31:4]),
+		.local_2_address(local_2_address[31:4]),
+		.local_3_address(local_3_address[31:4]),
+
 		.*
 	);
 

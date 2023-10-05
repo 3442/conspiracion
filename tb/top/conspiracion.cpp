@@ -346,6 +346,7 @@ int main(int argc, char **argv)
 	sim_slave dbg_2(*plat.smp_dbg_2, 0x3012'0000, 32);
 	sim_slave dbg_3(*plat.smp_dbg_3, 0x3013'0000, 32);
 	sim_slave smp_ctrl(*plat.smp_sim, 0x3014'0000, 4);
+	sim_slave perf_monitor(*plat.perf_sim, 0x3015'0000, 256);
 
 	interconnect<Vtop_platform> avl(plat);
 	//interconnect<Vtop_vga_domain> avl_vga(plat->vga);
@@ -367,6 +368,7 @@ int main(int argc, char **argv)
 	avl.attach(dbg_2);
 	avl.attach(dbg_3);
 	avl.attach(smp_ctrl);
+	avl.attach(perf_monitor);
 	avl.attach_intc(intc);
 
 	for (auto &slave : consts)

@@ -8,6 +8,7 @@
 `ifndef WORD_DEFINED
 typedef logic[29:0] ptr;
 typedef logic[31:0] word;
+typedef logic[15:0] hword;
 `define WORD_DEFINED
 `endif
 
