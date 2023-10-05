@@ -11,7 +11,10 @@
 #include <unistd.h>
 
 #include <verilated.h>
-#include <verilated_vcd_c.h>
+
+#if VM_TRACE
+#include <verilated_fst_c.h>
+#endif
 
 #include "Vconspiracion.h"
 #include "Vconspiracion_arm810.h"
@@ -258,14 +261,19 @@ int main(int argc, char **argv)
 		parser, "addr,filename", "Load a file", {"load"}
 	);
 
+	args::ValueFlag<std::string> coverage_out
+	(
+		parser, "coverage", "Coverage output file", {"coverage"}
+	);
+
+	args::ValueFlag<std::string> trace_out
+	(
+		parser, "trace", "trace output file", {"trace"}
+	);
+
 	args::Positional<std::string> image
 	(
 		parser, "image", "Executable image to run", args::Options::Required
-	);
-
-	args::Positional<std::string> coverage_out
-	(
-		parser, "coverage-out", "Coverage output file"
 	);
 
 	try
@@ -302,13 +310,13 @@ int main(int argc, char **argv)
 	Vconspiracion top;
 
 #if VM_TRACE
-	VerilatedVcdC trace;
+	VerilatedFstC trace;
 
-	bool enable_trace = std::getenv("TRACE");
+	auto enable_trace = static_cast<bool>(trace_out);
 	if (enable_trace) {
 		Verilated::traceEverOn(true);
 		top.trace(&trace, 0);
-		trace.open("trace.vcd");
+		trace.open(trace_out->c_str());
 	}
 #else
 	bool enable_trace = false;
@@ -448,10 +456,8 @@ int main(int argc, char **argv)
 		}
 
 #if VM_TRACE
-		if(enable_trace)
-		{
+		if (enable_trace)
 			trace.dump(time++);
-		}
 #endif
 	};
 

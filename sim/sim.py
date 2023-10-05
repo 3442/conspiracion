@@ -6,13 +6,15 @@ parser = argparse.ArgumentParser()
 parser.add_argument('module_path')
 parser.add_argument('verilated')
 parser.add_argument('image')
-parser.add_argument('coverage_out', nargs='?')
+parser.add_argument('--coverage')
+parser.add_argument('--trace')
 args = parser.parse_args()
 
 module_path = args.module_path
 verilated = args.verilated
 image = args.image
-coverage_out = args.coverage_out
+coverage_out = args.coverage
+trace = args.trace
 
 test_name = pathlib.Path(module_path).stem
 module = None
@@ -409,7 +411,10 @@ init_regs = None
 exec_args.append(image)
 
 if coverage_out:
-    exec_args.append(coverage_out)
+    exec_args.extend(['--coverage', coverage_out])
+
+if trace:
+    exec_args.extend(['--trace', trace])
 
 exec_args.append(f'+verilator+seed+{seed}')
 if not os.getenv('SIM_PULLX', 0):

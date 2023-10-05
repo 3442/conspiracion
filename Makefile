@@ -1,5 +1,5 @@
 TOP           := conspiracion
-VCD_DIR       := vcd
+FST_DIR       := trace
 OBJ_DIR       := obj
 COV_DIR       := cov
 RTL_DIR       := rtl
@@ -37,7 +37,7 @@ CC_CPU := -mcpu=arm810
 VFLAGS ?= \
 	--x-assign $(X_MODE) --x-initial $(X_MODE) \
 	$(if $(ENABLE_THREADS),--threads $(shell nproc)) \
-	$(if $(DISABLE_TRACE),,--trace) \
+	$(if $(DISABLE_TRACE),,--trace --trace-fst) \
 	$(if $(DISABLE_COV),,--coverage)
 
 RTL_FILES  = $(shell find $(RTL_DIR)/ ! -path '$(RTL_DIR)/top/*' -type f -name '*.sv')
@@ -46,10 +46,12 @@ TB_FILES   = $(shell find $(TB_DIR)/ ! -path '$(TB_DIR)/top/*' -type f -name '*.
 
 SIMS := $(patsubst $(TB_SIM_DIR)/%.py,%,$(wildcard $(TB_SIM_DIR)/*.py))
 
+GIT_REV := $(shell if [ -d .git ]; then echo -$$(git rev-parse --short HEAD); fi)
+
 all: sim
 
 clean:
-	rm -rf $(DIST_DIR) $(OBJ_DIR) $(VCD_DIR) $(COV_DIR)
+	rm -rf $(DIST_DIR) $(OBJ_DIR) $(FST_DIR) $(COV_DIR)
 
 dist: $(if $(DISABLE_COV),,cov)
 	@mkdir -p $(DIST_DIR)
@@ -57,26 +59,21 @@ dist: $(if $(DISABLE_COV),,cov)
 	@git ls-files | xargs cp --parents -rvt $(DIST_OBJ_DIR)/src
 	@mv -vt $(DIST_OBJ_DIR) $(DIST_OBJ_DIR)/src/README.md
 	@$(if $(DISABLE_COV),,cp -rvt $(DIST_OBJ_DIR)/results $(COV_DIR))
+	@$(if $(DISABLE_TRACE),,cp -rvt $(DIST_OBJ_DIR)/results $(FST_DIR))
 	@[ -f $(RBF_OUT_DIR)/$(TOP).rbf ] \
 		&& cp -vt $(DIST_OBJ_DIR)/bitstream $(RBF_OUT_DIR)/$(TOP).rbf \
 		|| echo "Warning: missing bitstream at $(RBF_OUT_DIR)/$(TOP).rbf" >&2
 	cd $(DIST_OBJ_DIR) && zip -qr \
-		$(shell pwd)/$(DIST_DIR)/$(TOP)-$(shell git rev-parse --short HEAD)-$(shell date +'%Y%m%d-%H%M%S').zip *
-
-trace: trace/$(TOP)
-
-trace/%: exe/% $(VCD_DIR)/%
-	cd $(VCD_DIR)/$* && ../../$(OBJ_DIR)/$*/V$*
-
-$(VCD_DIR)/%:
-	mkdir -p $@
+		$(shell pwd)/$(DIST_DIR)/$(TOP)$(GIT_REV)-$(shell date +'%Y%m%d-%H%M%S').zip *
 
 sim: $(addprefix sim/,$(SIMS))
 
 sim/%: $(SIM_DIR)/sim.py $(TB_SIM_DIR)/%.py exe/$(TOP) $(SIM_OBJ_DIR)/%.bin
+	@$(if $(DISABLE_TRACE),,mkdir -p $(FST_DIR)/$*)
 	@$< $(TB_SIM_DIR)/$*.py $(OBJ_DIR)/$(TOP)/V$(TOP) \
 		$(SIM_OBJ_DIR)/$*.bin \
-		$(if $(DISABLE_COV),,$(SIM_OBJ_DIR)/$*.cov)
+		$(if $(DISABLE_COV),,--coverage $(SIM_OBJ_DIR)/$*.cov) \
+		$(if $(DISABLE_TRACE),,--trace $(FST_DIR)/$*/trace$(GIT_REV).fst)
 
 vmlaunch: $(SIM_DIR)/sim.py $(SIM_DIR)/gdbstub.py exe/$(TOP)
 	@ENABLE_VIDEO=1 $< $(SIM_DIR)/gdbstub.py $(OBJ_DIR)/$(TOP)/V$(TOP) build/u-boot.bin

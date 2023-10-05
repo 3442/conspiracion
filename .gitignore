@@ -34,6 +34,7 @@ __pycache__
 
 hps_sdram_p0_summary.csv
 vcd/
+trace/
 cov/
 obj/
 build/
@@ -44,6 +45,7 @@ platform.sopcinfo
 hps_isw_handoff/
 *~
 *.vcd
+*.fst
 qmegawiz_errors_log.txt
 cr_ie_info.json
 u-boot
