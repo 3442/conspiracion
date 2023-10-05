@@ -21,9 +21,11 @@ module cache_sram
 	// Existe un mito que habla de true dual-ports con byte-enables, dudo mucho que sea real:
 	// https://www.intel.com/content/www/us/en/docs/programmable/683082/21-3/ram-with-byte-enable-signals.html
 
+	// Es una cache one way: cada índice mapea a cada línea de cache (directamente mapeada)
+
 	// Define la cantidad de líneas de cache
-	// Cantidad de bits en addr_index = 9, entonces se le hace left shift 9
-	// espacios a 1. Osea, 512.
+	// Cantidad de bits en addr_index = 12, entonces se le hace left shift 12
+	// espacios a 1. Osea, 4096 líneas de cache.
 	localparam DEPTH = 1 << $bits(addr_index);
 
 	// Estas tres secciones constituyen al caché.
