@@ -12,7 +12,7 @@ spin_lock:
 	msr     cpsr_c, r2
 	mov     r3, #1
 1:	ldrex   r2, [r0]				@ se carga el valor del lock
-	teq     r2, #0					@ se revisa si el valor del lock, si es 1, se bringa al jump
+	teq     r2, #0					@ se revisa si el valor del lock, si es 1, se brinca al jump
 	strexeq r2, r3, [r0]			@ trata de guardar r3 en r0, pero solo si el monitor se lo permite
 	teqeq   r2, #0					@ revisa si en efecto se hizo el store o no
 	bne     1b						@ regresa al inicio

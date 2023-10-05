@@ -21,6 +21,14 @@ module cache_monitor
 	output logic       monitor_commit
 );
 
+	// Este módulo provee capacidad para spin_locks (básicamente mutexes) para
+	// proteger una sección de código a través de spin lock/unlock.
+	// Esto básicamente es la implemenntación de las instrucciones de ARM
+	// ldrex, strexeq, que originalmente no son parte ARMv4, esto implica
+	// que este quad-core es un frankenstein entre ARMv4 y alguna versión
+	// posterior que sí implementa esas instrucciones.
+
+
 	line monitor_rd, monitor_wr;
 	word update_3, update_2, update_1, update_0;
 	logic dirty, done, hit, known;
