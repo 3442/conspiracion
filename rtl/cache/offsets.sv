@@ -2,7 +2,8 @@
 
 module cache_offsets
 (
-	input  addr_offset core_offset,		// El offset es un input pero no un output porque se mapea
+	input  addr_offset core_offset,				// El offset es un input pero no
+												// un output porque se mapea
 	input  word_be     core_byteenable,
 	input  word        core_writedata,
 	input  line        core_readdata_line,
@@ -10,24 +11,36 @@ module cache_offsets
 
 	output line        core_data_wr,
 	                   core_writedata_line,
-	output word        core_readdata,	// Readdata pasa de ser una line en el input a una word por el offset
+	output word        core_readdata,			// Readdata pasa de ser una line
+												// en el input a una word por el
+												// offset
 	output line_be     core_byteenable_line
 );
-	// Simplificar offset, para que sea transparente para la cache
+	
+	// Este módulo sirve para simplificar offsets, para que sean transparentes
+	// para la cache. El caché nunca ve la parte de offset que hay en las
+	// direccciones.
+
 	line line_mask;
 
-	// El byteenable se utiliza para leer o escribir en cache algo diferente a una word
+	// El byteenable (be) se utiliza cuando se quiere leer o escribir en cache
+	// un solo byte, en lugar de una word entera
 	word be_extend, mask3, mask2, mask1, mask0;
 	word_be be3, be2, be1, be0;
 
+	// Concatena la misma word 4 veces.
 	assign core_writedata_line = {4{core_writedata}};
+
+	// Se prepara la mask de byte enable para cada word.
 	assign core_byteenable_line = {be3, be2, be1, be0};
 
-	// Concatenar para extender a una word ([31:0]) según el valor de byteenable que es [3:0]
+	// Concatenar para extender a una word ([31:0]). El valor de be determina
+	// a cuál word se va a extender.
 	assign be_extend = {{8{core_byteenable[3]}}, {8{core_byteenable[2]}},
 	                    {8{core_byteenable[1]}}, {8{core_byteenable[0]}}};
 
-	assign line_mask = {mask3, mask2, mask1, mask0};		// Máscara para toda la línea
+	// Máscara para toda la línea
+	assign line_mask = {mask3, mask2, mask1, mask0};
 	assign core_data_wr = (core_writedata_line & line_mask) | (data_rd & ~line_mask);
 
 	always_comb begin
