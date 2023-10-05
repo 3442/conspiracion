@@ -140,6 +140,16 @@ module cache_control
 
 		in_data_ready = !in_hold_valid;
 
+		// Maquina de estados maestra de la SRAM.
+		//
+		// Esta maquina define a lo que el controlador de SRAM está dándole
+		// prioridad, ya que SRAM tiene un único puerto de read/write,
+		// entonces tiene que decidir si le da prioridad al core o al bus.
+		// 
+		// ACCEPT:	recibiendo mensajes
+		// CORE:	cosas relacionadas a cada core específico (monitor, etc.)
+		// SNOOP:	vigilando memoria y "ejecutando" MESI
+		// REPLY:	enviando mensajes
 		unique case (state)
 			ACCEPT: begin
 				// Si es el último nodo en recibir el mensaje y la request no es de lectura
@@ -338,6 +348,14 @@ module cache_control
 		next_state = ACCEPT;
 
 		unique case (state)
+			// Le da prioridad a SNOOP, ya que la prioridad está en
+			// hacer forward de mensajes.
+
+			// Es mejor darle prioridad al SNOOP, ya que si se le da prioridad
+			// a CORE, podrían suceder deadlocks o alunos mensajes nunca
+			// podrían terminar de enviarse.
+
+			// El orden de prioridad es SNOOP y REPLY, DEBUG, CORE
 			ACCEPT: begin
 				if (accept_snoop)
 					next_state = SNOOP;
