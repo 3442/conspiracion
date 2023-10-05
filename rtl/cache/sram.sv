@@ -26,8 +26,8 @@ module cache_sram
 	// espacios a 1. Osea, 512.
 	localparam DEPTH = 1 << $bits(addr_index);
 
-	// Estas tres secciones constituyen a una línea de caché.
-	// data_file: Donde se guarda la información cacheada
+	// Estas tres secciones constituyen al caché.
+	// data_file: Donde se guarda la información cacheada.
 	// tag_file: Se guardan los tags de las líneas de caché.
 	// state_file: Se guarda el estado de cada línea de caché. (Acá están todos los estados de MESI)
 	line data_file[DEPTH] /*verilator public*/;
