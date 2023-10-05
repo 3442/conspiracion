@@ -49,9 +49,9 @@ _boot_num:
 
 _irq_entry:
 	ldr  sp, =_irq_stack
-	push {r0-r11, lr}
+	push {r0-r12, lr}
 	bl   irq
-	pop  {r0-r11, lr}
+	pop  {r0-r12, lr}
 	subs pc, lr, #4
 
 .weak undefined, swi, data_abort, prefetch_abort
