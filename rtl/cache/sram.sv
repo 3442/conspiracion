@@ -21,6 +21,8 @@ module cache_sram
 	// Existe un mito que habla de true dual-ports con byte-enables, dudo mucho que sea real:
 	// https://www.intel.com/content/www/us/en/docs/programmable/683082/21-3/ram-with-byte-enable-signals.html
 
+	// Define la cantidad de líneas de cache
+	// $bits(addr_index) = 9 --> 1 << 9 = 512
 	localparam DEPTH = 1 << $bits(addr_index);
 
 	line data_file[DEPTH] /*verilator public*/;
