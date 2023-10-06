@@ -28,3 +28,23 @@ spin_unlock:
 	str     r2, [r0]
 	msr     cpsr_c, r1
 	mov     pc, lr
+
+.global compare_exchange_64
+compare_exchange_64:
+	push    {r4, r5, r6, r7, r8}
+	ldr     r4, [r1]
+	ldr     r5, [r1, #4]
+	add     r8, r0, #4
+	ldrex   r6, [r0]
+	ldrex   r7, [r8]
+	teq     r4, r6
+	teqeq   r5, r7
+	strexeq r4, r2, [r0]
+	strexeq r4, r3, [r8]
+	teqeq   r4, #0
+	moveq   r0, #1
+	movne   r0, #0
+	strne   r6, [r1]
+	strne   r7, [r1, #4]
+	pop     {r4, r5, r6, r7, r8}
+	mov     pc, lr

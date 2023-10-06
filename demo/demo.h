@@ -3,15 +3,16 @@
 
 #define NUM_CPUS 4
 
-struct lock
+struct __attribute__((aligned(16))) lock
 {
 	volatile unsigned val;
 };
 
-struct cpu
+extern struct __attribute__((aligned(16))) cpu
 {
-	unsigned num;
-};
+	         unsigned           num;
+	volatile unsigned long long mailbox;
+} all_cpus[NUM_CPUS];
 
 /* Esto viola la ABI, pero no importa porque no dependemos de bibliotecas
  * https://gcc.gnu.org/onlinedocs/gcc/Global-Register-Variables.html
@@ -24,7 +25,7 @@ void spin_unlock(struct lock *lock, unsigned irq_save);
 
 void console_init(void);
 void print(const char *fmt, ...);
-void read_line(char *vuf, unsigned size);
+void read_line(char *buf, unsigned size);
 
 void run_cpu(unsigned num);
 void run_cpus(unsigned mask);
@@ -48,5 +49,12 @@ void cache_debug(unsigned cpu, void *ptr);
 
 void perf_show(unsigned cpu);
 void perf_clear(unsigned cpu);
+
+void do_read(void *ptr);
+void do_write(void *ptr, unsigned val);
+void remote_send(unsigned cpu, void *ptr, int write, unsigned val);
+void remote_recv(void **ptr, int *write, unsigned *val);
+
+int compare_exchange_64(volatile unsigned long long *p, unsigned long long *old, unsigned long long val);
 
 #endif
