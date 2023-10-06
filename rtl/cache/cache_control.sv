@@ -43,7 +43,14 @@ module cache_control
 
 	input  logic       locked,
 	                   may_send,
+	                   out_stall,
+	                   in_hold_valid,
+	                   last_hop,
+	input  ring_req    in_hold,
 	output logic       send,
+	                   send_read,
+	                   send_inval,
+	                   set_reply,
 	                   lock_line,
 	                   unlock_line,
 
@@ -66,13 +73,9 @@ module cache_control
 		REPLY
 	} state, next_state;
 
-	logic accept_snoop, debug, end_reply, in_hold_valid, last_hop,
-	      mem_begin, mem_end, mem_read_end, mem_wait, out_stall, wait_reply,
-	      replace, retry, send_inval, send_read, snoop_hit, set_reply,
-		  writeback;
-
-	// in_hold: el paquete actual
-	ring_req in_hold, send_data, fwd_data, stall_data, out_data_next;
+	logic accept_snoop, debug, end_reply,
+	      mem_begin, mem_end, mem_read_end, mem_wait, wait_reply,
+	      replace, retry, snoop_hit, writeback;
 
 	addr_tag mem_tag;
 	addr_index mem_index;
@@ -91,22 +94,9 @@ module cache_control
 
 	// Replace si no coinciden las tags y el estado no es INVALID
 	assign replace = tag_rd != core_tag && state_rd != INVALID;
-	assign last_hop = in_hold.ttl == `TTL_END;	//Indica si es el último salto
 	assign snoop_hit = tag_rd == in_hold.tag;	//Snoop hit si coinciden las tags
 	// Aceptar snoop si no es el último nodo y se tiene un mensaje válido
 	assign accept_snoop = in_hold_valid && !last_hop && (in_hold.inval || !in_hold.reply);
-
-	assign out_data = out_stall ? stall_data : out_data_next;
-	assign out_data_next = send ? send_data : fwd_data;
-	assign out_data_valid = out_stall || send || (in_hold_valid && !last_hop && in_data_ready);
-
-	assign send_data.tag = core_tag;
-	assign send_data.ttl = `TTL_MAX;	   // Acá se inicializa el valor máximo de TTL
-	assign send_data.data = fwd_data.data; // Esto evita muchos muxes
-	assign send_data.read = send_read;
-	assign send_data.index = core_index;
-	assign send_data.inval = send_inval;
-	assign send_data.reply = 0;
 
 	always_comb begin
 		tag_wr = core_tag;
@@ -338,16 +328,6 @@ module cache_control
 	end
 
 	always_comb begin
-		fwd_data = in_hold;
-		fwd_data.ttl = in_hold.ttl - 2'b1;
-
-		if (set_reply) begin
-			fwd_data.data = data_rd;
-			fwd_data.reply = 1;
-		end
-	end
-
-	always_comb begin
 		debug = 0;
 		next_state = ACCEPT;
 
@@ -383,9 +363,6 @@ module cache_control
 
 	always_ff @(posedge clk or negedge rst_n)
 		if (!rst_n) begin
-			in_hold_valid <= 0;
-			out_stall <= 0;
-
 			wait_reply <= 0;
 
 			mem_read <= 0;
@@ -393,11 +370,6 @@ module cache_control
 
 			debug_ready <= 0;
 		end else begin
-			if (in_data_ready)
-				in_hold_valid <= in_data_valid;
-
-			out_stall <= out_data_valid && !out_data_ready;
-
 			if (send)
 				wait_reply <= 1;
 
@@ -417,18 +389,11 @@ module cache_control
 			debug_ready <= debug;
 		end
 
-	always_ff @(posedge clk) begin
-		if (in_data_ready)
-			in_hold <= in_data;
-
-		if (!out_stall)
-			stall_data <= out_data_next;
-
+	always_ff @(posedge clk)
 		if (mem_begin) begin
 			mem_tag <= writeback ? tag_rd : core_tag;
 			mem_index <= index_wr;
 			mem_writedata <= data_rd;
 		end
-	end
 
 endmodule
