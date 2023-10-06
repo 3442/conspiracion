@@ -41,6 +41,7 @@ set_fileset_property QUARTUS_SYNTH ENABLE_RELATIVE_INCLUDE_PATHS false
 set_fileset_property QUARTUS_SYNTH ENABLE_FILE_OVERWRITE_MODE false
 add_fileset_file cache.sv SYSTEM_VERILOG PATH rtl/cache/cache.sv TOP_LEVEL_FILE
 add_fileset_file cache_control.sv SYSTEM_VERILOG PATH rtl/cache/cache_control.sv
+add_fileset_file token.sv SYSTEM_VERILOG PATH rtl/cache/token.sv
 add_fileset_file defs.sv SYSTEM_VERILOG PATH rtl/cache/defs.sv
 add_fileset_file offsets.sv SYSTEM_VERILOG PATH rtl/cache/offsets.sv
 add_fileset_file routing.sv SYSTEM_VERILOG PATH rtl/cache/routing.sv

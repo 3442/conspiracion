@@ -1,7 +1,6 @@
 `include "cache/defs.sv"
 
 module cache_control
-#(parameter TOKEN_AT_RESET=0)
 (
 	input  logic       clk,
 	                   rst_n,
@@ -22,22 +21,10 @@ module cache_control
 	output ring_req    out_data,			// lo que se envía
 	output logic       out_data_valid,		// este caché está enviando datos
 
-	input  ring_token  in_token,			// input del token
-	input  logic       in_token_valid,		// se está recibiendo el token
-
-	output ring_token  out_token,			// output del token
-	output logic       out_token_valid,		// se está enviando el token
-
 	// Señales para la SRAM
 	input  addr_tag    tag_rd,		// valor de la tag de esa línea
 	input  line        data_rd,		// datos de la línea
 	input  line_state  state_rd,	// estado de la línnea
-
-	input  line        monitor_update,
-	input  logic       monitor_commit,
-	output logic       monitor_acquire,
-	                   monitor_fail,
-	                   monitor_release,
 
 	output addr_index  index_rd,
 	                   index_wr,
@@ -54,9 +41,21 @@ module cache_control
 	                   mem_write,
 	output line        mem_writedata,
 
+	input  logic       locked,
+	                   may_send,
+	output logic       send,
+	                   lock_line,
+	                   unlock_line,
+
 	input  logic       dbg_write,
 	input  addr_index  debug_index,
-	output logic       debug_ready
+	output logic       debug_ready,
+
+	input  line        monitor_update,
+	input  logic       monitor_commit,
+	output logic       monitor_acquire,
+	                   monitor_fail,
+	                   monitor_release
 );
 
 	enum int unsigned
@@ -67,10 +66,10 @@ module cache_control
 		REPLY
 	} state, next_state;
 
-	logic accept_snoop, debug, end_reply, in_hold_valid, last_hop, lock_line,
-	      locked, may_send, may_send_if_token_held, mem_begin, mem_end, mem_read_end,
-	      mem_wait, out_stall, wait_reply, replace, retry, send, send_inval,
-	      send_read, snoop_hit, set_reply, unlock_line, writeback;
+	logic accept_snoop, debug, end_reply, in_hold_valid, last_hop,
+	      mem_begin, mem_end, mem_read_end, mem_wait, out_stall, wait_reply,
+	      replace, retry, send_inval, send_read, snoop_hit, set_reply,
+		  writeback;
 
 	// in_hold: el paquete actual
 	ring_req in_hold, send_data, fwd_data, stall_data, out_data_next;
@@ -96,14 +95,6 @@ module cache_control
 	assign snoop_hit = tag_rd == in_hold.tag;	//Snoop hit si coinciden las tags
 	// Aceptar snoop si no es el último nodo y se tiene un mensaje válido
 	assign accept_snoop = in_hold_valid && !last_hop && (in_hold.inval || !in_hold.reply);
-
-	// Solo se puede iniciar un request si se tiene el token y el token es
-	// válido
-	assign may_send = may_send_if_token_held && in_token_valid;
-	assign may_send_if_token_held
-	     = (!in_token.e2.valid || in_token.e2.index != core_index || in_token.e2.tag != core_tag)
-	    && (!in_token.e1.valid || in_token.e1.index != core_index || in_token.e1.tag != core_tag)
-	    && (!in_token.e0.valid || in_token.e0.index != core_index || in_token.e0.tag != core_tag);
 
 	assign out_data = out_stall ? stall_data : out_data_next;
 	assign out_data_next = send ? send_data : fwd_data;
@@ -392,13 +383,9 @@ module cache_control
 
 	always_ff @(posedge clk or negedge rst_n)
 		if (!rst_n) begin
-			out_token <= {($bits(out_token)){1'b0}};
-			out_token_valid <= TOKEN_AT_RESET;
-
 			in_hold_valid <= 0;
 			out_stall <= 0;
 
-			locked <= 0;
 			wait_reply <= 0;
 
 			mem_read <= 0;
@@ -406,24 +393,10 @@ module cache_control
 
 			debug_ready <= 0;
 		end else begin
-			out_token.e0.tag <= core_tag;
-			out_token.e0.index <= core_index;
-			out_token.e0.valid <= may_send_if_token_held && (send || locked) && !unlock_line;
-
-			out_token.e2 <= in_token.e1;
-			out_token.e1 <= in_token.e0;
-			out_token_valid <= in_token_valid;
-
 			if (in_data_ready)
 				in_hold_valid <= in_data_valid;
 
 			out_stall <= out_data_valid && !out_data_ready;
-
-			if (lock_line)
-				locked <= 1;
-
-			if (unlock_line)
-				locked <= 0;
 
 			if (send)
 				wait_reply <= 1;

@@ -60,9 +60,9 @@ module cache
 	word cache_mem_address;
 	line cache_mem_writedata;
 	logic cache_core_waitrequest, cache_mem_waitrequest, cache_mem_read, cache_mem_write,
-	      debug_ready;
+	      debug_ready, send, lock_line, unlock_line;
 
-	cache_control #(.TOKEN_AT_RESET(TOKEN_AT_RESET)) control
+	cache_control control
 	(
 		.core_read(cache_core_read),
 		.core_write(cache_core_write),
@@ -72,6 +72,14 @@ module cache
 		.mem_writedata(cache_mem_writedata),
 		.mem_read(cache_mem_read),
 		.mem_write(cache_mem_write),
+
+		.*
+	);
+
+	logic locked, may_send;
+
+	cache_token #(.TOKEN_AT_RESET(TOKEN_AT_RESET)) token
+	(
 		.*
 	);
 
