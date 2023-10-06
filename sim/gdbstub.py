@@ -1,8 +1,12 @@
-import sys, socket, traceback
+import os.path, sys, socket, traceback
 
-loads = {0x0100000: 'build/uImage',
-         0x1000000: 'build/initrd.img',
-        }
+loads = {}
+
+if os.path.exists('build/uImage'):
+    loads[0x0100000] = 'build/uImage'
+
+if os.path.exists('build/initrd.img'):
+    loads[0x1000000] = 'build/initrd.img'
 
 cycles = None
 enable_tty = True
@@ -24,14 +28,14 @@ def fatal():
     stop_reason = 'fatal'
     yield_to_gdb()
 
-def do_output(text):
-    if text is None:
-        return not is_halted()
-    elif not client:
-        return False
+#def do_output(text):
+#    if text is None:
+#        return not is_halted()
+#    elif not client:
+#        return False
 
-    reply(b'O' + hexout(text.encode('ascii')))
-    return True
+#    reply(b'O' + hexout(text.encode('ascii')))
+#    return True
 
 buffer = b''
 stop_reason = None
