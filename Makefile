@@ -15,7 +15,6 @@ RBF_OUT_DIR   := output_files
 VERILATOR     ?= verilator
 COCOTB_CONFIG ?= cocotb-config
 GENHTML       ?= genhtml
-COCOTB_CONFIG ?= cocotb-config
 CROSS_CC      := $(CROSS_COMPILE)gcc
 CROSS_OBJCOPY := $(CROSS_COMPILE)objcopy
 CROSS_CFLAGS  := -O3 -Wall -Wextra -Werror
@@ -56,7 +55,7 @@ VFLAGS ?= \
 
 VFLAGS += -O3 --cc --exe -y $(RTL_DIR) --prefix Vtop
 
-LIBPYTHON = $(shell $(COCOTB_CONFIG) --libpython)
+LIBPYTHON := $(shell $(COCOTB_CONFIG) --libpython)
 
 COCOTB_LDFLAGS := $(LDFLAGS) \
 	-Wl,-rpath,$(shell $(COCOTB_CONFIG) --lib-dir) \
@@ -180,7 +179,7 @@ exe/%: $(OBJ_DIR)/%/Vtop.mk
 	@CXXFLAGS="$(CXXFLAGS) -iquote $(ROOT)/$(TB_DIR)/top/$*" \
 		$(MAKE) -C $(OBJ_DIR)/$* -f Vtop.mk
 
-.PRECIOUS: $(OBJ_DIR)/%.mk $(SIM_OBJ_DIR)/% $(SIM_OBJ_DIR)/%.o $(SIM_OBJ_DIR)/%.cov %.bin
+.PRECIOUS: $(OBJ_DIR)/%.mk $(SIM_OBJ_DIR)/% $(SIM_OBJ_DIR)/%.o $(SIM_OBJ_DIR)/%.cov %.bin $(FST_DIR)/%
 .PHONY: all clean dist demo sim
 
 .SECONDEXPANSION:
@@ -188,7 +187,8 @@ exe/%: $(OBJ_DIR)/%/Vtop.mk
 $(OBJ_DIR)/%.mk: \
   $(RTL_DIR)/top/$$(word 1,$$(subst /, ,$$*)).sv \
   $$(shell find $(RTL_DIR)/top/$$(dir $$*) -type f 2>/dev/null) \
-  $(RTL_FILES) $(TB_FILES) $(TB_DIR)/top/$$(word 1,$$(subst /, ,$$*)).cpp \
+  $(RTL_FILES) $(TB_FILES) \
+  $$(shell find $(TB_DIR)/top/$$(word 1,$$(subst /, ,$$*)).cpp -type f 2>/dev/null) \
   $$(shell find $(TB_DIR)/top/$$(dir $$*) -type f 2>/dev/null)
 
 	mkdir -p $(dir $@)

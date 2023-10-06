@@ -1,4 +1,4 @@
-module smp_sim
+module test_smp
 (
 	input  logic	   clk,
 	                   rst_n,
