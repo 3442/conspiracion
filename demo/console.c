@@ -210,7 +210,7 @@ void irq(void)
 		switch (c) {
 			case 0x7f: // DEL
 				if (input_len > 0) {
-					--input_len;
+					input_buf[--input_len] = '\0';
 					print_str("\b \b");
 				}
 
