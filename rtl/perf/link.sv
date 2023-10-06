@@ -11,7 +11,7 @@ module perf_link
 
 	input  logic      in_right_valid,
 	input  ring_req   in_right,
-	output logic      in_right_ready,
+	input  logic      in_right_ready,
 
 	input  logic      out_left_ready,
 	output ring_req   out_left,
