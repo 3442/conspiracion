@@ -57,16 +57,28 @@ module cache
 		.*
 	);
 
-	word cache_mem_address;
-	line cache_mem_writedata;
-	logic cache_core_waitrequest, cache_mem_waitrequest, cache_mem_read, cache_mem_write,
-	      debug_ready, send, send_read, send_inval, set_reply, lock_line, unlock_line;
+	logic cache_core_waitrequest, debug_ready, send, send_read, send_inval,
+	      set_reply, lock_line, unlock_line, mem_begin, writeback;
 
 	cache_control control
 	(
 		.core_read(cache_core_read),
 		.core_write(cache_core_write),
 		.core_waitrequest(cache_core_waitrequest),
+
+		.*
+	);
+
+	word cache_mem_address;
+	line cache_mem_writedata;
+	logic cache_mem_waitrequest, cache_mem_read, cache_mem_write,
+	      mem_end, mem_read_end, mem_wait;
+
+	addr_tag mem_tag;
+	addr_index mem_index;
+
+	cache_mem mem
+	(
 		.mem_waitrequest(cache_mem_waitrequest),
 		.mem_address(cache_mem_address),
 		.mem_writedata(cache_mem_writedata),

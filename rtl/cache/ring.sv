@@ -10,7 +10,7 @@ module cache_ring
 
 	input  ring_req    in_data,				// lo que se recibe
 	input  logic       in_data_valid,		// este caché está recibiendo
-	output logic       in_data_ready,		// este caché esta listo para recibir
+	                   in_data_ready,
 
 	input  logic       out_data_ready,		// este caché está listo para enviar
 	output ring_req    out_data,			// lo que se envía

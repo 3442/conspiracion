@@ -2,67 +2,63 @@
 
 module cache_control
 (
-	input  logic       clk,
-	                   rst_n,
+	input  logic      clk,
+	                  rst_n,
 
-	input  addr_tag    core_tag,
-	input  addr_index  core_index,
-	input  logic       core_read,
-	                   core_write,
-	                   core_lock,
-	input  line        core_data_wr,
-	output logic       core_waitrequest,
+	input  addr_tag   core_tag,
+	input  addr_index core_index,
+	input  logic      core_read,
+	                  core_write,
+	                  core_lock,
+	input  line       core_data_wr,
+	output logic      core_waitrequest,
 
-	input  ring_req    in_data,				// lo que se recibe
-	input  logic       in_data_valid,		// este caché está recibiendo
-	output logic       in_data_ready,		// este caché esta listo para recibir
-
-	input  logic       out_data_ready,		// este caché está listo para enviar
-	output ring_req    out_data,			// lo que se envía
-	output logic       out_data_valid,		// este caché está enviando datos
+	output logic      in_data_ready,		// este caché esta listo para recibir
+	input  logic      out_data_ready,		// este caché está listo para enviar
 
 	// Señales para la SRAM
-	input  addr_tag    tag_rd,		// valor de la tag de esa línea
-	input  line        data_rd,		// datos de la línea
-	input  line_state  state_rd,	// estado de la línnea
+	input  addr_tag   tag_rd,		// valor de la tag de esa línea
+	input  line_state state_rd,	// estado de la línnea
 
-	output addr_index  index_rd,
-	                   index_wr,
-	output logic       write_data,
-	                   write_state,
-	output addr_tag    tag_wr,
-	output line        data_wr,
-	output line_state  state_wr,
+	output addr_index index_rd,
+	                  index_wr,
+	output logic      write_data,
+	                  write_state,
+	output addr_tag   tag_wr,
+	output line       data_wr,
+	output line_state state_wr,
 
-	input  logic       mem_waitrequest,
-	input  line        mem_readdata,
-	output word        mem_address,
-	output logic       mem_read,
-	                   mem_write,
-	output line        mem_writedata,
+	input  line       mem_readdata,
 
-	input  logic       locked,
-	                   may_send,
-	                   out_stall,
-	                   in_hold_valid,
-	                   last_hop,
-	input  ring_req    in_hold,
-	output logic       send,
-	                   send_read,
-	                   send_inval,
-	                   set_reply,
-	                   lock_line,
-	                   unlock_line,
+	input  logic      locked,
+	                  may_send,
+	                  out_stall,
+	                  in_hold_valid,
+	                  last_hop,
+	                  mem_end,
+	                  mem_read_end,
+	                  mem_wait,
+	input  ring_req   in_hold,
+	input  addr_tag   mem_tag,
+	input  addr_index mem_index,
+	output logic      send,
+	                  send_read,
+	                  send_inval,
+	                  set_reply,
+	                  lock_line,
+	                  unlock_line,
+	                  mem_begin,
+	                  writeback,
 
-	input  logic       dbg_write,
-	input  addr_index  debug_index,
-	output logic       debug_ready,
+	input  logic      dbg_write,
+	input  addr_index debug_index,
+	output logic      debug_ready,
 
-	input  line        monitor_update,
-	input  logic       monitor_commit,
-	output logic       monitor_acquire,
-	                   monitor_fail,
-	                   monitor_release
+	input  line       monitor_update,
+	input  logic      monitor_commit,
+	output logic      monitor_acquire,
+	                  monitor_fail,
+	                  monitor_release
 );
 
 	enum int unsigned
@@ -73,17 +69,7 @@ module cache_control
 		REPLY
 	} state, next_state;
 
-	logic accept_snoop, debug, end_reply,
-	      mem_begin, mem_end, mem_read_end, mem_wait, wait_reply,
-	      replace, retry, snoop_hit, writeback;
-
-	addr_tag mem_tag;
-	addr_index mem_index;
-
-	assign mem_end = (mem_read || mem_write) && !mem_waitrequest;
-	assign mem_wait = (mem_read || mem_write) && mem_waitrequest;
-	assign mem_address = {`IO_CACHED, mem_tag, mem_index, 4'b0000};
-	assign mem_read_end = mem_read && !mem_waitrequest;
+	logic accept_snoop, debug, end_reply, wait_reply, replace, retry, snoop_hit;
 
 	/* Desbloquear la línea hasta que la request del core termine garantiza
 	 * avance del sistema completo, en lockstep en el peor caso posible,
@@ -364,10 +350,6 @@ module cache_control
 	always_ff @(posedge clk or negedge rst_n)
 		if (!rst_n) begin
 			wait_reply <= 0;
-
-			mem_read <= 0;
-			mem_write <= 0;
-
 			debug_ready <= 0;
 		end else begin
 			if (send)
@@ -376,24 +358,7 @@ module cache_control
 			if (end_reply || mem_read_end)
 				wait_reply <= 0;
 
-			if (mem_end) begin
-				mem_read <= 0;
-				mem_write <= 0;
-			end
-
-			if (mem_begin) begin
-				mem_read <= !writeback;
-				mem_write <= writeback;
-			end
-
 			debug_ready <= debug;
-		end
-
-	always_ff @(posedge clk)
-		if (mem_begin) begin
-			mem_tag <= writeback ? tag_rd : core_tag;
-			mem_index <= index_wr;
-			mem_writedata <= data_rd;
 		end
 
 endmodule
