@@ -109,14 +109,14 @@ sim/%: $(SIM_DIR)/sim.py $(TB_SIM_DIR)/%.py exe/$(TOP) $(SIM_OBJ_DIR)/%.bin $(FS
 		$(SIM_OBJ_DIR)/$*.bin \
 		$(if $(DISABLE_COV),,--coverage $(SIM_OBJ_DIR)/$*.cov) \
 		$(if $(DISABLE_TRACE),,--trace $(SIM_OBJ_DIR)/$*.fst)
-	@cp $(SIM_OBJ_DIR)/$*.fst $(FST_DIR)/$*/trace$(GIT_REV).fst
+	@$(if $(DISABLE_TRACE),,cp $(SIM_OBJ_DIR)/$*.fst $(FST_DIR)/$*/trace$(GIT_REV).fst)
 
 sim/%: $(TB_DIR)/top/%.py exe/% $(FST_DIR)/%
 	@cd $(OBJ_DIR)/$* && \
 		LIBPYTHON_LOC=$(LIBPYTHON) PYTHONPATH="$$PYTHONPATH:$(ROOT)" MODULE=tb.top.$* \
 		$(if $(SIM_SEED),RANDOM_SEED=$(SIM_SEED)) \
 		./Vtop
-	@cp $(OBJ_DIR)/$*/dump.fst $(FST_DIR)/$*/trace$(GIT_REV).fst
+	@$(if $(DISABLE_TRACE),,cp $(OBJ_DIR)/$*/dump.fst $(FST_DIR)/$*/trace$(GIT_REV).fst)
 
 $(FST_DIR)/%:
 	@mkdir -p $@
