@@ -6,7 +6,7 @@ from cocotb_bus.drivers.avalon import AvalonMaster
 from tb.models import CorePaceModel, SmpModel
 
 @cocotb.test()
-async def reset(dut):
+async def bring_up(dut):
     await cocotb.start(Clock(dut.clk, 2).start())
 
     dut.rst_n.value = 1
@@ -39,5 +39,13 @@ async def reset(dut):
                                  [dut.cpu_halted_1, dut.cpu_halted_2, dut.cpu_halted_3])),
                        50)
 
-    await ClockCycles(dut.clk, 5)
+    await ClockCycles(dut.clk, 10)
+    assert await master.read(0) == model.read()
+
+    await master.write(0, 0x01000102)
+    model.halt(0)
+    model.run(1)
+    model.run(3)
+
+    await ClockCycles(dut.clk, 10)
     assert await master.read(0) == model.read()
