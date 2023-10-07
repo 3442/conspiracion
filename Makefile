@@ -129,6 +129,9 @@ vmlaunch: $(SIM_DIR)/sim.py $(SIM_DIR)/gdbstub.py exe/$(TOP)
 demo: $(SIM_DIR)/sim.py $(SIM_DIR)/gdbstub.py exe/$(TOP) $(DEMO_OBJ_DIR)/demo.bin
 	@START_HALTED=0 $< $(SIM_DIR)/gdbstub.py $(OBJ_DIR)/$(TOP)/Vtop $(DEMO_OBJ_DIR)/demo.bin
 
+demo.bin: $(DEMO_OBJ_DIR)/demo.bin
+	@echo $<
+
 ifndef DISABLE_COV
 cov: $(OBJ_DIR)/$(TOP)/cov.info
 	@rm -rf $(COV_DIR)
