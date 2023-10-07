@@ -78,11 +78,13 @@ all: sim
 clean:
 	rm -rf $(DIST_DIR) $(OBJ_DIR) $(FST_DIR) $(COV_DIR)
 
-dist: $(if $(DISABLE_COV),sim,cov)
+dist: $(DEMO_OBJ_DIR)/demo.bin $(if $(DISABLE_COV),sim,cov)
 	@mkdir -p $(DIST_DIR)
-	@rm -rf $(DIST_OBJ_DIR) && mkdir -pv $(DIST_OBJ_DIR)/{bin,bitstream,doc,results,src}
+	@rm -rf $(DIST_OBJ_DIR) && mkdir -pv $(DIST_OBJ_DIR)/{bin,bitstream,doc,results/flow,src}
 	@git ls-files | xargs cp --parents -rvt $(DIST_OBJ_DIR)/src
 	@mv -vt $(DIST_OBJ_DIR) $(DIST_OBJ_DIR)/src/README.md
+	@cp -vt $(DIST_OBJ_DIR)/bin $(DEMO_OBJ_DIR)/demo
+	@cp -v $(DEMO_OBJ_DIR)/demo.bin $(DIST_OBJ_DIR)/bin/boot.bin
 	@$(if $(DISABLE_COV),,cp -rv $(COV_DIR) $(DIST_OBJ_DIR)/results/coverage)
 	@for SIM in $(SYS_SIMS); do \
 		mkdir -pv $(DIST_OBJ_DIR)/results/system/$$SIM; \
@@ -91,10 +93,11 @@ dist: $(if $(DISABLE_COV),sim,cov)
 		fi; done
 	@for SIM in $(COCO_SIMS); do \
 		mkdir -pv $(DIST_OBJ_DIR)/results/block/$$SIM; \
-		cp -vt $(DIST_OBJ_DIR)/results/block/$$SIM $(OBJ_DIR)/$$SIM/results.xml; \
+		cp -vt $(DIST_OBJ_DIR)/results/block/$$SIM $(OBJ_DIR)/$$SIM/{results.xml,sim.log}; \
 		$(if $(DISABLE_TRACE),, \
 			cp -v $(OBJ_DIR)/$$SIM/dump.fst $(DIST_OBJ_DIR)/results/block/$$SIM/trace.fst); \
 		done
+	@cp -vt $(DIST_OBJ_DIR)/results/flow $(RBF_OUT_DIR)/*.rpt
 	@[ -f $(RBF_OUT_DIR)/$(TOP).rbf ] \
 		&& cp -vt $(DIST_OBJ_DIR)/bitstream $(RBF_OUT_DIR)/$(TOP).rbf \
 		|| echo "Warning: missing bitstream at $(RBF_OUT_DIR)/$(TOP).rbf" >&2
@@ -114,7 +117,7 @@ sim/%: $(TB_DIR)/top/%.py exe/% $(FST_DIR)/%
 	@cd $(OBJ_DIR)/$* && \
 		LIBPYTHON_LOC=$(LIBPYTHON) PYTHONPATH="$$PYTHONPATH:$(ROOT)" MODULE=tb.top.$* \
 		$(if $(SIM_SEED),RANDOM_SEED=$(SIM_SEED)) \
-		./Vtop
+		./Vtop | tee sim.log
 	@$(if $(DISABLE_TRACE),,cp $(OBJ_DIR)/$*/dump.fst $(FST_DIR)/$*/trace$(GIT_REV).fst)
 
 $(FST_DIR)/%:
