@@ -31,6 +31,7 @@ module core_mul
 	assign z = q_lo == 0 && (!long_mul || q_hi == 0);
 
 	//TODO: no está probado cuantos ciclos ocupa esto una vez sintetizado
+	//TODO: trivio?
 	dsp_mul it
 	(
 		.clock0(clk),

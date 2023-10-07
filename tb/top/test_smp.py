@@ -7,7 +7,7 @@ from tb.models import CorePaceModel, SmpModel
 
 @cocotb.test()
 async def reset(dut):
-    cocotb.start(Clock(dut.clk, 2).start())
+    await cocotb.start(Clock(dut.clk, 2).start())
 
     dut.rst_n.value = 1
     await Timer(1)
