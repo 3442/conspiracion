@@ -51,5 +51,6 @@ hps_isw_handoff/
 qmegawiz_errors_log.txt
 cr_ie_info.json
 u-boot
+doc_out/
 c5_pin_model_dump.txt
 hps_sdram_p0_all_pins.txt

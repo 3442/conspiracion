@@ -85,6 +85,7 @@ dist: $(DEMO_OBJ_DIR)/demo.bin $(if $(DISABLE_COV),sim,cov)
 	@mv -vt $(DIST_OBJ_DIR) $(DIST_OBJ_DIR)/src/README.md
 	@cp -vt $(DIST_OBJ_DIR)/bin $(DEMO_OBJ_DIR)/demo
 	@cp -v $(DEMO_OBJ_DIR)/demo.bin $(DIST_OBJ_DIR)/bin/boot.bin
+	@if [ -d doc_out ]; then cp -vrt $(DIST_OBJ_DIR)/doc doc_out/*; fi
 	@$(if $(DISABLE_COV),,cp -rv $(COV_DIR) $(DIST_OBJ_DIR)/results/coverage)
 	@for SIM in $(SYS_SIMS); do \
 		mkdir -pv $(DIST_OBJ_DIR)/results/system/$$SIM; \
