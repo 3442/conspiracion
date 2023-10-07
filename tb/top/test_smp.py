@@ -7,6 +7,8 @@ from tb.models import CorePaceModel, SmpModel
 
 @cocotb.test()
 async def reset(dut):
+    cocotb.start(Clock(dut.clk, 2).start())
+
     dut.rst_n.value = 1
     await Timer(1)
     dut.rst_n.value = 0
@@ -14,8 +16,6 @@ async def reset(dut):
     dut.rst_n.value = 1
 
     model = SmpModel()
-
-    cocotb.start_soon(Clock(dut.clk, 2).start())
     master = AvalonMaster(dut, 'avl', dut.clk, case_insensitive=False)
 
     cpu0 = CorePaceModel(clk=dut.clk, halt=dut.halt_0, step=dut.step_0,
