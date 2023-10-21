@@ -97,6 +97,14 @@
          type = "int";
       }
    }
+   element gfx_0
+   {
+      datum _sortIndex
+      {
+         value = "29";
+         type = "int";
+      }
+   }
    element hps_0
    {
       datum _sortIndex
@@ -426,6 +434,7 @@
  <module name="cpu_3" kind="core" version="1.0" enabled="1">
   <parameter name="AUTO_INTERRUPT_RECEIVER_INTERRUPTS_USED" value="0" />
  </module>
+ <module name="gfx_0" kind="gfx" version="1.0" enabled="1" />
  <module name="hps_0" kind="altera_hps" version="20.1" enabled="1">
   <parameter name="ABSTRACT_REAL_COMPARE_TEST" value="false" />
   <parameter name="ABS_RAM_MEM_INIT_FILENAME" value="meminit" />
@@ -1424,6 +1433,11 @@
   <parameter name="baseAddress" value="0x30140000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
+ <connection kind="avalon" version="20.1" start="mm_bridge.m0" end="gfx_0.cmd">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x3c000000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
  <connection kind="avalon" version="20.1" start="mm_bridge.m0" end="cache_0.dbg">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x30100000" />
@@ -1665,6 +1679,7 @@
    end="hps_0.f2h_sdram0_clock" />
  <connection kind="clock" version="20.1" start="pll_0.outclk1" end="mm_bridge.clk" />
  <connection kind="clock" version="20.1" start="pll_0.outclk1" end="smp_0.clock" />
+ <connection kind="clock" version="20.1" start="pll_0.outclk1" end="gfx_0.clock" />
  <connection
    kind="clock"
    version="20.1"
@@ -1886,6 +1901,11 @@
    version="20.1"
    start="clk_0.clk_reset"
    end="perf_0.reset_sink" />
+ <connection
+   kind="reset"
+   version="20.1"
+   start="clk_0.clk_reset"
+   end="gfx_0.reset_sink" />
  <connection
    kind="reset"
    version="20.1"
