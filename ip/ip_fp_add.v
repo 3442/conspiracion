@@ -8,14 +8,16 @@
 module ip_fp_add (
 		input  wire        clk,    //    clk.clk
 		input  wire        areset, // areset.reset
-		input  wire [31:0] a,      //      a.a
-		input  wire [31:0] b,      //      b.b
-		output wire [31:0] q       //      q.q
+		input  wire [0:0]  en,     //     en.en
+		input  wire [15:0] a,      //      a.a
+		input  wire [15:0] b,      //      b.b
+		output wire [15:0] q       //      q.q
 	);
 
 	ip_fp_add_0002 ip_fp_add_inst (
 		.clk    (clk),    //    clk.clk
 		.areset (areset), // areset.reset
+		.en     (en),     //     en.en
 		.a      (a),      //      a.a
 		.b      (b),      //      b.b
 		.q      (q)       //      q.q
@@ -57,16 +59,16 @@ endmodule
 // Retrieval info: 	<generic name="TRIG_function" value="SIN" />
 // Retrieval info: 	<generic name="COMPARE_function" value="MIN" />
 // Retrieval info: 	<generic name="ROOTS_function" value="SQRT" />
-// Retrieval info: 	<generic name="fp_format" value="single" />
-// Retrieval info: 	<generic name="fp_exp" value="8" />
-// Retrieval info: 	<generic name="fp_man" value="23" />
+// Retrieval info: 	<generic name="fp_format" value="custom" />
+// Retrieval info: 	<generic name="fp_exp" value="5" />
+// Retrieval info: 	<generic name="fp_man" value="10" />
 // Retrieval info: 	<generic name="exponent_width" value="23" />
-// Retrieval info: 	<generic name="frequency_target" value="200" />
+// Retrieval info: 	<generic name="frequency_target" value="100" />
 // Retrieval info: 	<generic name="latency_target" value="2" />
 // Retrieval info: 	<generic name="performance_goal" value="frequency" />
 // Retrieval info: 	<generic name="rounding_mode" value="nearest with tie breaking away from zero" />
 // Retrieval info: 	<generic name="faithful_rounding" value="true" />
-// Retrieval info: 	<generic name="gen_enable" value="false" />
+// Retrieval info: 	<generic name="gen_enable" value="true" />
 // Retrieval info: 	<generic name="divide_type" value="0" />
 // Retrieval info: 	<generic name="select_signal_enable" value="false" />
 // Retrieval info: 	<generic name="scale_by_pi" value="false" />

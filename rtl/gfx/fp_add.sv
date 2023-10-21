@@ -21,6 +21,7 @@ module fp_add
 `ifndef VERILATOR
 	ip_fp_add ip_add
 	(
+		.en(1),
 		.areset(0),
 		.*
 	);

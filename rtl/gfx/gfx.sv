@@ -12,10 +12,13 @@ module gfx
 	output logic[31:0] cmd_readdata
 );
 
+	fp readdata, writedata;
 	mat4 a, b, q, hold_q;
 	logic start, done;
 
-	assign cmd_readdata = hold_q[cmd_address[3:2]][cmd_address[1:0]];
+	assign readdata = hold_q[cmd_address[3:2]][cmd_address[1:0]];
+	assign writedata = cmd_writedata[`FLOAT_BITS - 1:0];
+	assign cmd_readdata = {{($bits(cmd_readdata) - `FLOAT_BITS){1'b0}}, readdata};
 
 	mat_mat_mul mul
 	(
@@ -25,9 +28,9 @@ module gfx
 	always_ff @(posedge clk) begin
 		if (cmd_write) begin
 			if (cmd_address[4])
-				a[cmd_address[3:2]][cmd_address[1:0]] <= cmd_writedata;
+				a[cmd_address[3:2]][cmd_address[1:0]] <= writedata;
 			else
-				b[cmd_address[3:2]][cmd_address[1:0]] <= cmd_writedata;
+				b[cmd_address[3:2]][cmd_address[1:0]] <= writedata;
 		end
 
 		if (done)

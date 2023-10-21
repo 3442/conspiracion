@@ -21,6 +21,7 @@ module fp_mul
 `ifndef VERILATOR
 	ip_fp_mul ip_mul
 	(
+		.en(1),
 		.areset(0),
 		.*
 	);
