@@ -43,6 +43,7 @@ dist/
 platform/
 platform.sopcinfo
 hps_isw_handoff/
+greybox_tmp/
 *~
 *.vcd
 *.fst

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<simPackage>
+ <file path="ip_fp_add_sim/ip_fp_add.vo" type="VERILOG" />
+ <topLevel name="ip_fp_add" />
+ <deviceFamily name="cyclonev" />
+</simPackage>
