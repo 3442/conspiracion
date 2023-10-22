@@ -3,25 +3,18 @@
 module fp_mul
 (
 	input  logic clk,
-	             rst_n,
 
-	input  logic start,
 	input  fp    a,
 	             b,
+	input  logic stall,
 
-	output logic done,
 	output fp    q
 );
-
-	pipelined_flow #(.STAGES(`FP_MUL_STAGES)) stages
-	(
-		.*
-	);
 
 `ifndef VERILATOR
 	ip_fp_mul ip_mul
 	(
-		.en(1),
+		.en(!stall),
 		.areset(0),
 		.*
 	);

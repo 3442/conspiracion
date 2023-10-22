@@ -5,29 +5,67 @@ module mat_mat_mul
 	input  logic clk,
 	             rst_n,
 
-	input  logic start,
 	input  mat4  a,
 	             b,
+	input  logic in_valid,
+	             out_ready,
 
-	output logic done,
-	output mat4  q
+	output mat4  q,
+	output logic in_ready,
+	             out_valid
 );
 
-	logic dones[`VECS_PER_MAT];
+	mat4 a_hold, b_hold, q_hold, mul_b;
+	vec4 mul_q;
+	logic mul_in_ready, mul_in_valid, mul_out_ready, mul_out_valid;
+	index4 in_index, out_index;
 
-	assign done = dones[0];
+	assign in_ready = mul_in_ready && in_index == `INDEX4_MIN;
+	assign out_valid = mul_out_valid && out_index == `INDEX4_MAX;
 
-	genvar i;
-	generate
-		for (i = 0; i < `VECS_PER_MAT; ++i) begin: columns
-			mat_vec_mul column_i
-			(
-				.x(b[i]),
-				.q(q[i]),
-				.done(dones[i]),
-				.*
-			);
+	assign mul_in_valid = in_valid || in_index != `INDEX4_MIN;
+	assign mul_out_ready = out_ready || out_index != `INDEX4_MAX;
+
+	mat_vec_mul mul
+	(
+		.a(in_index == `INDEX4_MIN ? a : a_hold),
+		.x(mul_b[in_index]),
+		.q(mul_q),
+		.in_ready(mul_in_ready),
+		.in_valid(mul_in_valid),
+		.out_ready(mul_out_ready),
+		.out_valid(mul_out_valid),
+		.*
+	);
+
+	always_comb begin
+		mul_b = b_hold;
+		mul_b[0] = b[0];
+
+		q = q_hold;
+		q[`VECS_PER_MAT - 1] = mul_q;
+	end
+
+	always_ff @(posedge clk or negedge rst_n)
+		if (!rst_n) begin
+			in_index <= `INDEX4_MIN;
+			out_index <= `INDEX4_MIN;
+		end else begin
+			if (mul_in_ready && mul_in_valid)
+				in_index <= in_index + 1;
+
+			if (mul_out_ready && mul_out_valid)
+				out_index <= out_index + 1;
 		end
-	endgenerate
+
+	always_ff @(posedge clk) begin
+		if (in_ready) begin
+			a_hold <= a;
+			b_hold <= b;
+		end
+
+		if (mul_out_ready && mul_out_valid)
+			q_hold[out_index] <= mul_q;
+	end
 
 endmodule

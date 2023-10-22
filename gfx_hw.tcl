@@ -46,7 +46,8 @@ add_fileset_file gfx_defs.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_defs.sv
 add_fileset_file horizontal_fold.sv SYSTEM_VERILOG PATH rtl/gfx/horizontal_fold.sv
 add_fileset_file mat_mat_mul.sv SYSTEM_VERILOG PATH rtl/gfx/mat_mat_mul.sv
 add_fileset_file mat_vec_mul.sv SYSTEM_VERILOG PATH rtl/gfx/mat_vec_mul.sv
-add_fileset_file pipelined_flow.sv SYSTEM_VERILOG PATH rtl/gfx/pipelined_flow.sv
+add_fileset_file pipeline_flow.sv SYSTEM_VERILOG PATH rtl/gfx/pipeline_flow.sv
+add_fileset_file fold_flow.sv SYSTEM_VERILOG PATH rtl/gfx/fold_flow.sv
 add_fileset_file vec_dot.sv SYSTEM_VERILOG PATH rtl/gfx/vec_dot.sv
 
 

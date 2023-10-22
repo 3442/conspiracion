@@ -22,6 +22,10 @@ module gfx
 
 	mat_mat_mul mul
 	(
+		.in_ready(),
+		.in_valid(start),
+		.out_ready(1),
+		.out_valid(done),
 		.*
 	);
 

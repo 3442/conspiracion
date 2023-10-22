@@ -1,50 +1,44 @@
 `include "gfx/gfx_defs.sv"
 
-// Asume que N es una potencia de 2
 module horizontal_fold
-#(parameter N=1)
 (
-	input  logic clk,
-	             rst_n,
+	input  logic  clk,
 
-	input  logic start,
-	input  fp    vec[N - 1:0],
+	input  vec4   vec,
+	input  logic  stall,
+	              feedback,
+	              feedback_last,
 
-	output logic done,
-	output fp    q
+	output fp     q
 );
 
-	fp q_left, q_right;
-	logic halves_done;
+	vec2 feedback_vec, queued[`FP_ADD_STAGES];
 
+	assign feedback_vec = queued[`FP_ADD_STAGES - 1];
+
+	fp_add add
+	(
+		.a(feedback ? q : vec[0]),
+		.b(feedback ? feedback_vec[feedback_last] : vec[1]),
+		.*
+	);
+
+	always_ff @(posedge clk)
+		if (!stall) begin
+			if (feedback)
+				queued[0] <= feedback_vec;
+			else begin
+				queued[0][0] <= vec[2];
+				queued[0][1] <= vec[3];
+			end
+		end
+
+	genvar i;
 	generate
-		if (N > 1) begin
-			horizontal_fold #(.N(N / 2)) left
-			(
-				.q(q_left),
-				.vec(vec[N - 1:N / 2]),
-				.done(halves_done),
-				.*
-			);
-
-			horizontal_fold #(.N(N / 2)) right
-			(
-				.q(q_right),
-				.vec(vec[N / 2 - 1:0]),
-				.done(),
-				.*
-			);
-
-			fp_add fold
-			(
-				.a(q_left),
-				.b(q_right),
-				.start(halves_done),
-				.*
-			);
-		end else begin
-			assign q = vec[0];
-			assign done = start;
+		for (i = 1; i < `FLOATS_PER_VEC; ++i) begin: stages
+			always_ff @(posedge clk)
+				if (!stall)
+					queued[i] <= queued[i - 1];
 		end
 	endgenerate
 

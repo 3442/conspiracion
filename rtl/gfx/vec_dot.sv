@@ -3,23 +3,24 @@
 module vec_dot
 (
 	input  logic clk,
-	             rst_n,
 
-	input  logic start,
+	input  logic stall_mul,
+	             stall_fold,
+	             feedback,
+	             feedback_last,
+
 	input  vec4  a,
 		         b,
 
-	output logic done,
 	output fp    q
 );
 
 	vec4 products;
-	logic dones[`FLOATS_PER_VEC];
 
-	horizontal_fold #(.N(`FLOATS_PER_VEC)) fold
+	horizontal_fold fold
 	(
-		.start(dones[0]),
 		.vec(products),
+		.stall(stall_fold),
 		.*
 	);
 
@@ -30,8 +31,8 @@ module vec_dot
 			(
 				.a(a[i]),
 				.b(b[i]),
-				.done(dones[i]),
 				.q(products[i]),
+				.stall(stall_mul),
 				.*
 			);
 		end
