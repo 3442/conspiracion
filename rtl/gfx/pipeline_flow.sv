@@ -1,5 +1,3 @@
-`include "gfx/gfx_defs.sv"
-
 module pipeline_flow
 #(parameter STAGES=0)
 (
@@ -16,14 +14,16 @@ module pipeline_flow
 
 	logic valid[STAGES];
 
-	assign stall = !in_ready;
-	assign in_ready = out_ready || !out_valid;
-	assign out_valid = valid[STAGES - 1];
+	skid_flow skid
+	(
+		.in_valid(valid[STAGES - 1]),
+		.*
+	);
 
 	always_ff @(posedge clk or negedge rst_n)
 		if (!rst_n)
 			valid[0] <= 0;
-		else if (in_ready)
+		else if (!stall)
 			valid[0] <= in_valid;
 
 	genvar i;
@@ -32,7 +32,7 @@ module pipeline_flow
 			always_ff @(posedge clk or negedge rst_n)
 				if (!rst_n)
 					valid[i] <= 0;
-				else if (in_ready)
+				else if (!stall)
 					valid[i] <= valid[i - 1];
 		end
 	endgenerate

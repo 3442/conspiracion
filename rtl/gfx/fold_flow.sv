@@ -15,16 +15,22 @@ module fold_flow
 	              feedback_last
 );
 
+	logic skid_ready;
 	index4 rounds[`FP_ADD_STAGES], last_round;
 
-	assign stall = out_valid && !out_ready;
-	assign in_ready = !stall && !feedback;
-	assign out_valid = last_round == `INDEX4_MAX;
+	assign in_ready = skid_ready && !feedback;
 
 	assign feedback = last_round[1] ^ last_round[0];
 	assign feedback_last = last_round[1];
 
 	assign last_round = rounds[`FP_ADD_STAGES - 1];
+
+	skid_flow skid
+	(
+		.in_valid(last_round == `INDEX4_MAX),
+		.in_ready(skid_ready),
+		.*
+	);
 
 	always_ff @(posedge clk or negedge rst_n)
 		if (!rst_n)

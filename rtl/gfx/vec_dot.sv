@@ -15,11 +15,11 @@ module vec_dot
 	output fp    q
 );
 
-	vec4 products;
+	vec4 products_fold, products_mul;
 
 	horizontal_fold fold
 	(
-		.vec(products),
+		.vec(products_fold),
 		.stall(stall_fold),
 		.*
 	);
@@ -31,7 +31,15 @@ module vec_dot
 			(
 				.a(a[i]),
 				.b(b[i]),
-				.q(products[i]),
+				.q(products_mul[i]),
+				.stall(stall_mul),
+				.*
+			);
+
+			skid_buf #(.WIDTH($bits(vec4))) skid_i
+			(
+				.in(products_mul[i]),
+				.out(products_fold[i]),
 				.stall(stall_mul),
 				.*
 			);

@@ -12,14 +12,23 @@ module horizontal_fold
 	output fp     q
 );
 
+	fp q_add;
 	vec2 feedback_vec, queued[`FP_ADD_STAGES];
 
 	assign feedback_vec = queued[`FP_ADD_STAGES - 1];
 
 	fp_add add
 	(
-		.a(feedback ? q : vec[0]),
+		.a(feedback ? q_add : vec[0]),
 		.b(feedback ? feedback_vec[feedback_last] : vec[1]),
+		.q(q_add),
+		.*
+	);
+
+	skid_buf #(.WIDTH($bits(q))) skid
+	(
+		.in(q_add),
+		.out(q),
 		.*
 	);
 
