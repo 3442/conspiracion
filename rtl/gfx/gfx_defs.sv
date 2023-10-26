@@ -6,9 +6,9 @@
 `define FLOATS_PER_VEC 4
 `define VECS_PER_MAT   4
 
-// Target de 100MHz con float16, rounding aproximado
-`define FP_ADD_STAGES 4 // ~325 LUTs
-`define FP_MUL_STAGES 3 // ~119 LUTs ~1 bloque DSP
+// Target de 200MHz (reloj es 143MHz) con float16, rounding aproximado
+`define FP_ADD_STAGES 10 // ~401 LUTs
+`define FP_MUL_STAGES 5  // ~144 LUTs ~1 bloque DSP
 
 typedef logic[`FLOAT_BITS - 1:0] fp;
 typedef fp                       vec2[2];
