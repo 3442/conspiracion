@@ -254,6 +254,14 @@
          type = "String";
       }
    }
+   element platform
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
    element pll_0
    {
       datum _sortIndex
@@ -1542,6 +1550,11 @@
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection kind="avalon" version="20.1" start="cache_3.mem" end="perf_0.local_3">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection kind="avalon" version="20.1" start="gfx_0.mem" end="vram.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x0000" />
   <parameter name="defaultConnection" value="false" />

@@ -5,16 +5,28 @@ module gfx
 	input  logic       clk,
 	                   rst_n,
 
-	input  logic[4:0]  cmd_address,
+	input  logic[5:0]  cmd_address,
 	input  logic       cmd_read,
 	                   cmd_write,
 	input  logic[31:0] cmd_writedata,
-	output logic[31:0] cmd_readdata
+	output logic[31:0] cmd_readdata,
+
+	input  logic       mem_waitrequest,
+	                   mem_readdatavalid,
+	input  logic[15:0] mem_readdata,
+	output logic[25:0] mem_address,
+	output logic       mem_read,
+	                   mem_write,
+	output logic[15:0] mem_writedata
 );
 
 	fp readdata, writedata;
 	mat4 a, b, q, hold_q;
 	logic start, done;
+
+	assign mem_address = 26'b0;
+	assign mem_read = 1;
+	assign mem_write = 0;
 
 	assign readdata = hold_q[cmd_address[3:2]][cmd_address[1:0]];
 	assign writedata = cmd_writedata[`FLOAT_BITS - 1:0];
