@@ -51,6 +51,7 @@ add_fileset_file fold_flow.sv SYSTEM_VERILOG PATH rtl/gfx/fold_flow.sv
 add_fileset_file skid_flow.sv SYSTEM_VERILOG PATH rtl/gfx/skid_flow.sv
 add_fileset_file skid_buf.sv SYSTEM_VERILOG PATH rtl/gfx/skid_buf.sv
 add_fileset_file vec_dot.sv SYSTEM_VERILOG PATH rtl/gfx/vec_dot.sv
+add_fileset_file transpose.sv SYSTEM_VERILOG PATH rtl/gfx/transpose.sv
 
 
 # 
