@@ -36,7 +36,7 @@ module vec_dot
 				.*
 			);
 
-			skid_buf #(.WIDTH($bits(vec4))) skid_i
+			skid_buf #(.WIDTH($bits(fp))) skid_i
 			(
 				.in(products_mul[i]),
 				.out(products_fold[i]),

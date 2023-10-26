@@ -53,7 +53,7 @@ module fold_flow
 			always_ff @(posedge clk or negedge rst_n)
 				if (!rst_n)
 					rounds[i] <= `INDEX4_MIN;
-				else if (in_ready)
+				else if (!stall)
 					rounds[i] <= rounds[i - 1];
 		end
 	endgenerate
