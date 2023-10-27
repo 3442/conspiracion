@@ -18,6 +18,23 @@ module fp_mul
 		.areset(0),
 		.*
 	);
+`else
+	fp a_pipeline[`FP_MUL_STAGES - 1], b_pipeline[`FP_MUL_STAGES - 1];
+
+	integer i;
+
+	always @(posedge clk)
+		if (!stall) begin
+			a_pipeline[0] <= a;
+			b_pipeline[0] <= b;
+
+			for (i = 1; i < `FP_MUL_STAGES - 1; ++i) begin
+				a_pipeline[i] <= a_pipeline[i - 1];
+				b_pipeline[i] <= b_pipeline[i - 1];
+			end
+
+			q <= $c("taller::fp_mul(", a_pipeline[`FP_MUL_STAGES - 2], ", ", b_pipeline[`FP_MUL_STAGES - 2], ")");
+		end
 `endif
 
 endmodule

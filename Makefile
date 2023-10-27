@@ -21,11 +21,11 @@ CROSS_CFLAGS  := -O3 -Wall -Wextra -Werror
 CROSS_LDFLAGS :=
 
 ifeq ($(shell which $(VERILATOR)),)
-  $(error verilator not found)
+	$(error verilator not found)
 endif
 
 ifeq ($(shell which $(COCOTB_CONFIG)),)
-  $(error cocotb not found)
+	$(error cocotb not found)
 endif
 
 ifdef FASTER_IS_BETTER
@@ -200,7 +200,7 @@ $(OBJ_DIR)/%.mk: \
 
 	mkdir -p $(dir $@)
 	$(VERILATOR) $(VFLAGS) \
-		--Mdir $(dir $@) --top $(word 1,$(subst /, ,$*)) \
+		--Mdir $(dir $@) --top $(word 1,$(subst /, ,$*)) -FI $(ROOT)/$(TB_DIR)/verilator.hpp \
 		$(filter %.sv %.cpp,$(patsubst tb/%,../tb/%,$^)) \
 		$(if $(filter $(TOP),$(word 1,$(subst /, ,$*))),, \
 			--vpi --public-flat-rw -LDFLAGS "$(COCOTB_LDFLAGS) $(LIBPYTHON)" \
