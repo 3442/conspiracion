@@ -15,7 +15,7 @@ module mat_mat_mul
 	             out_valid
 );
 
-	mat4 a_hold, b_hold, b_transpose, q_hold, mul_b;
+	mat4 a_hold, b_hold, b_transpose, q_hold, q_transpose, mul_b;
 	vec4 mul_q;
 	logic mul_in_ready, mul_in_valid, mul_out_ready, mul_out_valid;
 	index4 in_index, out_index;
@@ -26,7 +26,7 @@ module mat_mat_mul
 	assign mul_in_valid = in_valid || in_index != `INDEX4_MIN;
 	assign mul_out_ready = out_ready || out_index != `INDEX4_MAX;
 
-	transpose transpose
+	transpose transpose_b
 	(
 		.in(b),
 		.out(b_transpose)
@@ -44,12 +44,18 @@ module mat_mat_mul
 		.*
 	);
 
+	transpose transpose_q
+	(
+		.in(q_transpose),
+		.out(q)
+	);
+
 	always_comb begin
 		mul_b = b_hold;
 		mul_b[0] = b_transpose[0];
 
-		q = q_hold;
-		q[`VECS_PER_MAT - 1] = mul_q;
+		q_transpose = q_hold;
+		q_transpose[`VECS_PER_MAT - 1] = mul_q;
 	end
 
 	always_ff @(posedge clk or negedge rst_n)

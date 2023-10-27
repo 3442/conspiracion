@@ -44,7 +44,7 @@ module horizontal_fold
 
 	genvar i;
 	generate
-		for (i = 1; i < `FLOATS_PER_VEC; ++i) begin: stages
+		for (i = 1; i < `FP_ADD_STAGES; ++i) begin: stages
 			always_ff @(posedge clk)
 				if (!stall)
 					queued[i] <= queued[i - 1];

@@ -44,9 +44,9 @@ module gfx
 	always_ff @(posedge clk) begin
 		if (cmd_write) begin
 			if (cmd_address[4])
-				a[cmd_address[3:2]][cmd_address[1:0]] <= writedata;
-			else
 				b[cmd_address[3:2]][cmd_address[1:0]] <= writedata;
+			else
+				a[cmd_address[3:2]][cmd_address[1:0]] <= writedata;
 		end
 
 		if (done)

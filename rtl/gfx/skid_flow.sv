@@ -15,7 +15,7 @@ module skid_flow
 
 	assign stall = !in_ready;
 	assign in_ready = was_ready || !was_valid;
-	assign out_valid = in_valid || was_valid;
+	assign out_valid = in_valid || stall;
 
 	always @(posedge clk or negedge rst_n)
 		if (!rst_n) begin
