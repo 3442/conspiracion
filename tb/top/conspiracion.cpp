@@ -16,29 +16,7 @@
 #include <verilated_fst_c.h>
 #endif
 
-#include "Vtop.h"
-#include "Vtop_arm810.h"
-#include "Vtop_conspiracion.h"
-#include "Vtop_platform.h"
-#include "Vtop_sim_slave.h"
-#include "Vtop_vga_domain.h"
-#include "Vtop_core.h"
-#include "Vtop_core_control.h"
-#include "Vtop_core_control_issue.h"
-#include "Vtop_core_cp15_domain.h"
-#include "Vtop_core_cp15_far.h"
-#include "Vtop_core_cp15_fsr.h"
-#include "Vtop_core_cp15_syscfg.h"
-#include "Vtop_core_cp15_ttbr.h"
-#include "Vtop_core_cp15.h"
-#include "Vtop_core_fetch.h"
-#include "Vtop_core_mmu.h"
-#include "Vtop_core_psr.h"
-#include "Vtop_core_regs.h"
-#include "Vtop_core_reg_file.h"
-#include "Vtop_cache.h"
-#include "Vtop_cache__T1.h"
-#include "Vtop_cache_sram.h"
+#include "Vtop__Syms.h"
 
 #include "args.hxx"
 
@@ -414,17 +392,17 @@ int main(int argc, char **argv)
 	}
 
 	Vtop_arm810 *const cores[] = {
-		plat.cpu_0->cpu,
-		plat.cpu_1->cpu,
-		plat.cpu_2->cpu,
-		plat.cpu_3->cpu
+		plat.cpu_0->enable__DOT__cpu,
+		plat.cpu_1->enable__DOT__cpu,
+		plat.cpu_2->enable__DOT__cpu,
+		plat.cpu_3->enable__DOT__cpu
 	};
 
 	Vtop_cache_sram *const caches[] = {
-		plat.cache_0->sram,
-		plat.cache_1->sram,
-		plat.cache_2->sram,
-		plat.cache_3->sram
+		plat.cache_0->enable__DOT__sram,
+		plat.cache_1->enable__DOT__sram,
+		plat.cache_2->enable__DOT__sram,
+		plat.cache_3->enable__DOT__sram
 	};
 
 	for (const auto &init : init_regs) {

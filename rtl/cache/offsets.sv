@@ -2,8 +2,8 @@
 
 module cache_offsets
 (
-	input  addr_offset core_offset,				// El offset es un input pero no
-												// un output porque se mapea
+	input  addr_offset core_offset,             // El offset es un input pero no
+	                                            // un output porque se mapea
 	input  word_be     core_byteenable,
 	input  word        core_writedata,
 	input  line        core_readdata_line,
@@ -11,9 +11,9 @@ module cache_offsets
 
 	output line        core_data_wr,
 	                   core_writedata_line,
-	output word        core_readdata,			// Readdata pasa de ser una line
-												// en el input a una word por el
-												// offset
+	output word        core_readdata,           // Readdata pasa de ser una line
+	                                            // en el input a una word por el
+	                                            // offset
 	output line_be     core_byteenable_line
 );
 	

@@ -55,14 +55,14 @@ add_fileset_file cache_debug.sv SYSTEM_VERILOG PATH rtl/cache/cache_debug.sv
 # 
 # parameters
 # 
-add_parameter TOKEN_AT_RESET INTEGER 0
-set_parameter_property TOKEN_AT_RESET DEFAULT_VALUE 0
-set_parameter_property TOKEN_AT_RESET DISPLAY_NAME TOKEN_AT_RESET
-set_parameter_property TOKEN_AT_RESET TYPE INTEGER
-set_parameter_property TOKEN_AT_RESET UNITS None
-set_parameter_property TOKEN_AT_RESET ALLOWED_RANGES -2147483648:2147483647
-set_parameter_property TOKEN_AT_RESET AFFECTS_GENERATION false
-set_parameter_property TOKEN_AT_RESET HDL_PARAMETER true
+add_parameter ID INTEGER 0
+set_parameter_property ID DEFAULT_VALUE 0
+set_parameter_property ID DISPLAY_NAME ID
+set_parameter_property ID TYPE INTEGER
+set_parameter_property ID UNITS None
+set_parameter_property ID ALLOWED_RANGES 0:3
+set_parameter_property ID AFFECTS_GENERATION false
+set_parameter_property ID HDL_PARAMETER true
 
 
 # 

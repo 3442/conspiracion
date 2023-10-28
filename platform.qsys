@@ -392,16 +392,16 @@
   <parameter name="width" value="8" />
  </module>
  <module name="cache_0" kind="cache" version="1.0" enabled="1">
-  <parameter name="TOKEN_AT_RESET" value="0" />
+  <parameter name="ID" value="0" />
  </module>
  <module name="cache_1" kind="cache" version="1.0" enabled="1">
-  <parameter name="TOKEN_AT_RESET" value="0" />
+  <parameter name="ID" value="1" />
  </module>
  <module name="cache_2" kind="cache" version="1.0" enabled="1">
-  <parameter name="TOKEN_AT_RESET" value="0" />
+  <parameter name="ID" value="2" />
  </module>
  <module name="cache_3" kind="cache" version="1.0" enabled="1">
-  <parameter name="TOKEN_AT_RESET" value="1" />
+  <parameter name="ID" value="3" />
  </module>
  <module name="clk_0" kind="clock_source" version="20.1" enabled="1">
   <parameter name="clockFrequency" value="50000000" />
@@ -411,15 +411,19 @@
  </module>
  <module name="cpu_0" kind="core" version="1.0" enabled="1">
   <parameter name="AUTO_INTERRUPT_RECEIVER_INTERRUPTS_USED" value="1" />
+  <parameter name="ID" value="0" />
  </module>
  <module name="cpu_1" kind="core" version="1.0" enabled="1">
   <parameter name="AUTO_INTERRUPT_RECEIVER_INTERRUPTS_USED" value="0" />
+  <parameter name="ID" value="1" />
  </module>
  <module name="cpu_2" kind="core" version="1.0" enabled="1">
   <parameter name="AUTO_INTERRUPT_RECEIVER_INTERRUPTS_USED" value="0" />
+  <parameter name="ID" value="2" />
  </module>
  <module name="cpu_3" kind="core" version="1.0" enabled="1">
   <parameter name="AUTO_INTERRUPT_RECEIVER_INTERRUPTS_USED" value="0" />
+  <parameter name="ID" value="3" />
  </module>
  <module name="gfx_0" kind="gfx" version="1.0" enabled="1" />
  <module name="hps_0" kind="altera_hps" version="20.1" enabled="1">

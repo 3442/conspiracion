@@ -40,6 +40,7 @@ set_fileset_property QUARTUS_SYNTH TOP_LEVEL core
 set_fileset_property QUARTUS_SYNTH ENABLE_RELATIVE_INCLUDE_PATHS false
 set_fileset_property QUARTUS_SYNTH ENABLE_FILE_OVERWRITE_MODE false
 add_fileset_file core.sv SYSTEM_VERILOG PATH rtl/core/core.sv TOP_LEVEL_FILE
+add_fileset_file bus_master.sv SYSTEM_VERILOG PATH rtl/core/bus_master.sv
 add_fileset_file arm810.sv SYSTEM_VERILOG PATH rtl/core/arm810.sv
 add_fileset_file mul.sv SYSTEM_VERILOG PATH rtl/core/mul.sv
 add_fileset_file psr.sv SYSTEM_VERILOG PATH rtl/core/psr.sv
@@ -111,6 +112,14 @@ add_fileset_file exclusive.sv SYSTEM_VERILOG PATH rtl/core/decode/ldst/exclusive
 # 
 # parameters
 # 
+add_parameter ID INTEGER 0
+set_parameter_property ID DEFAULT_VALUE 0
+set_parameter_property ID DISPLAY_NAME ID
+set_parameter_property ID TYPE INTEGER
+set_parameter_property ID UNITS None
+set_parameter_property ID ALLOWED_RANGES 0:3
+set_parameter_property ID AFFECTS_GENERATION false
+set_parameter_property ID HDL_PARAMETER true
 
 
 # 

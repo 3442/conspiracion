@@ -88,7 +88,7 @@ module platform
 	logic[1:0]  cpu_0_response, cpu_1_response, cpu_2_response, cpu_3_response;
 	logic[3:0]  cpu_0_byteenable, cpu_1_byteenable, cpu_2_byteenable, cpu_3_byteenable;
 
-	core cpu_0
+	core #(.ID(0)) cpu_0
 	(
 		.step(step_0),
 		.breakpoint(breakpoint_0),
@@ -106,7 +106,7 @@ module platform
 		.*
 	);
 
-	core cpu_1
+	core #(.ID(1)) cpu_1
 	(
 		.step(step_1),
 		.breakpoint(breakpoint_1),
@@ -125,7 +125,7 @@ module platform
 		.*
 	);
 
-	core cpu_2
+	core #(.ID(2)) cpu_2
 	(
 		.step(step_2),
 		.breakpoint(breakpoint_2),
@@ -144,7 +144,7 @@ module platform
 		.*
 	);
 
-	core cpu_3
+	core #(.ID(3)) cpu_3
 	(
 		.step(step_3),
 		.breakpoint(breakpoint_3),
@@ -177,7 +177,7 @@ module platform
 	      out_0_ready, out_1_ready, out_2_ready, out_3_ready,
 	      token_valid_0, token_valid_1, token_valid_2, token_valid_3;
 
-	cache cache_0
+	cache #(.ID(0)) cache_0
 	(
 		.core_address(cpu_0_address[31:2]),
 		.core_read(cpu_0_read),
@@ -233,7 +233,7 @@ module platform
 		.*
 	);
 
-	cache cache_1
+	cache #(.ID(1)) cache_1
 	(
 		.core_address(cpu_1_address[31:2]),
 		.core_read(cpu_1_read),
@@ -289,7 +289,7 @@ module platform
 		.*
 	);
 
-	cache cache_2
+	cache #(.ID(2)) cache_2
 	(
 		.core_address(cpu_2_address[31:2]),
 		.core_read(cpu_2_read),
@@ -345,7 +345,7 @@ module platform
 		.*
 	);
 
-	cache #(.TOKEN_AT_RESET(1)) cache_3
+	cache #(.ID(3)) cache_3
 	(
 		.core_address(cpu_3_address[31:2]),
 		.core_read(cpu_3_read),

@@ -1,4 +1,5 @@
 `include "cache/defs.sv"
+`include "config.sv"
 
 module cache_routing
 (
@@ -63,7 +64,7 @@ module cache_routing
 	 * Entonces si los bits de IO son distintos de 0, se sabe que no es
 	 * una dirección cached
 	 */
-	assign cached = io == `IO_CACHED;
+	assign cached = io == `IO_CACHED && `CONFIG_CACHE;
 	// Se afirma si cache quiere hacer un read o write de memoria
 	assign cache_mem = cache_mem_read || cache_mem_write;
 
