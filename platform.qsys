@@ -21,7 +21,7 @@
    {
       datum _sortIndex
       {
-         value = "16";
+         value = "14";
          type = "int";
       }
    }
@@ -29,7 +29,7 @@
    {
       datum _sortIndex
       {
-         value = "20";
+         value = "18";
          type = "int";
       }
    }
@@ -37,7 +37,7 @@
    {
       datum _sortIndex
       {
-         value = "22";
+         value = "20";
          type = "int";
       }
    }
@@ -45,7 +45,7 @@
    {
       datum _sortIndex
       {
-         value = "24";
+         value = "22";
          type = "int";
       }
    }
@@ -53,7 +53,7 @@
    {
       datum _sortIndex
       {
-         value = "26";
+         value = "24";
          type = "int";
       }
    }
@@ -69,7 +69,7 @@
    {
       datum _sortIndex
       {
-         value = "19";
+         value = "17";
          type = "int";
       }
    }
@@ -77,7 +77,7 @@
    {
       datum _sortIndex
       {
-         value = "21";
+         value = "19";
          type = "int";
       }
    }
@@ -85,7 +85,7 @@
    {
       datum _sortIndex
       {
-         value = "23";
+         value = "21";
          type = "int";
       }
    }
@@ -93,7 +93,7 @@
    {
       datum _sortIndex
       {
-         value = "25";
+         value = "23";
          type = "int";
       }
    }
@@ -101,7 +101,7 @@
    {
       datum _sortIndex
       {
-         value = "29";
+         value = "27";
          type = "int";
       }
    }
@@ -117,7 +117,7 @@
    {
       datum _sortIndex
       {
-         value = "17";
+         value = "15";
          type = "int";
       }
    }
@@ -141,7 +141,7 @@
    {
       datum _sortIndex
       {
-         value = "18";
+         value = "16";
          type = "int";
       }
    }
@@ -149,7 +149,7 @@
    {
       datum _sortIndex
       {
-         value = "28";
+         value = "26";
          type = "int";
       }
    }
@@ -161,33 +161,12 @@
          type = "int";
       }
    }
-   element pixdma
+   element pixfifo
    {
       datum _sortIndex
       {
          value = "12";
          type = "int";
-      }
-   }
-   element pixfifo
-   {
-      datum _sortIndex
-      {
-         value = "14";
-         type = "int";
-      }
-   }
-   element pixfmt
-   {
-      datum _sortIndex
-      {
-         value = "13";
-         type = "int";
-      }
-      datum sopceditor_expanded
-      {
-         value = "1";
-         type = "boolean";
       }
    }
    element platform
@@ -274,7 +253,7 @@
    {
       datum _sortIndex
       {
-         value = "27";
+         value = "25";
          type = "int";
       }
    }
@@ -282,7 +261,7 @@
    {
       datum _sortIndex
       {
-         value = "15";
+         value = "13";
          type = "int";
       }
    }
@@ -311,7 +290,7 @@
       }
       datum sopceditor_expanded
       {
-         value = "0";
+         value = "1";
          type = "boolean";
       }
    }
@@ -1044,20 +1023,6 @@
   <parameter name="width" value="8" />
  </module>
  <module
-   name="pixdma"
-   kind="altera_up_avalon_video_pixel_buffer_dma"
-   version="18.0"
-   enabled="1">
-  <parameter name="AUTO_CLK_CLOCK_RATE" value="143000000" />
-  <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
-  <parameter name="addr_mode" value="Consecutive" />
-  <parameter name="back_start_address" value="2097152" />
-  <parameter name="color_space" value="32-bit RGBA" />
-  <parameter name="image_height" value="480" />
-  <parameter name="image_width" value="640" />
-  <parameter name="start_address" value="0" />
- </module>
- <module
    name="pixfifo"
    kind="altera_up_avalon_video_dual_clock_buffer"
    version="18.0"
@@ -1067,17 +1032,6 @@
   <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
   <parameter name="color_bits" value="10" />
   <parameter name="color_planes" value="3" />
- </module>
- <module
-   name="pixfmt"
-   kind="altera_up_avalon_video_rgb_resampler"
-   version="18.0"
-   enabled="1">
-  <parameter name="AUTO_CLK_CLOCK_RATE" value="143000000" />
-  <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
-  <parameter name="alpha" value="1023" />
-  <parameter name="input_type" value="32-bit RGBA" />
-  <parameter name="output_type" value="30-bit RGB" />
  </module>
  <module name="pll_0" kind="altera_pll" version="20.1" enabled="1">
   <parameter name="debug_print_output" value="false" />
@@ -1385,15 +1339,6 @@
  <connection
    kind="avalon"
    version="20.1"
-   start="pixdma.avalon_pixel_dma_master"
-   end="vram.s1">
-  <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x0000" />
-  <parameter name="defaultConnection" value="false" />
- </connection>
- <connection
-   kind="avalon"
-   version="20.1"
    start="address_span_extender_0.expanded_master"
    end="hps_0.f2h_sdram0_data">
   <parameter name="arbitrationPriority" value="1" />
@@ -1404,27 +1349,9 @@
    kind="avalon"
    version="20.1"
    start="mm_bridge.m0"
-   end="pixdma.avalon_control_slave">
-  <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x30030000" />
-  <parameter name="defaultConnection" value="false" />
- </connection>
- <connection
-   kind="avalon"
-   version="20.1"
-   start="mm_bridge.m0"
    end="jtag_uart_0.avalon_jtag_slave">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x30000000" />
-  <parameter name="defaultConnection" value="false" />
- </connection>
- <connection
-   kind="avalon"
-   version="20.1"
-   start="mm_bridge.m0"
-   end="pixfmt.avalon_rgb_slave">
-  <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x30040000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
@@ -1582,16 +1509,6 @@
  <connection
    kind="avalon_streaming"
    version="20.1"
-   start="pixdma.avalon_pixel_source"
-   end="pixfmt.avalon_rgb_sink" />
- <connection
-   kind="avalon_streaming"
-   version="20.1"
-   start="pixfmt.avalon_rgb_source"
-   end="pixfifo.avalon_dc_buffer_sink" />
- <connection
-   kind="avalon_streaming"
-   version="20.1"
    start="perf_0.out_0"
    end="cache_0.in_data" />
  <connection
@@ -1737,16 +1654,6 @@
    version="20.1"
    start="sys_sdram_pll_0.sys_clk"
    end="vram.clk" />
- <connection
-   kind="clock"
-   version="20.1"
-   start="sys_sdram_pll_0.sys_clk"
-   end="pixdma.clk" />
- <connection
-   kind="clock"
-   version="20.1"
-   start="sys_sdram_pll_0.sys_clk"
-   end="pixfmt.clk" />
  <connection
    kind="clock"
    version="20.1"
@@ -1928,16 +1835,6 @@
    version="20.1"
    start="video_pll_0.reset_source"
    end="vga.reset" />
- <connection
-   kind="reset"
-   version="20.1"
-   start="sys_sdram_pll_0.reset_source"
-   end="pixdma.reset" />
- <connection
-   kind="reset"
-   version="20.1"
-   start="sys_sdram_pll_0.reset_source"
-   end="pixfmt.reset" />
  <connection
    kind="reset"
    version="20.1"
