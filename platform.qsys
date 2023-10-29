@@ -241,6 +241,14 @@
          type = "String";
       }
    }
+   element platform
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
    element pll_0
    {
       datum _sortIndex
@@ -1570,6 +1578,11 @@
    version="20.1"
    start="cache_2.out_token"
    end="cache_3.in_token" />
+ <connection
+   kind="avalon_streaming"
+   version="20.1"
+   start="gfx_0.scan"
+   end="pixfifo.avalon_dc_buffer_sink" />
  <connection
    kind="clock"
    version="20.1"

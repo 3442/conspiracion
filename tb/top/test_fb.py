@@ -14,6 +14,7 @@ async def fp_mat_mul(dut):
     dut.rst_n.value = 0
     await Timer(1)
     dut.rst_n.value = 1
+    dut.scan_ready.value = 1
 
     master = AvalonMaster(dut, 'cmd', dut.clk, case_insensitive=False)
 

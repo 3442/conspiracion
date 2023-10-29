@@ -17,7 +17,13 @@ module gfx
 	output logic[25:0] mem_address,
 	output logic       mem_read,
 	                   mem_write,
-	output logic[15:0] mem_writedata
+	output logic[15:0] mem_writedata,
+
+	input  logic       scan_ready,
+	output logic       scan_valid,
+	                   scan_endofpacket,
+	                   scan_startofpacket,
+	output rgb30       scan_data
 );
 
 	fp readdata, writedata;
@@ -57,6 +63,43 @@ module gfx
 		.in_valid(start),
 		.out_ready(1),
 		.out_valid(done),
+		.*
+	);
+
+	logic frag_mask, scan_mask;
+
+	gfx_masks masks
+	(
+		.frag_mask_set(0),
+		.frag_mask_write(0),
+		.frag_mask_read_addr(),
+		.frag_mask_write_addr(),
+		.*
+	);
+
+	logic swap_buffers;
+	rgb24 clear_color;
+
+	assign swap_buffers = 0;
+	assign clear_color.r = 255;
+	assign clear_color.g = 0;
+	assign clear_color.b = 0;
+
+	linear_coord scan_mask_addr;
+
+	logic scanout_read_tmp;
+
+	gfx_scanout scanout
+	(
+		.mask(scan_mask),
+		.mask_addr(scan_mask_addr),
+
+		.fb_read(scanout_read_tmp),
+		.fb_address(),
+		.fb_readdata(),
+		.fb_waitrequest(0),
+		.fb_readdatavalid(scanout_read_tmp),
+
 		.*
 	);
 

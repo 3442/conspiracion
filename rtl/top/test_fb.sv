@@ -15,7 +15,13 @@ module test_fb
 	output logic[25:0] mem_address,
 	output logic       mem_read,
 	                   mem_write,
-	output logic[15:0] mem_writedata
+	output logic[15:0] mem_writedata,
+
+	input  logic       scan_ready,
+	output logic       scan_valid,
+	                   scan_endofpacket,
+	                   scan_startofpacket,
+	output logic[29:0] scan_data
 );
 
 	gfx dut
