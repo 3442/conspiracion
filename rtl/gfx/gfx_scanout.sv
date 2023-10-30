@@ -5,6 +5,7 @@ module gfx_scanout
 	input  logic        clk,
 	                    rst_n,
 
+	input  logic        enable_clear,
 	input  rgb24        clear_color,
 
 	input  logic        mask,
@@ -20,7 +21,9 @@ module gfx_scanout
 	output logic        scan_valid,
 	                    scan_endofpacket,
 	                    scan_startofpacket,
-	output rgb30        scan_data
+	output rgb30        scan_data,
+
+	output logic        vsync
 );
 
 	logic[`GFX_SCAN_STAGES:0] fb_ready, fb_valid, src_ready, src_valid, src_pipes;
@@ -28,7 +31,7 @@ module gfx_scanout
 	logic[`GFX_MASK_STAGES - 1:0] request_valid;
 	logic[$clog2(`GFX_SCAN_STAGES) - 1:0] queued;
 
-	logic foreground, foreground_valid, partial, put_fb_valid, put_src_valid,
+	logic effective_mask, foreground, foreground_valid, partial, put_fb_valid, put_src_valid,
 	      queued_dec, queued_inc, read_half, read_valid, request_flush;
 
 	rgb24 fb_pipes[`GFX_SCAN_STAGES + 1], scan_pixel;
@@ -61,10 +64,11 @@ module gfx_scanout
 
 	assign read_half = request_pos[`GFX_MASK_STAGES - 1][0];
 	assign read_valid = request_valid[`GFX_MASK_STAGES - 1];
-	assign request_flush = (fb_read && fb_waitrequest) || (src_valid[0] && !src_ready[0]) || queued == `GFX_SCAN_STAGES;
+	assign request_flush = (fb_read && fb_waitrequest) || (src_valid[0] && !src_ready[0]) || queued == `GFX_SCAN_STAGES || vsync;
 
-	assign queued_inc = !request_flush && read_valid && read_half && mask;
+	assign queued_inc = !request_flush && read_valid && read_half && effective_mask;
 	assign queued_dec = fb_ready[`GFX_SCAN_STAGES - 1] && fb_valid[`GFX_SCAN_STAGES - 1];
+	assign effective_mask = mask || !enable_clear;
 
 	genvar i;
 	generate
@@ -109,6 +113,7 @@ module gfx_scanout
 
 	always_ff @(posedge clk or negedge rst_n)
 		if (!rst_n) begin
+			vsync <= 0;
 			queued <= 0;
 
 			read_pos <= 0;
@@ -146,12 +151,14 @@ module gfx_scanout
 				put_src_valid <= 0;
 
 			if (!request_flush) begin
-				fb_read <= read_valid && mask;
+				fb_read <= read_valid && effective_mask;
 				put_src_valid <= read_valid && read_half;
 	
 				if (read_valid)
 					commit_pos <= request_pos[`GFX_MASK_STAGES - 1];
 			end
+
+			vsync <= !vsync && !request_flush && read_valid && request_pos[`GFX_MASK_STAGES - 1] == {last_pos, 1'b1};
 		end
 
 	always_ff @(posedge clk) begin
@@ -159,7 +166,7 @@ module gfx_scanout
 
 		if (!request_flush) begin
 			fb_address <= request_pos[`GFX_MASK_STAGES - 1];
-			src_pipes[0] <= mask;
+			src_pipes[0] <= effective_mask;
 		end
 
 		if (fb_readdatavalid) begin
