@@ -23,7 +23,7 @@ module fp_mul
 
 	integer i;
 
-	always @(posedge clk)
+	always_ff @(posedge clk)
 		if (!stall) begin
 			a_pipeline[0] <= a;
 			b_pipeline[0] <= b;

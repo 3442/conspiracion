@@ -9,6 +9,7 @@
 // Target de 200MHz (reloj es 143MHz) con float16, rounding aproximado
 `define FP_ADD_STAGES 10 // ~401 LUTs
 `define FP_MUL_STAGES 5  // ~144 LUTs ~1 bloque DSP
+`define FP_INV_STAGES 3  // ~178 LUTs ~1 bloque DSP
 
 typedef logic[`FLOAT_BITS - 1:0] fp;
 typedef fp                       vec2[2];
