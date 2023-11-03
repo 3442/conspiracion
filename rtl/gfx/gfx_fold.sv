@@ -1,6 +1,6 @@
 `include "gfx/gfx_defs.sv"
 
-module horizontal_fold
+module gfx_fold
 (
 	input  logic  clk,
 
@@ -17,7 +17,7 @@ module horizontal_fold
 
 	assign feedback_vec = queued[`FP_ADD_STAGES - 1];
 
-	fp_add add
+	gfx_fp_add add
 	(
 		.a(feedback ? q_add : vec[0]),
 		.b(feedback ? feedback_vec[feedback_last] : vec[1]),
@@ -25,7 +25,7 @@ module horizontal_fold
 		.*
 	);
 
-	skid_buf #(.WIDTH($bits(q))) skid
+	gfx_skid_buf #(.WIDTH($bits(q))) skid
 	(
 		.in(q_add),
 		.out(q),

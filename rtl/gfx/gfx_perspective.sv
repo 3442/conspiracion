@@ -19,7 +19,7 @@ module gfx_perspective
 	assign w_inv = w_inv_pipes[`FP_MUL_STAGES - 1];
 	assign selected_w_inv = in_start ? next_w_inv : vertex_w_inv;
 
-	fp_inv inv
+	gfx_fp_inv inv
 	(
 		.a(clip_attr.w),
 		.q(next_w_inv),
@@ -29,7 +29,7 @@ module gfx_perspective
 	genvar i;
 	generate
 		for (i = 0; i < `FLOATS_PER_VEC; ++i) begin: divs
-			fp_mul div
+			gfx_fp_mul div
 			(
 				.a(in_pipes[`FP_INV_STAGES - 1][i]),
 				.b(selected_w_inv),

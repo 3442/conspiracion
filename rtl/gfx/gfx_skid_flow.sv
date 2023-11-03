@@ -1,4 +1,4 @@
-module skid_flow
+module gfx_skid_flow
 (
 	input  logic clk,
 	             rst_n,
@@ -17,7 +17,7 @@ module skid_flow
 	assign in_ready = was_ready || !was_valid;
 	assign out_valid = in_valid || stall;
 
-	always @(posedge clk or negedge rst_n)
+	always_ff @(posedge clk or negedge rst_n)
 		if (!rst_n) begin
 			was_ready <= 0;
 			was_valid <= 0;

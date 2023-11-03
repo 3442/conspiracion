@@ -1,4 +1,4 @@
-module pipeline_flow
+module gfx_pipeline_flow
 #(parameter STAGES=0)
 (
 	input  logic clk,
@@ -14,7 +14,7 @@ module pipeline_flow
 
 	logic[STAGES - 1:0] valid;
 
-	skid_flow skid
+	gfx_skid_flow skid
 	(
 		.in_valid(valid[STAGES - 1]),
 		.*

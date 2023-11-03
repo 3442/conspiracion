@@ -1,6 +1,6 @@
 `include "gfx/gfx_defs.sv"
 
-module mat_mat_mul
+module gfx_mat_mat
 (
 	input  logic clk,
 	             rst_n,
@@ -26,13 +26,13 @@ module mat_mat_mul
 	assign mul_in_valid = in_valid || in_index != `INDEX4_MIN;
 	assign mul_out_ready = out_ready || out_index != `INDEX4_MAX;
 
-	transpose transpose_b
+	gfx_transpose transpose_b
 	(
 		.in(b),
 		.out(b_transpose)
 	);
 
-	mat_vec_mul mul
+	gfx_mat_vec mul
 	(
 		.a(in_index == `INDEX4_MIN ? a : a_hold),
 		.x(mul_b[in_index]),
@@ -44,7 +44,7 @@ module mat_mat_mul
 		.*
 	);
 
-	transpose transpose_q
+	gfx_transpose transpose_q
 	(
 		.in(q_transpose),
 		.out(q)

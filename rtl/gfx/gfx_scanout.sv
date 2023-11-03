@@ -73,7 +73,7 @@ module gfx_scanout
 	genvar i;
 	generate
 		for (i = 0; i < `GFX_SCAN_STAGES; ++i) begin: stages
-			pipeline_flow #(.STAGES(1)) fb_flow
+			gfx_pipeline_flow #(.STAGES(1)) fb_flow
 			(
 				.stall(fb_stalls[i]),
 				.in_ready(fb_ready[i]),
@@ -83,7 +83,7 @@ module gfx_scanout
 				.*
 			);
 
-			pipeline_flow #(.STAGES(1)) src_flow
+			gfx_pipeline_flow #(.STAGES(1)) src_flow
 			(
 				.stall(src_stalls[i]),
 				.in_ready(src_ready[i]),

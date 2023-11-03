@@ -25,7 +25,7 @@ module gfx_perspective_flow
 	assign in_start = start_pipes[`FP_INV_STAGES - 1];
 	assign out_start = start_pipes[STAGES - 1];
 
-	pipeline_flow #(.STAGES(STAGES)) flow
+	gfx_pipeline_flow #(.STAGES(STAGES)) flow
 	(
 		.*
 	);

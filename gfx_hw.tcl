@@ -40,20 +40,20 @@ set_fileset_property QUARTUS_SYNTH TOP_LEVEL gfx
 set_fileset_property QUARTUS_SYNTH ENABLE_RELATIVE_INCLUDE_PATHS false
 set_fileset_property QUARTUS_SYNTH ENABLE_FILE_OVERWRITE_MODE false
 add_fileset_file gfx.sv SYSTEM_VERILOG PATH rtl/gfx/gfx.sv TOP_LEVEL_FILE
-add_fileset_file fp_add.sv SYSTEM_VERILOG PATH rtl/gfx/fp_add.sv
-add_fileset_file fp_inv.sv SYSTEM_VERILOG PATH rtl/gfx/fp_inv.sv
-add_fileset_file fp_mul.sv SYSTEM_VERILOG PATH rtl/gfx/fp_mul.sv
+add_fileset_file gfx_fp_add.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_fp_add.sv
+add_fileset_file gfx_fp_inv.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_fp_inv.sv
+add_fileset_file gfx_fp_mul.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_fp_mul.sv
 add_fileset_file gfx_cmd.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_cmd.sv
 add_fileset_file gfx_defs.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_defs.sv
-add_fileset_file horizontal_fold.sv SYSTEM_VERILOG PATH rtl/gfx/horizontal_fold.sv
-add_fileset_file mat_mat_mul.sv SYSTEM_VERILOG PATH rtl/gfx/mat_mat_mul.sv
-add_fileset_file mat_vec_mul.sv SYSTEM_VERILOG PATH rtl/gfx/mat_vec_mul.sv
-add_fileset_file pipeline_flow.sv SYSTEM_VERILOG PATH rtl/gfx/pipeline_flow.sv
-add_fileset_file fold_flow.sv SYSTEM_VERILOG PATH rtl/gfx/fold_flow.sv
-add_fileset_file skid_flow.sv SYSTEM_VERILOG PATH rtl/gfx/skid_flow.sv
-add_fileset_file skid_buf.sv SYSTEM_VERILOG PATH rtl/gfx/skid_buf.sv
-add_fileset_file vec_dot.sv SYSTEM_VERILOG PATH rtl/gfx/vec_dot.sv
-add_fileset_file transpose.sv SYSTEM_VERILOG PATH rtl/gfx/transpose.sv
+add_fileset_file gfx_fold.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_fold.sv
+add_fileset_file gfx_mat_mat.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_mat_mat.sv
+add_fileset_file gfx_mat_vec.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_mat_vec.sv
+add_fileset_file gfx_pipeline_flow.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_pipeline_flow.sv
+add_fileset_file gfx_fold_flow.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_fold_flow.sv
+add_fileset_file gfx_skid_flow.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_skid_flow.sv
+add_fileset_file gfx_skid_buf.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_skid_buf.sv
+add_fileset_file gfx_dot.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_dot.sv
+add_fileset_file gfx_transpose.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_transpose.sv
 add_fileset_file gfx_scanout.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_scanout.sv
 add_fileset_file gfx_masks.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_masks.sv
 add_fileset_file gfx_mask_sram.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_mask_sram.sv

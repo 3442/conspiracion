@@ -1,6 +1,6 @@
 `include "gfx/gfx_defs.sv"
 
-module mat_vec_mul
+module gfx_mat_vec
 (
 	input  logic clk,
 	             rst_n,
@@ -17,7 +17,7 @@ module mat_vec_mul
 
 	logic stall_mul, stall_fold, mul_ready, mul_valid, feedback, feedback_last;
 
-	pipeline_flow #(.STAGES(`FP_MUL_STAGES)) mul
+	gfx_pipeline_flow #(.STAGES(`FP_MUL_STAGES)) mul
 	(
 		.stall(stall_mul),
 		.out_ready(mul_ready),
@@ -25,7 +25,7 @@ module mat_vec_mul
 		.*
 	);
 
-	fold_flow fold
+	gfx_fold_flow fold
 	(
 		.stall(stall_fold),
 		.in_ready(mul_ready),
@@ -36,7 +36,7 @@ module mat_vec_mul
 	genvar i;
 	generate
 		for (i = 0; i < `VECS_PER_MAT; ++i) begin: dots
-			vec_dot dot_i
+			gfx_dot dot_i
 			(
 				.a(a[i]),
 				.b(x),

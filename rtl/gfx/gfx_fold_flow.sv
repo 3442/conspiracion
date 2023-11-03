@@ -1,6 +1,6 @@
 `include "gfx/gfx_defs.sv"
 
-module fold_flow
+module gfx_fold_flow
 (
 	input  logic  clk,
 	              rst_n,
@@ -25,7 +25,7 @@ module fold_flow
 
 	assign last_round = rounds[`FP_ADD_STAGES - 1];
 
-	skid_flow skid
+	gfx_skid_flow skid
 	(
 		.in_valid(last_round == `INDEX4_MAX),
 		.in_ready(skid_ready),

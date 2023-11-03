@@ -1,6 +1,6 @@
 `include "gfx/gfx_defs.sv"
 
-module fp_mul
+module gfx_fp_mul
 (
 	input  logic clk,
 

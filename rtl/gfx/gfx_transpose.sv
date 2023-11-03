@@ -1,6 +1,6 @@
 `include "gfx/gfx_defs.sv"
 
-module transpose
+module gfx_transpose
 (
 	input  mat4 in,
 	output mat4 out

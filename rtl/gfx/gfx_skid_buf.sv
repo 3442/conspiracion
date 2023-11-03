@@ -1,4 +1,4 @@
-module skid_buf
+module gfx_skid_buf
 #(parameter WIDTH=0)
 (
 	input  logic              clk,

@@ -1,6 +1,6 @@
 `include "gfx/gfx_defs.sv"
 
-module vec_dot
+module gfx_dot
 (
 	input  logic clk,
 
@@ -17,7 +17,7 @@ module vec_dot
 
 	vec4 products_fold, products_mul;
 
-	horizontal_fold fold
+	gfx_fold fold
 	(
 		.vec(products_fold),
 		.stall(stall_fold),
@@ -27,7 +27,7 @@ module vec_dot
 	genvar i;
 	generate
 		for (i = 0; i < `FLOATS_PER_VEC; ++i) begin: entries
-			fp_mul entry_i
+			gfx_fp_mul entry_i
 			(
 				.a(a[i]),
 				.b(b[i]),
@@ -36,7 +36,7 @@ module vec_dot
 				.*
 			);
 
-			skid_buf #(.WIDTH($bits(fp))) skid_i
+			gfx_skid_buf #(.WIDTH($bits(fp))) skid_i
 			(
 				.in(products_mul[i]),
 				.out(products_fold[i]),
