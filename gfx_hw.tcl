@@ -58,6 +58,7 @@ add_fileset_file gfx_scanout.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_scanout.sv
 add_fileset_file gfx_masks.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_masks.sv
 add_fileset_file gfx_mask_sram.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_mask_sram.sv
 add_fileset_file gfx_setup_offsets.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_setup_offsets.sv
+add_fileset_file gfx_fine.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_fine.sv
 
 
 # 

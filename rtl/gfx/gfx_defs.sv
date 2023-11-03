@@ -52,6 +52,11 @@ typedef logic signed[31:0] fixed;
 
 `define FIXED_FRAC 16
 
+typedef struct packed
+{
+	fixed x, y;
+} raster_xy;
+
 `define GFX_MASK_SRAM_STAGES 3
 `define GFX_MASK_STAGES      (1 + `GFX_MASK_SRAM_STAGES + 1)
 `define GFX_SCAN_STAGES      3 // Ajustable
