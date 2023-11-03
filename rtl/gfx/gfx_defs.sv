@@ -48,8 +48,16 @@ typedef struct packed
 	logic[9:0] r, g, b;
 } rgb30;
 
+typedef logic signed[31:0] fixed;
+
+`define FIXED_FRAC 16
+
 `define GFX_MASK_SRAM_STAGES 3
 `define GFX_MASK_STAGES      (1 + `GFX_MASK_SRAM_STAGES + 1)
 `define GFX_SCAN_STAGES      3 // Ajustable
+
+`define GFX_RASTER_BITS    2
+`define GFX_RASTER_SIZE    (1 << GFX_RASTER_BITS)
+`define GFX_RASTER_OFFSETS (1 << (2 * GFX_RASTER_BITS))
 
 `endif
