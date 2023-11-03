@@ -12,7 +12,7 @@ module pipeline_flow
 	             stall
 );
 
-	logic valid[STAGES];
+	logic[STAGES - 1:0] valid;
 
 	skid_flow skid
 	(

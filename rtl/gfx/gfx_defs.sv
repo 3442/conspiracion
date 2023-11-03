@@ -11,10 +11,18 @@
 `define FP_MUL_STAGES 5  // ~144 LUTs ~1 bloque DSP
 `define FP_INV_STAGES 3  // ~178 LUTs ~1 bloque DSP
 
-typedef logic[`FLOAT_BITS - 1:0] fp;
-typedef fp                       vec2[2];
-typedef fp                       vec4[`FLOATS_PER_VEC];
-typedef vec4                     mat4[`VECS_PER_MAT];
+typedef logic[`FLOAT_BITS - 1:0]  fp;
+typedef fp                        vec2[2];
+typedef fp                        vec4[`FLOATS_PER_VEC];
+typedef fp[`FLOATS_PER_VEC - 1:0] vec4_packed;
+typedef vec4                      mat4[`VECS_PER_MAT];
+
+`define FP_UNIT 16'h3c00
+
+typedef struct packed
+{
+	fp x, y, z, w;
+} attr4;
 
 typedef logic[1:0] index4;
 
