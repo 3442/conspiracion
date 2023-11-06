@@ -323,6 +323,7 @@ set_global_assignment -name SIP_FILE ip/ip_fp_mul.sip
 
 set_global_assignment -name QIP_FILE ip/ip_fp_add.qip
 set_global_assignment -name SIP_FILE ip/ip_fp_add.sip
-set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
 set_global_assignment -name QIP_FILE ip/ip_fp_inv.qip
 set_global_assignment -name SIP_FILE ip/ip_fp_inv.sip
+set_global_assignment -name SIP_FILE ip/ip_dot2.sip
+set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

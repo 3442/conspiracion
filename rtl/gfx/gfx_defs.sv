@@ -14,7 +14,6 @@
 typedef logic[`FLOAT_BITS - 1:0]  fp;
 typedef fp                        vec2[2];
 typedef fp                        vec4[`FLOATS_PER_VEC];
-typedef fp[`FLOATS_PER_VEC - 1:0] vec4_packed;
 typedef vec4                      mat4[`VECS_PER_MAT];
 
 `define FP_UNIT 16'h3c00
@@ -48,9 +47,12 @@ typedef struct packed
 	logic[9:0] r, g, b;
 } rgb30;
 
-typedef logic signed[31:0] fixed;
-
 `define FIXED_FRAC 16
+
+`define FIXED_FMA_STAGES     5
+`define FIXED_FMA_DOT_STAGES (2 * `FIXED_FMA_STAGES)
+
+typedef logic signed[31:0] fixed;
 
 typedef struct packed
 {
