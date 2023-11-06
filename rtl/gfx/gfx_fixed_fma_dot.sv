@@ -14,7 +14,7 @@ module gfx_fixed_fma_dot
 	output fixed q
 );
 
-	fixed q0, a1_hold[`FIXED_FMA_STAGES], b1_hold[`FIXED_FMA_STAGES];
+	fixed q0, a1_hold, b1_hold;
 
 	gfx_fixed_fma fma0
 	(
@@ -24,25 +24,26 @@ module gfx_fixed_fma_dot
 		.*
 	);
 
-	gfx_fixed_fma fma1
+	gfx_pipes #(.WIDTH($bits(fixed)), .DEPTH(`FIXED_FMA_STAGES)) a_pipes
 	(
-		.a(a1_hold[`FIXED_FMA_STAGES - 1]),
-		.b(b1_hold[`FIXED_FMA_STAGES - 1]),
-		.c(q0),
+		.in(a1),
+		.out(a1_hold),
 		.*
 	);
 
-	integer i;
+	gfx_pipes #(.WIDTH($bits(fixed)), .DEPTH(`FIXED_FMA_STAGES)) b_pipes
+	(
+		.in(b1),
+		.out(b1_hold),
+		.*
+	);
 
-	always_ff @(posedge clk)
-		if (!stall) begin
-			a1_hold[0] <= a1;
-			b1_hold[0] <= b1;
-
-			for (i = 1; i < `FIXED_FMA_STAGES; ++i) begin
-				a1_hold[i] <= a1_hold[i - 1];
-				b1_hold[i] <= b1_hold[i - 1];
-			end
-		end
+	gfx_fixed_fma fma1
+	(
+		.a(a1_hold),
+		.b(b1_hold),
+		.c(q0),
+		.*
+	);
 
 endmodule

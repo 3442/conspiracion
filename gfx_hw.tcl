@@ -54,6 +54,7 @@ add_fileset_file gfx_pipeline_flow.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_pipeline_f
 add_fileset_file gfx_fold_flow.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_fold_flow.sv
 add_fileset_file gfx_skid_flow.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_skid_flow.sv
 add_fileset_file gfx_skid_buf.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_skid_buf.sv
+add_fileset_file gfx_pipes.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_pipes.sv
 add_fileset_file gfx_dot.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_dot.sv
 add_fileset_file gfx_transpose.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_transpose.sv
 add_fileset_file gfx_scanout.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_scanout.sv
