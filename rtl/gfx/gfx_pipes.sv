@@ -13,12 +13,11 @@ module gfx_pipes
 
 	assign out = pipes[DEPTH - 1];
 
-	integer i;
 	always_ff @(posedge clk)
 		if (!stall) begin
 			pipes[0] <= in;
 
-			for (i = 1; i < DEPTH; ++i)
+			for (integer i = 1; i < DEPTH; ++i)
 				pipes[i] <= pipes[i - 1];
 		end
 

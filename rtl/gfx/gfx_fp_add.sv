@@ -19,22 +19,23 @@ module gfx_fp_add
 		.*
 	);
 `else
-	fp a_pipeline[`FP_ADD_STAGES - 1], b_pipeline[`FP_ADD_STAGES - 1];
+	fp a_pop, b_pop;
 
-	integer i;
+	assign q = $c("taller::fp_add(", a_pop, ", ", b_pop, ")");
 
-	always_ff @(posedge clk)
-		if (!stall) begin
-			a_pipeline[0] <= a;
-			b_pipeline[0] <= b;
+	gfx_pipes #(.WIDTH($bits(a)), .DEPTH(`FP_ADD_STAGES)) a_pipes
+	(
+		.in(a),
+		.out(a_pop),
+		.*
+	);
 
-			for (i = 1; i < `FP_ADD_STAGES - 1; ++i) begin
-				a_pipeline[i] <= a_pipeline[i - 1];
-				b_pipeline[i] <= b_pipeline[i - 1];
-			end
-
-			q <= $c("taller::fp_add(", a_pipeline[`FP_ADD_STAGES - 2], ", ", b_pipeline[`FP_ADD_STAGES - 2], ")");
-		end
+	gfx_pipes #(.WIDTH($bits(b)), .DEPTH(`FP_ADD_STAGES)) b_pipes
+	(
+		.in(b),
+		.out(b_pop),
+		.*
+	);
 `endif
 
 endmodule

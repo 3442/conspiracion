@@ -18,19 +18,16 @@ module gfx_fp_inv
 		.*
 	);
 `else
-	fp pipeline[`FP_INV_STAGES - 1];
+	fp a_pop;
 
-	integer i;
+	assign q = $c("taller::fp_inv(", a_pop, ")");
 
-	always_ff @(posedge clk)
-		if (!stall) begin
-			pipeline[0] <= a;
-
-			for (i = 1; i < `FP_INV_STAGES - 1; ++i)
-				pipeline[i] <= pipeline[i - 1];
-
-			q <= $c("taller::fp_inv(", pipeline[`FP_INV_STAGES - 2], ")");
-		end
+	gfx_pipes #(.WIDTH($bits(a)), .DEPTH(`FP_INV_STAGES)) a_pipes
+	(
+		.in(a),
+		.out(a_pop),
+		.*
+	);
 `endif
 
 endmodule
