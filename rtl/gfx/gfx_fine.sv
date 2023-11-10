@@ -3,46 +3,45 @@
 module gfx_fine
 #(parameter X=0, Y=0)
 (
-	input  logic     clk,
+	input  logic              clk,
 
-	input  raster_xy pos,
-	input  fixed     corner_a,
-	                 corner_b,
-	                 corner_c,
-	input  fixed     offsets_a[`GFX_RASTER_OFFSETS],
-	                 offsets_b[`GFX_RASTER_OFFSETS],
-	                 offsets_c[`GFX_RASTER_OFFSETS],
-	input  logic     stall,
+	input  raster_xy          pos,
+	input  fixed_tri          corners,
+	input  raster_offsets_tri offsets,
+	input  logic              stall,
 
-	output frag_xy   fragment,
-	output logic     paint
+	output frag_xy            fragment,
+	output logic              paint
 );
 
 	localparam INDEX = Y * `GFX_RASTER_SIZE + X;
 
-	fixed edge_a, edge_b, edge_c, offset_a, offset_b, offset_c;
-	logic sign_a, sign_b, sign_c;
 	frag_xy fragment_hold;
+	fixed_tri edges, per_edge_offsets;
+	logic[2:0] signs;
+	raster_xy_prec prec;
+	logic[`GFX_RASTER_BITS - 1:0] fine_x, fine_y;
 
-	assign offset_a = offsets_a[INDEX];
-	assign offset_b = offsets_b[INDEX];
-	assign offset_c = offsets_c[INDEX];
+	assign prec = pos;
+	assign fine_x = X;
+	assign fine_y = Y;
 
-	assign sign_a = edge_a[$bits(edge_a) - 1];
-	assign sign_b = edge_b[$bits(edge_b) - 1];
-	assign sign_c = edge_c[$bits(edge_c) - 1];
+	always_comb
+		for (integer i = 0; i < 3; ++i) begin
+			signs[i] = edges[i][$bits(edges[0]) - 1];
+			per_edge_offsets[i] = offsets[i][INDEX];
+		end
 
 	always_ff @(posedge clk)
 		if (!stall) begin
-			paint <= !sign_a && !sign_b && !sign_c;
+			paint <= signs == 0;
 	
 			fragment <= fragment_hold;
-			fragment_hold.x <= pos.x.frag.num;
-			fragment_hold.y <= pos.y.frag.num;
+			fragment_hold.x <= {prec.x.coarse, fine_x};
+			fragment_hold.y <= {prec.y.coarse, fine_y};
 
-			edge_a <= corner_a + offset_a;
-			edge_b <= corner_b + offset_b;
-			edge_c <= corner_c + offset_c;
+			for (integer i = 0; i < 3; ++i)
+				edges[i] <= corners[i] + per_edge_offsets[i];
 		end
 
 endmodule

@@ -28,8 +28,9 @@ typedef logic[1:0] index4;
 `define INDEX4_MIN 2'b00
 `define INDEX4_MAX 2'b11
 
-typedef logic[9:0]  y_coord;
 typedef logic[8:0]  x_coord;
+typedef logic[9:0]  y_coord;
+typedef logic[9:0]  xy_coord;
 typedef logic[18:0] linear_coord;
 typedef logic[19:0] half_coord;
 
@@ -53,18 +54,65 @@ typedef struct packed
 `define FIXED_FMA_DOT_STAGES (2 * `FIXED_FMA_STAGES)
 
 typedef logic signed[31:0] fixed;
+typedef fixed[2:0]         fixed_tri;
 
 typedef struct packed
 {
 	fixed x, y;
 } raster_xy;
 
+typedef logic[7:0] coarse_dim;
+
 `define GFX_MASK_SRAM_STAGES 3
 `define GFX_MASK_STAGES      (1 + `GFX_MASK_SRAM_STAGES + 1)
 `define GFX_SCAN_STAGES      3 // Ajustable
 
-`define GFX_RASTER_BITS    2
-`define GFX_RASTER_SIZE    (1 << GFX_RASTER_BITS)
-`define GFX_RASTER_OFFSETS (1 << (2 * GFX_RASTER_BITS))
+`define GFX_SETUP_BOUNDS_STAGES  3
+`define GFX_SETUP_EDGE_STAGES    (1 + `FIXED_FMA_DOT_STAGES)
+`define GFX_SETUP_OFFSETS_STAGES 2
+`define GFX_SETUP_STAGES         (`GFX_SETUP_BOUNDS_STAGES \
+                                 + `GFX_SETUP_EDGE_STAGES \
+                                 + `GFX_SETUP_OFFSETS_STAGES)
+
+`define GFX_FINE_STAGES 2
+
+`define GFX_RASTER_BITS     2
+`define GFX_RASTER_SUB_BITS 4
+`define GFX_RASTER_PAD_BITS ($bits(fixed) - $bits(coarse_dim) - `FIXED_FRAC - `GFX_RASTER_BITS - 1)
+`define GFX_RASTER_SIZE     (1 << `GFX_RASTER_BITS)
+`define GFX_RASTER_OFFSETS  (1 << (2 * `GFX_RASTER_BITS))
+
+typedef struct packed
+{
+	logic[`GFX_RASTER_SUB_BITS - 1:0]               num;
+	logic[`FIXED_FRAC - `GFX_RASTER_SUB_BITS - 1:0] prec;
+} raster_sub;
+
+typedef struct packed
+{
+	logic                             sign;
+	logic[`GFX_RASTER_PAD_BITS - 1:0] padding;
+	coarse_dim                        coarse;
+	logic[`GFX_RASTER_BITS - 1:0]     fine;
+	raster_sub                        sub;
+} raster_prec;
+
+typedef struct packed
+{
+	raster_prec x, y;
+} raster_xy_prec;
+
+typedef fixed[`GFX_RASTER_OFFSETS - 1:0] raster_offsets;
+typedef raster_offsets[2:0]              raster_offsets_tri;
+
+`define GFX_FINE_LANES (`GFX_RASTER_SIZE * `GFX_RASTER_SIZE)
+
+typedef struct packed
+{
+	xy_coord x, y;
+} frag_xy;
+
+typedef frag_xy[`GFX_FINE_LANES - 1:0] frag_xy_lanes;
+typedef logic[`GFX_FINE_LANES - 1:0]   paint_lanes;
 
 `endif
