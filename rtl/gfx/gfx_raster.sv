@@ -41,7 +41,7 @@ module gfx_raster
 	fixed_tri coarse_corners;
 	raster_xy coarse_pos;
 
-	gfx_coarse coarse
+	gfx_raster_coarse coarse
 	(
 		.in_valid(setup_valid),
 		.in_ready(coarse_ready),
@@ -83,7 +83,7 @@ module gfx_raster
 	generate
 		for (i = 0; i < `GFX_RASTER_SIZE; ++i) begin: fine_x
 			for (j = 0; j < `GFX_RASTER_SIZE; ++j) begin: fine_y
-				gfx_fine #(.X(i), .Y(j)) fine
+				gfx_raster_fine #(.X(i), .Y(j)) fine
 				(
 					.stall(fine_stall),
 

@@ -1,6 +1,6 @@
 `include "gfx/gfx_defs.sv"
 
-module gfx_fine
+module gfx_raster_fine
 #(parameter X=0, Y=0)
 (
 	input  logic              clk,

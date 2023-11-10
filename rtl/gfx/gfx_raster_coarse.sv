@@ -1,6 +1,6 @@
 `include "gfx/gfx_defs.sv"
 
-module gfx_coarse
+module gfx_raster_coarse
 (
 	input  logic      clk,
 	                  rst_n,
