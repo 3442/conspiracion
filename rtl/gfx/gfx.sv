@@ -26,7 +26,7 @@ module gfx
 	output rgb30       scan_data
 );
 
-	logic enable_clear, swap_buffers;
+	logic enable_clear, start_clear, swap_buffers;
 	rgb24 clear_color;
 
 	gfx_cmd cmd
@@ -38,10 +38,17 @@ module gfx
 
 	gfx_masks masks
 	(
-		.frag_mask_set(0),
-		.frag_mask_write(0),
 		.frag_mask_read_addr(),
-		.frag_mask_write_addr(),
+		.*
+	);
+
+	logic frag_mask_set, frag_mask_write, frag_wait;
+	linear_coord frag_mask_write_addr;
+
+	gfx_clear clear
+	(
+		.rop_mask_addr(),
+		.rop_mask_assert(0),
 		.*
 	);
 

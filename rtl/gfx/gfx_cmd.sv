@@ -15,13 +15,15 @@ module gfx_cmd
 
 	output logic       swap_buffers,
 	                   enable_clear,
+	                   start_clear,
 	output rgb24       clear_color
 );
 
 	struct packed
 	{
-		logic[5:0] mbz;
-		logic      enable_clear,
+		logic[4:0] mbz;
+		logic      start_frame,
+		           enable_clear,
 		           swap_buffers;
 		rgb24      clear_color;
 	} readdata_scan, writedata_scan;
@@ -36,17 +38,21 @@ module gfx_cmd
 	assign cmd_readdata = readdata_scan;
 
 	rgb24 next_clear_color;
-	logic next_enable_clear, next_swap_buffers;
+	logic next_start_clear, next_enable_clear, next_swap_buffers;
 
 	always_ff @(posedge clk or negedge rst_n)
 		if (!rst_n) begin
+			start_clear <= 0;
 			enable_clear <= 0;
 			swap_buffers <= 0;
 
+			next_start_clear <= 0;
 			next_enable_clear <= 0;
 			next_swap_buffers <= 0;
 		end else begin
+			start_clear <= 0;
 			if (vsync) begin
+				start_clear <= next_start_clear;
 				enable_clear <= next_enable_clear;
 				swap_buffers <= next_swap_buffers;
 			end
@@ -54,6 +60,9 @@ module gfx_cmd
 			if (cmd_write) begin
 				next_enable_clear <= writedata_scan.enable_clear;
 				next_swap_buffers <= writedata_scan.swap_buffers;
+
+				if (!next_start_clear)
+					next_start_clear <= writedata_scan.start_frame && writedata_scan.enable_clear;
 			end
 		end
 
