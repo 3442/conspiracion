@@ -42,6 +42,24 @@ module gfx
 		.*
 	);
 
+	logic raster_ready;
+	paint_lanes raster_valid;
+	frag_xy_lanes fragments;
+
+	gfx_raster raster
+	(
+		.in_ready(raster_ready),
+		.in_valid(0), //TODO
+		.out_ready(frag_ready),
+		.out_valid(raster_valid),
+
+		.vertex_a(), //TODO
+		.vertex_b(), //TODO
+		.vertex_c(), //TODO
+
+		.*
+	);
+
 	logic frag_mask_set, frag_mask_write, frag_wait;
 	linear_coord frag_mask_write_addr;
 
@@ -49,6 +67,20 @@ module gfx
 	(
 		.rop_mask_addr(),
 		.rop_mask_assert(0),
+		.*
+	);
+
+	logic frag_ready, frag_valid;
+	frag_paint frag_out;
+
+	gfx_frag frag
+	(
+		.in_ready(frag_ready),
+		.in_valid(raster_valid),
+		.out_ready(1), //TODO
+		.out_valid(frag_valid),
+
+		.out(frag_out),
 		.*
 	);
 

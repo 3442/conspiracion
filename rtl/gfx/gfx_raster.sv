@@ -6,7 +6,7 @@ module gfx_raster
 	                     rst_n,
 
 	input  raster_xy     vertex_a,
-				         vertex_b,
+	                     vertex_b,
 	                     vertex_c,
 	input  logic         in_valid,
 	output logic         in_ready,

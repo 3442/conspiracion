@@ -48,6 +48,11 @@ typedef struct packed
 	logic[9:0] r, g, b;
 } rgb30;
 
+typedef struct packed
+{
+	logic[7:0] a, r, g, b;
+} rgb32;
+
 `define FIXED_FRAC 16
 
 `define FIXED_FMA_STAGES     5
@@ -114,5 +119,13 @@ typedef struct packed
 
 typedef frag_xy[`GFX_FINE_LANES - 1:0] frag_xy_lanes;
 typedef logic[`GFX_FINE_LANES - 1:0]   paint_lanes;
+
+typedef struct packed
+{
+	linear_coord addr;
+	rgb32        color;
+} frag_paint;
+
+`define GFX_FRAG_ADDR_STAGES 3
 
 `endif
