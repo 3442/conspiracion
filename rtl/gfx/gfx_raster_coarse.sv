@@ -54,8 +54,8 @@ module gfx_raster_coarse
 
 	gfx_skid_flow skid_flow
 	(
-		.in_valid(send),
 		.in_ready(skid_ready),
+		.in_valid(send),
 		.*
 	);
 
