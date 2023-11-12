@@ -38,9 +38,13 @@ typedef logic[19:0] half_coord;
 `define GFX_Y_RES      480
 `define GFX_LINEAR_RES (`GFX_X_RES * `GFX_Y_RES)
 
+`define COLOR_CHANNELS 4
+
+typedef logic[7:0] color8;
+
 typedef struct packed
 {
-	logic[7:0] r, g, b;
+	color8 r, g, b;
 } rgb24;
 
 typedef struct packed
@@ -50,13 +54,14 @@ typedef struct packed
 
 typedef struct packed
 {
-	logic[7:0] a, r, g, b;
+	color8 a, r, g, b;
 } rgb32;
 
 `define FIXED_FRAC 16
 
 `define FIXED_FMA_STAGES     5
 `define FIXED_FMA_DOT_STAGES (2 * `FIXED_FMA_STAGES)
+`define LERP_STAGES          `FIXED_FMA_DOT_STAGES
 
 typedef logic signed[31:0] fixed;
 typedef fixed[2:0]         fixed_tri;
@@ -119,6 +124,7 @@ typedef struct packed
 
 typedef frag_xy[`GFX_FINE_LANES - 1:0] frag_xy_lanes;
 typedef logic[`GFX_FINE_LANES - 1:0]   paint_lanes;
+typedef fixed[`COLOR_CHANNELS - 1:0]   color_lerp_lanes;
 
 typedef struct packed
 {
@@ -126,6 +132,7 @@ typedef struct packed
 	rgb32        color;
 } frag_paint;
 
-`define GFX_FRAG_ADDR_STAGES 3
+`define GFX_FRAG_ADDR_STAGES  3
+`define GFX_FRAG_SHADE_STAGES (`LERP_STAGES + 1)
 
 `endif

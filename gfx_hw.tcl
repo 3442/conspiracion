@@ -68,8 +68,10 @@ add_fileset_file gfx_raster.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_raster.sv
 add_fileset_file gfx_raster_fine.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_raster_fine.sv
 add_fileset_file gfx_raster_coarse.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_raster_coarse.sv
 add_fileset_file gfx_clear.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_clear.sv
+add_fileset_file gfx_lerp.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_lerp.sv
 add_fileset_file gfx_frag.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_frag.sv
 add_fileset_file gfx_frag_addr.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_frag_addr.sv
+add_fileset_file gfx_frag_shade.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_frag_shade.sv
 add_fileset_file gfx_frag_funnel.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_frag_funnel.sv
 
 

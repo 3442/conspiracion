@@ -17,7 +17,7 @@ module gfx_frag_addr
 	 *
 	 *   linear = y_corregido * `GFX_X_RES + x_corregido
 	 *
-	 * Afortunadamente, esto es trivializable y no necesita FMA:
+	 * Afortunadamente, esto no necesita una FMA, como procederé a demostrar:
 	 *
 	 *   y * `GFX_X_RES + x
 	 * = y * 640 + x
