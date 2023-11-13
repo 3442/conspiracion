@@ -2,25 +2,25 @@
 
 module gfx_frag
 (
-	input  logic         clk,
-	                     rst_n,
+	input  logic      clk,
+	                  rst_n,
 
-	input  frag_xy       frag,
-	input  fixed_tri     bary,
-	                     ws,
-	input  logic         in_valid,
-	output logic         in_ready,
+	input  frag_xy    frag,
+	input  fixed_tri  bary,
+	                  ws,
+	input  logic      in_valid,
+	output logic      in_ready,
 
-	input  logic         out_ready,
-	output logic         out_valid,
-	output frag_paint    out
+	input  logic      out_ready,
+	output logic      out_valid,
+	output frag_paint out
 );
 
 	logic stall;
+	frag_paint frag_out;
 
 	gfx_pipeline_flow #(.STAGES(`GFX_FRAG_STAGES)) addr_flow
 	(
-		.stall(stall),
 		.*
 	);
 
@@ -28,7 +28,6 @@ module gfx_frag
 
 	gfx_frag_addr addr
 	(
-		.stall(stall),
 		.*
 	);
 
@@ -37,8 +36,7 @@ module gfx_frag
 	gfx_pipes #(.WIDTH($bits(linear_coord)), .DEPTH(ADDR_WAIT_STAGES)) addr_pipes
 	(
 		.in(linear),
-		.out(),
-		.stall(stall),
+		.out(frag_out.addr),
 		.*
 	);
 
@@ -46,17 +44,21 @@ module gfx_frag
 
 	gfx_frag_bary frag_bary
 	(
-		.stall(stall),
 		.*
 	);
 
 	gfx_frag_shade shade
 	(
-		.stall(stall),
-		.color(),
+		.color(frag_out.color),
 		.argb0(),
 		.argb1_argb0(),
 		.argb2_argb0(),
+		.*
+	);
+
+	gfx_skid_buf #(.WIDTH($bits(frag_out))) skid
+	(
+		.in(frag_out),
 		.*
 	);
 
