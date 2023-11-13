@@ -43,13 +43,14 @@ module gfx
 	);
 
 	logic raster_ready;
-	fixed_tri ws;
+	fixed_tri raster_ws;
 	bary_lanes barys;
 	paint_lanes raster_valid;
 	frag_xy_lanes fragments;
 
 	gfx_raster raster
 	(
+		.ws(raster_ws),
 		.in_ready(raster_ready),
 		.in_valid(0), //TODO
 		.out_ready(funnel_ready),
@@ -73,13 +74,11 @@ module gfx
 	);
 
 	logic funnel_ready, funnel_valid;
-	frag_xy funnel_frag;
-	fixed_tri funnel_bary;
+	frag_xy frag;
+	fixed_tri frag_bary, frag_ws;
 
 	gfx_funnel funnel
 	(
-		.bary(funnel_bary),
-		.frag(funnel_frag),
 		.in_ready(funnel_ready),
 		.in_valid(raster_valid),
 		.out_ready(frag_ready),
@@ -90,11 +89,12 @@ module gfx
 	logic frag_ready, frag_valid;
 	frag_paint frag_out;
 
-	gfx_frag frag
+	gfx_frag frag_
 	(
 		.out(frag_out),
-		.bary(funnel_bary),
-		.frag(funnel_frag),
+
+		.ws(frag_ws),
+		.bary(frag_bary),
 		.in_ready(frag_ready),
 		.in_valid(funnel_valid),
 		.out_ready(1), //TODO

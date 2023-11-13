@@ -7,18 +7,20 @@ module gfx_funnel
 
 	input  frag_xy_lanes fragments,
 	input  bary_lanes    barys,
+	input  fixed_tri     raster_ws,
 	input  paint_lanes   in_valid,
 	output logic         in_ready,
 
 	input  logic         out_ready,
 	output logic         out_valid,
 	output frag_xy       frag,
-	output fixed_tri     bary
+	output fixed_tri     frag_bary,
+	                     frag_ws
 );
 
 	logic skid_ready, stall, ready, valid;
 	frag_xy next_frag, out_frag;
-	fixed_tri next_bary, out_bary;
+	fixed_tri next_bary, out_bary, out_ws, ws_hold;
 	bary_lanes barys_hold;
 	paint_lanes current, next;
 	frag_xy_lanes fragments_hold;
@@ -33,10 +35,17 @@ module gfx_funnel
 		.*
 	);
 
-	gfx_skid_buf #(.WIDTH($bits(bary))) skid_bary
+	gfx_skid_buf #(.WIDTH($bits(frag_bary))) skid_bary
 	(
 		.in(out_bary),
-		.out(bary),
+		.out(frag_bary),
+		.*
+	);
+
+	gfx_skid_buf #(.WIDTH($bits(frag_ws))) skid_ws
+	(
+		.in(out_ws),
+		.out(frag_ws),
 		.*
 	);
 
@@ -74,10 +83,12 @@ module gfx_funnel
 	always_ff @(posedge clk)
 		if (!stall) begin
 			if (ready) begin
+				ws_hold <= raster_ws;
 				barys_hold <= barys;
 				fragments_hold <= fragments;
 			end
 
+			out_ws <= ws_hold;
 			out_bary <= next_bary;
 			out_frag <= next_frag;
 		end
