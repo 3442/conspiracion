@@ -1,6 +1,6 @@
 `include "gfx/gfx_defs.sv"
 
-module gfx_frag_funnel
+module gfx_funnel
 (
 	input  logic         clk,
 	                     rst_n,

@@ -52,7 +52,7 @@ module gfx
 	(
 		.in_ready(raster_ready),
 		.in_valid(0), //TODO
-		.out_ready(frag_ready),
+		.out_ready(funnel_ready),
 		.out_valid(raster_valid),
 
 		.vertex_a(), //TODO
@@ -72,17 +72,33 @@ module gfx
 		.*
 	);
 
+	logic funnel_ready, funnel_valid;
+	frag_xy funnel_frag;
+	fixed_tri funnel_bary;
+
+	gfx_funnel funnel
+	(
+		.bary(funnel_bary),
+		.frag(funnel_frag),
+		.in_ready(funnel_ready),
+		.in_valid(raster_valid),
+		.out_ready(frag_ready),
+		.out_valid(funnel_valid),
+		.*
+	);
+
 	logic frag_ready, frag_valid;
 	frag_paint frag_out;
 
 	gfx_frag frag
 	(
+		.out(frag_out),
+		.bary(funnel_bary),
+		.frag(funnel_frag),
 		.in_ready(frag_ready),
-		.in_valid(raster_valid),
+		.in_valid(funnel_valid),
 		.out_ready(1), //TODO
 		.out_valid(frag_valid),
-
-		.out(frag_out),
 		.*
 	);
 

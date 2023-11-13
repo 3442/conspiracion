@@ -5,10 +5,10 @@ module gfx_frag
 	input  logic         clk,
 	                     rst_n,
 
-	input  frag_xy_lanes fragments,
-	input  bary_lanes    barys,
-	input  fixed_tri     ws,
-	input  paint_lanes   in_valid,
+	input  frag_xy       frag,
+	input  fixed_tri     bary,
+	                     ws,
+	input  logic         in_valid,
 	output logic         in_ready,
 
 	input  logic         out_ready,
@@ -16,27 +16,11 @@ module gfx_frag
 	output frag_paint    out
 );
 
-	logic funnel_valid;
-	frag_xy funnel_frag;
-	fixed_tri bary;
-
-	gfx_frag_funnel funnel
-	(
-		.frag(funnel_frag),
-		.out_ready(frag_ready),
-		.out_valid(funnel_valid),
-		.*
-	);
-
-	logic frag_ready, frag_stall;
+	logic stall;
 
 	gfx_pipeline_flow #(.STAGES(`GFX_FRAG_STAGES)) addr_flow
 	(
-		.stall(frag_stall),
-		.in_ready(frag_ready),
-		.in_valid(funnel_valid),
-		.out_ready(1),
-		.out_valid(),
+		.stall(stall),
 		.*
 	);
 
@@ -44,8 +28,7 @@ module gfx_frag
 
 	gfx_frag_addr addr
 	(
-		.frag(funnel_frag),
-		.stall(frag_stall),
+		.stall(stall),
 		.*
 	);
 
@@ -55,7 +38,7 @@ module gfx_frag
 	(
 		.in(linear),
 		.out(),
-		.stall(frag_stall),
+		.stall(stall),
 		.*
 	);
 
@@ -63,13 +46,13 @@ module gfx_frag
 
 	gfx_frag_bary frag_bary
 	(
-		.stall(frag_stall),
+		.stall(stall),
 		.*
 	);
 
 	gfx_frag_shade shade
 	(
-		.stall(frag_stall),
+		.stall(stall),
 		.color(),
 		.argb0(),
 		.argb1_argb0(),
