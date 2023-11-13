@@ -43,6 +43,7 @@ module gfx
 	);
 
 	logic raster_ready;
+	fixed_tri ws;
 	bary_lanes barys;
 	paint_lanes raster_valid;
 	frag_xy_lanes fragments;

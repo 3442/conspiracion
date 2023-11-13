@@ -7,6 +7,7 @@ module gfx_frag
 
 	input  frag_xy_lanes fragments,
 	input  bary_lanes    barys,
+	input  fixed_tri     ws,
 	input  paint_lanes   in_valid,
 	output logic         in_ready,
 
@@ -62,7 +63,6 @@ module gfx_frag
 
 	gfx_frag_bary frag_bary
 	(
-		.ws(),
 		.stall(frag_stall),
 		.*
 	);

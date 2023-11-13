@@ -76,6 +76,17 @@ typedef struct packed
 	fixed x, y;
 } raster_xy;
 
+typedef struct packed
+{
+	fixed z, w;
+} raster_zw;
+
+typedef struct packed
+{
+	raster_xy xy;
+	raster_zw zw;
+} raster_xyzw;
+
 typedef logic[7:0] coarse_dim;
 
 `define GFX_MASK_SRAM_STAGES 3

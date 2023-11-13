@@ -5,7 +5,7 @@ module gfx_raster
 	input  logic         clk,
 	                     rst_n,
 
-	input  raster_xy     vertex_a,
+	input  raster_xyzw   vertex_a,
 	                     vertex_b,
 	                     vertex_c,
 	input  logic         in_valid,
@@ -13,9 +13,15 @@ module gfx_raster
 
 	output frag_xy_lanes fragments,
 	output bary_lanes    barys,
+	output fixed_tri     ws,
 	input  logic         out_ready,
 	output paint_lanes   out_valid
 );
+
+	//TODO: Es exactamente el mismo asunto que offsets
+	assign ws[0] = vertex_a.zw.w;
+	assign ws[1] = vertex_b.zw.w;
+	assign ws[2] = vertex_c.zw.w;
 
 	logic setup_stall, setup_valid;
 
@@ -35,6 +41,9 @@ module gfx_raster
 	gfx_setup setup
 	(
 		.stall(setup_stall),
+		.vertex_a(vertex_a.xy),
+		.vertex_b(vertex_b.xy),
+		.vertex_c(vertex_c.xy),
 		.*
 	);
 
