@@ -4,7 +4,7 @@ module gfx_frag_bary
 (
 	input  logic     clk,
 
-	input  fixed_tri edges,
+	input  fixed_tri bary,
 	                 ws,
 	input  logic     stall,
 
@@ -19,9 +19,9 @@ module gfx_frag_bary
 	assign b1_w1 = bs_ws[1];
 	assign b2_w2 = bs_ws[2];
 
-	assign orthographic_bs[0] = edges[`EDGE_P1_TO_P2];
-	assign orthographic_bs[1] = edges[`EDGE_P2_TO_P0];
-	assign orthographic_bs[2] = edges[`EDGE_P0_TO_P1];
+	assign orthographic_bs[0] = bary[`EDGE_P1_TO_P2];
+	assign orthographic_bs[1] = bary[`EDGE_P2_TO_P0];
+	assign orthographic_bs[2] = bary[`EDGE_P0_TO_P1];
 
 	genvar i;
 	generate

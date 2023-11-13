@@ -6,26 +6,37 @@ module gfx_frag_funnel
 	                     rst_n,
 
 	input  frag_xy_lanes fragments,
+	input  bary_lanes    barys,
 	input  paint_lanes   in_valid,
 	output logic         in_ready,
 
 	input  logic         out_ready,
 	output logic         out_valid,
-	output frag_xy       frag
+	output frag_xy       frag,
+	output fixed_tri     bary
 );
 
 	logic skid_ready, stall, ready, valid;
-	frag_xy next_frag, out;
+	frag_xy next_frag, out_frag;
+	fixed_tri next_bary, out_bary;
+	bary_lanes barys_hold;
 	paint_lanes current, next;
 	frag_xy_lanes fragments_hold;
 
 	assign ready = !(|next);
 	assign in_ready = skid_ready && ready;
 
-	gfx_skid_buf #(.WIDTH($bits(frag))) skid
+	gfx_skid_buf #(.WIDTH($bits(frag))) skid_frag
 	(
-		.in(out),
+		.in(out_frag),
 		.out(frag),
+		.*
+	);
+
+	gfx_skid_buf #(.WIDTH($bits(bary))) skid_bary
+	(
+		.in(out_bary),
+		.out(bary),
 		.*
 	);
 
@@ -38,6 +49,7 @@ module gfx_frag_funnel
 
 	always_comb begin
 		next = 0;
+		next_bary = {($bits(next_bary)){1'bx}};
 		next_frag = {($bits(next_frag)){1'bx}};
 
 		for (integer i = 0; i < `GFX_FINE_LANES; ++i)
@@ -45,6 +57,7 @@ module gfx_frag_funnel
 				next = current;
 				next[i] = 0;
 
+				next_bary = barys_hold[i];
 				next_frag = fragments_hold[i];
 			end
 	end
@@ -60,10 +73,13 @@ module gfx_frag_funnel
 
 	always_ff @(posedge clk)
 		if (!stall) begin
-			if (ready)
+			if (ready) begin
+				barys_hold <= barys;
 				fragments_hold <= fragments;
+			end
 
-			out <= next_frag;
+			out_bary <= next_bary;
+			out_frag <= next_frag;
 		end
 
 endmodule

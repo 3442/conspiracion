@@ -11,6 +11,7 @@ module gfx_raster_fine
 	input  logic              stall,
 
 	output frag_xy            fragment,
+	output fixed_tri          barys,
 	output logic              paint
 );
 
@@ -34,6 +35,7 @@ module gfx_raster_fine
 
 	always_ff @(posedge clk)
 		if (!stall) begin
+			barys <= edges;
 			paint <= signs == 0;
 	
 			fragment <= fragment_hold;

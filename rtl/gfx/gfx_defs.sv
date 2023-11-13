@@ -127,9 +127,10 @@ typedef struct packed
 	xy_coord x, y;
 } frag_xy;
 
-typedef frag_xy[`GFX_FINE_LANES - 1:0] frag_xy_lanes;
-typedef logic[`GFX_FINE_LANES - 1:0]   paint_lanes;
-typedef fixed[`COLOR_CHANNELS - 1:0]   color_lerp_lanes;
+typedef frag_xy[`GFX_FINE_LANES - 1:0]   frag_xy_lanes;
+typedef logic[`GFX_FINE_LANES - 1:0]     paint_lanes;
+typedef fixed[`COLOR_CHANNELS - 1:0]     color_lerp_lanes;
+typedef fixed_tri[`GFX_FINE_LANES - 1:0] bary_lanes;
 
 typedef struct packed
 {

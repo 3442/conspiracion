@@ -12,6 +12,7 @@ module gfx_raster
 	output logic         in_ready,
 
 	output frag_xy_lanes fragments,
+	output bary_lanes    barys,
 	input  logic         out_ready,
 	output paint_lanes   out_valid
 );
@@ -69,6 +70,7 @@ module gfx_raster
 	);
 
 	frag_xy fragment_ij[`GFX_RASTER_SIZE][`GFX_RASTER_SIZE];
+	fixed_tri barys_ij[`GFX_RASTER_SIZE][`GFX_RASTER_SIZE];
 	logic[`GFX_FINE_LANES - 1:0] paint_ij, skid_paint_ij;
 
 	gfx_skid_buf #(.WIDTH(`GFX_FINE_LANES)) skid_paint
@@ -90,6 +92,7 @@ module gfx_raster
 					.pos(coarse_pos),
 					.corners(coarse_corners),
 
+					.barys(barys_ij[i][j]),
 					.paint(paint_ij[j * `GFX_RASTER_SIZE + i]),
 					.fragment(fragment_ij[i][j]),
 					.*
@@ -99,6 +102,14 @@ module gfx_raster
 				(
 					.in(fragment_ij[i][j]),
 					.out(fragments[j * `GFX_RASTER_SIZE + i]),
+					.stall(fine_stall),
+					.*
+				);
+
+				gfx_skid_buf #(.WIDTH($bits(fixed_tri))) skid_barys
+				(
+					.in(barys_ij[i][j]),
+					.out(barys[j * `GFX_RASTER_SIZE + i]),
 					.stall(fine_stall),
 					.*
 				);

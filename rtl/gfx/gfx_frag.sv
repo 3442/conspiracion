@@ -6,6 +6,7 @@ module gfx_frag
 	                     rst_n,
 
 	input  frag_xy_lanes fragments,
+	input  bary_lanes    barys,
 	input  paint_lanes   in_valid,
 	output logic         in_ready,
 
@@ -16,6 +17,7 @@ module gfx_frag
 
 	logic funnel_valid;
 	frag_xy funnel_frag;
+	fixed_tri bary;
 
 	gfx_frag_funnel funnel
 	(
@@ -58,10 +60,9 @@ module gfx_frag
 
 	fixed b1, b2;
 
-	gfx_frag_bary bary
+	gfx_frag_bary frag_bary
 	(
 		.ws(),
-		.edges(),
 		.stall(frag_stall),
 		.*
 	);
