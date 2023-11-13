@@ -67,6 +67,10 @@ typedef struct packed
 typedef logic signed[31:0] fixed;
 typedef fixed[2:0]         fixed_tri;
 
+`define EDGE_P0_TO_P1 0
+`define EDGE_P1_TO_P2 1
+`define EDGE_P2_TO_P0 2
+
 typedef struct packed
 {
 	fixed x, y;
@@ -134,6 +138,8 @@ typedef struct packed
 } frag_paint;
 
 `define GFX_FRAG_ADDR_STAGES  3
+`define GFX_FRAG_BARY_STAGES  (`FIXED_DIV_STAGES + 2 + `FIXED_DIV_STAGES)
 `define GFX_FRAG_SHADE_STAGES (`LERP_STAGES + 1)
+`define GFX_FRAG_STAGES       (`GFX_FRAG_BARY_STAGES + `GFX_FRAG_SHADE_STAGES)
 
 `endif
