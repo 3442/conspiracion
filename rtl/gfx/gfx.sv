@@ -13,11 +13,11 @@ module gfx
 
 	input  logic       mem_waitrequest,
 	                   mem_readdatavalid,
-	input  logic[15:0] mem_readdata,
-	output logic[25:0] mem_address,
+	input  mem_word    mem_readdata,
+	output mem_addr    mem_address,
 	output logic       mem_read,
 	                   mem_write,
-	output logic[15:0] mem_writedata,
+	output mem_word    mem_writedata,
 
 	input  logic       scan_ready,
 	output logic       scan_valid,

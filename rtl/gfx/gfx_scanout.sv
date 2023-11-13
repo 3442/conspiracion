@@ -13,7 +13,7 @@ module gfx_scanout
 
 	input  logic        fb_waitrequest,
 	                    fb_readdatavalid,
-	input  logic[15:0]  fb_readdata,
+	input  mem_word     fb_readdata,
 	output logic        fb_read,
 	output half_coord   fb_address,
 
@@ -35,8 +35,8 @@ module gfx_scanout
 	      queued_dec, queued_inc, read_half, read_valid, request_flush;
 
 	rgb24 fb_pipes[`GFX_SCAN_STAGES + 1], scan_pixel;
+	mem_word half;
 	half_coord commit_pos, next_pos, read_pos, request_pos[`GFX_MASK_STAGES - 1:0];
-	logic[15:0] half;
 	linear_coord scan_pos, last_pos;
 
 	assign last_pos = `GFX_LINEAR_RES - 1;

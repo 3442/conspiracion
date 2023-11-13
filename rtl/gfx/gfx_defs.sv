@@ -154,4 +154,13 @@ typedef struct packed
 `define GFX_FRAG_SHADE_STAGES (`LERP_STAGES + 1)
 `define GFX_FRAG_STAGES       (`GFX_FRAG_BARY_STAGES + `GFX_FRAG_SHADE_STAGES)
 
+`define GFX_MEM_WORD_ADDR_BITS 25
+`define GFX_MEM_DATA_BITS      16 // No puedo hacer nada al respecto
+`define GFX_MEM_SUBWORD_BITS   ($clog2(`GFX_MEM_DATA_BITS / 8))
+`define GFX_MEM_ADDR_BITS      (`GFX_MEM_WORD_ADDR_BITS + `GFX_MEM_SUBWORD_BITS)
+
+typedef logic[`GFX_MEM_DATA_BITS - 1:0]      mem_word;
+typedef logic[`GFX_MEM_ADDR_BITS - 1:0]      mem_addr;
+typedef logic[`GFX_MEM_WORD_ADDR_BITS - 1:0] mem_word_addr;
+
 `endif
