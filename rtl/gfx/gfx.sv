@@ -68,8 +68,6 @@ module gfx
 
 	gfx_clear clear
 	(
-		.rop_mask_addr(),
-		.rop_mask_assert(0),
 		.*
 	);
 
@@ -97,8 +95,27 @@ module gfx
 		.bary(frag_bary),
 		.in_ready(frag_ready),
 		.in_valid(funnel_valid),
-		.out_ready(1), //TODO
+		.out_ready(rop_ready),
 		.out_valid(frag_valid),
+		.*
+	);
+
+	logic rop_mask_assert, rop_ready;
+	linear_coord rop_mask_addr;
+
+	gfx_rop rop
+	(
+		.in(frag_out),
+		.in_ready(rop_ready),
+		.in_valid(frag_valid),
+		.mask_addr(rop_mask_addr),
+		.mask_assert(rop_mask_assert),
+
+		.rop_write(),
+		.rop_address(),
+		.rop_writedata(),
+		.rop_waitrequest(0),
+
 		.*
 	);
 
