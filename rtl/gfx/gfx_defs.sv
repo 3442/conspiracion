@@ -59,6 +59,7 @@ typedef struct packed
 
 `define FIXED_FRAC 16
 
+`define FIXED_DIV_STAGES     8
 `define FIXED_FMA_STAGES     5
 `define FIXED_FMA_DOT_STAGES (2 * `FIXED_FMA_STAGES)
 `define LERP_STAGES          `FIXED_FMA_DOT_STAGES
