@@ -100,7 +100,9 @@ module gfx
 		.*
 	);
 
-	logic rop_mask_assert, rop_ready;
+	logic rop_mask_assert, rop_ready, rop_write;
+	mem_word rop_writedata;
+	half_coord rop_address;
 	linear_coord rop_mask_addr;
 
 	gfx_rop rop
@@ -110,29 +112,25 @@ module gfx
 		.in_valid(frag_valid),
 		.mask_addr(rop_mask_addr),
 		.mask_assert(rop_mask_assert),
-
-		.rop_write(),
-		.rop_address(),
-		.rop_writedata(),
-		.rop_waitrequest(0),
-
 		.*
 	);
 
-	logic scanout_read_tmp, vsync;
+	logic fb_readdatavalid, fb_waitrequest, rop_waitrequest;
+	mem_word fb_readdata;
+
+	gfx_mem mem
+	(
+		.*
+	);
+
+	logic fb_read, vsync;
+	half_coord fb_address;
 	linear_coord scan_mask_addr;
 
 	gfx_scanout scanout
 	(
 		.mask(scan_mask),
 		.mask_addr(scan_mask_addr),
-
-		.fb_read(scanout_read_tmp),
-		.fb_address(),
-		.fb_readdata(),
-		.fb_waitrequest(0),
-		.fb_readdatavalid(scanout_read_tmp),
-
 		.*
 	);
 
