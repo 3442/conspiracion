@@ -76,6 +76,7 @@ add_fileset_file gfx_frag_addr.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_frag_addr.sv
 add_fileset_file gfx_frag_bary.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_frag_bary.sv
 add_fileset_file gfx_frag_shade.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_frag_shade.sv
 add_fileset_file gfx_rop.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_rop.sv
+add_fileset_file gfx_fifo.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_fifo.sv
 
 
 # 
