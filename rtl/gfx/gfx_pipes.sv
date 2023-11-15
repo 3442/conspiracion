@@ -17,8 +17,13 @@ module gfx_pipes
 		if (!stall) begin
 			pipes[0] <= in;
 
-			for (integer i = 1; i < DEPTH; ++i)
-				pipes[i] <= pipes[i - 1];
+			/* Esto tiene que ir así porque Verilator no soporta <= en for
+			 * loops a las que no logre hacerle unrolling. Nótese que el
+			 * orden de iteración descendiente es necesario porque estamos
+			 * usando un blocking assignment dentro de always_ff.
+			 */
+			for (integer i = DEPTH - 1; i > 0; --i)
+				pipes[i] = pipes[i - 1];
 		end
 
 endmodule
