@@ -1039,7 +1039,7 @@
    kind="altera_up_avalon_video_dual_clock_buffer"
    version="18.0"
    enabled="1">
-  <parameter name="AUTO_CLOCK_STREAM_IN_CLOCK_RATE" value="143000000" />
+  <parameter name="AUTO_CLOCK_STREAM_IN_CLOCK_RATE" value="120000000" />
   <parameter name="AUTO_CLOCK_STREAM_OUT_CLOCK_RATE" value="25000000" />
   <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
   <parameter name="color_bits" value="10" />
@@ -1061,7 +1061,7 @@
   <parameter name="gui_actual_output_clock_frequency15" value="0 MHz" />
   <parameter name="gui_actual_output_clock_frequency16" value="0 MHz" />
   <parameter name="gui_actual_output_clock_frequency17" value="0 MHz" />
-  <parameter name="gui_actual_output_clock_frequency2" value="25.396825 MHz" />
+  <parameter name="gui_actual_output_clock_frequency2" value="120.000000 MHz" />
   <parameter name="gui_actual_output_clock_frequency3" value="25.396825 MHz" />
   <parameter name="gui_actual_output_clock_frequency4" value="0 MHz" />
   <parameter name="gui_actual_output_clock_frequency5" value="0 MHz" />
@@ -1162,7 +1162,7 @@
   <parameter name="gui_fractional_cout" value="32" />
   <parameter name="gui_mif_generate" value="false" />
   <parameter name="gui_multiply_factor" value="1" />
-  <parameter name="gui_number_of_clocks" value="2" />
+  <parameter name="gui_number_of_clocks" value="3" />
   <parameter name="gui_operation_mode" value="direct" />
   <parameter name="gui_output_clock_frequency0" value="50.0" />
   <parameter name="gui_output_clock_frequency1" value="80.0" />
@@ -1174,7 +1174,7 @@
   <parameter name="gui_output_clock_frequency15" value="100.0" />
   <parameter name="gui_output_clock_frequency16" value="100.0" />
   <parameter name="gui_output_clock_frequency17" value="100.0" />
-  <parameter name="gui_output_clock_frequency2" value="25.175" />
+  <parameter name="gui_output_clock_frequency2" value="120.0" />
   <parameter name="gui_output_clock_frequency3" value="143.0" />
   <parameter name="gui_output_clock_frequency4" value="25.175" />
   <parameter name="gui_output_clock_frequency5" value="100.0" />
@@ -1666,21 +1666,17 @@
    version="20.1"
    start="pll_0.outclk1"
    end="perf_0.clock_sink" />
+ <connection kind="clock" version="20.1" start="pll_0.outclk2" end="gfx_0.clock" />
+ <connection
+   kind="clock"
+   version="20.1"
+   start="pll_0.outclk2"
+   end="pixfifo.clock_stream_in" />
  <connection
    kind="clock"
    version="20.1"
    start="sys_sdram_pll_0.sys_clk"
    end="vram.clk" />
- <connection
-   kind="clock"
-   version="20.1"
-   start="sys_sdram_pll_0.sys_clk"
-   end="gfx_0.clock" />
- <connection
-   kind="clock"
-   version="20.1"
-   start="sys_sdram_pll_0.sys_clk"
-   end="pixfifo.clock_stream_in" />
  <connection kind="clock" version="20.1" start="video_pll_0.vga_clk" end="vga.clk" />
  <connection
    kind="clock"
