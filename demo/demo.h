@@ -27,6 +27,7 @@ void console_init(void);
 void print(const char *fmt, ...);
 void read_line(char *buf, unsigned size);
 
+int cpu_is_alive(unsigned num);
 void run_cpu(unsigned num);
 void run_cpus(unsigned mask);
 void halt_cpu(unsigned num);

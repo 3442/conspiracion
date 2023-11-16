@@ -26,7 +26,10 @@ class SmpPe:
         self._halted = halt_on_reset
 
     def read(self):
-        return self._bkpt << 1 | self._halted
+        # bit 2 es alive
+        return 1 << 2 \
+            | self._bkpt << 1 \
+            | self._halted
 
     def halt(self):
         self._halted = 1

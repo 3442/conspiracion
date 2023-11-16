@@ -132,6 +132,7 @@ set_interface_property cpu_0 SVD_ADDRESS_GROUP ""
 
 add_interface_port cpu_0 halt_0 halt Output 1
 add_interface_port cpu_0 step_0 step Output 1
+add_interface_port cpu_0 cpu_alive_0 cpu_alive Input 1
 add_interface_port cpu_0 cpu_halted_0 cpu_halted Input 1
 add_interface_port cpu_0 breakpoint_0 breakpoint Input 1
 
@@ -149,6 +150,7 @@ set_interface_property cpu_1 CMSIS_SVD_VARIABLES ""
 set_interface_property cpu_1 SVD_ADDRESS_GROUP ""
 
 add_interface_port cpu_1 breakpoint_1 breakpoint Input 1
+add_interface_port cpu_1 cpu_alive_1 cpu_alive Input 1
 add_interface_port cpu_1 cpu_halted_1 cpu_halted Input 1
 add_interface_port cpu_1 halt_1 halt Output 1
 add_interface_port cpu_1 step_1 step Output 1
@@ -167,6 +169,7 @@ set_interface_property cpu_2 CMSIS_SVD_VARIABLES ""
 set_interface_property cpu_2 SVD_ADDRESS_GROUP ""
 
 add_interface_port cpu_2 breakpoint_2 breakpoint Input 1
+add_interface_port cpu_2 cpu_alive_2 cpu_alive Input 1
 add_interface_port cpu_2 cpu_halted_2 cpu_halted Input 1
 add_interface_port cpu_2 halt_2 halt Output 1
 add_interface_port cpu_2 step_2 step Output 1
@@ -185,6 +188,7 @@ set_interface_property cpu_3 CMSIS_SVD_VARIABLES ""
 set_interface_property cpu_3 SVD_ADDRESS_GROUP ""
 
 add_interface_port cpu_3 breakpoint_3 breakpoint Input 1
+add_interface_port cpu_3 cpu_alive_3 cpu_alive Input 1
 add_interface_port cpu_3 cpu_halted_3 cpu_halted Input 1
 add_interface_port cpu_3 halt_3 halt Output 1
 add_interface_port cpu_3 step_3 step Output 1

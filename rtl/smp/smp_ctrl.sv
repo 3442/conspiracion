@@ -8,11 +8,15 @@ module smp_ctrl
 	input  logic[31:0] avl_writedata,
 	output logic[31:0] avl_readdata,
 
-	input logic        cpu_halted_0,
+	input logic        cpu_alive_0,
+	                   cpu_alive_1,
+	                   cpu_alive_2,
+	                   cpu_alive_3,
+	                   cpu_halted_0,
 	                   cpu_halted_1,
 	                   cpu_halted_2,
 	                   cpu_halted_3,
-	input logic        breakpoint_0,
+	                   breakpoint_0,
 	                   breakpoint_1,
 	                   breakpoint_2,
 	                   breakpoint_3,	
@@ -41,6 +45,7 @@ module smp_ctrl
 	(
 		.step(step_0),
 		.halt(halt_0),
+		.cpu_alive(cpu_alive_0),
 		.cpu_halted(cpu_halted_0),
 		.breakpoint(breakpoint_0),
 		.readdata(readdata_0),
@@ -52,6 +57,7 @@ module smp_ctrl
 	(
 		.step(step_1),
 		.halt(halt_1),
+		.cpu_alive(cpu_alive_1),
 		.cpu_halted(cpu_halted_1),
 		.breakpoint(breakpoint_1),
 		.readdata(readdata_1),
@@ -63,6 +69,7 @@ module smp_ctrl
 	(
 		.step(step_2),
 		.halt(halt_2),
+		.cpu_alive(cpu_alive_2),
 		.cpu_halted(cpu_halted_2),
 		.breakpoint(breakpoint_2),
 		.readdata(readdata_2),
@@ -74,6 +81,7 @@ module smp_ctrl
 	(
 		.step(step_3),
 		.halt(halt_3),
+		.cpu_alive(cpu_alive_3),
 		.cpu_halted(cpu_halted_3),
 		.breakpoint(breakpoint_3),
 		.readdata(readdata_3),

@@ -93,6 +93,7 @@ module platform
 		.step(step_0),
 		.breakpoint(breakpoint_0),
 		.cpu_halt(halt_0),
+		.cpu_alive(cpu_alive_0),
 		.cpu_halted(cpu_halted_0),
 		.avl_address(cpu_0_address),
 		.avl_read(cpu_0_read),
@@ -111,6 +112,7 @@ module platform
 		.step(step_1),
 		.breakpoint(breakpoint_1),
 		.cpu_halt(halt_1),
+		.cpu_alive(cpu_alive_1),
 		.cpu_halted(cpu_halted_1),
 		.avl_address(cpu_1_address),
 		.avl_read(cpu_1_read),
@@ -130,6 +132,7 @@ module platform
 		.step(step_2),
 		.breakpoint(breakpoint_2),
 		.cpu_halt(halt_2),
+		.cpu_alive(cpu_alive_2),
 		.cpu_halted(cpu_halted_2),
 		.avl_address(cpu_2_address),
 		.avl_read(cpu_2_read),
@@ -149,6 +152,7 @@ module platform
 		.step(step_3),
 		.breakpoint(breakpoint_3),
 		.cpu_halt(halt_3),
+		.cpu_alive(cpu_alive_3),
 		.cpu_halted(cpu_halted_3),
 		.avl_address(cpu_3_address),
 		.avl_read(cpu_3_read),
@@ -419,6 +423,7 @@ module platform
 	logic step_0, step_1, step_2, step_3,
 	      halt_0, halt_1, halt_2, halt_3,
 	      breakpoint_0, breakpoint_1, breakpoint_2, breakpoint_3,
+	      cpu_alive_0, cpu_alive_1, cpu_alive_2, cpu_alive_3,
 	      cpu_halted_0, cpu_halted_1, cpu_halted_2, cpu_halted_3;
 
 	smp_ctrl smp

@@ -225,6 +225,7 @@ set_interface_property smp SVD_ADDRESS_GROUP ""
 
 add_interface_port smp step step Input 1
 add_interface_port smp cpu_halt halt Input 1
+add_interface_port smp cpu_alive cpu_alive Output 1
 add_interface_port smp cpu_halted cpu_halted Output 1
 add_interface_port smp breakpoint breakpoint Output 1
 

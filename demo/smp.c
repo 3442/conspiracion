@@ -3,6 +3,11 @@
 #define SMP_CTRL_BASE 0x30140000
 #define SMP_CTRL      (*(volatile unsigned *)SMP_CTRL_BASE)
 
+int cpu_is_alive(unsigned num)
+{
+	return !!(SMP_CTRL & (0b100 << (num * 8)));
+}
+
 void run_cpu(unsigned num)
 {
 	run_cpus(1 << num);

@@ -123,13 +123,27 @@ static void cmd_remote(char **tokens)
 		unknown_command(cmd);
 }
 
+static void kick_cpus(void)
+{
+	for (unsigned i = this_cpu->num + 1; i < NUM_CPUS; ++i) {
+		if (cpu_is_alive(i)) {
+			run_cpu(i);
+			return;
+		}
+
+		print("cpu%u is dead", i);
+	}
+
+	boot_done = 1;
+}
+
 static void bsp_main(void)
 {
 	for (struct cpu *cpu = all_cpus; cpu < all_cpus + NUM_CPUS; ++cpu)
 		cpu->mailbox = 0;
 
 	boot_done = 0;
-	run_cpu(1);
+	kick_cpus();
 
 	while (!boot_done);
 	print("booted %u cpus", NUM_CPUS);
@@ -165,11 +179,7 @@ static void bsp_main(void)
 
 static void ap_main(void)
 {
-	if (this_cpu->num < NUM_CPUS - 1)
-		run_cpu(this_cpu->num + 1);
-	else
-		boot_done = 1;
-
+	kick_cpus();
 	halt_cpu(this_cpu->num);
 
 	while (1) {

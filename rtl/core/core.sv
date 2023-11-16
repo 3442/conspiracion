@@ -9,6 +9,7 @@ module core
 
 	input  wire       step,
 	input  wire       cpu_halt,
+	output wire       cpu_alive,
 	output wire       cpu_halted,
 	output wire       breakpoint,
 
@@ -27,6 +28,8 @@ module core
 
 	generate
 		if (ID < `CONFIG_CPUS) begin: enable
+			assign cpu_alive = 1;
+
 			ptr addr;
 			word data_wr;
 			logic start, write;
@@ -57,6 +60,7 @@ module core
 				.*
 			);
 		end else begin
+			assign cpu_alive = 0;
 			assign cpu_halted = 1;
 			assign breakpoint = 0;
 

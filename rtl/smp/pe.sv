@@ -8,7 +8,8 @@ module smp_pe
 	input  logic[7:0] writedata,
 	output logic[7:0] readdata,
 
-	input  logic      cpu_halted,
+	input  logic      cpu_alive,
+	                  cpu_halted,
 	                  breakpoint,
 
 	output logic      halt,
@@ -22,11 +23,16 @@ module smp_pe
 
 	struct packed
 	{
-		logic breakpoint, cpu_halted;
-	} status;
+		logic alive, breakpoint, cpu_halted;
+	} status, status_out;
 
 	assign req = writedata[$bits(req) - 1:0];
-	assign readdata = {{(8 - $bits(status)){1'b0}}, status};
+	assign readdata = {{(8 - $bits(status_out)){1'b0}}, status_out};
+
+	always_comb begin
+		status_out = status;
+		status_out.alive = cpu_alive;
+	end
 
 	always @(posedge clk or negedge rst_n)
 		if (!rst_n) begin

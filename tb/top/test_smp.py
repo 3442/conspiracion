@@ -9,6 +9,11 @@ from tb.models import CorePaceModel, SmpModel
 async def bring_up(dut):
     await cocotb.start(Clock(dut.clk, 2).start())
 
+    dut.cpu_alive_0.value = 1
+    dut.cpu_alive_1.value = 1
+    dut.cpu_alive_2.value = 1
+    dut.cpu_alive_3.value = 1
+
     dut.rst_n.value = 1
     await Timer(1)
     dut.rst_n.value = 0
