@@ -44,6 +44,7 @@ _start:
 	bl  reset
 	b   .
 
+.global _boot_num
 _boot_num:
 	.word 0
 

@@ -146,7 +146,10 @@ static void bsp_main(void)
 	kick_cpus();
 
 	while (!boot_done);
-	print("booted %u cpus", NUM_CPUS);
+
+	extern volatile unsigned _boot_num;
+	print("booted %u cpus", _boot_num);
+	_boot_num = 0;
 
 	while (1) {
 		char input[64];
