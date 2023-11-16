@@ -88,7 +88,7 @@ typedef struct packed
 	raster_zw zw;
 } raster_xyzw;
 
-typedef logic[7:0] coarse_dim;
+typedef logic[8:0] coarse_dim;
 
 `define GFX_MASK_SRAM_STAGES 3
 `define GFX_MASK_STAGES      (1 + `GFX_MASK_SRAM_STAGES + 1)
@@ -103,7 +103,7 @@ typedef logic[7:0] coarse_dim;
 
 `define GFX_FINE_STAGES 2
 
-`define GFX_RASTER_BITS     2
+`define GFX_RASTER_BITS     1 // Solía ser 2, pero la FPGA no da para tanto
 `define GFX_RASTER_SUB_BITS 4
 `define GFX_RASTER_PAD_BITS ($bits(fixed) - $bits(coarse_dim) - `FIXED_FRAC - `GFX_RASTER_BITS - 1)
 `define GFX_RASTER_SIZE     (1 << `GFX_RASTER_BITS)
