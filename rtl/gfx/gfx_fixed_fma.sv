@@ -12,10 +12,9 @@ module gfx_fixed_fma
 	output fixed q
 );
 
-	logic[$bits(fixed) + `FIXED_FRAC - 1:0] q_ext;
-
 `ifndef VERILATOR
-	assign q = q_ext[$bits(fixed) + `FIXED_FRAC - 1:`FIXED_FRAC];
+	logic[2 * $bits(fixed) - `FIXED_FRAC - 1:0] q_ext;
+	assign q = q_ext[$bits(fixed) - 1:0];
 
 	lpm_mult mult
 	(
@@ -24,19 +23,26 @@ module gfx_fixed_fma
 		.clken(!stall),
 
 		.sum({c, {`FIXED_FRAC{1'b0}}}),
-		.dataa({{`FIXED_FRAC{a[$bits(a) - 1]}}, a}),
-		.datab({{`FIXED_FRAC{b[$bits(b) - 1]}}, b}),
+		.dataa(a),
+		.datab(b),
 		.result(q_ext)
 	);
 
 	defparam
-		mult.lpm_widtha         = $bits(fixed) + `FIXED_FRAC,
-		mult.lpm_widthb         = $bits(fixed) + `FIXED_FRAC,
+		mult.lpm_widtha         = $bits(fixed),
+		mult.lpm_widthb         = $bits(fixed),
 		mult.lpm_widths         = $bits(fixed) + `FIXED_FRAC,
-		mult.lpm_widthp         = $bits(fixed) + `FIXED_FRAC,
+		/* Esto es crucial. No está documentado en ningún lado (aparte de un
+		 * comentario en r/fpga). Si lpm_widthp < lpm_widtha + lpm_widthb,
+		 * entonces result contiene los lpm_widthp bits más significativos
+		 * del producto, no los menos significativos como tendría sentido.
+		 */
+		mult.lpm_widthp         = 2 * $bits(fixed) - `FIXED_FRAC,
 		mult.lpm_representation = "SIGNED",
 		mult.lpm_pipeline       = `FIXED_FMA_STAGES;
 `else
+	logic[$bits(fixed) + `FIXED_FRAC - 1:0] q_ext;
+
 	fixed a_hold, b_hold, c_hold;
 
 	assign q = q_ext[$bits(fixed) + `FIXED_FRAC - 1:`FIXED_FRAC] + c_hold;
