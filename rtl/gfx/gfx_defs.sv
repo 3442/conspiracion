@@ -41,6 +41,7 @@ typedef logic[19:0] half_coord;
 `define COLOR_CHANNELS 4
 
 typedef logic[7:0] color8;
+typedef logic[9:0] color10;
 
 typedef struct packed
 {
@@ -49,7 +50,7 @@ typedef struct packed
 
 typedef struct packed
 {
-	logic[9:0] r, g, b;
+	color10 r, g, b;
 } rgb30;
 
 typedef struct packed
@@ -92,7 +93,8 @@ typedef logic[8:0] coarse_dim;
 
 `define GFX_MASK_SRAM_STAGES 3
 `define GFX_MASK_STAGES      (1 + `GFX_MASK_SRAM_STAGES + 1)
-`define GFX_SCAN_STAGES      3 // Ajustable
+
+`define GFX_SCANOUT_FIFO_DEPTH 16 // Ajustable
 
 `define GFX_SETUP_BOUNDS_STAGES  3
 `define GFX_SETUP_EDGE_STAGES    (1 + `FIXED_FMA_DOT_STAGES)

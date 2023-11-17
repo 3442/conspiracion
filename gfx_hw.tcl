@@ -51,6 +51,7 @@ add_fileset_file gfx_defs.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_defs.sv
 add_fileset_file gfx_fold.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_fold.sv
 add_fileset_file gfx_mat_mat.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_mat_mat.sv
 add_fileset_file gfx_mat_vec.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_mat_vec.sv
+add_fileset_file gfx_flush_flow.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_flush_flow.sv
 add_fileset_file gfx_pipeline_flow.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_pipeline_flow.sv
 add_fileset_file gfx_fold_flow.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_fold_flow.sv
 add_fileset_file gfx_skid_flow.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_skid_flow.sv
@@ -59,6 +60,7 @@ add_fileset_file gfx_pipes.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_pipes.sv
 add_fileset_file gfx_dot.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_dot.sv
 add_fileset_file gfx_transpose.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_transpose.sv
 add_fileset_file gfx_scanout.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_scanout.sv
+add_fileset_file gfx_scanout_dac.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_scanout_dac.sv
 add_fileset_file gfx_masks.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_masks.sv
 add_fileset_file gfx_mask_sram.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_mask_sram.sv
 add_fileset_file gfx_setup.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_setup.sv

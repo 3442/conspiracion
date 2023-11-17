@@ -26,155 +26,105 @@ module gfx_scanout
 	output logic        vsync
 );
 
-	logic[`GFX_SCAN_STAGES:0] fb_ready, fb_valid, src_ready, src_valid, src_pipes;
-	logic[`GFX_SCAN_STAGES - 1:0] fb_stalls, src_stalls;
-	logic[`GFX_MASK_STAGES - 1:0] request_valid;
-	logic[$clog2(`GFX_SCAN_STAGES) - 1:0] queued;
+	logic commit, effective_mask, flush, mask_fifo_out, dac_ready,
+	      fb_ready, mask_fifo_ready, fb_fifo_valid, mask_fifo_valid, pop, put, put_mask;
 
-	logic effective_mask, foreground, foreground_valid, partial, put_fb_valid, put_src_valid,
-	      queued_dec, queued_inc, read_half, read_valid, request_flush;
+	mem_word fb_fifo_out;
+	half_coord mask_in_addr, mask_hold_addr, mask_out_addr, max_addr, commit_addr;
 
-	rgb24 fb_pipes[`GFX_SCAN_STAGES + 1], scan_pixel;
-	mem_word half;
-	half_coord commit_pos, next_pos, read_pos, request_pos[`GFX_MASK_STAGES - 1:0];
-	linear_coord scan_pos, last_pos;
+	assign mask_addr = mask_in_addr[$bits(mask_in_addr) - 1:$bits(mask_in_addr) - $bits(mask_addr)];
+	assign max_addr[0] = 1;
+	assign max_addr[$bits(max_addr) - 1:1] = `GFX_X_RES * `GFX_Y_RES - 1;
 
-	assign last_pos = `GFX_LINEAR_RES - 1;
-	assign scan_data.r = {scan_pixel.r, {2{scan_pixel.r[0]}}};
-	assign scan_data.g = {scan_pixel.g, {2{scan_pixel.g[0]}}};
-	assign scan_data.b = {scan_pixel.b, {2{scan_pixel.b[0]}}};
-
-	assign scan_pixel = foreground ? fb_pipes[`GFX_SCAN_STAGES] : clear_color;
-	assign scan_valid = foreground_valid && (!foreground || fb_valid[`GFX_SCAN_STAGES]);
-	assign scan_endofpacket = scan_pos == last_pos;
-	assign scan_startofpacket = scan_pos == 0;
-
-	assign foreground = src_pipes[`GFX_SCAN_STAGES];
-	assign foreground_valid = src_valid[`GFX_SCAN_STAGES];
-
-	// Soluciona Error-BLKANDNBLK en Verilator
-	assign fb_valid[0] = put_fb_valid;
-	assign src_valid[0] = put_src_valid;
-
-	assign fb_ready[`GFX_SCAN_STAGES] = scan_ready && foreground_valid && foreground;
-	assign src_ready[`GFX_SCAN_STAGES] = scan_ready && scan_valid;
-
-	assign next_pos = request_flush ? commit_pos : read_pos;
-	assign mask_addr = read_pos[$bits(read_pos) - 1:1];
-
-	assign read_half = request_pos[`GFX_MASK_STAGES - 1][0];
-	assign read_valid = request_valid[`GFX_MASK_STAGES - 1];
-	assign request_flush = (fb_read && fb_waitrequest) || (src_valid[0] && !src_ready[0]) || queued == `GFX_SCAN_STAGES || vsync;
-
-	assign queued_inc = !request_flush && read_valid && read_half && effective_mask;
-	assign queued_dec = fb_ready[`GFX_SCAN_STAGES - 1] && fb_valid[`GFX_SCAN_STAGES - 1];
+	assign fb_ready = !fb_read || !fb_waitrequest;
 	assign effective_mask = mask || !enable_clear;
 
-	genvar i;
-	generate
-		for (i = 0; i < `GFX_SCAN_STAGES; ++i) begin: stages
-			gfx_pipeline_flow #(.STAGES(1)) fb_flow
-			(
-				.stall(fb_stalls[i]),
-				.in_ready(fb_ready[i]),
-				.in_valid(fb_valid[i]),
-				.out_ready(fb_ready[i + 1]),
-				.out_valid(fb_valid[i + 1]),
-				.*
-			);
+	gfx_flush_flow #(.STAGES(`GFX_MASK_STAGES)) mask_flow
+	(
+		.in_valid(1),
+		.out_ready(fb_ready && mask_fifo_ready),
+		.out_valid(pop),
+		.*
+	);
 
-			gfx_pipeline_flow #(.STAGES(1)) src_flow
-			(
-				.stall(src_stalls[i]),
-				.in_ready(src_ready[i]),
-				.in_valid(src_valid[i]),
-				.out_ready(src_ready[i + 1]),
-				.out_valid(src_valid[i + 1]),
-				.*
-			);
+	gfx_pipes #(.WIDTH($bits(mask_in_addr)), .DEPTH(`GFX_MASK_STAGES)) addr_pipes
+	(
+		.in(mask_in_addr),
+		.out(mask_out_addr),
+		.stall(0),
+		.*
+	);
 
-			always_ff @(posedge clk) begin
-				if (!fb_stalls[i])
-					fb_pipes[i + 1] <= fb_pipes[i];
+	/* Estas FIFOs deben cumplir dos propiedades para garantizar correctitud:
+	 *
+	 * 1. mask_fifo.out_ready && mask_fifo.out_valid <=> scan.in_ready && scan.in_valid
+	 * 2. fb_fifo.out_ready && fb_fifo.out_valid => scan.in_ready && scan.in_valid
+	 *
+	 * Nótese la asimetría (<=> vs =>), debido a mask_fifo.out
+	 */
 
-				if (!src_stalls[i])
-					src_pipes[i + 1] <= src_pipes[i];
-			end
-		end
+	gfx_fifo #(.WIDTH($bits(effective_mask)), .DEPTH(`GFX_SCANOUT_FIFO_DEPTH)) mask_fifo
+	(
+		.in(put_mask),
+		.out(mask_fifo_out),
+		.in_ready(mask_fifo_ready),
+		.in_valid(put),
+		.out_ready(dac_ready && (!mask_fifo_out || fb_fifo_valid)),
+		.out_valid(mask_fifo_valid),
+		.*
+	);
 
-		for (i = 1; i < `GFX_MASK_STAGES; ++i) begin: request
-			always_ff @(posedge clk or negedge rst_n)
-				request_valid[i] <= !rst_n ? 0 : (request_valid[i - 1] && !request_flush);
+	// 2x para evitar potencial overflow cuando fb_read=1 pero mask_fifo está llena
+	gfx_fifo #(.WIDTH($bits(mem_word)), .DEPTH(2 * `GFX_SCANOUT_FIFO_DEPTH)) fb_fifo
+	(
+		.in(fb_readdata),
+		.out(fb_fifo_out),
+		.in_ready(), // readdatavalid no soporta backpressure
+		.in_valid(fb_readdatavalid),
+		.out_ready(dac_ready && mask_fifo_valid && mask_fifo_out),
+		.out_valid(fb_fifo_valid),
+		.*
+	);
 
-			always_ff @(posedge clk)
-				request_pos[i] <= request_pos[i - 1];
-		end
-	endgenerate
+	gfx_scanout_dac dac
+	(
+		.in_ready(dac_ready),
+		.in_valid(mask_fifo_valid && (!mask_fifo_out || fb_fifo_valid)),
+		.*
+	);
 
 	always_ff @(posedge clk or negedge rst_n)
 		if (!rst_n) begin
-			vsync <= 0;
-			queued <= 0;
-
-			read_pos <= 0;
-			scan_pos <= 0;
-			commit_pos <= 0;
-
+			put <= 0;
 			fb_read <= 0;
-			partial <= 0;
-
-			put_fb_valid <= 0;
-			put_src_valid <= 0;
-			request_valid[0] <= 0;
+			commit_addr <= 0;
+			mask_in_addr <= 0;
 		end else begin
-			if (queued_inc && !queued_dec)
-				queued <= queued + 1;
-			else if (!queued_inc && queued_dec)
-				queued <= queued - 1;
+			mask_in_addr <= mask_in_addr + 1;
+			if (mask_in_addr == max_addr)
+				mask_in_addr <= 0;
 
-			if (scan_ready && scan_valid)
-				scan_pos <= scan_endofpacket ? 0 : scan_pos + 1;
+			if (flush)
+				mask_in_addr <= commit_addr;
 
-			partial <= partial ^ fb_readdatavalid;
+			if (commit)
+				commit_addr <= mask_hold_addr;
 
-			put_fb_valid <= partial && fb_readdatavalid;
-			request_valid[0] <= !request_flush;
+			if (fb_ready)
+				fb_read <= mask_fifo_ready && pop && effective_mask;
 
-			read_pos <= next_pos + 1;
-			if (next_pos == {last_pos, 1'b1})
-				read_pos <= 0;
-
-			if (!fb_waitrequest)
-				fb_read <= 0;
-
-			if (src_ready[0])
-				put_src_valid <= 0;
-
-			if (!request_flush) begin
-				fb_read <= read_valid && effective_mask;
-				put_src_valid <= read_valid && read_half;
-	
-				if (read_valid)
-					commit_pos <= request_pos[`GFX_MASK_STAGES - 1];
-			end
-
-			vsync <= !vsync && !request_flush && read_valid && request_pos[`GFX_MASK_STAGES - 1] == {last_pos, 1'b1};
+			if (mask_fifo_ready)
+				put <= fb_ready && pop;
 		end
 
 	always_ff @(posedge clk) begin
-		request_pos[0] <= read_pos;
+		mask_hold_addr <= mask_out_addr;
 
-		if (!request_flush) begin
-			fb_address <= request_pos[`GFX_MASK_STAGES - 1];
-			src_pipes[0] <= effective_mask;
-		end
+		if (fb_ready)
+			fb_address <= mask_out_addr;
 
-		if (fb_readdatavalid) begin
-			if (partial)
-				fb_pipes[0] <= {fb_readdata[7:0], half};
-			else
-				half <= fb_readdata;
-		end
+		if (mask_fifo_ready)
+			put_mask <= effective_mask;
 	end
 
 endmodule
