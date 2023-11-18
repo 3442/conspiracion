@@ -13,9 +13,14 @@ module gfx_fifo
 	output logic[WIDTH - 1:0] out
 );
 
-	logic full_if_eq, in_stall, out_stall, may_read, may_write, read, read_ok, write;
+	logic do_read, do_write, full_if_eq, in_stall, out_stall,
+	      may_read, may_write, read, read_ok, write;
+
 	logic[WIDTH - 1:0] fifo[DEPTH], read_data, write_data;
 	logic[$clog2(DEPTH) - 1:0] read_ptr, write_ptr;
+
+	assign do_read = read && may_read;
+	assign do_write = write && may_write;
 
 	always_comb begin
 		may_read = full_if_eq;
@@ -70,15 +75,15 @@ module gfx_fifo
 			if (!out_stall)
 				read_ok <= read && may_read;
 
-			if (read && may_read)
+			if (do_read)
 				read_ptr <= read_ptr + 1;
 
-			if (write && may_write)
+			if (do_write)
 				write_ptr <= write_ptr + 1;
 
-			if (read && !write)
+			if (do_read && !do_write)
 				full_if_eq <= 0;
-			else if (!read && write)
+			else if (!do_read && do_write)
 				full_if_eq <= 1;
 		end
 
