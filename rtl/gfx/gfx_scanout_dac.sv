@@ -87,7 +87,7 @@ module gfx_scanout_dac
 		end else begin
 			vsync <= 0;
 			if (in_ready && dac_valid) begin
-				vsync <= scan_endofpacket;
+				vsync <= skid_in.endofpacket;
 				dac_valid <= 0;
 			end
 

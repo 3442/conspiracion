@@ -27,22 +27,25 @@ module gfx_scanout
 );
 
 	logic commit, effective_mask, flush, mask_fifo_out, dac_ready,
-	      fb_ready, mask_fifo_ready, fb_fifo_valid, mask_fifo_valid, pop, put, put_mask;
+	      fb_ready, mask_fifo_ready, fb_fifo_valid, mask_fifo_valid,
+	      pop, put, put_mask, next_vsync, start_vsync, wait_vsync;
 
 	mem_word fb_fifo_out;
-	half_coord mask_in_addr, mask_hold_addr, mask_out_addr, max_addr, commit_addr;
+	half_coord commit_addr, mask_in_addr, mask_out_addr, mask_hold_addr, max_addr;
 
 	assign mask_addr = mask_in_addr[$bits(mask_in_addr) - 1:$bits(mask_in_addr) - $bits(mask_addr)];
 	assign max_addr[0] = 1;
 	assign max_addr[$bits(max_addr) - 1:1] = `GFX_X_RES * `GFX_Y_RES - 1;
 
 	assign fb_ready = !fb_read || !fb_waitrequest;
+	assign next_vsync = commit && start_vsync;
+	assign start_vsync = mask_hold_addr == max_addr;
 	assign effective_mask = mask || !enable_clear;
 
 	gfx_flush_flow #(.STAGES(`GFX_MASK_STAGES)) mask_flow
 	(
-		.in_valid(1),
-		.out_ready(fb_ready && mask_fifo_ready),
+		.in_valid(!wait_vsync),
+		.out_ready(fb_ready && mask_fifo_ready && !next_vsync),
 		.out_valid(pop),
 		.*
 	);
@@ -97,24 +100,28 @@ module gfx_scanout
 		if (!rst_n) begin
 			put <= 0;
 			fb_read <= 0;
+			wait_vsync <= 0;
 			commit_addr <= 0;
 			mask_in_addr <= 0;
 		end else begin
 			mask_in_addr <= mask_in_addr + 1;
-			if (mask_in_addr == max_addr)
-				mask_in_addr <= 0;
 
-			if (flush)
+			if (flush || wait_vsync)
 				mask_in_addr <= commit_addr;
 
-			if (commit)
-				commit_addr <= mask_hold_addr;
+			if (commit) begin
+				wait_vsync <= start_vsync;
+				commit_addr <= start_vsync ? 0 : mask_out_addr;
+			end
 
 			if (fb_ready)
-				fb_read <= mask_fifo_ready && pop && effective_mask;
+				fb_read <= mask_fifo_ready && pop && !next_vsync && effective_mask;
 
 			if (mask_fifo_ready)
-				put <= fb_ready && pop;
+				put <= fb_ready && pop && !next_vsync;
+
+			if (vsync)
+				wait_vsync <= 0;
 		end
 
 	always_ff @(posedge clk) begin
