@@ -50,6 +50,10 @@ module gfx_scanout_dac
 		dac_color = {in, {2{in[0]}}};
 	endfunction
 
+	assign skid_in.pixel.r = dac_color(pixel.r);
+	assign skid_in.pixel.g = dac_color(pixel.g);
+	assign skid_in.pixel.b = dac_color(pixel.b);
+
 	always_comb begin
 		// Descarta fifo_pixel.a
 		pixel.r = fifo_pixel.r;
@@ -58,13 +62,6 @@ module gfx_scanout_dac
 
 		if (!half_mask)
 			pixel = clear_color;
-
-		/* Esto no puede ir en assigns. Funciona en Verilator pero causa ub en
-		 * la netlist de Quartus. Eso no está documentado y perdí muchas horas.
-		 */
-		skid_in.pixel.r = dac_color(pixel.r);
-		skid_in.pixel.g = dac_color(pixel.g);
-		skid_in.pixel.b = dac_color(pixel.b);
 	end
 
 	gfx_skid_flow flow
