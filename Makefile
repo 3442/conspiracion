@@ -203,5 +203,6 @@ $(OBJ_DIR)/%.mk: \
 		--Mdir $(dir $@) --top $(word 1,$(subst /, ,$*)) -FI $(ROOT)/$(TB_DIR)/verilator.hpp \
 		$(filter %.sv %.cpp,$(patsubst tb/%,../tb/%,$^)) \
 		$(if $(filter $(TOP),$(word 1,$(subst /, ,$*))),, \
-			--vpi --public-flat-rw -LDFLAGS "$(COCOTB_LDFLAGS) $(LIBPYTHON)" \
+			--vpi --public-flat-rw --unroll-count 128 \
+			-LDFLAGS "$(COCOTB_LDFLAGS) $(LIBPYTHON)" \
 			$(shell $(COCOTB_CONFIG) --share)/lib/verilator/verilator.cpp)
