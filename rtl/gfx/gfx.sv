@@ -26,10 +26,19 @@ module gfx
 	output rgb30          scan_data
 );
 
-	logic enable_clear, start_clear, swap_buffers;
+	logic enable_clear, program_start, start_clear, swap_buffers;
 	rgb24 clear_color;
+	cmd_word program_header_base, program_header_size;
 
 	gfx_cmd cmd
+	(
+		.*
+	);
+
+	logic fetch_read;
+	vram_addr fetch_address;
+
+	gfx_sp sp
 	(
 		.*
 	);
@@ -115,8 +124,10 @@ module gfx
 		.*
 	);
 
-	logic fb_readdatavalid, fb_waitrequest, rop_waitrequest;
-	vram_word fb_readdata;
+	logic fetch_readdatavalid, fb_readdatavalid,
+	      fetch_waitrequest, fb_waitrequest, rop_waitrequest;
+
+	vram_word fetch_readdata, fb_readdata;
 
 	gfx_mem mem
 	(

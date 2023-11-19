@@ -168,7 +168,23 @@ typedef logic[`GFX_MEM_DATA_BITS - 1:0]      vram_word;
 typedef logic[`GFX_MEM_ADDR_BITS - 1:0]      vram_byte_addr;
 typedef logic[`GFX_MEM_WORD_ADDR_BITS - 1:0] vram_addr;
 
+`define GFX_INSN_BITS         32
+`define GFX_INSN_ADDR_BITS    (`GFX_MEM_WORD_ADDR_BITS - $clog2(`GFX_INSN_BITS / `GFX_MEM_DATA_BITS))
+`define GFX_INSN_SUBWORD_BITS (`GFX_MEM_ADDR_BITS - `GFX_INSN_ADDR_BITS)
+
+typedef logic[`GFX_INSN_BITS - 1:0]      insn_word;
+typedef logic[`GFX_INSN_ADDR_BITS - 1:0] vram_insn_addr;
+
 typedef logic[5:0]  cmd_addr;
 typedef logic[31:0] cmd_word;
+
+typedef struct packed
+{
+	logic[$bits(cmd_word) - $bits(vram_insn_addr) - `GFX_INSN_SUBWORD_BITS - 1:0] pad;
+	vram_insn_addr                                                                addr;
+	logic[`GFX_INSN_SUBWORD_BITS - 1:0]                                           sub;
+} cmd_insn_ptr;
+
+`define GFX_FETCH_FIFO_DEPTH 8
 
 `endif

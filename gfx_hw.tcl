@@ -80,6 +80,9 @@ add_fileset_file gfx_frag_shade.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_frag_shade.sv
 add_fileset_file gfx_rop.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_rop.sv
 add_fileset_file gfx_fifo.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_fifo.sv
 add_fileset_file gfx_mem.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_mem.sv
+add_fileset_file gfx_sp.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp.sv
+add_fileset_file gfx_sp_fetch.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp_fetch.sv
+add_fileset_file gfx_sp_widener.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp_widener.sv
 
 
 # 
