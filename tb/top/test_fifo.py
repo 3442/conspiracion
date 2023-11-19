@@ -47,10 +47,25 @@ async def fifo(dut):
 
     await ClockCycles(dut.clk, 2)
 
-    ready_driver = BitDriver(dut.out_ready, dut.clk)
     valid_driver = BitDriver(dut.in_valid, dut.clk)
-
-    ready_driver.start((1, i % 5) for i in itertools.count())
     valid_driver.start((1 + (i % 2), (i + 1) % 3) for i in itertools.count())
+
+    await ClockCycles(dut.clk, 1 << 10)
+    valid_driver.stop()
+
+    ready_driver = BitDriver(dut.out_ready, dut.clk)
+    ready_driver.start((1, i % 5) for i in itertools.count())
+
+    await ClockCycles(dut.clk, 1 << 10)
+    valid_driver.start()
+
+    await ClockCycles(dut.clk, 1 << 10)
+    ready_driver.stop()
+    valid_driver.stop()
+
+    await ClockCycles(dut.clk, 2)
+
+    dut.in_valid.value = 1
+    dut.out_ready.value = 1
 
     await ClockCycles(dut.clk, 1 << 16)
