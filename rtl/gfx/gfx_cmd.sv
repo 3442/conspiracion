@@ -5,11 +5,11 @@ module gfx_cmd
 	input  logic       clk,
 	                   rst_n,
 
-	input  logic[5:0]  cmd_address,
+	input  cmd_addr    cmd_address,
 	input  logic       cmd_read,
 	                   cmd_write,
-	input  logic[31:0] cmd_writedata,
-	output logic[31:0] cmd_readdata,
+	input  cmd_word    cmd_writedata,
+	output cmd_word    cmd_readdata,
 
 	input  logic       vsync,
 

@@ -168,4 +168,7 @@ typedef logic[`GFX_MEM_DATA_BITS - 1:0]      vram_word;
 typedef logic[`GFX_MEM_ADDR_BITS - 1:0]      vram_byte_addr;
 typedef logic[`GFX_MEM_WORD_ADDR_BITS - 1:0] vram_addr;
 
+typedef logic[5:0]  cmd_addr;
+typedef logic[31:0] cmd_word;
+
 `endif
