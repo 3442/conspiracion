@@ -2,27 +2,27 @@
 
 module gfx_mem
 (
-	input  logic      clk,
-	                  rst_n,
+	input  logic          clk,
+	                      rst_n,
 
-	input  logic      mem_waitrequest,
-	                  mem_readdatavalid,
-	input  mem_word   mem_readdata,
-	output mem_addr   mem_address,
-	output logic      mem_read,
-	                  mem_write,
-	output mem_word   mem_writedata,
+	input  logic          mem_waitrequest,
+	                      mem_readdatavalid,
+	input  vram_word      mem_readdata,
+	output vram_byte_addr mem_address,
+	output logic          mem_read,
+	                      mem_write,
+	output vram_word      mem_writedata,
 
-	input  logic      rop_write,
-	input  mem_word   rop_writedata,
-	input  half_coord rop_address,
-	output logic      rop_waitrequest,
+	input  logic          rop_write,
+	input  vram_word      rop_writedata,
+	input  half_coord     rop_address,
+	output logic          rop_waitrequest,
 
-	input  logic      fb_read,
-	input  half_coord fb_address,
-	output logic      fb_waitrequest,
-	                  fb_readdatavalid,
-	output mem_word   fb_readdata
+	input  logic          fb_read,
+	input  half_coord     fb_address,
+	output logic          fb_waitrequest,
+	                      fb_readdatavalid,
+	output vram_word      fb_readdata
 );
 
 	// Esto está mal, hay que reescribirlo totalmente
@@ -31,9 +31,9 @@ module gfx_mem
 
 	struct packed
 	{
-		mem_addr address;
-		logic    write;
-		mem_word writedata;
+		vram_addr address;
+		logic     write;
+		vram_word writedata;
 	} trans_in, trans_out, trans_in_skid, trans_out_skid;
 
 	/* Cerrar timing aquí no es tan fácil, debido al enrutamiento al el que
@@ -85,7 +85,7 @@ module gfx_mem
 		.*
 	);
 
-	gfx_pipes #(.WIDTH($bits(mem_word)), .DEPTH(`GFX_MEM_FIFO_DEPTH)) readdata_pipes
+	gfx_pipes #(.WIDTH($bits(vram_word)), .DEPTH(`GFX_MEM_FIFO_DEPTH)) readdata_pipes
 	(
 		.in(mem_readdata),
 		.out(fb_readdata),
@@ -105,7 +105,7 @@ module gfx_mem
 
 	assign mem_read = mem_rw && !trans_out_skid.write;
 	assign mem_write = mem_rw && trans_out_skid.write;
-	assign mem_address = trans_out_skid.address;
+	assign mem_address = {trans_out_skid.address, {`GFX_MEM_SUBWORD_BITS{1'b0}}};
 	assign mem_writedata = trans_out_skid.writedata;
 
 	always_comb begin
@@ -117,11 +117,11 @@ module gfx_mem
 		if (fb_read) begin
 			fb_waitrequest = !in_ready;
 			trans_in.write = 0;
-			trans_in.address = {6'd0, fb_address};
+			trans_in.address = {5'd0, fb_address};
 		end else begin
 			rop_waitrequest = !in_ready;
 			trans_in.write = 1;
-			trans_in.address = {6'd0, rop_address};
+			trans_in.address = {5'd0, rop_address};
 		end
 	end
 

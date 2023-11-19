@@ -2,28 +2,28 @@
 
 module gfx
 (
-	input  logic       clk,
-	                   rst_n,
+	input  logic          clk,
+	                      rst_n,
 
-	input  logic[5:0]  cmd_address,
-	input  logic       cmd_read,
-	                   cmd_write,
-	input  logic[31:0] cmd_writedata,
-	output logic[31:0] cmd_readdata,
+	input  logic[5:0]     cmd_address,
+	input  logic          cmd_read,
+	                      cmd_write,
+	input  logic[31:0]    cmd_writedata,
+	output logic[31:0]    cmd_readdata,
 
-	input  logic       mem_waitrequest,
-	                   mem_readdatavalid,
-	input  mem_word    mem_readdata,
-	output mem_addr    mem_address,
-	output logic       mem_read,
-	                   mem_write,
-	output mem_word    mem_writedata,
+	input  logic          mem_waitrequest,
+	                      mem_readdatavalid,
+	input  vram_word      mem_readdata,
+	output vram_byte_addr mem_address,
+	output logic          mem_read,
+	                      mem_write,
+	output vram_word      mem_writedata,
 
-	input  logic       scan_ready,
-	output logic       scan_valid,
-	                   scan_endofpacket,
-	                   scan_startofpacket,
-	output rgb30       scan_data
+	input  logic          scan_ready,
+	output logic          scan_valid,
+	                      scan_endofpacket,
+	                      scan_startofpacket,
+	output rgb30          scan_data
 );
 
 	logic enable_clear, start_clear, swap_buffers;
@@ -101,7 +101,7 @@ module gfx
 	);
 
 	logic rop_mask_assert, rop_ready, rop_write;
-	mem_word rop_writedata;
+	vram_word rop_writedata;
 	half_coord rop_address;
 	linear_coord rop_mask_addr;
 
@@ -116,7 +116,7 @@ module gfx
 	);
 
 	logic fb_readdatavalid, fb_waitrequest, rop_waitrequest;
-	mem_word fb_readdata;
+	vram_word fb_readdata;
 
 	gfx_mem mem
 	(

@@ -2,30 +2,30 @@
 
 module gfx_scanout_dac
 (
-	input  logic    clk,
-	                rst_n,
+	input  logic     clk,
+	                 rst_n,
 
-	input  logic    enable_clear,
-	input  rgb24    clear_color,
+	input  logic     enable_clear,
+	input  rgb24     clear_color,
 
-	input  logic    mask_fifo_out,
-	input  mem_word fb_fifo_out,
-	input  logic    in_valid,
-	output logic    in_ready,
+	input  logic     mask_fifo_out,
+	input  vram_word fb_fifo_out,
+	input  logic     in_valid,
+	output logic     in_ready,
 
-	input  logic    scan_ready,
-	output logic    scan_valid,
-	                scan_endofpacket,
-	                scan_startofpacket,
-	output rgb30    scan_data,
+	input  logic     scan_ready,
+	output logic     scan_valid,
+	                 scan_endofpacket,
+	                 scan_startofpacket,
+	output rgb30     scan_data,
 
-	output logic    vsync
+	output logic     vsync
 );
 
 	logic dac_valid, half, half_mask, stall, endofpacket, startofpacket;
 	rgb24 pixel;
 	rgb32 fifo_pixel;
-	mem_word msw, lsw;
+	vram_word msw, lsw;
 	half_coord next_addr;
 	linear_coord max_addr, pixel_addr;
 
@@ -42,16 +42,13 @@ module gfx_scanout_dac
 
 	assign max_addr = `GFX_X_RES * `GFX_Y_RES - 1;
 
+	assign fifo_pixel = {msw, lsw};
+	assign skid_in.endofpacket = endofpacket;
+	assign skid_in.startofpacket = startofpacket;
+
 	function color10 dac_color(color8 in);
 		dac_color = {in, {2{in[0]}}};
 	endfunction
-
-	assign fifo_pixel = {msw, lsw};
-	assign skid_in.pixel.r = dac_color(pixel.r);
-	assign skid_in.pixel.g = dac_color(pixel.g);
-	assign skid_in.pixel.b = dac_color(pixel.b);
-	assign skid_in.endofpacket = endofpacket;
-	assign skid_in.startofpacket = startofpacket;
 
 	always_comb begin
 		// Descarta fifo_pixel.a
@@ -61,6 +58,13 @@ module gfx_scanout_dac
 
 		if (!half_mask)
 			pixel = clear_color;
+
+		/* Esto no puede ir en assigns. Funciona en Verilator pero causa ub en
+		 * la netlist de Quartus. Eso no está documentado y perdí muchas horas.
+		 */
+		skid_in.pixel.r = dac_color(pixel.r);
+		skid_in.pixel.g = dac_color(pixel.g);
+		skid_in.pixel.b = dac_color(pixel.b);
 	end
 
 	gfx_skid_flow flow

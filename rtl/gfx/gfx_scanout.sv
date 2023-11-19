@@ -13,7 +13,7 @@ module gfx_scanout
 
 	input  logic        fb_waitrequest,
 	                    fb_readdatavalid,
-	input  mem_word     fb_readdata,
+	input  vram_word    fb_readdata,
 	output logic        fb_read,
 	output half_coord   fb_address,
 
@@ -30,7 +30,7 @@ module gfx_scanout
 	      fb_ready, mask_fifo_ready, fb_fifo_valid, mask_fifo_valid,
 	      pop, put, put_mask, next_vsync, start_vsync, wait_vsync;
 
-	mem_word fb_fifo_out;
+	vram_word fb_fifo_out;
 	half_coord commit_addr, mask_in_addr, mask_out_addr, mask_hold_addr, max_addr;
 
 	assign mask_addr = mask_in_addr[$bits(mask_in_addr) - 1:$bits(mask_in_addr) - $bits(mask_addr)];
@@ -78,7 +78,7 @@ module gfx_scanout
 	);
 
 	// 2x para evitar potencial overflow cuando fb_read=1 pero mask_fifo está llena
-	gfx_fifo #(.WIDTH($bits(mem_word)), .DEPTH(2 * `GFX_SCANOUT_FIFO_DEPTH)) fb_fifo
+	gfx_fifo #(.WIDTH($bits(vram_word)), .DEPTH(2 * `GFX_SCANOUT_FIFO_DEPTH)) fb_fifo
 	(
 		.in(fb_readdata),
 		.out(fb_fifo_out),

@@ -164,8 +164,8 @@ typedef struct packed
 `define GFX_MEM_FIFO_DEPTH     4 // Ajustar
 `define GFX_MEM_TRANS_DEPTH    4 // Ajustar
 
-typedef logic[`GFX_MEM_DATA_BITS - 1:0]      mem_word;
-typedef logic[`GFX_MEM_ADDR_BITS - 1:0]      mem_addr;
-typedef logic[`GFX_MEM_WORD_ADDR_BITS - 1:0] mem_word_addr;
+typedef logic[`GFX_MEM_DATA_BITS - 1:0]      vram_word;
+typedef logic[`GFX_MEM_ADDR_BITS - 1:0]      vram_byte_addr;
+typedef logic[`GFX_MEM_WORD_ADDR_BITS - 1:0] vram_addr;
 
 `endif

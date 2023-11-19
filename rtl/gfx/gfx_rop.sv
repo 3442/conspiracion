@@ -11,7 +11,7 @@ module gfx_rop
 
 	input  logic        rop_waitrequest,
 	output logic        rop_write,
-	output mem_word     rop_writedata,
+	output vram_word    rop_writedata,
 	output half_coord   rop_address,
 
 	output linear_coord mask_addr,
@@ -26,7 +26,7 @@ module gfx_rop
 	} state;
 
 	logic hi;
-	mem_word color_hi, color_lo;
+	vram_word color_hi, color_lo;
 	frag_paint hold;
 
 	assign {color_hi, color_lo} = hold.color;
