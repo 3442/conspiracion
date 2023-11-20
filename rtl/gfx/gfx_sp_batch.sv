@@ -24,12 +24,11 @@ module gfx_sp_batch
 	localparam TAIL_BITS  = $clog2($bits(lane_mask)),
 	           BLOCK_BITS = $bits(batch_length) - TAIL_BITS;
 
-	logic fifo_down, fifo_up, lane_read, lane_readdatavalid, lane_waitrequest;
+	logic fifo_down_safe, lane_read, lane_readdatavalid, lane_waitrequest;
 	lane_word lane_readdata;
 	vram_lane_addr aligned_batch_base, lane_address;
 	logic[TAIL_BITS - 1:0] batch_length_tail, read_tail;
 	logic[BLOCK_BITS - 1:0] batch_length_block, fetch_block_count, read_block_count;
-	logic[$clog2(`GFX_BATCH_FIFO_DEPTH + 1) - 1:0] fifo_pending;
 
 	struct packed
 	{
@@ -46,14 +45,10 @@ module gfx_sp_batch
 	assign out_data = fifo_out.data;
 	assign out_mask = fifo_out.mask;
 
-	assign fifo_up = out_ready && out_valid;
-	assign fifo_down = lane_read && !lane_waitrequest;
 	assign fifo_in.data = lane_readdata;
 
 	assign {batch_length_block, batch_length_tail} = batch_length;
-	assign aligned_batch_base = batch_base[
-		$bits(batch_base) - 1:$bits(batch_base) - $bits(vram_lane_addr)
-	];
+	assign aligned_batch_base = batch_base[`GFX_INSN_BITS_IN_LANE +: $bits(vram_lane_addr)];
 
 	gfx_sp_widener #(.WIDTH($bits(vram_lane_addr))) lane_bus
 	(
@@ -79,6 +74,14 @@ module gfx_sp_batch
 		.*
 	);
 
+	gfx_fifo_overflow #(.DEPTH(`GFX_BATCH_FIFO_DEPTH)) overflow
+	(
+		.down(lane_read && !lane_waitrequest),
+		.empty(),
+		.down_safe(fifo_down_safe),
+		.*
+	);
+
 	always_comb begin
 		unique case (read_tail)
 			2'b00: fifo_in.mask = 4'b0000;
@@ -95,29 +98,23 @@ module gfx_sp_batch
 		if (!rst_n) begin
 			state <= IDLE;
 			lane_read <= 0;
-			fifo_pending <= 0;
-		end else begin
-			unique case (state)
-				IDLE:
-					if (batch_start) begin
-						state <= STREAM;
-						lane_read <= 1;
-					end
-
-				STREAM: begin
-					if (!lane_read || !lane_waitrequest)
-						lane_read <= fifo_pending < `GFX_BATCH_FIFO_DEPTH - 1;
-
-					if (lane_read && !lane_waitrequest && read_block_count == 0)
-						state <= IDLE;
+		end else unique case (state)
+			IDLE:
+				if (batch_start) begin
+					state <= STREAM;
+					lane_read <= 1;
 				end
-			endcase
 
-			if (fifo_up && !fifo_down)
-				fifo_pending <= fifo_pending - 1;
-			else if (!fifo_up && fifo_down)
-				fifo_pending <= fifo_pending + 1;
-		end
+			STREAM: begin
+				if (!lane_read || !lane_waitrequest)
+					lane_read <= fifo_down_safe;
+
+				if (lane_read && !lane_waitrequest && fetch_block_count == 0) begin
+					state <= IDLE;
+					lane_read <= 0;
+				end
+			end
+		endcase
 
 	always_ff @(posedge clk) begin
 		unique case (state)

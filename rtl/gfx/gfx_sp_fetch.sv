@@ -29,14 +29,13 @@ module gfx_sp_fetch
 
 	localparam ENTRY_SIZE = 4;
 
-	logic break_loop, entry_end, fifo_down, fifo_up, fifo_put, header_continue,
-	      insn_read, insn_readdatavalid, insn_waitrequest;
+	logic break_loop, entry_end, fifo_down_safe, fifo_empty, fifo_put,
+	      header_continue, insn_read, insn_readdatavalid, insn_waitrequest;
 
 	cmd_word header_count;
 	insn_word code_length, code_read_ptr, code_fetch_ptr, insn_readdata, entry_data[ENTRY_SIZE];
 	vram_insn_addr code_base, insn_address, header_ptr;
 	logic[$clog2(ENTRY_SIZE - 1):0] entry_fetch_count, entry_read_count;
-	logic[$clog2(`GFX_FETCH_FIFO_DEPTH + 1) - 1:0] fifo_pending;
 
 	enum int unsigned
 	{
@@ -60,16 +59,13 @@ module gfx_sp_fetch
 	assign break_loop = batch_end && (!insn_read || !insn_waitrequest);
 
 	function vram_insn_addr base_from_word(insn_word in);
-		base_from_word = in[$bits(in) - 1:$bits(in) - $bits(vram_insn_addr)];
+		base_from_word = in[`GFX_INSN_SUBWORD_BITS +: $bits(vram_insn_addr)];
 	endfunction
 
 	assign code_base = base_from_word(entry_data[0]);
 	assign batch_base = base_from_word(entry_data[2]);
 	assign code_length = entry_data[1];
 	assign batch_length = entry_data[3];
-
-	assign fifo_up = ready && valid;
-	assign fifo_down = insn_read && !insn_waitrequest;
 
 	gfx_sp_widener #(.WIDTH($bits(vram_insn_addr))) insn_bus
 	(
@@ -97,6 +93,16 @@ module gfx_sp_fetch
 		.*
 	);
 
+	gfx_fifo_overflow #(.DEPTH(`GFX_FETCH_FIFO_DEPTH)) overflow
+	(
+		.down(insn_read && !insn_waitrequest),
+		.empty(fifo_empty),
+		.down_safe(fifo_down_safe),
+		.out_ready(ready),
+		.out_valid(valid),
+		.*
+	);
+
 	always_ff @(posedge clk or negedge rst_n)
 		if (!rst_n) begin
 			state <= IDLE;
@@ -104,59 +110,51 @@ module gfx_sp_fetch
 			fifo_put <= 0;
 			insn_read <= 0;
 			batch_start <= 0;
-			fifo_pending <= 0;
-		end else begin
-			unique case (state)
-				IDLE:
-					if (program_start) begin
-						state <= HEADER;
-						running <= 1;
-						insn_read <= 1;
-					end
-
-				HEADER: begin
-					if (insn_read && !insn_waitrequest)
-						insn_read <= entry_fetch_count == ENTRY_SIZE - 1;
-
-					if (insn_readdatavalid && entry_end) begin
-						state <= LOOP;
-						insn_read <= 1;
-						batch_start <= 1;
-					end
+		end else unique case (state)
+			IDLE:
+				if (program_start) begin
+					state <= HEADER;
+					running <= 1;
+					insn_read <= 1;
 				end
 
-				LOOP: begin
-					fifo_put <= 0;
-					batch_start <= 0;
+			HEADER: begin
+				if (insn_read && !insn_waitrequest)
+					insn_read <= entry_fetch_count != ENTRY_SIZE - 1;
 
-					if (!insn_read || !insn_waitrequest)
-						insn_read <= fifo_pending < `GFX_FETCH_FIFO_DEPTH - 1;
+				if (insn_readdatavalid && entry_end) begin
+					state <= LOOP;
+					insn_read <= 1;
+					batch_start <= 1;
+				end
+			end
 
-					if (break_loop) begin
-						state <= FLUSH;
-						insn_read <= 0;
-					end
+			LOOP: begin
+				fifo_put <= 0;
+				batch_start <= 0;
 
-					if (insn_readdatavalid)
-						fifo_put <= 1;
+				if (!insn_read || !insn_waitrequest)
+					insn_read <= fifo_down_safe;
+
+				if (break_loop) begin
+					state <= FLUSH;
+					insn_read <= 0;
 				end
 
-				FLUSH: begin
-					fifo_put <= 0;
+				if (insn_readdatavalid)
+					fifo_put <= 1;
+			end
 
-					if (fifo_pending == 0) begin
-						state <= header_continue ? HEADER : IDLE;
-						running <= header_continue;
-						insn_read <= header_continue;
-					end
+			FLUSH: begin
+				fifo_put <= 0;
+
+				if (fifo_empty) begin
+					state <= header_continue ? HEADER : IDLE;
+					running <= header_continue;
+					insn_read <= header_continue;
 				end
-			endcase
-
-			if (fifo_up && !fifo_down)
-				fifo_pending <= fifo_pending - 1;
-			else if (!fifo_up && fifo_down)
-				fifo_pending <= fifo_pending + 1;
-		end
+			end
+		endcase
 
 	always_ff @(posedge clk)
 		unique case (state)
@@ -217,7 +215,7 @@ module gfx_sp_fetch
 			end
 
 			FLUSH:
-				if (fifo_pending == 0) begin
+				if (fifo_empty) begin
 					header_count <= header_count - 1;
 					insn_address <= header_ptr;
 				end
