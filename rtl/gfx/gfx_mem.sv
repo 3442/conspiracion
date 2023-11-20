@@ -22,19 +22,67 @@ module gfx_mem
 	input  half_coord     fb_address,
 	output logic          fb_waitrequest,
 	                      fb_readdatavalid,
-	output vram_word      fb_readdata
+	output vram_word      fb_readdata,
+
+	input  logic          batch_read,
+	input  vram_addr      batch_address,
+	output logic          batch_waitrequest,
+	                      batch_readdatavalid,
+	output vram_word      batch_readdata,
+
+	input  logic          fetch_read,
+	input  vram_addr      fetch_address,
+	output logic          fetch_waitrequest,
+	                      fetch_readdatavalid,
+	output vram_word      fetch_readdata
 );
 
-	// Esto está mal, hay que reescribirlo totalmente
+	// Este módulo es inaceptable, hay que reescribirlo
 
-	logic mem_rw, trans_in_stall, trans_out_stall, in_ready, skid_in_valid, out_ready;
+	logic mem_rw, trans_in_stall, trans_out_stall, in_ready, skid_in_valid, out_ready,
+	      any_readdatavalid, readdatavalid, dispatch_full, dispatch_put, mem_ready;
+
+	vram_word any_readdata, readdata;
+	logic[$clog2(`GFX_MEM_DISPATCH_DEPTH) - 1:0] next_put_ptr, pop_ptr, put_ptr;
+
+	struct packed
+	{
+		logic fb,
+		      batch,
+		      fetch;
+	} dispatch_in, dispatch_out, dispatch_buf[`GFX_MEM_DISPATCH_DEPTH];
 
 	struct packed
 	{
 		vram_addr address;
-		logic     write;
+		logic     write,
+		          fb_waitrequest,
+		          batch_waitrequest,
+		          fetch_waitrequest;
 		vram_word writedata;
 	} trans_in, trans_out, trans_in_skid, trans_out_skid;
+
+	assign mem_read = mem_rw && !trans_out_skid.write && !dispatch_full;
+	assign mem_write = mem_rw && trans_out_skid.write;
+	assign mem_address = {trans_out_skid.address, {`GFX_MEM_SUBWORD_BITS{1'b0}}};
+	assign mem_writedata = trans_out_skid.writedata;
+
+	assign fb_readdata = any_readdata;
+	assign batch_readdata = any_readdata;
+	assign fetch_readdata = any_readdata;
+
+	assign fb_readdatavalid = any_readdatavalid && dispatch_out.fb;
+	assign batch_readdatavalid = any_readdatavalid && dispatch_out.batch;
+	assign fetch_readdatavalid = any_readdatavalid && dispatch_out.fetch;
+
+	assign dispatch_in.fb = !trans_out_skid.fb_waitrequest;
+	assign dispatch_in.batch = !trans_out_skid.batch_waitrequest;
+	assign dispatch_in.fetch = !trans_out_skid.fetch_waitrequest;
+
+	assign mem_ready = !mem_waitrequest && (!dispatch_full || trans_out_skid.write);
+	assign next_put_ptr = put_ptr + 1;
+	assign dispatch_put = mem_ready && mem_rw && !trans_out_skid.write;
+	assign dispatch_full = next_put_ptr == pop_ptr;
 
 	/* Cerrar timing aquí no es tan fácil, debido al enrutamiento al el que
 	 * necesariamente está sujeto este módulo (eg, VRAM y DAC están en
@@ -53,7 +101,7 @@ module gfx_mem
 	(
 		.stall(trans_in_stall),
 		.in_ready(in_ready),
-		.in_valid(rop_write || fb_read),
+		.in_valid(rop_write || fb_read || batch_read || fetch_read),
 		.out_ready(out_ready),
 		.out_valid(skid_in_valid),
 		.*
@@ -80,49 +128,79 @@ module gfx_mem
 		.stall(trans_out_stall),
 		.in_ready(out_ready),
 		.in_valid(skid_in_valid),
-		.out_ready(!mem_waitrequest),
+		.out_ready(mem_ready),
 		.out_valid(mem_rw),
 		.*
 	);
 
-	gfx_pipes #(.WIDTH($bits(vram_word)), .DEPTH(`GFX_MEM_FIFO_DEPTH)) readdata_pipes
+	gfx_pipes #(.WIDTH($bits(vram_word)), .DEPTH(`GFX_MEM_RESPONSE_DEPTH)) readdata_pipes
 	(
 		.in(mem_readdata),
-		.out(fb_readdata),
+		.out(readdata),
 		.stall(0),
 		.*
 	);
 
-	gfx_pipeline_flow #(.STAGES(`GFX_MEM_FIFO_DEPTH)) readdata_flow
+	gfx_pipeline_flow #(.STAGES(`GFX_MEM_RESPONSE_DEPTH)) readdata_flow
 	(
 		.stall(),
 		.in_ready(),
 		.in_valid(mem_readdatavalid),
 		.out_ready(1),
-		.out_valid(fb_readdatavalid),
+		.out_valid(readdatavalid),
 		.*
 	);
-
-	assign mem_read = mem_rw && !trans_out_skid.write;
-	assign mem_write = mem_rw && trans_out_skid.write;
-	assign mem_address = {trans_out_skid.address, {`GFX_MEM_SUBWORD_BITS{1'b0}}};
-	assign mem_writedata = trans_out_skid.writedata;
 
 	always_comb begin
 		fb_waitrequest = 1;
 		rop_waitrequest = 1;
+		batch_waitrequest = 1;
+		fetch_waitrequest = 1;
 
+		trans_in.write = 0;
 		trans_in.writedata = rop_writedata;
 
 		if (fb_read) begin
 			fb_waitrequest = !in_ready;
-			trans_in.write = 0;
 			trans_in.address = {5'd0, fb_address};
-		end else begin
+		end else if (batch_read) begin
+			batch_waitrequest = !in_ready;
+			trans_in.address = batch_address;
+		end else if (rop_write) begin
 			rop_waitrequest = !in_ready;
 			trans_in.write = 1;
 			trans_in.address = {5'd0, rop_address};
+		end else begin
+			fetch_waitrequest = !in_ready;
+			trans_in.address = fetch_address;
 		end
+
+		trans_in.fb_waitrequest = fb_waitrequest;
+		trans_in.batch_waitrequest = batch_waitrequest;
+		trans_in.fetch_waitrequest = fetch_waitrequest;
+	end
+
+	always_ff @(posedge clk or negedge rst_n)
+		if (!rst_n) begin
+			pop_ptr <= 0;
+			put_ptr <= 0;
+		end else begin
+			if (readdatavalid)
+				pop_ptr <= pop_ptr + 1;
+
+			if (dispatch_put)
+				put_ptr <= next_put_ptr;
+		end
+
+
+	always_ff @(posedge clk) begin
+		any_readdata <= readdata;
+		any_readdatavalid <= readdatavalid;
+
+		dispatch_out <= dispatch_buf[pop_ptr];
+
+		if (dispatch_put)
+			dispatch_buf[put_ptr] <= dispatch_in;
 	end
 
 endmodule

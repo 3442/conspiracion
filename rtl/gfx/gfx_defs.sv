@@ -161,8 +161,9 @@ typedef struct packed
 `define GFX_MEM_DATA_BITS      16 // No puedo hacer nada al respecto
 `define GFX_MEM_SUBWORD_BITS   ($clog2(`GFX_MEM_DATA_BITS / 8))
 `define GFX_MEM_ADDR_BITS      (`GFX_MEM_WORD_ADDR_BITS + `GFX_MEM_SUBWORD_BITS)
-`define GFX_MEM_FIFO_DEPTH     4 // Ajustar
+`define GFX_MEM_RESPONSE_DEPTH 2 // Ajustar
 `define GFX_MEM_TRANS_DEPTH    4 // Ajustar
+`define GFX_MEM_DISPATCH_DEPTH 8 // Nótese que platform.vram_0.s1.maximumPendingReadTransactions = 7
 
 typedef logic[`GFX_MEM_DATA_BITS - 1:0]      vram_word;
 typedef logic[`GFX_MEM_ADDR_BITS - 1:0]      vram_byte_addr;
