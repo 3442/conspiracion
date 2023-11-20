@@ -171,9 +171,14 @@ typedef logic[`GFX_MEM_WORD_ADDR_BITS - 1:0] vram_addr;
 `define GFX_INSN_BITS         32
 `define GFX_INSN_ADDR_BITS    (`GFX_MEM_WORD_ADDR_BITS - $clog2(`GFX_INSN_BITS / `GFX_MEM_DATA_BITS))
 `define GFX_INSN_SUBWORD_BITS (`GFX_MEM_ADDR_BITS - `GFX_INSN_ADDR_BITS)
+`define GFX_LANE_BITS         $bits(mat4)
+`define GFX_LANE_ADDR_BITS    (`GFX_MEM_WORD_ADDR_BITS - $clog2(`GFX_LANE_BITS / `GFX_MEM_DATA_BITS))
+`define GFX_LANE_SUBWORD_BITS (`GFX_MEM_ADDR_BITS - `GFX_LANE_ADDR_BITS)
 
 typedef logic[`GFX_INSN_BITS - 1:0]      insn_word;
+typedef logic[`GFX_LANE_BITS - 1:0]      lane_word;
 typedef logic[`GFX_INSN_ADDR_BITS - 1:0] vram_insn_addr;
+typedef logic[`GFX_LANE_ADDR_BITS - 1:0] vram_lane_addr;
 
 typedef logic[5:0]  cmd_addr;
 typedef logic[31:0] cmd_word;
@@ -185,6 +190,18 @@ typedef struct packed
 	logic[`GFX_INSN_SUBWORD_BITS - 1:0]                                           sub;
 } cmd_insn_ptr;
 
+typedef struct packed
+{
+	logic[$bits(cmd_word) - $bits(vram_lane_addr) - `GFX_LANE_SUBWORD_BITS - 1:0] pad;
+	vram_lane_addr                                                                addr;
+	logic[`GFX_LANE_SUBWORD_BITS - 1:0]                                           sub;
+} cmd_lane_ptr;
+
 `define GFX_FETCH_FIFO_DEPTH 8
+
+`define GFX_BATCH_FIFO_DEPTH 4
+`define GFX_SP_LANES         `VECS_PER_MAT
+
+typedef logic[`GFX_SP_LANES - 1:0] lane_mask;
 
 `endif

@@ -5,6 +5,12 @@ module gfx_sp
 	input  logic     clk,
 	                 rst_n,
 
+	input  logic     batch_waitrequest,
+	                 batch_readdatavalid,
+	input  vram_word batch_readdata,
+	output vram_addr batch_address,
+	output logic     batch_read,
+
 	input  logic     fetch_waitrequest,
 	                 fetch_readdatavalid,
 	input  vram_word fetch_readdata,
@@ -25,6 +31,15 @@ module gfx_sp
 	(
 		.ready(1),
 		.valid(),
+		.*
+	);
+
+	gfx_sp_batch batch
+	(
+		.out_data(),
+		.out_mask(),
+		.out_ready(1),
+		.out_valid(),
 		.*
 	);
 

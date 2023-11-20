@@ -35,8 +35,8 @@ module gfx
 		.*
 	);
 
-	logic fetch_read;
-	vram_addr fetch_address;
+	logic batch_read, fetch_read;
+	vram_addr batch_address, fetch_address;
 
 	gfx_sp sp
 	(
@@ -124,10 +124,10 @@ module gfx
 		.*
 	);
 
-	logic fetch_readdatavalid, fb_readdatavalid,
-	      fetch_waitrequest, fb_waitrequest, rop_waitrequest;
+	logic batch_readdatavalid, fb_readdatavalid, fetch_readdatavalid,
+	      batch_waitrequest, fb_waitrequest, fetch_waitrequest, rop_waitrequest;
 
-	vram_word fetch_readdata, fb_readdata;
+	vram_word batch_readdata, fb_readdata, fetch_readdata;
 
 	gfx_mem mem
 	(
