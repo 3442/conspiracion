@@ -188,6 +188,11 @@ typedef logic[`GFX_LANE_ADDR_BITS - 1:0] vram_lane_addr;
 typedef logic[5:0]  cmd_addr;
 typedef logic[31:0] cmd_word;
 
+`define GFX_CMD_REG_ID          2'b00
+`define GFX_CMD_REG_SCAN        2'b01
+`define GFX_CMD_REG_HEADER_BASE 2'b10
+`define GFX_CMD_REG_HEADER_SIZE 2'b11
+
 typedef struct packed
 {
 	logic[$bits(cmd_word) - $bits(vram_insn_addr) - `GFX_INSN_SUBWORD_BITS - 1:0] pad;
