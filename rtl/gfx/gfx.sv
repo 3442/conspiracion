@@ -19,6 +19,14 @@ module gfx
 	                      mem_write,
 	output vram_word      mem_writedata,
 
+	input  vram_addr      host_address,
+	input  logic          host_read,
+	                      host_write,
+	input  vram_word      host_writedata,
+	output logic          host_waitrequest,
+	                      host_readdatavalid,
+	output vram_word      host_readdata,
+
 	input  logic          scan_ready,
 	output logic          scan_valid,
 	                      scan_endofpacket,

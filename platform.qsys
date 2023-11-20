@@ -1405,6 +1405,11 @@
   <parameter name="baseAddress" value="0x30130000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
+ <connection kind="avalon" version="20.1" start="mm_bridge.m0" end="gfx_0.host">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x38000000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
  <connection kind="avalon" version="20.1" start="mm_bridge.m0" end="perf_0.perf">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x30150000" />

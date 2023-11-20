@@ -5,11 +5,11 @@ module test_fb
 	input  logic          clk,
 	                      rst_n,
 
-	input  logic[5:0]     cmd_address,
+	input  cmd_addr       cmd_address,
 	input  logic          cmd_read,
 	                      cmd_write,
-	input  logic[31:0]    cmd_writedata,
-	output logic[31:0]    cmd_readdata,
+	input  cmd_word       cmd_writedata,
+	output cmd_word       cmd_readdata,
 
 	input  logic          mem_waitrequest,
 	                      mem_readdatavalid,
@@ -18,6 +18,14 @@ module test_fb
 	output logic          mem_read,
 	                      mem_write,
 	output vram_word      mem_writedata,
+
+	input  vram_addr      host_address,
+	input  logic          host_read,
+	                      host_write,
+	input  vram_word      host_writedata,
+	output logic          host_waitrequest,
+	                      host_readdatavalid,
+	output vram_word      host_readdata,
 
 	input  logic          scan_ready,
 	output logic          scan_valid,
