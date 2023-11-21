@@ -90,7 +90,7 @@ module gfx_sp_batch
 			2'b11: fifo_in.mask = 4'b0111;
 		endcase
 
-		if (read_block_count == 0)
+		if (read_block_count != 0)
 			fifo_in.mask = 4'b1111;
 	end
 
