@@ -212,6 +212,9 @@ typedef struct packed
 `define GFX_BATCH_FIFO_DEPTH 4
 `define GFX_SP_LANES         `VECS_PER_MAT
 
-typedef logic[`GFX_SP_LANES - 1:0] lane_mask;
+typedef logic[`GFX_SP_LANES - 1:0]   lane_mask;
+typedef logic[`FLOATS_PER_VEC - 1:0] vec_mask;
+
+typedef logic[`FLOATS_PER_VEC - 1:0][$clog2(`FLOATS_PER_VEC) - 1:0] swizzle_lanes;
 
 `endif
