@@ -37,7 +37,7 @@ module gfx_sp_shuffler
 
 	genvar gen_i;
 	generate
-		for (gen_i = 0; gen_i < `VECS_PER_MAT; ++gen_i) begin: lanes
+		for (gen_i = 0; gen_i < `GFX_SP_LANES; ++gen_i) begin: lanes
 			gfx_sp_select select
 			(
 				.a(a[gen_i]),
@@ -63,7 +63,7 @@ module gfx_sp_shuffler
 			is_swizzle <= deco.shuffler.is_swizzle;
 
 			wb_out.dst <= hold_dst;
-			for (integer i = 0; i < `VECS_PER_MAT; ++i)
+			for (integer i = 0; i < `GFX_SP_LANES; ++i)
 				wb_out.data[i] <= is_swizzle ? swizzle_out[i] : select_out[i];
 		end
 

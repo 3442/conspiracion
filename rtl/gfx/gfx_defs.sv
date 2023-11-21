@@ -255,4 +255,6 @@ typedef struct packed
 	mat4     data;
 } wb_op;
 
+`define GFX_SP_COMBINER_FIFO_DEPTH 4 // TODO: optimizar esto
+
 `endif
