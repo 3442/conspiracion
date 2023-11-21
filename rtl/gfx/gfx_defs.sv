@@ -6,7 +6,7 @@
 `define FLOATS_PER_VEC 4
 `define VECS_PER_MAT   4
 
-// Target de 200MHz (reloj es 143MHz) con float16, rounding aproximado
+// Target de 200MHz (reloj es 143MHz) con float16, rounding (muy) aproximado
 `define FP_ADD_STAGES 10 // ~401 LUTs
 `define FP_MUL_STAGES 5  // ~144 LUTs ~1 bloque DSP
 `define FP_INV_STAGES 3  // ~178 LUTs ~1 bloque DSP
@@ -218,7 +218,10 @@ typedef logic[`FLOATS_PER_VEC - 1:0] vec_mask;
 
 typedef logic[`FLOATS_PER_VEC - 1:0][$clog2(`FLOATS_PER_VEC) - 1:0] swizzle_lanes;
 
-typedef logic[2:0] vreg_num;
+`define GFX_SP_REG_BITS  3
+`define GFX_SP_REG_COUNT (1 << `GFX_SP_REG_BITS)
+
+typedef logic[`GFX_SP_REG_BITS - 1:0] vreg_num;
 
 typedef struct packed
 {

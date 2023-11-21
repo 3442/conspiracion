@@ -1,5 +1,5 @@
-`include "gfx/gfx_isa.sv"
 `include "gfx/gfx_defs.sv"
+`include "gfx/gfx_sp_isa.sv"
 
 module gfx_sp_decode
 (

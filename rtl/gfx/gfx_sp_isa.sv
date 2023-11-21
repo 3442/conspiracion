@@ -1,5 +1,5 @@
-`ifndef GFX_ISA_SV
-`define GFX_ISA_SV
+`ifndef GFX_SP_ISA_SV
+`define GFX_SP_ISA_SV
 
 `include "gfx/gfx_defs.sv"
 

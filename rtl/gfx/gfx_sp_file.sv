@@ -12,7 +12,7 @@ module gfx_sp_file
 	input  vec4     wr_data
 );
 
-	vec4 file[1 << $bits(vreg_num)], hold_rd_data, hold_wr_data;
+	vec4 file[`GFX_SP_REG_COUNT], hold_rd_data, hold_wr_data;
 	logic hold_wr;
 	vreg_num hold_rd_reg, hold_wr_reg;
 

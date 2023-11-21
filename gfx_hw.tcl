@@ -46,7 +46,6 @@ add_fileset_file gfx_fixed_div.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_fixed_div.sv
 add_fileset_file gfx_fixed_fma.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_fixed_fma.sv
 add_fileset_file gfx_fixed_fma_dot.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_fixed_fma_dot.sv
 add_fileset_file gfx_cmd.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_cmd.sv
-add_fileset_file gfx_isa.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_isa.sv
 add_fileset_file gfx_defs.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_defs.sv
 add_fileset_file gfx_fold.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_fold.sv
 add_fileset_file gfx_mat_mat.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_mat_mat.sv
@@ -82,10 +81,12 @@ add_fileset_file gfx_fifo.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_fifo.sv
 add_fileset_file gfx_fifo_overflow.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_fifo_overflow.sv
 add_fileset_file gfx_mem.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_mem.sv
 add_fileset_file gfx_sp.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp.sv
+add_fileset_file gfx_sp_isa.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp_isa.sv
 add_fileset_file gfx_sp_file.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp_file.sv
 add_fileset_file gfx_sp_regs.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp_regs.sv
 add_fileset_file gfx_sp_batch.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp_batch.sv
 add_fileset_file gfx_sp_fetch.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp_fetch.sv
+add_fileset_file gfx_sp_issue.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp_issue.sv
 add_fileset_file gfx_sp_decode.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp_decode.sv
 add_fileset_file gfx_sp_select.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp_select.sv
 add_fileset_file gfx_sp_stream.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp_stream.sv

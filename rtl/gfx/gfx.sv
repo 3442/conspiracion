@@ -43,7 +43,7 @@ module gfx
 		.*
 	);
 
-	logic batch_read, fetch_read, send_valid;
+	logic batch_read, fetch_read, running, send_valid;
 	lane_word send_data;
 	lane_mask send_mask;
 	vram_addr batch_address, fetch_address;
