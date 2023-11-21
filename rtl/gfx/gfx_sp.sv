@@ -51,6 +51,19 @@ module gfx_sp
 		.*
 	);
 
+	gfx_sp_shuffler shuffler
+	(
+		.a(),
+		.b(),
+		.wb(),
+		.deco(),
+		.in_ready(),
+		.in_valid(0),
+		.wb_ready(1),
+		.wb_valid(),
+		.*
+	);
+
 	logic batch_end, deco_ready;
 	assign deco_ready = 1;
 

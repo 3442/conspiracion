@@ -51,8 +51,8 @@ module gfx_sp_decode
 		deco_in.ex.combiner = 0;
 		deco_in.ex.shuffler = 0;
 
-		deco_in.shuffler.is_imm = 1'bx;
 		deco_in.shuffler.is_swizzle = 1'bx;
+		deco_in.shuffler.is_broadcast = 1'bx;
 
 		unique casez (insn)
 			`GFX_INSN_OP_SELECT: begin
@@ -61,8 +61,8 @@ module gfx_sp_decode
 				deco_in.read_src_b = 1;
 
 				deco_in.ex.shuffler = 1;
-				deco_in.shuffler.is_imm = 0;
 				deco_in.shuffler.is_swizzle = 0;
+				deco_in.shuffler.is_broadcast = 0;
 			end
 
 			`GFX_INSN_OP_SWIZZL: begin
@@ -70,7 +70,6 @@ module gfx_sp_decode
 				deco_in.read_src_a = 1;
 
 				deco_in.ex.shuffler = 1;
-				deco_in.shuffler.is_imm = 0;
 				deco_in.shuffler.is_swizzle = 1;
 			end
 
@@ -78,8 +77,8 @@ module gfx_sp_decode
 				deco_in.writeback = 1;
 
 				deco_in.ex.shuffler = 1;
-				deco_in.shuffler.is_imm = 1;
 				deco_in.shuffler.is_swizzle = 0;
+				deco_in.shuffler.is_broadcast = 1;
 			end
 
 			`GFX_INSN_OP_MATVEC: begin

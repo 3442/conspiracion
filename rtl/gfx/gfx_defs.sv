@@ -12,9 +12,9 @@
 `define FP_INV_STAGES 3  // ~178 LUTs ~1 bloque DSP
 
 typedef logic[`FLOAT_BITS - 1:0]  fp;
-typedef fp                        vec2[2];
-typedef fp                        vec4[`FLOATS_PER_VEC];
-typedef vec4                      mat4[`VECS_PER_MAT];
+typedef fp[1:0]                   vec2;
+typedef fp[`FLOATS_PER_VEC - 1:0] vec4;
+typedef vec4[`VECS_PER_MAT - 1:0] mat4;
 
 `define FP_UNIT 16'h3c00
 
@@ -229,8 +229,8 @@ typedef struct packed
 
 typedef struct packed
 {
-	logic         is_imm,
-	              is_swizzle;
+	logic         is_swizzle,
+	              is_broadcast;
 	fp            imm;
 	vec_mask      select_mask;
 	swizzle_lanes swizzle_op;
@@ -248,5 +248,11 @@ typedef struct packed
 	ex_units      ex;
 	shuffler_deco shuffler;
 } insn_deco; // "insn_decode" ya existe en core, esto es confuso pero lo hice por tiempo
+
+typedef struct packed
+{
+	vreg_num dst;
+	mat4     data;
+} wb_op;
 
 `endif
