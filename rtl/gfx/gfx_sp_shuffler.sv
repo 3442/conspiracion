@@ -5,9 +5,9 @@ module gfx_sp_shuffler
 	input  logic     clk,
 	                 rst_n,
 
-	input  insn_deco deco,
 	input  mat4      a,
 	                 b,
+	input  insn_deco deco,
 	input  logic     in_valid,
 	output logic     in_ready,
 

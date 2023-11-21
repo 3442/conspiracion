@@ -19,7 +19,12 @@ module gfx_sp
 
 	input  logic     program_start,
 	input  cmd_word  program_header_base,
-	                 program_header_size
+	                 program_header_size,
+
+	input  logic     send_ready,
+	output logic     send_valid,
+	output lane_word send_data,
+	output lane_mask send_mask
 );
 
 	logic batch_start, clear_lanes, insn_valid, running;
@@ -42,12 +47,16 @@ module gfx_sp
 		.*
 	);
 
+	logic recv_valid;
+	lane_word recv_data;
+	lane_mask recv_mask;
+
 	gfx_sp_batch batch
 	(
-		.out_data(),
-		.out_mask(),
-		.out_ready(1),
-		.out_valid(),
+		.out_data(recv_data),
+		.out_mask(recv_mask),
+		.out_ready(recv_ready),
+		.out_valid(recv_valid),
 		.*
 	);
 
@@ -68,6 +77,20 @@ module gfx_sp
 	(
 		.a(),
 		.b(),
+		.wb(),
+		.deco(),
+		.in_ready(),
+		.in_valid(0),
+		.wb_ready(1),
+		.wb_valid(),
+		.*
+	);
+
+	logic recv_ready;
+
+	gfx_sp_stream stream
+	(
+		.a(),
 		.wb(),
 		.deco(),
 		.in_ready(),

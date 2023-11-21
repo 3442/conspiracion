@@ -43,11 +43,14 @@ module gfx
 		.*
 	);
 
-	logic batch_read, fetch_read;
+	logic batch_read, fetch_read, send_valid;
+	lane_word send_data;
+	lane_mask send_mask;
 	vram_addr batch_address, fetch_address;
 
 	gfx_sp sp
 	(
+		.send_ready(1), //TODO
 		.*
 	);
 

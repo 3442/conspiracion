@@ -15,8 +15,8 @@ module gfx_sp_batch
 	input  vram_insn_addr batch_base,
 	input  cmd_word       batch_length,
 
-	output lane_word      out_data,
 	output lane_mask      out_mask,
+	output lane_word      out_data,
 	input  logic          out_ready,
 	output logic          out_valid
 );

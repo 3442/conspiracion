@@ -86,6 +86,7 @@ add_fileset_file gfx_sp_batch.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp_batch.sv
 add_fileset_file gfx_sp_fetch.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp_fetch.sv
 add_fileset_file gfx_sp_decode.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp_decode.sv
 add_fileset_file gfx_sp_select.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp_select.sv
+add_fileset_file gfx_sp_stream.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp_stream.sv
 add_fileset_file gfx_sp_widener.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp_widener.sv
 add_fileset_file gfx_sp_swizzle.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp_swizzle.sv
 add_fileset_file gfx_sp_combiner.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp_combiner.sv
