@@ -82,6 +82,8 @@ add_fileset_file gfx_fifo.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_fifo.sv
 add_fileset_file gfx_fifo_overflow.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_fifo_overflow.sv
 add_fileset_file gfx_mem.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_mem.sv
 add_fileset_file gfx_sp.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp.sv
+add_fileset_file gfx_sp_file.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp_file.sv
+add_fileset_file gfx_sp_regs.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp_regs.sv
 add_fileset_file gfx_sp_batch.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp_batch.sv
 add_fileset_file gfx_sp_fetch.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp_fetch.sv
 add_fileset_file gfx_sp_decode.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp_decode.sv

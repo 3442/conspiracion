@@ -65,8 +65,6 @@ module gfx_sp
 
 	gfx_sp_shuffler shuffler
 	(
-		.a(),
-		.b(),
 		.wb(shuffler_wb),
 		.deco(),
 		.in_ready(),
@@ -81,8 +79,6 @@ module gfx_sp
 
 	gfx_sp_combiner combiner
 	(
-		.a(),
-		.b(),
 		.wb(combiner_wb),
 		.deco(),
 		.in_ready(),
@@ -97,7 +93,6 @@ module gfx_sp
 
 	gfx_sp_stream stream
 	(
-		.a(),
 		.wb(stream_wb),
 		.deco(),
 		.in_ready(),
@@ -113,6 +108,17 @@ module gfx_sp
 
 	gfx_sp_writeback writeback
 	(
+		.*
+	);
+
+	mat4 a, b;
+
+	gfx_sp_regs regs
+	(
+		.rd_a_reg(),
+		.rd_b_reg(),
+		.rd_a_data(a),
+		.rd_b_data(b),
 		.*
 	);
 
