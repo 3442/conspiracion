@@ -22,15 +22,23 @@ module gfx_sp
 	                 program_header_size
 );
 
-	logic batch_start, clear_lanes, running;
+	logic batch_start, clear_lanes, insn_valid, running;
 	cmd_word batch_length;
 	insn_word insn;
 	vram_insn_addr batch_base;
 
 	gfx_sp_fetch fetch
 	(
-		.ready(1),
-		.valid(),
+		.ready(insn_ready),
+		.valid(insn_valid),
+		.*
+	);
+
+	logic deco_valid, insn_ready;
+	insn_deco deco;
+
+	gfx_sp_decode decode
+	(
 		.*
 	);
 
@@ -43,6 +51,7 @@ module gfx_sp
 		.*
 	);
 
-	logic batch_end;
+	logic batch_end, deco_ready;
+	assign deco_ready = 1;
 
 endmodule

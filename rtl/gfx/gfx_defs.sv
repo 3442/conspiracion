@@ -179,6 +179,7 @@ typedef logic[`GFX_MEM_WORD_ADDR_BITS - 1:0] vram_addr;
 `define GFX_LANE_BITS         $bits(mat4)
 `define GFX_LANE_ADDR_BITS    (`GFX_MEM_WORD_ADDR_BITS - $clog2(`GFX_LANE_BITS / `GFX_MEM_DATA_BITS))
 `define GFX_LANE_SUBWORD_BITS (`GFX_MEM_ADDR_BITS - `GFX_LANE_ADDR_BITS)
+`define GFX_INSN_BITS_IN_LANE (`GFX_LANE_SUBWORD_BITS - `GFX_INSN_SUBWORD_BITS)
 
 typedef logic[`GFX_INSN_BITS - 1:0]      insn_word;
 typedef logic[`GFX_LANE_BITS - 1:0]      lane_word;
@@ -216,5 +217,36 @@ typedef logic[`GFX_SP_LANES - 1:0]   lane_mask;
 typedef logic[`FLOATS_PER_VEC - 1:0] vec_mask;
 
 typedef logic[`FLOATS_PER_VEC - 1:0][$clog2(`FLOATS_PER_VEC) - 1:0] swizzle_lanes;
+
+typedef logic[2:0] vreg_num;
+
+typedef struct packed
+{
+	logic stream,
+	      combiner,
+	      shuffler;
+} ex_units;
+
+typedef struct packed
+{
+	logic         is_imm,
+	              is_swizzle;
+	fp            imm;
+	vec_mask      select_mask;
+	swizzle_lanes swizzle_op;
+} shuffler_deco;
+
+typedef struct packed
+{
+	logic         writeback,
+	              read_src_a,
+	              read_src_b,
+	              clear_lanes;
+	vreg_num      dst,
+	              src_a,
+	              src_b;
+	ex_units      ex;
+	shuffler_deco shuffler;
+} insn_deco; // "insn_decode" ya existe en core, esto es confuso pero lo hice por tiempo
 
 `endif

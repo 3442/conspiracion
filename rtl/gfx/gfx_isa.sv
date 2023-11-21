@@ -1,0 +1,23 @@
+`ifndef GFX_ISA_SV
+`define GFX_ISA_SV
+
+`include "gfx/gfx_defs.sv"
+
+`define GFX_INSN_OP_SELECT 32'b00000000_zzzz0zzz_0zzz0zzz_00000001
+`define GFX_INSN_OP_SWIZZL 32'bzzzzzzzz_00000000_0zzz0zzz_00000010
+`define GFX_INSN_OP_BROADC 32'bzzzzzzzz_zzzzzzzz_00000zzz_00000100
+`define GFX_INSN_OP_MATVEC 32'b00000000_00000zzz_0zzz0zzz_00001000
+`define GFX_INSN_OP_SEND   32'b00000000_00000000_0zzz0000_00010000
+`define GFX_INSN_OP_RECV   32'b00000000_00000000_00000zzz_00100000
+
+`define GFX_INSN_DST   [10:8]
+`define GFX_INSN_SRC_A [14:12]
+`define GFX_INSN_SRC_B [18:16]
+
+`define GFX_INSN_SELECT_MASK [23:20]
+
+`define GFX_INSN_SWIZZL_LANES [31:24]
+
+`define GFX_INSN_BROADC_IMM [31:16]
+
+`endif
