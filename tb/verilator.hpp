@@ -30,15 +30,6 @@ namespace taller
 		q_bits.fp16 = a_bits.fp16 * b_bits.fp16;
 		return q_bits.u16;
 	}
-
-	static inline std::uint16_t fp_inv(std::uint16_t a) noexcept
-	{
-		fp16_bits a_bits, q_bits;
-		a_bits.u16 = a;
-
-		q_bits.fp16 = 1 / a_bits.fp16;
-		return q_bits.u16;
-	}
 }
 
 #endif

@@ -41,7 +41,6 @@ set_fileset_property QUARTUS_SYNTH ENABLE_RELATIVE_INCLUDE_PATHS false
 set_fileset_property QUARTUS_SYNTH ENABLE_FILE_OVERWRITE_MODE false
 add_fileset_file gfx.sv SYSTEM_VERILOG PATH rtl/gfx/gfx.sv TOP_LEVEL_FILE
 add_fileset_file gfx_fp_add.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_fp_add.sv
-add_fileset_file gfx_fp_inv.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_fp_inv.sv
 add_fileset_file gfx_fp_mul.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_fp_mul.sv
 add_fileset_file gfx_fixed_div.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_fixed_div.sv
 add_fileset_file gfx_fixed_fma.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_fixed_fma.sv
