@@ -11,9 +11,9 @@ module gfx_sp_shuffler
 	input  logic     in_valid,
 	output logic     in_ready,
 
-	output wb_op     wb,
 	input  logic     wb_ready,
-	output logic     wb_valid
+	output logic     wb_valid,
+	output wb_op     wb
 );
 
 	mat4 select_out, swizzle_out;

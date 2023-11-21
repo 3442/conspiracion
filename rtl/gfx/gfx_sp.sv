@@ -60,43 +60,59 @@ module gfx_sp
 		.*
 	);
 
+	logic shuffler_wb_valid;
+	wb_op shuffler_wb;
+
 	gfx_sp_shuffler shuffler
 	(
 		.a(),
 		.b(),
-		.wb(),
+		.wb(shuffler_wb),
 		.deco(),
 		.in_ready(),
 		.in_valid(0),
-		.wb_ready(1),
-		.wb_valid(),
+		.wb_ready(shuffler_wb_ready),
+		.wb_valid(shuffler_wb_valid),
 		.*
 	);
+
+	logic combiner_wb_valid;
+	wb_op combiner_wb;
 
 	gfx_sp_combiner combiner
 	(
 		.a(),
 		.b(),
-		.wb(),
+		.wb(combiner_wb),
 		.deco(),
 		.in_ready(),
 		.in_valid(0),
-		.wb_ready(1),
-		.wb_valid(),
+		.wb_ready(combiner_wb_ready),
+		.wb_valid(combiner_wb_valid),
 		.*
 	);
 
-	logic recv_ready;
+	logic recv_ready, stream_wb_valid;
+	wb_op stream_wb;
 
 	gfx_sp_stream stream
 	(
 		.a(),
-		.wb(),
+		.wb(stream_wb),
 		.deco(),
 		.in_ready(),
 		.in_valid(0),
-		.wb_ready(1),
-		.wb_valid(),
+		.wb_ready(stream_wb_ready),
+		.wb_valid(stream_wb_valid),
+		.*
+	);
+
+	mat4 wr_data;
+	logic combiner_wb_ready, shuffler_wb_ready, stream_wb_ready, wr;
+	vreg_num wr_reg;
+
+	gfx_sp_writeback writeback
+	(
 		.*
 	);
 

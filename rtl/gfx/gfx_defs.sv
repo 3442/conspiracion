@@ -257,4 +257,6 @@ typedef struct packed
 
 `define GFX_SP_COMBINER_FIFO_DEPTH 4 // TODO: optimizar esto
 
+`define GFX_SP_WB_STAGES 2
+
 `endif

@@ -10,9 +10,9 @@ module gfx_sp_stream
 	input  logic     in_valid,
 	output logic     in_ready,
 
-	output wb_op     wb,
 	input  logic     wb_ready,
 	output logic     wb_valid,
+	output wb_op     wb,
 
 	input  lane_word recv_data,
 	input  lane_mask recv_mask,
