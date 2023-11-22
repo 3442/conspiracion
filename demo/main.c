@@ -211,3 +211,11 @@ void reset(void)
 	else
 		ap_main();
 }
+
+// Requerido por libgcc
+int raise(int sig)
+{
+	print("raise(%d) called, aborting", sig);
+	halt_cpu(this_cpu->num);
+	while (1);
+}
