@@ -18,11 +18,6 @@ typedef vec4[`VECS_PER_MAT - 1:0] mat4;
 
 `define FP_UNIT 16'h3c00
 
-typedef struct packed
-{
-	fp x, y, z, w;
-} attr4;
-
 typedef logic[1:0] index4;
 
 `define INDEX4_MIN 2'b00
