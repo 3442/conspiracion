@@ -62,6 +62,24 @@ module gfx
 		.*
 	);
 
+	logic persp_ready, persp_valid;
+	raster_xyzw persp_vertex_a, persp_vertex_b, persp_vertex_c;
+
+	gfx_persp perspective
+	(
+		.in_ready(persp_ready),
+		.in_valid(0), //TODO
+		.out_ready(raster_ready),
+		.out_valid(persp_valid),
+		.in_vertex_a(), //TODO
+		.in_vertex_b(), //TODO
+		.in_vertex_c(), //TODO
+		.out_vertex_a(persp_vertex_a),
+		.out_vertex_b(persp_vertex_b),
+		.out_vertex_c(persp_vertex_c),
+		.*
+	);
+
 	logic raster_ready;
 	fixed_tri raster_ws;
 	bary_lanes barys;
@@ -72,13 +90,13 @@ module gfx
 	(
 		.ws(raster_ws),
 		.in_ready(raster_ready),
-		.in_valid(0), //TODO
+		.in_valid(persp_valid),
 		.out_ready(funnel_ready),
 		.out_valid(raster_valid),
 
-		.vertex_a(), //TODO
-		.vertex_b(), //TODO
-		.vertex_c(), //TODO
+		.vertex_a(persp_vertex_a),
+		.vertex_b(persp_vertex_b),
+		.vertex_c(persp_vertex_c),
 
 		.*
 	);
