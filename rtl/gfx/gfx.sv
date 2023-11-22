@@ -62,18 +62,36 @@ module gfx
 		.*
 	);
 
+	logic fix_ready, fix_valid;
+	raster_xyzw fix_vertex_a, fix_vertex_b, fix_vertex_c;
+
+	gfx_fix_floats fix
+	(
+		.in_ready(fix_ready),
+		.in_valid(0), //TODO
+		.out_ready(persp_ready),
+		.out_valid(fix_valid),
+		.in_vertex_a(), //TODO
+		.in_vertex_b(), //TODO
+		.in_vertex_c(), //TODO
+		.out_vertex_a(fix_vertex_a),
+		.out_vertex_b(fix_vertex_b),
+		.out_vertex_c(fix_vertex_c),
+		.*
+	);
+
 	logic persp_ready, persp_valid;
 	raster_xyzw persp_vertex_a, persp_vertex_b, persp_vertex_c;
 
 	gfx_persp perspective
 	(
 		.in_ready(persp_ready),
-		.in_valid(0), //TODO
+		.in_valid(fix_valid),
 		.out_ready(raster_ready),
 		.out_valid(persp_valid),
-		.in_vertex_a(), //TODO
-		.in_vertex_b(), //TODO
-		.in_vertex_c(), //TODO
+		.in_vertex_a(fix_vertex_a),
+		.in_vertex_b(fix_vertex_b),
+		.in_vertex_c(fix_vertex_c),
 		.out_vertex_a(persp_vertex_a),
 		.out_vertex_b(persp_vertex_b),
 		.out_vertex_c(persp_vertex_c),

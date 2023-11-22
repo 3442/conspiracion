@@ -83,6 +83,8 @@ add_fileset_file gfx_fifo_overflow.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_fifo_overf
 add_fileset_file gfx_mem.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_mem.sv
 add_fileset_file gfx_persp.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_persp.sv
 add_fileset_file gfx_persp_vertex.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_persp_vertex.sv
+add_fileset_file gfx_fix_floats.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_fix_floats.sv
+add_fileset_file gfx_fix_vertex.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_fix_vertex.sv
 add_fileset_file gfx_sp.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp.sv
 add_fileset_file gfx_sp_isa.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp_isa.sv
 add_fileset_file gfx_sp_file.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp_file.sv
