@@ -7,6 +7,7 @@ module gfx_scanout
 
 	input  logic        enable_clear,
 	input  rgb24        clear_color,
+	input  vram_addr    scan_base,
 
 	input  logic        mask,
 	output linear_coord mask_addr,
@@ -15,7 +16,7 @@ module gfx_scanout
 	                    fb_readdatavalid,
 	input  vram_word    fb_readdata,
 	output logic        fb_read,
-	output half_coord   fb_address,
+	output vram_addr    fb_address,
 
 	input  logic        scan_ready,
 	output logic        scan_valid,
@@ -128,7 +129,7 @@ module gfx_scanout
 		mask_hold_addr <= mask_out_addr;
 
 		if (fb_ready)
-			fb_address <= mask_out_addr;
+			fb_address <= scan_base + {5'd0, mask_out_addr};
 
 		if (mask_fifo_ready)
 			put_mask <= effective_mask;

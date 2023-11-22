@@ -3,8 +3,11 @@
 module gfx_masks
 (
 	input  logic        clk,
+	                    rst_n,
 
 	input  logic        swap_buffers,
+	input  cmd_word     fb_base_a,
+	                    fb_base_b,
 
 	input  linear_coord scan_mask_addr,
 	output logic        scan_mask,
@@ -13,7 +16,10 @@ module gfx_masks
 	                    frag_mask_set,
 	input  linear_coord frag_mask_read_addr,
 	                    frag_mask_write_addr,
-	output logic        frag_mask
+	output logic        frag_mask,
+
+	output vram_addr    frag_base,
+	                    scan_base
 );
 
 	logic mask_a, mask_b, frag_write_hold, frag_set_hold;
@@ -38,6 +44,15 @@ module gfx_masks
 		.write_addr(frag_write_addr_hold),
 		.*
 	);
+
+	always_ff @(posedge clk or negedge rst_n)
+		if (!rst_n) begin
+			frag_base <= 0;
+			scan_base <= 0;
+		end else begin
+			frag_base <= swap_buffers ? fb_base_a[$bits(vram_addr):1] : fb_base_b[$bits(vram_addr):1];
+			scan_base <= swap_buffers ? fb_base_b[$bits(vram_addr):1] : fb_base_a[$bits(vram_addr):1];
+		end
 
 	always_ff @(posedge clk) begin
 		scan_mask <= swap_buffers ? mask_b : mask_a;

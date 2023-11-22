@@ -23,11 +23,11 @@ module gfx_mem
 
 	input  logic          rop_write,
 	input  vram_word      rop_writedata,
-	input  half_coord     rop_address,
+	input  vram_addr      rop_address,
 	output logic          rop_waitrequest,
 
 	input  logic          fb_read,
-	input  half_coord     fb_address,
+	input  vram_addr      fb_address,
 	output logic          fb_waitrequest,
 	                      fb_readdatavalid,
 	output vram_word      fb_readdata,
@@ -175,7 +175,7 @@ module gfx_mem
 
 		if (fb_read) begin
 			fb_waitrequest = !in_ready;
-			trans_in.address = {5'd0, fb_address};
+			trans_in.address = fb_address;
 		end else if (batch_read) begin
 			batch_waitrequest = !in_ready;
 			trans_in.address = batch_address;
@@ -183,7 +183,7 @@ module gfx_mem
 			rop_waitrequest = !in_ready;
 
 			trans_in.write = 1;
-			trans_in.address = {5'd0, rop_address};
+			trans_in.address = rop_address;
 			trans_in.writedata = rop_writedata;
 		end else if (fetch_read) begin
 			fetch_waitrequest = !in_ready;

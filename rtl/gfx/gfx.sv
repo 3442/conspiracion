@@ -36,7 +36,7 @@ module gfx
 
 	logic enable_clear, program_start, start_clear, swap_buffers;
 	rgb24 clear_color;
-	cmd_word program_header_base, program_header_size;
+	cmd_word fb_base_a, fb_base_b, program_header_base, program_header_size;
 
 	gfx_cmd cmd
 	(
@@ -124,6 +124,7 @@ module gfx
 	);
 
 	logic frag_mask, scan_mask;
+	vram_addr frag_base, scan_base;
 
 	gfx_masks masks
 	(
@@ -169,8 +170,8 @@ module gfx
 	);
 
 	logic rop_mask_assert, rop_ready, rop_write;
+	vram_addr rop_address;
 	vram_word rop_writedata;
-	half_coord rop_address;
 	linear_coord rop_mask_addr;
 
 	gfx_rop rop
@@ -194,7 +195,7 @@ module gfx
 	);
 
 	logic fb_read, vsync;
-	half_coord fb_address;
+	vram_addr fb_address;
 	linear_coord scan_mask_addr;
 
 	gfx_scanout scanout

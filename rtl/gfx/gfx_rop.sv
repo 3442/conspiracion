@@ -5,6 +5,8 @@ module gfx_rop
 	input  logic        clk,
 	                    rst_n,
 
+	input  vram_addr    frag_base,
+
 	input  frag_paint   in,
 	input  logic        in_valid,
 	output logic        in_ready,
@@ -12,7 +14,7 @@ module gfx_rop
 	input  logic        rop_waitrequest,
 	output logic        rop_write,
 	output vram_word    rop_writedata,
-	output half_coord   rop_address,
+	output vram_addr    rop_address,
 
 	output linear_coord mask_addr,
 	output logic        mask_assert
@@ -32,7 +34,7 @@ module gfx_rop
 	assign {color_hi, color_lo} = hold.color;
 
 	assign mask_addr = hold.addr;
-	assign rop_address = {hold.addr, hi};
+	assign rop_address = frag_base + {5'd0, hold.addr, hi};
 	assign rop_writedata = hi ? color_hi : color_lo;
 
 	always_comb begin

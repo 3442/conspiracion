@@ -189,10 +189,12 @@ typedef logic[`GFX_LANE_ADDR_BITS - 1:0] vram_lane_addr;
 typedef logic[5:0]  cmd_addr;
 typedef logic[31:0] cmd_word;
 
-`define GFX_CMD_REG_ID          2'b00
-`define GFX_CMD_REG_SCAN        2'b01
-`define GFX_CMD_REG_HEADER_BASE 2'b10
-`define GFX_CMD_REG_HEADER_SIZE 2'b11
+`define GFX_CMD_REG_ID          3'b000
+`define GFX_CMD_REG_SCAN        3'b001
+`define GFX_CMD_REG_HEADER_BASE 3'b010
+`define GFX_CMD_REG_HEADER_SIZE 3'b011
+`define GFX_CMD_REG_FB_BASE_A   3'b100
+`define GFX_CMD_REG_FB_BASE_B   3'b101
 
 typedef struct packed
 {

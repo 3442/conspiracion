@@ -2,25 +2,28 @@
 
 module gfx_cmd
 (
-	input  logic       clk,
-	                   rst_n,
+	input  logic    clk,
+	                rst_n,
 
-	input  cmd_addr    cmd_address,
-	input  logic       cmd_read,
-	                   cmd_write,
-	input  cmd_word    cmd_writedata,
-	output cmd_word    cmd_readdata,
+	input  cmd_addr cmd_address,
+	input  logic    cmd_read,
+	                cmd_write,
+	input  cmd_word cmd_writedata,
+	output cmd_word cmd_readdata,
 
-	input  logic       vsync,
+	input  logic    vsync,
 
-	output logic       swap_buffers,
-	                   enable_clear,
-	                   start_clear,
-	output rgb24       clear_color,
+	output logic    swap_buffers,
+	                enable_clear,
+	                start_clear,
+	output rgb24    clear_color,
 
-	output logic       program_start,
-	output cmd_word    program_header_base,
-	                   program_header_size
+	output logic    program_start,
+	output cmd_word program_header_base,
+	                program_header_size,
+
+	output cmd_word fb_base_a,
+	                fb_base_b
 );
 
 	rgb24 next_clear_color;
@@ -56,6 +59,9 @@ module gfx_cmd
 			next_swap_buffers <= 0;
 
 			program_start <= 0;
+
+			fb_base_a <= 0;
+			fb_base_b <= 0;
 		end else begin
 			start_clear <= 0;
 			program_start <= 0;
@@ -67,7 +73,7 @@ module gfx_cmd
 			end
 
 			if (cmd_write)
-				unique case (cmd_address[1:0])
+				unique case (cmd_address[2:0])
 					`GFX_CMD_REG_ID: ;
 
 					`GFX_CMD_REG_SCAN: begin
@@ -82,6 +88,14 @@ module gfx_cmd
 
 					`GFX_CMD_REG_HEADER_SIZE:
 						program_start <= 1;
+
+					`GFX_CMD_REG_FB_BASE_A:
+						fb_base_a <= cmd_writedata;
+	
+					`GFX_CMD_REG_FB_BASE_B:
+						fb_base_b <= cmd_writedata;
+
+					default: ;
 				endcase
 		end
 
@@ -90,7 +104,7 @@ module gfx_cmd
 			clear_color <= next_clear_color;
 
 		if (cmd_write)
-			unique case (cmd_address[1:0])
+			unique case (cmd_address[2:0])
 				`GFX_CMD_REG_ID: ;
 
 				`GFX_CMD_REG_SCAN:
@@ -101,6 +115,8 @@ module gfx_cmd
 
 				`GFX_CMD_REG_HEADER_SIZE:
 					program_header_size <= cmd_writedata;
+
+				default: ;
 			endcase
 	end
 
