@@ -1,0 +1,10 @@
+	component ip_fp_fix is
+		port (
+			clk    : in  std_logic                     := 'X';             -- clk
+			areset : in  std_logic                     := 'X';             -- reset
+			en     : in  std_logic_vector(0 downto 0)  := (others => 'X'); -- en
+			a      : in  std_logic_vector(15 downto 0) := (others => 'X'); -- a
+			q      : out std_logic_vector(31 downto 0)                     -- q
+		);
+	end component ip_fp_fix;
+
