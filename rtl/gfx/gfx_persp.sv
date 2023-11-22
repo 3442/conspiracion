@@ -18,6 +18,14 @@ module gfx_persp
 	                   out_vertex_c
 );
 
+	// Perdón Ronald
+	assign in_ready = out_ready;
+	assign out_valid = in_valid;
+	assign out_vertex_a = in_vertex_a;
+	assign out_vertex_b = in_vertex_b;
+	assign out_vertex_c = in_vertex_c;
+
+/*
 	logic stall;
 
 	gfx_pipeline_flow #(.STAGES(`FIXED_DIV_STAGES)) flow
@@ -45,5 +53,6 @@ module gfx_persp
 		.out_vertex(out_vertex_c),
 		.*
 	);
+*/
 
 endmodule
