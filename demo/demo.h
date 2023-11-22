@@ -41,10 +41,12 @@ void unexpected_eof();
 
 int parse_hex(char **tokens, unsigned *val);
 int parse_ptr(char **tokens, void **ptr);
+int parse_fp16(char **tokens, short *ptr);
 int parse_aligned(char **tokens, void **ptr);
 
 int parse_cpu(char **tokens, unsigned *cpu);
 int parse_cpu_mask(char **tokens, unsigned *mask);
+int parse_lane(char **tokens, unsigned *lane);
 
 void cache_debug(unsigned cpu, void *ptr);
 
@@ -57,5 +59,12 @@ void remote_send(unsigned cpu, void *ptr, int write, unsigned val);
 void remote_recv(void **ptr, int *write, unsigned *val);
 
 int compare_exchange_64(volatile unsigned long long *p, unsigned long long *old, unsigned long long val);
+
+void gfx_init(void);
+void gfx_draw(void);
+void gfx_swap(void);
+void gfx_clear(void);
+void gfx_bg(unsigned color);
+void gfx_data(unsigned block, unsigned lane, short data[static 4]);
 
 #endif

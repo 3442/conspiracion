@@ -123,6 +123,74 @@ static void cmd_remote(char **tokens)
 		unknown_command(cmd);
 }
 
+static void cmd_gfx_swap(char **tokens)
+{
+	if (!expect_end(tokens))
+		gfx_swap();
+}
+
+static void cmd_gfx_draw(char **tokens)
+{
+	if (!expect_end(tokens))
+		gfx_draw();
+}
+
+static void cmd_gfx_clear(char **tokens)
+{
+	if (!expect_end(tokens))
+		gfx_clear();
+}
+
+static void cmd_gfx_data(char **tokens)
+{
+	short data[4];
+	unsigned block, lane;
+
+	if (parse_hex(tokens, &block) < 0 || parse_lane(tokens, &lane) < 0
+	 || parse_fp16(tokens, &data[3]) < 0 || parse_fp16(tokens, &data[2]) < 0
+	 || parse_fp16(tokens, &data[1]) < 0 || parse_fp16(tokens, &data[0]) < 0
+	 || expect_end(tokens) < 0)
+		return;
+
+	gfx_data(block, lane, data);
+}
+
+static void cmd_gfx_bg(char **tokens)
+{
+	unsigned color;
+	if (parse_hex(tokens, &color) < 0 || expect_end(tokens) < 0)
+		return;
+	else if (color & 0xff000000) {
+		print("bad color: %x", color);
+		return;
+	}
+
+	gfx_bg(color);
+}
+
+static void cmd_gfx(char **tokens)
+{
+	const char *cmd;
+
+	if (!(cmd = strtok_input(tokens))) {
+		unexpected_eof();
+		return;
+	}
+
+	if (!strcmp(cmd, "swap"))
+		cmd_gfx_swap(tokens);
+	else if (!strcmp(cmd, "draw"))
+		cmd_gfx_draw(tokens);
+	else if (!strcmp(cmd, "clear"))
+		cmd_gfx_clear(tokens);
+	else if (!strcmp(cmd, "data"))
+		cmd_gfx_data(tokens);
+	else if (!strcmp(cmd, "bg"))
+		cmd_gfx_bg(tokens);
+	else
+		unknown_command(cmd);
+}
+
 static void kick_cpus(void)
 {
 	for (unsigned i = this_cpu->num + 1; i < NUM_CPUS; ++i) {
@@ -175,6 +243,8 @@ static void bsp_main(void)
 			cmd_perf(&tokens);
 		else if (!strcmp(cmd, "remote"))
 			cmd_remote(&tokens);
+		else if (!strcmp(cmd, "gfx"))
+			cmd_gfx(&tokens);
 		else
 			unknown_command(cmd);
 	}
@@ -201,8 +271,10 @@ static void ap_main(void)
 
 void reset(void)
 {
-	if (this_cpu->num == 0)
+	if (this_cpu->num == 0) {
 		console_init();
+		gfx_init();
+	}
 
 	print("exited reset");
 

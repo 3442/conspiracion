@@ -1,6 +1,7 @@
 #include <stddef.h>
 
 #include "demo.h"
+#include "float16.h"
 
 static void bad_input(void)
 {
@@ -64,6 +65,24 @@ int parse_cpu(char **tokens, unsigned *cpu)
 	return parse_cpu_token(token, cpu);
 }
 
+int parse_lane(char **tokens, unsigned *lane)
+{
+	char *token = strtok_input(tokens);
+	if (!token) {
+		unexpected_eof();
+		return -1;
+	}
+
+	if (token[0] != 'l' || token[1] != 'a' || token[2] != 'n' || token[3] != 'e'
+	|| !('0' <= token[4] && token[4] <= '3') || token[5]) {
+		bad_input();
+		return -1;
+	}
+
+	*lane = token[4] - '0';
+	return 0;
+}
+
 int parse_cpu_mask(char **tokens, unsigned *mask)
 {
 	*mask = 0;
@@ -120,6 +139,48 @@ int parse_hex(char **tokens, unsigned *val)
 		return -1;
 	}
 
+	return 0;
+}
+
+int parse_fp16(char **tokens, short *val)
+{
+	char *token = strtok_input(tokens);
+	if (!token) {
+		unexpected_eof();
+		return -1;
+	}
+
+	int neg = token[0] == '-';
+	if (neg)
+		++token;
+
+	int in_denom = 0;
+	int32_t num = 0, denom = 1;
+
+	do {
+		if (*token == '.') {
+			if (in_denom) {
+				bad_input();
+				return -1;
+			}
+
+			in_denom = 1;
+			continue;
+		} else if (!(*token >= '0' && *token <= '9')) {
+			bad_input();
+			return -1;
+		}
+
+		num = num * 10 + (*token - '0');
+		if (in_denom)
+			denom *= 10;
+	} while (*++token);
+
+	short fp = f16_div(f16_from_int(num), f16_from_int(denom));
+	if (neg)
+		fp = f16_neg(fp);
+
+	*val = fp;
 	return 0;
 }
 
