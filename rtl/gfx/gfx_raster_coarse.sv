@@ -2,25 +2,27 @@
 
 module gfx_raster_coarse
 (
-	input  logic      clk,
-	                  rst_n,
+	input  logic              clk,
+	                          rst_n,
 
-	input  raster_xy  pos_ref,
-	input  coarse_dim span_x,
-	                  span_y,
-	input  fixed_tri  edge_refs,
-	                  coarse_x_offsets,
-	                  coarse_y_offsets,
-	                  coarse_test_offsets,
+	input  raster_xy          pos_ref,
+	input  coarse_dim         span_x,
+	                          span_y,
+	input  raster_offsets_tri offsets,
+	input  fixed_tri          edge_refs,
+	                          coarse_x_offsets,
+	                          coarse_y_offsets,
+	                          coarse_test_offsets,
 
-	input  logic      in_valid,
-	output logic      in_ready,
+	input  logic              in_valid,
+	output logic              in_ready,
 
-	input  logic      out_ready,
-	output logic      out_valid,
+	input  logic              out_ready,
+	output logic              out_valid,
 
-	output raster_xy  pos,
-	output fixed_tri  corners
+	output raster_xy          pos,
+	output fixed_tri          corners,
+	output raster_offsets_tri fine_offsets
 );
 
 	fixed reference_x;
@@ -29,15 +31,20 @@ module gfx_raster_coarse
 	fixed_tri edge_fns, edge_tests, edge_vert, edge_vert_next;
 	coarse_dim stride_x, stride_y, width;
 	logic[2:0] edge_signs;
+	raster_offsets_tri hold_offsets;
+
+	fixed_tri hold_coarse_x_offsets, hold_coarse_y_offsets, hold_coarse_test_offsets;
 
 	struct packed
 	{
-		raster_xy pos;
-		fixed_tri corners;
+		raster_xy          pos;
+		fixed_tri          corners;
+		raster_offsets_tri fine_offsets;
 	} out, skid_out;
 
 	assign pos = skid_out.pos;
 	assign corners = skid_out.corners;
+	assign fine_offsets = skid_out.fine_offsets;
 
 	assign end_x = stride_x == 0;
 	assign end_y = stride_y == 0;
@@ -61,8 +68,8 @@ module gfx_raster_coarse
 
 	always_comb
 		for (integer i = 0; i < 3; ++i) begin
-			edge_tests[i] = edge_fns[i] + coarse_test_offsets[i];
-			edge_vert_next[i] = edge_vert[i] + coarse_y_offsets[i];
+			edge_tests[i] = edge_fns[i] + hold_coarse_test_offsets[i];
+			edge_vert_next[i] = edge_vert[i] + hold_coarse_y_offsets[i];
 		end
 
 	always_ff @(posedge clk or negedge rst_n)
@@ -82,6 +89,7 @@ module gfx_raster_coarse
 		if (!stall) begin
 			out.pos <= next_pos;
 			out.corners <= edge_fns;
+			out.fine_offsets <= hold_offsets;
 
 			stride_x <= stride_x - 1;
 			next_pos.x <= next_pos.x + (1 << (`FIXED_FRAC + `GFX_RASTER_BITS));
@@ -101,10 +109,15 @@ module gfx_raster_coarse
 				width <= span_x;
 				stride_x <= span_x;
 				stride_y <= span_y;
+
+				hold_offsets <= offsets;
+				hold_coarse_x_offsets <= coarse_x_offsets;
+				hold_coarse_y_offsets <= coarse_y_offsets;
+				hold_coarse_test_offsets <= coarse_test_offsets;
 			end
 
 			for (integer i = 0; i < 3; ++i) begin
-				edge_fns[i] <= edge_fns[i] + coarse_x_offsets[i];
+				edge_fns[i] <= edge_fns[i] + hold_coarse_x_offsets[i];
 				if (end_x) begin
 					edge_fns[i] <= edge_vert_next[i];
 					edge_vert[i] <= edge_vert_next[i];

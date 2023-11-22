@@ -36,7 +36,7 @@ module gfx_raster
 	fixed_tri coarse_x_offsets, coarse_y_offsets, coarse_test_offsets, edge_refs;
 	raster_xy pos_ref;
 	coarse_dim span_x, span_y;
-	raster_offsets_tri offsets; //TODO: fsm con esto holdeado
+	raster_offsets_tri offsets;
 
 	gfx_setup setup
 	(
@@ -50,6 +50,7 @@ module gfx_raster
 	logic coarse_ready, coarse_valid;
 	fixed_tri coarse_corners;
 	raster_xy coarse_pos;
+	raster_offsets_tri fine_offsets;
 
 	gfx_raster_coarse coarse
 	(
@@ -100,6 +101,7 @@ module gfx_raster
 
 					.pos(coarse_pos),
 					.corners(coarse_corners),
+					.offsets(fine_offsets),
 
 					.barys(barys_ij[i][j]),
 					.paint(paint_ij[j * `GFX_RASTER_SIZE + i]),
