@@ -85,6 +85,7 @@ add_fileset_file gfx_persp.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_persp.sv
 add_fileset_file gfx_persp_vertex.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_persp_vertex.sv
 add_fileset_file gfx_fix_floats.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_fix_floats.sv
 add_fileset_file gfx_fix_vertex.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_fix_vertex.sv
+add_fileset_file gfx_assembly.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_assembly.sv
 add_fileset_file gfx_sp.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp.sv
 add_fileset_file gfx_sp_isa.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp_isa.sv
 add_fileset_file gfx_sp_file.sv SYSTEM_VERILOG PATH rtl/gfx/gfx_sp_file.sv

@@ -50,15 +50,19 @@ module gfx
 
 	gfx_sp sp
 	(
-		.send_ready(1), //TODO
 		.*
 	);
 
-	logic frag_mask, scan_mask;
+	logic send_ready, assembly_valid;
+	fp_xyzw assembly_vertex_a, assembly_vertex_b, assembly_vertex_c;
 
-	gfx_masks masks
+	gfx_assembly assembly
 	(
-		.frag_mask_read_addr(),
+		.out_ready(fix_ready),
+		.out_valid(assembly_valid),
+		.out_vertex_a(assembly_vertex_a),
+		.out_vertex_b(assembly_vertex_b),
+		.out_vertex_c(assembly_vertex_c),
 		.*
 	);
 
@@ -68,12 +72,12 @@ module gfx
 	gfx_fix_floats fix
 	(
 		.in_ready(fix_ready),
-		.in_valid(0), //TODO
+		.in_valid(assembly_valid),
 		.out_ready(persp_ready),
 		.out_valid(fix_valid),
-		.in_vertex_a(), //TODO
-		.in_vertex_b(), //TODO
-		.in_vertex_c(), //TODO
+		.in_vertex_a(assembly_vertex_a),
+		.in_vertex_b(assembly_vertex_b),
+		.in_vertex_c(assembly_vertex_c),
 		.out_vertex_a(fix_vertex_a),
 		.out_vertex_b(fix_vertex_b),
 		.out_vertex_c(fix_vertex_c),
@@ -116,6 +120,14 @@ module gfx
 		.vertex_b(persp_vertex_b),
 		.vertex_c(persp_vertex_c),
 
+		.*
+	);
+
+	logic frag_mask, scan_mask;
+
+	gfx_masks masks
+	(
+		.frag_mask_read_addr(),
 		.*
 	);
 
