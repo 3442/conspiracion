@@ -147,6 +147,12 @@ $(OBJ_DIR)/$(TOP)/cov.info: $(patsubst %,sim/%,$(SIMS))
 		$(SIM_OBJ_DIR)/*.cov $(patsubst %,$(OBJ_DIR)/%/coverage.dat,$(COCO_SIMS))
 endif
 
+$(DEMO_OBJ_DIR)/gfx_rom.bin: gfx_asm/assembler.py gfx_asm/default.s
+	$^ >$@
+
+%.embed.o: %.bin
+	$(CROSS_COMPILE)ld -r -b binary -o $@ $<
+
 %.bin: %
 	$(CROSS_OBJCOPY) -O binary --only-section=._img $< $@
 
@@ -157,7 +163,8 @@ $(OBJ_DIR)/%.bin: $(SIM_OBJ_DIR)/%
 	$(CROSS_OBJCOPY) -O binary --only-section=._img $< $@
 
 $(DEMO_OBJ_DIR)/demo: $(DEMO_DIR)/link.ld $(patsubst $(DEMO_DIR)/%,$(DEMO_OBJ_DIR)/%.o,\
-                      $(basename $(wildcard $(DEMO_DIR)/*.c) $(wildcard $(DEMO_DIR)/*.S)))
+                      $(basename $(wildcard $(DEMO_DIR)/*.c) $(wildcard $(DEMO_DIR)/*.S))) \
+                      $(DEMO_OBJ_DIR)/gfx_rom.embed.o
 	$(CROSS_CC) $(CROSS_LDFLAGS) -o $@ -g -nostartfiles -nostdlib -T $^ -lgcc
 
 $(DEMO_OBJ_DIR)/%.o: $(DEMO_DIR)/%.c $(wildcard $(DEMO_DIR)/*.h)

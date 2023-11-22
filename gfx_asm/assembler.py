@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import ast, sys, string, struct
 
 REG_STACK     = 14

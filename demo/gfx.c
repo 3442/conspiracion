@@ -18,7 +18,6 @@
 #define HEADER_BASE 0x400000
 #define HEADER_SIZE (1 - 1)
 #define CODE_BASE   0x500000
-#define CODE_SIZE   (3 - 1)
 #define DATA_BASE   0x600000
 
 #define VRAM_HEADER_CODE_BASE ((unsigned *)(GFX_VRAM_BASE + HEADER_BASE + 0))
@@ -32,6 +31,9 @@
 static int swap_buffers;
 static unsigned clear_color;
 static unsigned data_size;
+
+extern const unsigned char _binary_obj_conspiracion_demo_gfx_rom_bin_end[];
+extern const unsigned char _binary_obj_conspiracion_demo_gfx_rom_bin_start[];
 
 static void gfx_write_scan(int do_clear)
 {
@@ -58,14 +60,24 @@ void gfx_init(void)
 	GFX_CMD_FB_BASE_B = FB_BASE_B;
 	GFX_CMD_HEADER_BASE = HEADER_BASE;
 
+	const unsigned char *start = _binary_obj_conspiracion_demo_gfx_rom_bin_start;
+	unsigned length = (unsigned)&_binary_obj_conspiracion_demo_gfx_rom_bin_end[0] - (unsigned)start;
+
+	print("gfx: loading %u bytes program at %p", length, start);
+	for (unsigned i = 0; i < length / 4; ++i) {
+		unsigned word
+			= (unsigned)start[4 * i]
+			| (unsigned)start[4 * i + 1] << 8
+			| (unsigned)start[4 * i + 2] << 16
+			| (unsigned)start[4 * i + 3] << 24;
+
+		VRAM_CODE[i] = word;
+	}
+
 	*VRAM_HEADER_CODE_BASE = CODE_BASE;
-	*VRAM_HEADER_CODE_SIZE = CODE_SIZE;
+	*VRAM_HEADER_CODE_SIZE = length / 4 - 1;
 	*VRAM_HEADER_DATA_BASE = DATA_BASE;
 	*VRAM_HEADER_DATA_SIZE = 0;
-
-	VRAM_CODE[0] = 0x00000120; // recv m1
-	VRAM_CODE[1] = 0x00001010; // send m1
-	VRAM_CODE[2] = 0x00001010; // send m1
 }
 
 void gfx_clear(void)
