@@ -70,6 +70,8 @@ module gfx_cmd
 				start_clear <= next_start_clear;
 				enable_clear <= next_enable_clear;
 				swap_buffers <= next_swap_buffers;
+
+				next_start_clear <= 0;
 			end
 
 			if (cmd_write)
