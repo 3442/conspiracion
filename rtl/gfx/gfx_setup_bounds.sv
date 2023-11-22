@@ -25,13 +25,13 @@ module gfx_setup_bounds
 
 	assign ref_prec.x.sub = 0;
 	assign ref_prec.x.fine = 0;
-	assign ref_prec.x.coarse = ref_x;
-	assign ref_prec.x.padding = 0;
+	assign ref_prec.x.padding = {`GFX_RASTER_PAD_BITS{ref_x[$bits(ref_x) - 1]}};
+	assign {ref_prec.x.sign, ref_prec.x.coarse} = ref_x;
 
 	assign ref_prec.y.sub = 0;
 	assign ref_prec.y.fine = 0;
-	assign ref_prec.y.coarse = ref_y;
-	assign ref_prec.y.padding = 0;
+	assign ref_prec.y.padding = {`GFX_RASTER_PAD_BITS{ref_y[$bits(ref_y) - 1]}};
+	assign {ref_prec.y.sign, ref_prec.y.coarse} = ref_y;
 
 	always_ff @(posedge clk)
 		if (!stall) begin
@@ -63,11 +63,11 @@ module gfx_setup_bounds
 				max.y <= y_a_lt_c ? hold_c.y : hold_a.y;
 			end
 
-			ref_x <= min_prec.x.coarse;
-			ref_y <= min_prec.y.coarse;
+			ref_x <= {min_prec.x.sign, min_prec.x.coarse};
+			ref_y <= {min_prec.y.sign, min_prec.y.coarse};
 
-			span_x <= max_prec.x.coarse - min_prec.x.coarse;
-			span_y <= max_prec.y.coarse - min_prec.y.coarse;
+			span_x <= {max_prec.x.sign, max_prec.x.coarse} - {min_prec.x.sign, min_prec.x.coarse};
+			span_y <= {max_prec.y.sign, max_prec.y.coarse} - {min_prec.y.sign, min_prec.y.coarse};
 		end
 
 endmodule

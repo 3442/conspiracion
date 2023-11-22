@@ -107,7 +107,7 @@ typedef logic[8:0] coarse_dim;
 
 `define GFX_RASTER_BITS     1 // Solía ser 2, pero la FPGA no da para tanto
 `define GFX_RASTER_SUB_BITS 4
-`define GFX_RASTER_PAD_BITS ($bits(fixed) - $bits(coarse_dim) - `FIXED_FRAC - `GFX_RASTER_BITS - 1)
+`define GFX_RASTER_PAD_BITS ($bits(fixed) - $bits(coarse_dim) - `FIXED_FRAC - `GFX_RASTER_BITS)
 `define GFX_RASTER_SIZE     (1 << `GFX_RASTER_BITS)
 `define GFX_RASTER_OFFSETS  (1 << (2 * `GFX_RASTER_BITS))
 
@@ -121,7 +121,7 @@ typedef struct packed
 {
 	logic                             sign;
 	logic[`GFX_RASTER_PAD_BITS - 1:0] padding;
-	coarse_dim                        coarse;
+	logic[$bits(coarse_dim) - 2:0]    coarse;
 	logic[`GFX_RASTER_BITS - 1:0]     fine;
 	raster_sub                        sub;
 } raster_prec;

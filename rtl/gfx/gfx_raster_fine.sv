@@ -39,8 +39,8 @@ module gfx_raster_fine
 			paint <= signs == 0;
 	
 			fragment <= fragment_hold;
-			fragment_hold.x <= {prec.x.coarse, fine_x};
-			fragment_hold.y <= {prec.y.coarse, fine_y};
+			fragment_hold.x <= {prec.x.sign, prec.x.coarse, fine_x};
+			fragment_hold.y <= {prec.y.sign, prec.y.coarse, fine_y};
 
 			for (integer i = 0; i < 3; ++i)
 				edges[i] <= corners[i] + per_edge_offsets[i];
