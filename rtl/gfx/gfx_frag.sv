@@ -47,12 +47,26 @@ module gfx_frag
 		.*
 	);
 
+	color_lerp_lanes argb0, argb1_argb0, argb2_argb0;
+
+	assign argb0[3] = 32'd0 << 8;
+	assign argb0[2] = 32'd255 << 8;
+	assign argb0[1] = 32'd0 << 8;
+	assign argb0[0] = 32'd0 << 8;
+
+	assign argb1_argb0[3] = 32'd0 << 8;
+	assign argb1_argb0[2] = (-32'sd255) << 8;
+	assign argb1_argb0[1] = 32'd255 << 8;
+	assign argb1_argb0[0] = 32'd0 << 8;
+
+	assign argb2_argb0[3] = 32'd0 << 8;
+	assign argb2_argb0[2] = (-32'sd255) << 8;
+	assign argb2_argb0[1] = 32'd0 << 8;
+	assign argb2_argb0[0] = 32'd255 << 8;
+
 	gfx_frag_shade shade
 	(
 		.color(frag_out.color),
-		.argb0(),
-		.argb1_argb0(),
-		.argb2_argb0(),
 		.*
 	);
 
