@@ -1,5 +1,5 @@
+`include "core/isa.sv"
 `include "core/uarch.sv"
-`include "core/decode/isa.sv"
 
 module core_alu
 #(parameter W=16)

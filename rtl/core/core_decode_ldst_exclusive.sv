@@ -1,4 +1,4 @@
-`include "core/decode/isa.sv"
+`include "core/isa.sv"
 `include "core/uarch.sv"
 
 module core_decode_ldst_exclusive

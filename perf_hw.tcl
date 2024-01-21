@@ -40,8 +40,8 @@ set_fileset_property QUARTUS_SYNTH TOP_LEVEL perf_monitor
 set_fileset_property QUARTUS_SYNTH ENABLE_RELATIVE_INCLUDE_PATHS false
 set_fileset_property QUARTUS_SYNTH ENABLE_FILE_OVERWRITE_MODE false
 add_fileset_file perf_monitor.sv SYSTEM_VERILOG PATH rtl/perf/perf_monitor.sv TOP_LEVEL_FILE
-add_fileset_file link.sv SYSTEM_VERILOG PATH rtl/perf/link.sv
-add_fileset_file snoop.sv SYSTEM_VERILOG PATH rtl/perf/snoop.sv
+add_fileset_file perf_link.sv SYSTEM_VERILOG PATH rtl/perf/perf_link.sv
+add_fileset_file perf_snoop.sv SYSTEM_VERILOG PATH rtl/perf/perf_snoop.sv
 
 
 # 

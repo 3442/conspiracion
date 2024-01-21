@@ -1,5 +1,5 @@
 `include "core/uarch.sv"
-`include "core/cp15/map.sv"
+`include "core/cp15_map.sv"
 
 module core_cp15_syscfg
 (

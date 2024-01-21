@@ -1,5 +1,5 @@
-`include "core/cp15/map.sv"
-`include "core/mmu/format.sv"
+`include "core/cp15_map.sv"
+`include "core/mmu_format.sv"
 `include "core/uarch.sv"
 
 module core_cp15

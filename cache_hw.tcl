@@ -39,16 +39,16 @@ add_fileset QUARTUS_SYNTH QUARTUS_SYNTH "" ""
 set_fileset_property QUARTUS_SYNTH TOP_LEVEL cache
 set_fileset_property QUARTUS_SYNTH ENABLE_RELATIVE_INCLUDE_PATHS false
 set_fileset_property QUARTUS_SYNTH ENABLE_FILE_OVERWRITE_MODE false
+add_fileset_file defs.sv SYSTEM_VERILOG PATH rtl/cache/defs.sv
 add_fileset_file cache.sv SYSTEM_VERILOG PATH rtl/cache/cache.sv TOP_LEVEL_FILE
 add_fileset_file cache_control.sv SYSTEM_VERILOG PATH rtl/cache/cache_control.sv
-add_fileset_file token.sv SYSTEM_VERILOG PATH rtl/cache/token.sv
-add_fileset_file ring.sv SYSTEM_VERILOG PATH rtl/cache/ring.sv
-add_fileset_file mem.sv SYSTEM_VERILOG PATH rtl/cache/mem.sv
-add_fileset_file defs.sv SYSTEM_VERILOG PATH rtl/cache/defs.sv
-add_fileset_file offsets.sv SYSTEM_VERILOG PATH rtl/cache/offsets.sv
-add_fileset_file routing.sv SYSTEM_VERILOG PATH rtl/cache/routing.sv
-add_fileset_file sram.sv SYSTEM_VERILOG PATH rtl/cache/sram.sv
-add_fileset_file monitor.sv SYSTEM_VERILOG PATH rtl/cache/monitor.sv
+add_fileset_file cache_token.sv SYSTEM_VERILOG PATH rtl/cache/cache_token.sv
+add_fileset_file cache_ring.sv SYSTEM_VERILOG PATH rtl/cache/cache_ring.sv
+add_fileset_file cache_mem.sv SYSTEM_VERILOG PATH rtl/cache/cache_mem.sv
+add_fileset_file cache_offsets.sv SYSTEM_VERILOG PATH rtl/cache/cache_offsets.sv
+add_fileset_file cache_routing.sv SYSTEM_VERILOG PATH rtl/cache/cache_routing.sv
+add_fileset_file cache_sram.sv SYSTEM_VERILOG PATH rtl/cache/cache_sram.sv
+add_fileset_file cache_monitor.sv SYSTEM_VERILOG PATH rtl/cache/cache_monitor.sv
 add_fileset_file cache_debug.sv SYSTEM_VERILOG PATH rtl/cache/cache_debug.sv
 
 

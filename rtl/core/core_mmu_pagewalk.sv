@@ -1,4 +1,4 @@
-`include "core/mmu/format.sv"
+`include "core/mmu_format.sv"
 `include "core/uarch.sv"
 
 module core_mmu_pagewalk

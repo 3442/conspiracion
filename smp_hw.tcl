@@ -40,7 +40,7 @@ set_fileset_property QUARTUS_SYNTH TOP_LEVEL smp_ctrl
 set_fileset_property QUARTUS_SYNTH ENABLE_RELATIVE_INCLUDE_PATHS false
 set_fileset_property QUARTUS_SYNTH ENABLE_FILE_OVERWRITE_MODE false
 add_fileset_file smp_ctrl.sv SYSTEM_VERILOG PATH rtl/smp/smp_ctrl.sv TOP_LEVEL_FILE
-add_fileset_file pe.sv SYSTEM_VERILOG PATH rtl/smp/pe.sv
+add_fileset_file smp_pe.sv SYSTEM_VERILOG PATH rtl/smp/smp_pe.sv
 
 
 # 
