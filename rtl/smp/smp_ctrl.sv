@@ -31,6 +31,10 @@ module smp_ctrl
 	                   step_3
 );
 
+`ifdef VERILATOR
+	logic avl_address /*verilator public*/;
+`endif
+
 	logic write;
 	logic[7:0] readdata_3, readdata_2, readdata_1, readdata_0,
 	           writedata_3, writedata_2, writedata_1, writedata_0;

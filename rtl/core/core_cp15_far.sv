@@ -16,16 +16,17 @@ module core_cp15_far
 	output word      read /*verilator public*/
 );
 
-	word far;
+	// %Warning-SYMRSVDWORD: rtl/core/core_cp15_far.sv:19:7: Symbol matches C++ common word: 'far'
+	word far_;
 
-	assign read = far;
+	assign read = far_;
 
 	always @(posedge clk or negedge rst_n)
 		if(!rst_n)
-			far <= 0;
+			far_ <= 0;
 		else if(fault_register)
-			far <= {fault_addr, 2'b00};
+			far_ <= {fault_addr, 2'b00};
 		else if(transfer && !load)
-			far <= write;
+			far_ <= write;
 
 endmodule

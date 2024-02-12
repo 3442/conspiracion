@@ -1,3 +1,6 @@
+top := conspiracion
+core_dirs := rtl tb
+
 .PHONY: all
 
 all: test

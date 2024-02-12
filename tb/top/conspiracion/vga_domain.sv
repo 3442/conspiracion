@@ -26,11 +26,11 @@ module vga_domain
 	logic[7:0]  vga_g /*verilator public*/;
 	logic[7:0]  vga_b  /*verilator public*/;
 
-	vga crtc
+	/*vga crtc
 	(
 		.clk(clk_clk),
 		.rst_n(reset_reset_n),
 		.*
-	);
+	);*/
 
 endmodule
