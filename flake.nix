@@ -154,8 +154,6 @@
           shellHook = ''
             export CROSS_COMPILE=arm-unknown-linux-gnueabi-
             export MAKEFLAGS="AR=gcc-ar"
-            export CXXFLAGS="$(pkg-config --cflags ncursesw sdl2 zlib)"
-            export LDFLAGS="$(pkg-config --libs ncursesw sdl2 zlib)"
 
             # <https://discourse.nixos.org/t/fonts-in-nix-installed-packages-on-a-non-nixos-system/5871/7>
             export LOCALE_ARCHIVE="${glibcLocales}/lib/locale/locale-archive"
