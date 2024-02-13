@@ -124,4 +124,10 @@ typedef struct packed
 	logic[0:0]   c;
 } cp15_ttbr;
 
+`define CP15_PID_FSCE     3'd0
+`define CP15_PID_CONTEXT  3'd1
+`define CP15_PID_TPIDRURW 3'd2
+`define CP15_PID_TDIDRURO 3'd3
+`define CP15_PID_TDIDRPRW 3'd4
+
 `endif

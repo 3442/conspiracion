@@ -33,7 +33,8 @@ module core_cp15
 	assign load = dec.load;
 
 	word read_cpuid, read_syscfg, read_ttbr, read_domain, read_far,
-	     read_fsr, read_cache_lockdown, read_tlb_lockdown, read_cyclecnt;
+	     read_fsr, read_cache_lockdown, read_tlb_lockdown, read_pid,
+	     read_cyclecnt;
 
 	core_cp15_cpuid cpuid
 	(
@@ -102,6 +103,13 @@ module core_cp15
 		.*
 	);
 
+	core_cp15_pid pid
+	(
+		.read(read_pid),
+		.transfer(transfer && crn == `CP15_CRN_PID),
+		.*
+	);
+
 	core_cp15_cyclecnt cyclecnt
 	(
 		.read(read_cyclecnt),
@@ -133,6 +141,9 @@ module core_cp15
 
 			`CP15_CRN_TLB_LCK:
 				read = read_tlb_lockdown;
+
+			`CP15_CRN_PID:
+				read = read_pid;
 
 			`CP15_CRN_CYCLECNT:
 				read = read_cyclecnt;

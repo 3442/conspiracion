@@ -71,6 +71,7 @@ add_fileset_file core_cp15_cyclecnt.sv SYSTEM_VERILOG PATH rtl/core/core_cp15_cy
 add_fileset_file core_cp15_domain.sv SYSTEM_VERILOG PATH rtl/core/core_cp15_domain.sv
 add_fileset_file core_cp15_far.sv SYSTEM_VERILOG PATH rtl/core/core_cp15_far.sv
 add_fileset_file core_cp15_fsr.sv SYSTEM_VERILOG PATH rtl/core/core_cp15_fsr.sv
+add_fileset_file core_cp15_pid.sv SYSTEM_VERILOG PATH rtl/core/core_cp15_pid.sv
 add_fileset_file core_cp15_syscfg.sv SYSTEM_VERILOG PATH rtl/core/core_cp15_syscfg.sv
 add_fileset_file core_cp15_tlb.sv SYSTEM_VERILOG PATH rtl/core/core_cp15_tlb.sv
 add_fileset_file core_cp15_tlb_lockdown.sv SYSTEM_VERILOG PATH rtl/core/core_cp15_tlb_lockdown.sv
