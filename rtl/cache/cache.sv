@@ -146,19 +146,21 @@ module cache
 			assign cache_mem_write = 0;
 			assign cache_core_waitrequest = 0;
 
-			assign in_data_ready = out_data_ready;
+			if (`CONFIG_CACHE) begin: null_ring
+				assign in_data_ready = out_data_ready;
 
-			ring_req null_fwd;
-			assign out_data = null_fwd;
-			assign out_data_valid = in_data_valid;
+				ring_req null_fwd;
+				assign out_data = null_fwd;
+				assign out_data_valid = in_data_valid;
 
-			always_comb begin
-				null_fwd = in_data;
-				null_fwd.ttl = in_data.ttl - 1;
+				always_comb begin
+					null_fwd = in_data;
+					null_fwd.ttl = in_data.ttl - 1;
+				end
+
+				assign out_token = in_token;
+				assign out_token_valid = in_token_valid;
 			end
-
-			assign out_token = in_token;
-			assign out_token_valid = in_token_valid;
 		end
 	endgenerate
 
