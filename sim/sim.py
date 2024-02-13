@@ -152,12 +152,12 @@ def recv_mem_dump():
             while_running()
             out(f'{COLOR_BLUE}{line}{COLOR_RESET}')
 
-def read_mem(base, length, *, may_fail = False):
+def read_mem(base, length, *, may_fail=False, phys=False):
     fragments = []
     i = 0
 
     if halted and length > 0:
-        print('dump-mem', base >> 2, (length + base - (base & ~0b11) + 0b11) >> 2, file=sim_end, flush=True)
+        print('dump-phys' if phys else 'dump-mem', base >> 2, (length + base - (base & ~0b11) + 0b11) >> 2, file=sim_end, flush=True)
         recv_mem_dump()
 
     while length > 0:

@@ -559,7 +559,7 @@ int main(int argc, char **argv)
 		}
 	};
 
-	auto do_mem_dump = [&](const mem_region *dumps, std::size_t count)
+	auto do_mem_dump = [&](const mem_region *dumps, std::size_t count, bool map_virtual = true)
 	{
 		std::fputs("=== dump-mem ===\n", ctrl);
 		for(std::size_t i = 0; i < count; ++i)
@@ -570,7 +570,7 @@ int main(int argc, char **argv)
 			for(std::size_t i = 0; i < dump.length; ++i)
 			{
 				std::uint32_t at = dump.start + i;
-				if(!pagewalk(at))
+				if(map_virtual && !pagewalk(at))
 				{
 					break;
 				}
@@ -695,6 +695,11 @@ int main(int argc, char **argv)
 			else if(!std::strcmp(cmd, "step")) {
 				current_core->step__VforceEn = 1;
 				break;
+			} else if (!std::strcmp(cmd, "dump-phys")) {
+				mem_region dump = {};
+				std::sscanf(std::strtok(nullptr, " "), "%zu", &dump.start);
+				std::sscanf(std::strtok(nullptr, " "), "%zu", &dump.length);
+				do_mem_dump(&dump, 1, false);
 			} else if (!std::strcmp(cmd, "dump-mem")) {
 				mem_region dump = {};
 				std::sscanf(std::strtok(nullptr, " "), "%zu", &dump.start);

@@ -68,7 +68,7 @@ module core_control_issue
 			pc_visible <= next_pc_visible;
 
 `ifdef VERILATOR
-			if(insn_pc != pc && insn_pc != pc + 1) begin
+			if(insn_pc != pc && insn_pc != pc + 1 && bh0 != {pc, 2'b00}) begin
 				bh0 <= {pc, 2'b00};
 				bh1 <= bh0;
 				bh2 <= bh1;
