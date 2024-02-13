@@ -144,7 +144,7 @@ module cache
 
 			assign cache_mem_read = 0;
 			assign cache_mem_write = 0;
-			assign cache_core_waitrequest = 0;
+			assign cache_core_waitrequest = 1;
 
 			if (`CONFIG_CACHE) begin: null_ring
 				assign in_data_ready = out_data_ready;
