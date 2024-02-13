@@ -1,4 +1,5 @@
 `include "cache/defs.sv"
+`include "config.sv"
 
 module perf_link
 (
@@ -55,127 +56,131 @@ module perf_link
 		.*
 	);
 
-	assign cached = snoop_addr_bits.io == `IO_CACHED;
-	assign mem_cycles = mem_cycles_hold + 1;
-	assign snoop_addr_bits = snoop_address;
+	generate
+		if (`CONFIG_PERF_MONITOR) begin: enable
+			assign cached = snoop_addr_bits.io == `IO_CACHED;
+			assign mem_cycles = mem_cycles_hold + 1;
+			assign snoop_addr_bits = snoop_address;
 
-	always_comb
-		if (!address[3]) unique case (address[2:0])
-			3'b000: readdata = reads;
-			3'b001: readdata = writes;
-			3'b010: readdata = {max_read_cycles, min_read_cycles};
-			3'b011: readdata = {max_write_cycles, min_write_cycles};
-			3'b100: readdata = ring_reads;
-			3'b101: readdata = ring_invals;
-			3'b110: readdata = ring_read_invals;
-			3'b111: readdata = ring_replies;
-		endcase else unique case (address[1:0])
-			2'b00:  readdata = ring_forwards;
-			2'b01:  readdata = {max_ring_cycles, min_ring_cycles};
-			2'b10:  readdata = io_reads;
-			2'b11:  readdata = io_writes;
-		endcase
+			always_comb
+				if (!address[3]) unique case (address[2:0])
+					3'b000: readdata = reads;
+					3'b001: readdata = writes;
+					3'b010: readdata = {max_read_cycles, min_read_cycles};
+					3'b011: readdata = {max_write_cycles, min_write_cycles};
+					3'b100: readdata = ring_reads;
+					3'b101: readdata = ring_invals;
+					3'b110: readdata = ring_read_invals;
+					3'b111: readdata = ring_replies;
+				endcase else unique case (address[1:0])
+					2'b00:  readdata = ring_forwards;
+					2'b01:  readdata = {max_ring_cycles, min_ring_cycles};
+					2'b10:  readdata = io_reads;
+					2'b11:  readdata = io_writes;
+				endcase
 
-	always @(posedge clk or negedge rst_n)
-		if (!rst_n) begin
-			reads <= 0;
-			writes <= 0;
-			io_reads <= 0;
-			io_writes <= 0;
+			always @(posedge clk or negedge rst_n)
+				if (!rst_n) begin
+					reads <= 0;
+					writes <= 0;
+					io_reads <= 0;
+					io_writes <= 0;
 
-			min_ring_cycles <= 0;
-			max_ring_cycles <= 0;
-			min_read_cycles <= 0;
-			max_read_cycles <= 0;
-			min_write_cycles <= 0;
-			max_write_cycles <= 0;
+					min_ring_cycles <= 0;
+					max_ring_cycles <= 0;
+					min_read_cycles <= 0;
+					max_read_cycles <= 0;
+					min_write_cycles <= 0;
+					max_write_cycles <= 0;
 
-			ring_reads <= 0;
-			ring_invals <= 0;
-			ring_replies <= 0;
-			ring_forwards <= 0;
-			ring_read_invals <= 0;
+					ring_reads <= 0;
+					ring_invals <= 0;
+					ring_replies <= 0;
+					ring_forwards <= 0;
+					ring_read_invals <= 0;
 
-			mem_cycles_hold <= 0;
-		end else begin
-			ring_cycles <= ring_cycles + 1;
-
-			if (mem_read || mem_write)
-				mem_cycles_hold <= mem_cycles;
-
-			if ((mem_read || mem_write) && !mem_waitrequest) begin
-				mem_cycles_hold <= 0;
-
-				if (!cached) begin
-					if (mem_write)
-						io_writes <= io_writes + 1;
-					else
-						io_reads <= io_reads + 1;
-				end else if (mem_write) begin
-					writes <= writes + 1;
-
-					if (min_write_cycles == 0 || mem_cycles_hold < min_write_cycles)
-						min_write_cycles <= mem_cycles;
-
-					if (mem_cycles_hold >= max_write_cycles)
-						max_write_cycles <= mem_cycles;
+					mem_cycles_hold <= 0;
 				end else begin
-					reads <= reads + 1;
+					ring_cycles <= ring_cycles + 1;
 
-					if (min_read_cycles == 0 || mem_cycles_hold < min_read_cycles)
-						min_read_cycles <= mem_cycles;
+					if (mem_read || mem_write)
+						mem_cycles_hold <= mem_cycles;
 
-					if (mem_cycles_hold >= max_read_cycles)
-						max_read_cycles <= mem_cycles;
+					if ((mem_read || mem_write) && !mem_waitrequest) begin
+						mem_cycles_hold <= 0;
+
+						if (!cached) begin
+							if (mem_write)
+								io_writes <= io_writes + 1;
+							else
+								io_reads <= io_reads + 1;
+						end else if (mem_write) begin
+							writes <= writes + 1;
+
+							if (min_write_cycles == 0 || mem_cycles_hold < min_write_cycles)
+								min_write_cycles <= mem_cycles;
+
+							if (mem_cycles_hold >= max_write_cycles)
+								max_write_cycles <= mem_cycles;
+						end else begin
+							reads <= reads + 1;
+
+							if (min_read_cycles == 0 || mem_cycles_hold < min_read_cycles)
+								min_read_cycles <= mem_cycles;
+
+							if (mem_cycles_hold >= max_read_cycles)
+								max_read_cycles <= mem_cycles;
+						end
+					end
+
+					if (snoop_left_valid && snoop_left_ready && snoop_left.ttl == `TTL_END) begin
+						if (snoop_left.reply)
+							ring_replies <= ring_replies + 1;
+
+						if (min_ring_cycles == 0 || ring_cycles < min_ring_cycles)
+							min_ring_cycles <= ring_cycles;
+
+						if (ring_cycles > max_ring_cycles)
+							max_ring_cycles <= ring_cycles;
+					end
+
+					if (snoop_right_valid && snoop_right_ready) begin
+						if (snoop_right.ttl == `TTL_MAX) begin
+							ring_cycles <= 1;
+
+							if (snoop_right.read && !snoop_right.inval)
+								ring_reads <= ring_reads + 1;
+
+							if (!snoop_right.read && snoop_right.inval)
+								ring_invals <= ring_invals + 1;
+
+							if (snoop_right.read && snoop_right.inval)
+								ring_read_invals <= ring_read_invals + 1;
+						end else
+							ring_forwards <= ring_forwards + 1;
+					end
+
+					if (clear) begin
+						reads <= 0;
+						writes <= 0;
+						io_reads <= 0;
+						io_writes <= 0;
+
+						min_ring_cycles <= 0;
+						max_ring_cycles <= 0;
+						min_read_cycles <= 0;
+						max_read_cycles <= 0;
+						min_write_cycles <= 0;
+						max_write_cycles <= 0;
+
+						ring_reads <= 0;
+						ring_invals <= 0;
+						ring_replies <= 0;
+						ring_forwards <= 0;
+						ring_read_invals <= 0;
+					end
 				end
-			end
-
-			if (snoop_left_valid && snoop_left_ready && snoop_left.ttl == `TTL_END) begin
-				if (snoop_left.reply)
-					ring_replies <= ring_replies + 1;
-
-				if (min_ring_cycles == 0 || ring_cycles < min_ring_cycles)
-					min_ring_cycles <= ring_cycles;
-
-				if (ring_cycles > max_ring_cycles)
-					max_ring_cycles <= ring_cycles;
-			end
-
-			if (snoop_right_valid && snoop_right_ready) begin
-				if (snoop_right.ttl == `TTL_MAX) begin
-					ring_cycles <= 1;
-
-					if (snoop_right.read && !snoop_right.inval)
-						ring_reads <= ring_reads + 1;
-
-					if (!snoop_right.read && snoop_right.inval)
-						ring_invals <= ring_invals + 1;
-
-					if (snoop_right.read && snoop_right.inval)
-						ring_read_invals <= ring_read_invals + 1;
-				end else
-					ring_forwards <= ring_forwards + 1;
-			end
-
-			if (clear) begin
-				reads <= 0;
-				writes <= 0;
-				io_reads <= 0;
-				io_writes <= 0;
-
-				min_ring_cycles <= 0;
-				max_ring_cycles <= 0;
-				min_read_cycles <= 0;
-				max_read_cycles <= 0;
-				min_write_cycles <= 0;
-				max_write_cycles <= 0;
-
-				ring_reads <= 0;
-				ring_invals <= 0;
-				ring_replies <= 0;
-				ring_forwards <= 0;
-				ring_read_invals <= 0;
-			end
 		end
+	endgenerate
 
 endmodule

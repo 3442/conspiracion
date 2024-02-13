@@ -1,4 +1,5 @@
 `include "cache/defs.sv"
+`include "config.sv"
 
 module perf_monitor
 (
@@ -252,35 +253,39 @@ module perf_monitor
 		.*
 	);
 
-	assign address = perf_address[3:0];
+	generate
+		if (`CONFIG_PERF_MONITOR) begin: enable
+			assign address = perf_address[3:0];
 
-	always_comb begin
-		clear_0 = 0;
-		clear_1 = 0;
-		clear_2 = 0;
-		clear_3 = 0;
+			always_comb begin
+				clear_0 = 0;
+				clear_1 = 0;
+				clear_2 = 0;
+				clear_3 = 0;
 
-		unique case (perf_address[5:4])
-			2'b00: begin
-				clear_0 = perf_write;
-				perf_readdata = readdata_0;
+				unique case (perf_address[5:4])
+					2'b00: begin
+						clear_0 = perf_write;
+						perf_readdata = readdata_0;
+					end
+
+					2'b01: begin
+						clear_1 = perf_write;
+						perf_readdata = readdata_1;
+					end
+
+					2'b10: begin
+						clear_2 = perf_write;
+						perf_readdata = readdata_2;
+					end
+
+					2'b11: begin
+						clear_3 = perf_write;
+						perf_readdata = readdata_3;
+					end
+				endcase
 			end
-
-			2'b01: begin
-				clear_1 = perf_write;
-				perf_readdata = readdata_1;
-			end
-
-			2'b10: begin
-				clear_2 = perf_write;
-				perf_readdata = readdata_2;
-			end
-
-			2'b11: begin
-				clear_3 = perf_write;
-				perf_readdata = readdata_3;
-			end
-		endcase
-	end
+		end
+	endgenerate
 
 endmodule
