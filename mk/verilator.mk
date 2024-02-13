@@ -37,7 +37,7 @@ define prepare_verilator_target
 endef
 
 define setup_verilator_target
-  $(call build_vars,$(addprefix enable_,rand threads trace cov opt lto))
+  $(call build_vars,$(addprefix enable_,rand threads trace cov opt lto prof))
 
   $(call target_var,vl_flags) = $(common_vl_flags)
   $(call target_var,vl_cflags) = $(common_vl_cflags)
@@ -61,6 +61,7 @@ define set_verilator_common
     $$(if $$(enable_trace),--trace --trace-fst --trace-structs) \
     $$(if $$(enable_cov),--coverage) \
     $$(if $$(enable_opt),-O3) \
+    $$(if $$(enable_prof),--prof-cfuncs) \
     --cc --exe --prefix Vtop --MMD --MP
 
   common_vl_flags := $$(static_flags) $$(core_info/$$(rule_top)/vl_flags)
