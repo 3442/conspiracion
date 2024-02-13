@@ -152,9 +152,22 @@ def recv_mem_dump():
             while_running()
             out(f'{COLOR_BLUE}{line}{COLOR_RESET}')
 
-def read_mem(base, length, *, may_fail=False, phys=False):
+mem_virtual = True
+
+def set_mem_phys():
+    global mem_virtual
+    mem_virtual = False
+
+def set_mem_virt():
+    global mem_virtual
+    mem_virtual = True
+
+def read_mem(base, length, *, may_fail=False, phys=None):
     fragments = []
     i = 0
+
+    if phys is None:
+        phys = not mem_virtual
 
     if halted and length > 0:
         print('dump-phys' if phys else 'dump-mem', base >> 2, (length + base - (base & ~0b11) + 0b11) >> 2, file=sim_end, flush=True)
@@ -357,6 +370,8 @@ prelude = {
     'init_reg':           init_reg,
     'dump_regs':          dump_regs,
     'split_dword':        split_dword,
+    'set_mem_phys':       set_mem_phys,
+    'set_mem_virt':       set_mem_virt,
     'register_interrupt': register_interrupt,
     }
 
