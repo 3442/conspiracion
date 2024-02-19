@@ -6,7 +6,7 @@ reset:
     mov r9, #9
     mov sp, #256
     str r5, [sp, #-4]
-    mov r0, #69
+    mov r0, #70
     mov r1, #-10
 
 	.loop1:
