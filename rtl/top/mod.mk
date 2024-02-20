@@ -1,12 +1,26 @@
 cores := conspiracion test_fb test_fifo test_ring test_smp
 
 define core/conspiracion
-  $(this)/targets   := sim
-  $(this)/deps      := conspiracion/tb
+  $(this)/deps := config
+  $(this)/targets := sim
+
   $(this)/rtl_files := conspiracion.sv
   $(this)/rtl_top   := conspiracion
+
   $(this)/vl_main   := ../../tb/top/conspiracion/conspiracion.cpp
   $(this)/vl_runner := run_conspiracion
+
+  $(this)/altera_device := 5CSEMA5F31C6
+  $(this)/altera_family := Cyclone V
+  $(this)/qsys_platform := ../../platform.qsys
+
+  $(this)/sdc_files := ../../conspiracion.sdc
+  $(this)/qip_files := $(patsubst %,../../ip/%.qip,dsp_mul ip_fp_add ip_fp_mul ip_fp_fix)
+  $(this)/qsf_files := ../../pins.tcl
+
+  ifeq (sim,$(flow/type))
+    $(this)/deps += conspiracion/tb
+  endif
 endef
 
 define core/test_fb

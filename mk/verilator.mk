@@ -17,10 +17,7 @@ endef
 define target/sim/setup
   $(setup_verilator_target)
 
-  $$(call target_var,vl_main) := $$(strip $$(call core_paths,$$(rule_top),vl_main))
-  ifeq (,$$(vl_main))
-    $$(error core '$$(rule_top)' does not define vl_main)
-  endif
+  $$(call target_var,vl_main) := $$(strip $$(call require_core_paths,$$(rule_top),vl_main))
 endef
 
 define target/sim/rules
@@ -123,8 +120,8 @@ endef
 
 verilator_src_args = \
   $(strip \
-    $(let rtl_top,$(core_info/$(rule_top)/rtl_top), \
-      $(if $(rtl_top),--top $(rtl_top),$(error core '$(rule_top)' must define rtl_top)) \
+    $(let rtl_top,$(call require_core_var,$(rule_top),rtl_top), \
+      --top $(rtl_top) \
       $(foreach dep,$(dep_tree/$(rule_top)), \
         $(let prefix,$(core_info/$(dep)/workdir)/, \
           $(foreach rtl_dir,$(call core_paths,$(dep),rtl_dirs), \
@@ -132,6 +129,5 @@ verilator_src_args = \
           $(foreach include_dir,$(call core_paths,$(dep),rtl_include_dirs), \
             -I$(include_dir)) \
           $(foreach src_file,$(call core_paths,$(dep),rtl_files) $(call core_paths,$(dep),vl_files), \
-            $(src_file)))) \
-      $(if $(core_info/$(rule_top)/rtl_files),,$(rtl_top))) \
+            $(src_file))))) \
     $(if $(vl_main),$(vl_main),$(error $$(vl_main) not defined by target '$(rule_target)')))

@@ -38,7 +38,7 @@ define setup_obj
 
   $$(obj): export CONTENTS := $$(build_id_text)
   $$(obj):
-	@mkdir -p $$@ && echo -n "$$$$CONTENTS" >$$@/build-vars
+	@mkdir -p $$@ && echo -n "$$$$CONTENTS" >$$@/build-vars && ln -Tsf ../../../ $$@/src
 endef
 
 define find_command_lazy

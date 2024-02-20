@@ -31,6 +31,7 @@ include mk/cocotb.mk
 include mk/cores.mk
 include mk/cov.mk
 include mk/output.mk
+include mk/quartus.mk
 include mk/target.mk
 include mk/tools.mk
 include mk/verilator.mk

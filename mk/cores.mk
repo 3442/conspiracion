@@ -17,6 +17,16 @@ core_paths = \
         $(let prefix,$(core_info/$(1)/workdir), \
           $(addprefix /$(if $(prefix),$(prefix)/),$(core_info/$(1)/$(2)))))))
 
+require_core_paths = \
+  $(strip \
+    $(let val,$(strip $(call core_paths,$(1),$(2))), \
+      $(if $(val),$(val),$(error core '$(1)' must define '$(2)'))))
+
+require_core_var = \
+  $(strip \
+    $(let val,$(core_info/$(1)/$(2)), \
+      $(if $(val),$(val),$(error core '$(1)' must define '$(2)'))))
+
 define add_core
   this := core_info/$(1)
 
