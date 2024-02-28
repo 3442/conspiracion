@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -152,9 +154,9 @@ module dma_axi32_core0_axim_wdata(clk,reset,rd_transfer,rd_transfer_size,ch_fifo
    
    always @(posedge clk or posedge reset)
      if (reset)
-       data_fullness <= #1 3'd0;
+       data_fullness <= 3'd0;
      else if (data_ready | wr_transfer_pre)
-       data_fullness <= #1 data_fullness_pre;
+       data_fullness <= data_fullness_pre;
 
    prgen_joint_stall #(3)
      gen_joint_stall (
@@ -212,9 +214,9 @@ module dma_axi32_core0_axim_wdata(clk,reset,rd_transfer,rd_transfer_size,ch_fifo
    
    always @(posedge clk or posedge reset)
      if (reset)
-       last_channel <= #1 3'b000;
+       last_channel <= 3'b000;
      else if (cmd_push)
-       last_channel <= #1 WID_pre[2:0];
+       last_channel <= WID_pre[2:0];
       
    
    //update pointers in channel
@@ -232,13 +234,13 @@ module dma_axi32_core0_axim_wdata(clk,reset,rd_transfer,rd_transfer_size,ch_fifo
    always @(posedge clk or posedge reset)
      if (reset)
        begin
-      wr_transfer_num  <= #1 3'd0;
-      wr_transfer_size <= #1 3'd0;
+      wr_transfer_num  <= 3'd0;
+      wr_transfer_size <= 3'd0;
        end
      else if (wr_transfer_pre)
        begin
-      wr_transfer_num  <= #1 wr_transfer_num_pre;
-      wr_transfer_size <= #1 wr_transfer_size_pre;
+      wr_transfer_num  <= wr_transfer_num_pre;
+      wr_transfer_size <= wr_transfer_size_pre;
        end
    
    
@@ -248,9 +250,9 @@ module dma_axi32_core0_axim_wdata(clk,reset,rd_transfer,rd_transfer_size,ch_fifo
    
    always @(posedge clk or posedge reset)
      if (reset)
-       wr_clr_line_num <= #1 3'd0;
+       wr_clr_line_num <= 3'd0;
      else if (wr_clr_line_pre)
-       wr_clr_line_num <= #1 line_end_num;
+       wr_clr_line_num <= line_end_num;
 
    assign wr_clr_line_stall_pre = wr_clr_line_pre & (ch_fifo_rd_num == line_end_num);
 
@@ -318,11 +320,11 @@ module dma_axi32_core0_axim_wdata(clk,reset,rd_transfer,rd_transfer_size,ch_fifo
    
    always @(posedge clk or posedge reset)
      if (reset)
-       rd_out_count <= #1 {`LEN_BITS{1'b0}};
+       rd_out_count <= {`LEN_BITS{1'b0}};
      else if (cmd_pop)
-       rd_out_count <= #1 {`LEN_BITS{1'b0}};
+       rd_out_count <= {`LEN_BITS{1'b0}};
      else if (ch_fifo_rd)
-       rd_out_count <= #1 rd_out_count + 1'b1;
+       rd_out_count <= rd_out_count + 1'b1;
 
    
    //data phase
@@ -358,11 +360,11 @@ module dma_axi32_core0_axim_wdata(clk,reset,rd_transfer,rd_transfer_size,ch_fifo
    
    always @(posedge clk or posedge reset)
      if (reset)
-       rd_in_count <= #1 {`LEN_BITS{1'b0}};
+       rd_in_count <= {`LEN_BITS{1'b0}};
      else if (cmd_data_pop)
-       rd_in_count <= #1 {`LEN_BITS{1'b0}};
+       rd_in_count <= {`LEN_BITS{1'b0}};
      else if (wr_transfer_pre)
-       rd_in_count <= #1 rd_in_count + 1'b1;
+       rd_in_count <= rd_in_count + 1'b1;
 
 
    
@@ -406,3 +408,5 @@ endmodule
 
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

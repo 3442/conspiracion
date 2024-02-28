@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -152,11 +154,11 @@ module dma_axi32_reg_core0(clk,reset,wr_joint,wr_clkdiv,wr_start,wr_prio,pwdata,
    always @(posedge clk or posedge reset)
      if (reset)
        begin
-      joint_mode <= #1 1'b0;
+      joint_mode <= 1'b0;
        end
      else if (wr_joint)
        begin
-      joint_mode <= #1 pwdata[0];
+      joint_mode <= pwdata[0];
        end
 
    
@@ -184,3 +186,5 @@ endmodule
    
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

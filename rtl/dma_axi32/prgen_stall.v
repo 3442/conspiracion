@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -55,11 +57,11 @@ module prgen_stall(clk,reset,din,stall,dout);
    
    always @(posedge clk or posedge reset)
      if (reset)
-       count <= #1 {DEPTH{1'b0}};
+       count <= {DEPTH{1'b0}};
      else if (pend & (~stall))
-       count <= #1 count - 1'b1;
+       count <= count - 1'b1;
      else if (din & stall)
-       count <= #1 count + 1'b1;
+       count <= count + 1'b1;
 
    assign               pend = (|count);
    assign               dout = (din | pend) & (~stall);
@@ -77,3 +79,5 @@ endmodule
 
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -63,11 +65,13 @@ module  prgen_rawstat (clk,reset,clear,write,pwdata,int_bus,rawstat);
    
    always @(posedge clk or posedge reset)
      if (reset) 
-       rawstat <= #1 {SIZE{1'b0}};
+       rawstat <= {SIZE{1'b0}};
      else 
-       rawstat <= #1 (rawstat | int_bus | write_bus) & (~clear_bus);
+       rawstat <= (rawstat | int_bus | write_bus) & (~clear_bus);
    
 endmodule
    
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -70,17 +72,19 @@ module dma_axi32_core0_ch_calc_addr(clk,reset,ch_update_d,load_in_prog,load_addr
    
    always @(posedge clk or posedge reset)
      if (reset)
-       burst_addr <= #1 {32{1'b0}};
+       burst_addr <= {32{1'b0}};
      else if (load_in_prog)
-       burst_addr <= #1 load_addr;
+       burst_addr <= load_addr;
      else if (ch_update_d)
-       burst_addr <= #1 start_addr;
+       burst_addr <= start_addr;
      else if (burst_start & incr)
-       burst_addr <= #1 burst_addr + burst_size;
+       burst_addr <= burst_addr + burst_size;
      else if (go_next_line_d & incr)
-       burst_addr <= #1 burst_addr + frame_width_diff;
+       burst_addr <= burst_addr + frame_width_diff;
    
    
 endmodule
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

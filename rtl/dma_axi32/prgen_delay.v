@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -52,9 +54,9 @@ module prgen_delay(clk,reset,din,dout);
    
    always @(posedge clk or posedge reset)
      if (reset)
-       shift_reg <= #1 {DELAY+1{1'b0}};
+       shift_reg <= {DELAY+1{1'b0}};
      else
-       shift_reg <= #1 {shift_reg[DELAY-1:0], din};
+       shift_reg <= {shift_reg[DELAY-1:0], din};
 
    assign               dout = shift_reg[DELAY-1];
    
@@ -68,3 +70,5 @@ endmodule
 
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

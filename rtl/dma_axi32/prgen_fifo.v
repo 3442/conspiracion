@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -97,40 +99,40 @@ module prgen_fifo(clk,reset,push,pop,din,dout,empty,full);
    always @(posedge clk or posedge reset)
      if (reset)
        begin
-      dout       <= #1 {WIDTH{1'b0}};
-      dout_empty <= #1 1'b1;
+      dout       <= {WIDTH{1'b0}};
+      dout_empty <= 1'b1;
        end
      else if (reg_push)
        begin
-      dout       <= #1 din;
-      dout_empty <= #1 1'b0;
+      dout       <= din;
+      dout_empty <= 1'b0;
        end
      else if (reg_pop)
        begin
-      dout       <= #1 {WIDTH{1'b0}};
-      dout_empty <= #1 1'b1;
+      dout       <= {WIDTH{1'b0}};
+      dout_empty <= 1'b1;
        end
      else if (fifo_pop)
        begin
-      dout       <= #1 fifo[ptr_out];
-      dout_empty <= #1 1'b0;
+      dout       <= fifo[ptr_out];
+      dout_empty <= 1'b0;
        end
    
    always @(posedge clk or posedge reset)
      if (reset)
-       ptr_in <= #1 {DEPTH_BITS{1'b0}};
+       ptr_in <= {DEPTH_BITS{1'b0}};
      else if (fifo_push)
-       ptr_in <= #1 ptr_in == LAST_LINE ? 0 : ptr_in + 1'b1;
+       ptr_in <= ptr_in == LAST_LINE ? 0 : ptr_in + 1'b1;
 
    always @(posedge clk or posedge reset)
      if (reset)
-       ptr_out <= #1 {DEPTH_BITS{1'b0}};
+       ptr_out <= {DEPTH_BITS{1'b0}};
      else if (fifo_pop)
-       ptr_out <= #1 ptr_out == LAST_LINE ? 0 : ptr_out + 1'b1;
+       ptr_out <= ptr_out == LAST_LINE ? 0 : ptr_out + 1'b1;
 
    always @(posedge clk)
      if (fifo_push)
-       fifo[ptr_in] <= #1 din;
+       fifo[ptr_in] <= din;
 
    
    always @(/*AUTOSENSE*/fifo_push or ptr_in)
@@ -147,9 +149,9 @@ module prgen_fifo(clk,reset,push,pop,din,dout,empty,full);
    
    always @(posedge clk or posedge reset)
      if (reset)
-       fullness <= #1 {DEPTH{1'b0}};
+       fullness <= {DEPTH{1'b0}};
      else if (fifo_push | fifo_pop)
-       fullness <= #1 (fullness & (~fullness_out)) | fullness_in;
+       fullness <= (fullness & (~fullness_out)) | fullness_in;
 
 
    assign next       = |fullness;
@@ -165,3 +167,5 @@ endmodule
 
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -75,9 +77,9 @@ module dma_axi32_core0_wdt(clk,reset,ch_active,rd_burst_start,rd_ch_num,wr_burst
 
    always @(posedge clk or posedge reset)
      if (reset)
-       wdt_ch_num <= #1 3'd0;
+       wdt_ch_num <= 3'd0;
      else if (advance)
-       wdt_ch_num <= #1 wdt_ch_num + 1'b1;
+       wdt_ch_num <= wdt_ch_num + 1'b1;
 
    
 
@@ -87,11 +89,11 @@ module dma_axi32_core0_wdt(clk,reset,ch_active,rd_burst_start,rd_ch_num,wr_burst
    
    always @(posedge clk or posedge reset)
      if (reset)
-       counter <= #1 {`WDT_BITS{1'b1}};
+       counter <= {`WDT_BITS{1'b1}};
      else if (advance | idle)
-       counter <= #1 {`WDT_BITS{1'b1}};
+       counter <= {`WDT_BITS{1'b1}};
      else
-       counter <= #1 counter - 1'b1;
+       counter <= counter - 1'b1;
 
    
 endmodule
@@ -101,3 +103,5 @@ endmodule
               
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

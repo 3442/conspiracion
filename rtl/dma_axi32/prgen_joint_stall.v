@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -84,9 +86,9 @@ module prgen_joint_stall(clk,reset,joint_req_out,rd_transfer,rd_transfer_size,ch
    //count fullness of channel's fifo
    always @(posedge clk or posedge reset)
      if (reset)
-       count_ch_fifo <= #1 3'd0;
+       count_ch_fifo <= 3'd0;
      else if (joint_req_out & (rd_transfer_joint | ch_fifo_rd))
-       count_ch_fifo <= #1 count_ch_fifo_pre;
+       count_ch_fifo <= count_ch_fifo_pre;
 
    //prevent read channel to overflow the channel's fifo
    assign               joint_stall_pre     = joint_req_out & ((count_ch_fifo_pre > 'd2) | ((count_ch_fifo_pre == 'd2) & (data_fullness_pre > 'd1)) | HOLD);
@@ -97,11 +99,11 @@ module prgen_joint_stall(clk,reset,joint_req_out,rd_transfer,rd_transfer_size,ch
    
    always @(posedge clk or posedge reset)
      if (reset)
-       joint_stall_reg <= #1 1'b0;
+       joint_stall_reg <= 1'b0;
      else if (joint_stall_pre)
-       joint_stall_reg <= #1 1'b1;
+       joint_stall_reg <= 1'b1;
      else if (count_ch_fifo_pre == 'd0)
-       joint_stall_reg <= #1 1'b0;
+       joint_stall_reg <= 1'b0;
 
    assign               joint_stall = joint_stall_reg | (joint_req_out & HOLD);
       
@@ -132,3 +134,5 @@ endmodule
 
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

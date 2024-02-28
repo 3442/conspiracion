@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -68,13 +70,13 @@ module prgen_min3(clk,reset,a,b,c,min);
    always @(posedge clk or posedge reset)
      if (reset)
        begin
-      min_ab <= #1 {WIDTH{1'b0}};
-      min_c  <= #1 {WIDTH{1'b0}};
+      min_ab <= {WIDTH{1'b0}};
+      min_c  <= {WIDTH{1'b0}};
        end
      else
        begin
-      min_ab <= #1 min_ab_pre;
-      min_c  <= #1 c;
+      min_ab <= min_ab_pre;
+      min_c  <= c;
        end
    
 endmodule
@@ -83,3 +85,5 @@ endmodule
    
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

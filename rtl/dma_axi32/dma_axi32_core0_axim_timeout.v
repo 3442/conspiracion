@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -60,11 +62,11 @@ module dma_axi32_core0_axim_timeout(clk,reset,VALID,READY,ID,axim_timeout_num,ax
    
    always @(posedge clk or posedge reset)
      if (reset)
-       counter <= #1 {`TIMEOUT_BITS{1'b1}};
+       counter <= {`TIMEOUT_BITS{1'b1}};
      else if (VALID & READY)
-       counter <= #1 {`TIMEOUT_BITS{1'b1}};
+       counter <= {`TIMEOUT_BITS{1'b1}};
      else if (VALID)
-       counter <= #1 counter - 1'b1;
+       counter <= counter - 1'b1;
 
    
    
@@ -74,3 +76,5 @@ endmodule
 
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

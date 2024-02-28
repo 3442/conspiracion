@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -82,11 +84,13 @@ module dma_axi32_core0_ch_reg_size(clk,reset,update,start_addr,burst_max_size_re
    
    always @(posedge clk or posedge reset)
      if (reset)
-       burst_max_size <= #1 {7{1'b0}};
+       burst_max_size <= {7{1'b0}};
      else if (update)
-       burst_max_size <= #1 burst_max_size_pre > MAX_BURST ? MAX_BURST : burst_max_size_pre;
+       burst_max_size <= burst_max_size_pre > MAX_BURST ? MAX_BURST : burst_max_size_pre;
 
    
 endmodule
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

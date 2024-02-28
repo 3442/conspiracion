@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -213,6 +215,7 @@ module dma_axi32_dual_core(clk,reset,scan_en,idle,INT,periph_tx_req,periph_tx_cl
    
    
 
+   // verilator lint_off PINMISSING
    dma_axi32_core0_top
    dma_axi32_core0_top (
       
@@ -277,6 +280,7 @@ module dma_axi32_dual_core(clk,reset,scan_en,idle,INT,periph_tx_req,periph_tx_cl
                      .RVALID(M0_RVALID),
                      .RREADY(M0_RREADY)
              );
+   // verilator lint_on PINMISSING
 
    
    
@@ -296,3 +300,5 @@ endmodule
 
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

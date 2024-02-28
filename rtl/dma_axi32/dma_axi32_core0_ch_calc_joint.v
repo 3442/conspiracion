@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -107,11 +109,11 @@ module dma_axi32_core0_ch_calc_joint(clk,reset,joint_update,ch_end,ch_end_flush,
    
    always @(posedge clk or posedge reset)
      if (reset)
-       joint_ready_out <= #1 1'b0;
+       joint_ready_out <= 1'b0;
      else if ((page_cross | ch_end_flush | joint_flush | joint_wait) & (~ch_end))
-       joint_ready_out <= #1 1'b0;
+       joint_ready_out <= 1'b0;
      else if ((~ch_end) & (~wr_cmd_pending))
-       joint_ready_out <= #1 joint_ready_out_pre;
+       joint_ready_out <= joint_ready_out_pre;
    
    
    always @(/*AUTOSENSE*/ch_end_flush or fifo_not_ready or fifo_remain
@@ -258,11 +260,11 @@ module dma_axi32_core0_ch_calc_joint(clk,reset,joint_update,ch_end,ch_end_flush,
    
    always @(posedge clk or posedge reset)
      if (reset)
-       ps <= #1 IDLE;
+       ps <= IDLE;
      else if (joint_update)
-       ps <= #1 IDLE;
+       ps <= IDLE;
      else
-       ps <= #1 ns;
+       ps <= ns;
 
    
 endmodule
@@ -270,3 +272,5 @@ endmodule
    
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -131,31 +133,31 @@ module dma_axi32_core0_axim_cmd(clk,reset,ch_num,burst_start,burst_addr,burst_si
    
    always @(posedge clk or posedge reset)
      if (reset)
-       burst_reach <= #1 {9{1'b0}};
+       burst_reach <= {9{1'b0}};
      else if (high_addr_pre)
-       burst_reach <= #1 burst_reach_pre;
+       burst_reach <= burst_reach_pre;
    
    always @(posedge clk or posedge reset)
      if (reset)
-       next_burst <= #1 1'b0;
+       next_burst <= 1'b0;
      else if (next_burst_start)
-       next_burst <= #1 1'b0;
+       next_burst <= 1'b0;
      else if (cross_start)
-       next_burst <= #1 1'b1;
+       next_burst <= 1'b1;
           
    always @(posedge clk or posedge reset)
      if (reset)
-       max_burst_d <= #1 {9{1'b0}};
+       max_burst_d <= {9{1'b0}};
      else if (cross_start)
-       max_burst_d <= #1 max_burst;
+       max_burst_d <= max_burst;
    
    always @(posedge clk or posedge reset)
      if (reset)
-       next_burst_size <= #1 {7{1'b0}};
+       next_burst_size <= {7{1'b0}};
      else if (cross_start)
-       next_burst_size <= #1 burst_size;
+       next_burst_size <= burst_size;
      else if (cross_start_d)
-       next_burst_size <= #1 next_burst_size - max_burst_d;
+       next_burst_size <= next_burst_size - max_burst_d;
    
    assign               cmd_split       = cross_start_d;
    
@@ -167,11 +169,11 @@ module dma_axi32_core0_axim_cmd(clk,reset,ch_num,burst_start,burst_addr,burst_si
    
    always @(posedge clk or posedge reset)
      if (reset)
-       cmd_pending <= #1 1'b0;
+       cmd_pending <= 1'b0;
      else if (burst_start)
-       cmd_pending <= #1 1'b1;
+       cmd_pending <= 1'b1;
      else if (cmd & (~next_burst))
-       cmd_pending <= #1 1'b0;
+       cmd_pending <= 1'b0;
    
    
    prgen_delay #(1) delay_cmd_line (.clk(clk), .reset(reset), .din(cmd_line_pre), .dout(cmd_line));
@@ -203,20 +205,20 @@ module dma_axi32_core0_axim_cmd(clk,reset,ch_num,burst_start,burst_addr,burst_si
    always @(posedge clk or posedge reset)
      if (reset)
        begin
-      ASIZE  <= #1 {2{1'b0}};
-      AJOINT <= #1 1'b0;
+      ASIZE  <= {2{1'b0}};
+      AJOINT <= 1'b0;
        end
      else if (burst_start)
        begin
-      ASIZE  <= #1 ASIZE_pre;
-      AJOINT <= #1 joint_req;
+      ASIZE  <= ASIZE_pre;
+      AJOINT <= joint_req;
        end
 
    always @(posedge clk or posedge reset)
      if (reset)
-       AID_reg <= #1 {`CMD_BITS{1'b0}};
+       AID_reg <= {`CMD_BITS{1'b0}};
      else if (burst_start)
-       AID_reg <= #1 AID_pre;
+       AID_reg <= AID_pre;
 
    always @(AID_reg or next_burst)
      begin
@@ -227,31 +229,31 @@ module dma_axi32_core0_axim_cmd(clk,reset,ch_num,burst_start,burst_addr,burst_si
    
    always @(posedge clk or posedge reset)
      if (reset)
-       AADDR  <= #1 {32{1'b0}};
+       AADDR  <= {32{1'b0}};
      else if (next_burst_start)
-       AADDR  <= #1 {AADDR[32-1:12], {12{1'b1}}} + 1'b1;
+       AADDR  <= {AADDR[32-1:12], {12{1'b1}}} + 1'b1;
      else if (burst_start)
-       AADDR  <= #1 AADDR_pre;
+       AADDR  <= AADDR_pre;
 
    always @(posedge clk or posedge reset)
      if (reset)
-       APORT <= #1 1'b0;
+       APORT <= 1'b0;
      else if (burst_start)
-       APORT <= #1 cmd_port;
+       APORT <= cmd_port;
    
    always @(posedge clk or posedge reset)
      if (reset)
-       ALEN   <= #1 {`LEN_BITS{1'b0}};
+       ALEN   <= {`LEN_BITS{1'b0}};
      else if (burst_start | next_burst_start)
-       ALEN   <= #1 ALEN_pre;
+       ALEN   <= ALEN_pre;
 
    always @(posedge clk or posedge reset)
      if (reset)
-       AVALID_reg <= #1 1'b0;
+       AVALID_reg <= 1'b0;
      else if (AVALID & AREADY)
-       AVALID_reg <= #1 1'b0;
+       AVALID_reg <= 1'b0;
      else if ((burst_start & (burst_size > 'd0)) | next_burst_start)
-       AVALID_reg <= #1 1'b1;
+       AVALID_reg <= 1'b1;
 
    assign AVALID = AJOINT ? AVALID_reg & (~AWVALID) : AVALID_reg;
    
@@ -272,3 +274,5 @@ endmodule
 
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

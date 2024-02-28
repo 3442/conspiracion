@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -85,19 +87,19 @@ module dma_axi32_core0_ch_offsets(clk,reset,ch_update,burst_start,burst_last,bur
    
    always @(posedge clk or posedge reset)
      if (reset)
-       ch_end <= #1 1'b0;
+       ch_end <= 1'b0;
      else if (ch_update)
-       ch_end <= #1 1'b0;
+       ch_end <= 1'b0;
      else if (ch_end_pre)
-       ch_end <= #1 1'b1;
+       ch_end <= 1'b1;
 
    always @(posedge clk or posedge reset)
      if (reset)
-       x_remain <= #1 {10{1'b0}};
+       x_remain <= {10{1'b0}};
      else if (ch_update | go_next_line)
-       x_remain <= #1 x_size;
+       x_remain <= x_size;
      else if (burst_start & (~load_req_in_prog))
-       x_remain <= #1 x_remain - burst_size;
+       x_remain <= x_remain - burst_size;
        
    
    assign             x_offset   = {10{1'b0}};
@@ -113,3 +115,5 @@ endmodule
 
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

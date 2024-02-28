@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -327,53 +329,53 @@ module dma_axi32_core0_ch (clk,reset,scan_en,pclk,clken,pclken,psel,penable,padd
    
    always @(posedge clk or posedge reset)
      if (reset)
-       rd_joint_not_in_prog <= #1 1'b0;
+       rd_joint_not_in_prog <= 1'b0;
      else if (ch_update)
-       rd_joint_not_in_prog <= #1 1'b0;
+       rd_joint_not_in_prog <= 1'b0;
      else if (rd_burst_start)
-       rd_joint_not_in_prog <= #1 (~joint_req);
+       rd_joint_not_in_prog <= (~joint_req);
      else if (rd_outs_empty & rd_clr_outs_d)
-       rd_joint_not_in_prog <= #1 1'b0;
+       rd_joint_not_in_prog <= 1'b0;
    
    always @(posedge clk or posedge reset)
      if (reset)
-       wr_joint_not_in_prog <= #1 1'b0;
+       wr_joint_not_in_prog <= 1'b0;
      else if (ch_update)
-       wr_joint_not_in_prog <= #1 1'b0;
+       wr_joint_not_in_prog <= 1'b0;
      else if (wr_burst_start)
-       wr_joint_not_in_prog <= #1 (~joint_req);
+       wr_joint_not_in_prog <= (~joint_req);
      else if (wr_outs_empty & wr_clr_outs_d)
-       wr_joint_not_in_prog <= #1 1'b0;
+       wr_joint_not_in_prog <= 1'b0;
    
    always @(posedge clk or posedge reset)
      if (reset)
-       rd_joint_in_prog <= #1 1'b0;
+       rd_joint_in_prog <= 1'b0;
      else if (ch_update)
-       rd_joint_in_prog <= #1 1'b0;
+       rd_joint_in_prog <= 1'b0;
      else if (rd_burst_start)
-       rd_joint_in_prog <= #1 joint_req;
+       rd_joint_in_prog <= joint_req;
      else if (rd_outs_empty & rd_clr_outs_d)
-       rd_joint_in_prog <= #1 1'b0;
+       rd_joint_in_prog <= 1'b0;
    
    always @(posedge clk or posedge reset)
      if (reset)
-       wr_joint_in_prog <= #1 1'b0;
+       wr_joint_in_prog <= 1'b0;
      else if (ch_update)
-       wr_joint_in_prog <= #1 1'b0;
+       wr_joint_in_prog <= 1'b0;
      else if (wr_burst_start)
-       wr_joint_in_prog <= #1 joint_req;
+       wr_joint_in_prog <= joint_req;
      else if (wr_outs_empty & wr_clr_outs_d)
-       wr_joint_in_prog <= #1 1'b0;
+       wr_joint_in_prog <= 1'b0;
    
    always @(posedge clk or posedge reset)
      if (reset)
-       joint_cross_reg <= #1 1'b0;
+       joint_cross_reg <= 1'b0;
      else if (ch_update)
-       joint_cross_reg <= #1 1'b0;
+       joint_cross_reg <= 1'b0;
      else if (page_cross & joint)
-       joint_cross_reg <= #1 1'b1;
+       joint_cross_reg <= 1'b1;
      else if (joint_not_in_prog & outs_empty)
-       joint_cross_reg <= #1 1'b0;
+       joint_cross_reg <= 1'b0;
 
    assign             joint_cross       = joint_cross_reg;
    assign             page_cross        = rd_page_cross | wr_page_cross;
@@ -786,3 +788,5 @@ module dma_axi32_core0_ch (clk,reset,scan_en,pclk,clken,pclken,psel,penable,padd
 endmodule
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

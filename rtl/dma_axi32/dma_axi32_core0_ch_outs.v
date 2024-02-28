@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -63,16 +65,16 @@ module dma_axi32_core0_ch_outs(clk,reset,cmd,clr,outs_max,outs,outs_empty,stall,
    
    always @(posedge clk or posedge reset)
      if (reset)
-       outs <= #1 'd0;
+       outs <= 'd0;
      else if (cmd | clr)
-       outs <= #1 outs_pre;
+       outs <= outs_pre;
 
    
    always @(posedge clk or posedge reset)
      if (reset)
-       stall <= #1 1'b0;
+       stall <= 1'b0;
      else if (|outs_max)
-       stall <= #1 outs >= outs_max;
+       stall <= outs >= outs_max;
    
 
    
@@ -80,11 +82,11 @@ module dma_axi32_core0_ch_outs(clk,reset,cmd,clr,outs_max,outs,outs_empty,stall,
    
    always @(posedge clk or posedge reset)
      if (reset)
-       counter <= #1 {`TIMEOUT_BITS{1'b1}};
+       counter <= {`TIMEOUT_BITS{1'b1}};
      else if (clr)
-       counter <= #1 {`TIMEOUT_BITS{1'b1}};
+       counter <= {`TIMEOUT_BITS{1'b1}};
      else if (|outs)
-       counter <= #1 counter - 1'b1;
+       counter <= counter - 1'b1;
    
              
 endmodule
@@ -99,3 +101,5 @@ endmodule
 
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

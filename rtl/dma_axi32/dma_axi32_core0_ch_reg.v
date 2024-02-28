@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -343,81 +345,81 @@ module dma_axi32_core0_ch_reg(clk,clken,pclken,reset,psel,penable,paddr,pwrite,p
    always @(posedge clk or posedge reset)
      if (reset)
        begin
-      rd_start_addr <= #1 {32{1'b0}};
+      rd_start_addr <= {32{1'b0}};
        end
      else if (wr_cmd_line0)
        begin
-      rd_start_addr <= #1 pwdata[32-1:0];
+      rd_start_addr <= pwdata[32-1:0];
        end
      else if (load_wr0)
        begin
-      rd_start_addr <= #1 load_wdata[32-1:0];
+      rd_start_addr <= load_wdata[32-1:0];
        end
    
    always @(posedge clk or posedge reset)
      if (reset)
        begin
-      wr_start_addr <= #1 {32{1'b0}};
+      wr_start_addr <= {32{1'b0}};
        end
      else if (wr_cmd_line1)
        begin
-      wr_start_addr <= #1 pwdata[32-1:0];
+      wr_start_addr <= pwdata[32-1:0];
        end
      else if (load_wr1)
        begin
-      wr_start_addr <= #1 load_wdata[32+32-DATA_SHIFT-1:32-DATA_SHIFT];
+      wr_start_addr <= load_wdata[32+32-DATA_SHIFT-1:32-DATA_SHIFT];
        end
 
    always @(posedge clk or posedge reset)
      if (reset)
        begin
-      buff_size <= #1 {10{1'b0}};
+      buff_size <= {10{1'b0}};
        end
      else if (wr_cmd_line2)
        begin
-      buff_size <= #1 pwdata[10-1:0];
+      buff_size <= pwdata[10-1:0];
        end
      else if (load_wr2)
        begin
-      buff_size <= #1 load_wdata[10-1:0];
+      buff_size <= load_wdata[10-1:0];
        end
 
    always @(posedge clk or posedge reset)
      if (reset)
        begin
-     cmd_set_int_reg   <= #1 1'b0;
-     cmd_last_reg      <= #1 1'b0;
-     cmd_next_addr_reg <= #1 {30{1'b0}};
+     cmd_set_int_reg   <= 1'b0;
+     cmd_last_reg      <= 1'b0;
+     cmd_next_addr_reg <= {30{1'b0}};
        end
      else if (wr_cmd_line3)
        begin
-      cmd_set_int_reg   <= #1 pwdata[0];
-      cmd_last_reg      <= #1 pwdata[1];
-      cmd_next_addr_reg <= #1 pwdata[32-1:2];
+      cmd_set_int_reg   <= pwdata[0];
+      cmd_last_reg      <= pwdata[1];
+      cmd_next_addr_reg <= pwdata[32-1:2];
        end
      else if (load_wr3)
        begin
-      cmd_set_int_reg   <= #1 load_wdata[32-DATA_SHIFT];
-      cmd_last_reg      <= #1 load_wdata[33-DATA_SHIFT];
-      cmd_next_addr_reg <= #1 load_wdata[32+32-DATA_SHIFT-1:34-DATA_SHIFT];
+      cmd_set_int_reg   <= load_wdata[32-DATA_SHIFT];
+      cmd_last_reg      <= load_wdata[33-DATA_SHIFT];
+      cmd_next_addr_reg <= load_wdata[32+32-DATA_SHIFT-1:34-DATA_SHIFT];
        end
 
    always @(posedge clk or posedge reset)
      if (reset)
-       cmd_counter_reg <= #1 {`CMD_CNT_BITS{1'b0}};
+       cmd_counter_reg <= {`CMD_CNT_BITS{1'b0}};
      else if (wr_ch_start)
-       cmd_counter_reg <= #1 {`CMD_CNT_BITS{1'b0}};
+       cmd_counter_reg <= {`CMD_CNT_BITS{1'b0}};
      else if (ch_end & clken)
-       cmd_counter_reg <= #1 cmd_counter_reg + 1'b1;
+       cmd_counter_reg <= cmd_counter_reg + 1'b1;
   
    
    always @(posedge clk or posedge reset)
      if (reset)
-       int_counter_reg <= #1 {`INT_CNT_BITS{1'b0}};
+       int_counter_reg <= {`INT_CNT_BITS{1'b0}};
      else if (wr_ch_start)
-       int_counter_reg <= #1 {`INT_CNT_BITS{1'b0}};
+       int_counter_reg <= {`INT_CNT_BITS{1'b0}};
      else if ((ch_end_int & clken) | ch_end_clear)
-       int_counter_reg <= #1 int_counter_reg + (ch_end_int & clken) - ch_end_clear;
+       int_counter_reg <= int_counter_reg + (ch_end_int & clken) - ch_end_clear;
 
    assign cmd_set_int   = cmd_set_int_reg;
    assign cmd_last      = cmd_last_reg;
@@ -434,34 +436,34 @@ module dma_axi32_core0_ch_reg(clk,clken,pclken,reset,psel,penable,paddr,pwrite,p
    always @(posedge clk or posedge reset)
      if (reset)
        begin
-            rd_burst_max_size_reg <= #1 'd0;
-   rd_tokens_reg         <= #1 'd1; 
-    rd_outs_max_reg       <= #1 {`OUT_BITS{1'b0}}; 
-            rd_incr_reg           <= #1 'd1;
+            rd_burst_max_size_reg <= 'd0;
+   rd_tokens_reg         <= 'd1; 
+    rd_outs_max_reg       <= {`OUT_BITS{1'b0}}; 
+            rd_incr_reg           <= 'd1;
        end
      else if (wr_static_line0)
        begin
-            rd_burst_max_size_reg <= #1 pwdata[7-1:0];
-  rd_tokens_reg         <= #1 pwdata[`TOKEN_BITS+16-1:16]; 
-     rd_outs_max_reg       <= #1 pwdata[`OUT_BITS+24-1:24]; 
-            rd_incr_reg           <= #1 pwdata[31];
+            rd_burst_max_size_reg <= pwdata[7-1:0];
+  rd_tokens_reg         <= pwdata[`TOKEN_BITS+16-1:16]; 
+     rd_outs_max_reg       <= pwdata[`OUT_BITS+24-1:24]; 
+            rd_incr_reg           <= pwdata[31];
        end
    
    
    always @(posedge clk or posedge reset)
      if (reset)
        begin
-            wr_burst_max_size_reg <= #1 'd0;
-  wr_tokens_reg         <= #1 'd1; 
-     wr_outs_max_reg       <= #1 {`OUT_BITS{1'b0}}; 
-      wr_incr_reg           <= #1 'd1;
+            wr_burst_max_size_reg <= 'd0;
+  wr_tokens_reg         <= 'd1; 
+     wr_outs_max_reg       <= {`OUT_BITS{1'b0}}; 
+      wr_incr_reg           <= 'd1;
        end
      else if (wr_static_line1)
        begin
-      wr_burst_max_size_reg <= #1 pwdata[7-1:0];
-  wr_tokens_reg         <= #1 pwdata[`TOKEN_BITS+16-1:16]; 
-     wr_outs_max_reg       <= #1 pwdata[`OUT_BITS+24-1:24]; 
-      wr_incr_reg           <= #1 pwdata[31];
+      wr_burst_max_size_reg <= pwdata[7-1:0];
+  wr_tokens_reg         <= pwdata[`TOKEN_BITS+16-1:16]; 
+     wr_outs_max_reg       <= pwdata[`OUT_BITS+24-1:24]; 
+      wr_incr_reg           <= pwdata[31];
        end
 
    assign rd_incr = rd_incr_reg;
@@ -528,21 +530,21 @@ module dma_axi32_core0_ch_reg(clk,clken,pclken,reset,psel,penable,paddr,pwrite,p
    always @(posedge clk or posedge reset)
      if (reset)
        begin
-                 joint_reg        <= #1 1'b1;
-         end_swap_reg     <= #1 2'b00; 
+                 joint_reg        <= 1'b1;
+         end_swap_reg     <= 2'b00; 
        end
      else if (wr_static_line2)
        begin
-                 joint_reg        <= #1 pwdata[16];
-         end_swap_reg     <= #1 pwdata[29:28]; 
+                 joint_reg        <= pwdata[16];
+         end_swap_reg     <= pwdata[29:28]; 
        end
 
    
    always @(posedge clk or posedge reset)
      if (reset)
-       simple_mem <= #1 1'b0;
+       simple_mem <= 1'b0;
      else if (ch_update)
-       simple_mem <= #1 (rd_periph_num == 'd0) & (wr_periph_num == 'd0) & (~allow_line_cmd);
+       simple_mem <= (rd_periph_num == 'd0) & (wr_periph_num == 'd0) & (~allow_line_cmd);
 
    assign joint     = joint_mode & joint_reg & simple_mem & 1'b1;
    
@@ -570,17 +572,17 @@ module dma_axi32_core0_ch_reg(clk,clken,pclken,reset,psel,penable,paddr,pwrite,p
    always @(posedge clk or posedge reset)
      if (reset)
        begin
-          rd_periph_num_reg   <= #1 'd0; //0 is memory
-          rd_periph_delay_reg <= #1 'd0; //0 is memory
-            wr_periph_num_reg   <= #1 'd0; //0 is memory
-          wr_periph_delay_reg <= #1 'd0; //0 is memory
+          rd_periph_num_reg   <= 'd0; //0 is memory
+          rd_periph_delay_reg <= 'd0; //0 is memory
+            wr_periph_num_reg   <= 'd0; //0 is memory
+          wr_periph_delay_reg <= 'd0; //0 is memory
        end
      else if (wr_static_line4)
        begin
-          rd_periph_num_reg   <= #1 pwdata[4:0];
-          rd_periph_delay_reg <= #1 pwdata[`DELAY_BITS+8-1:8];
-          wr_periph_num_reg   <= #1 pwdata[20:16];
-          wr_periph_delay_reg <= #1 pwdata[`DELAY_BITS+24-1:24];
+          rd_periph_num_reg   <= pwdata[4:0];
+          rd_periph_delay_reg <= pwdata[`DELAY_BITS+8-1:8];
+          wr_periph_num_reg   <= pwdata[20:16];
+          wr_periph_delay_reg <= pwdata[`DELAY_BITS+24-1:24];
        end
 
    assign rd_periph_num   = rd_periph_num_reg;
@@ -596,56 +598,56 @@ module dma_axi32_core0_ch_reg(clk,clken,pclken,reset,psel,penable,paddr,pwrite,p
    always @(posedge clk or posedge reset)
      if (reset)
        begin
-      ch_enable <= #1 1'b1;
+      ch_enable <= 1'b1;
        end
      else if (wr_ch_enable)
        begin
-      ch_enable <= #1 pwdata[0];
+      ch_enable <= pwdata[0];
        end
    
    always @(posedge clk or posedge reset)
      if (reset)
-       ch_in_prog <= #1 1'b0;
+       ch_in_prog <= 1'b0;
      else if (ch_update)
-       ch_in_prog <= #1 1'b1;
+       ch_in_prog <= 1'b1;
      else if (ch_end & clken)
-       ch_in_prog <= #1 1'b0;
+       ch_in_prog <= 1'b0;
    
    always @(posedge clk or posedge reset)
      if (reset)
-       rd_ch_in_prog <= #1 1'b0;
+       rd_ch_in_prog <= 1'b0;
      else if (ch_update)
-       rd_ch_in_prog <= #1 1'b1;
+       rd_ch_in_prog <= 1'b1;
      else if (fifo_underflow | fifo_overflow)
-       rd_ch_in_prog <= #1 1'b0;
+       rd_ch_in_prog <= 1'b0;
      else if (rd_ch_end & clken)
-       rd_ch_in_prog <= #1 1'b0;
+       rd_ch_in_prog <= 1'b0;
    
    always @(posedge clk or posedge reset)
      if (reset)
-       wr_ch_in_prog <= #1 1'b0;
+       wr_ch_in_prog <= 1'b0;
      else if (ch_update)
-       wr_ch_in_prog <= #1 1'b1;
+       wr_ch_in_prog <= 1'b1;
      else if (fifo_underflow | fifo_overflow)
-       wr_ch_in_prog <= #1 1'b0;
+       wr_ch_in_prog <= 1'b0;
      else if (wr_ch_end & clken)
-       wr_ch_in_prog <= #1 1'b0;
+       wr_ch_in_prog <= 1'b0;
 
    always @(posedge clk or posedge reset)
      if (reset)
-       load_in_prog_reg <= #1 1'b0;
+       load_in_prog_reg <= 1'b0;
      else if (load_req & clken)
-       load_in_prog_reg <= #1 1'b1;
+       load_in_prog_reg <= 1'b1;
      else if (ch_update & clken)
-       load_in_prog_reg <= #1 1'b0;
+       load_in_prog_reg <= 1'b0;
    
    always @(posedge clk or posedge reset)
      if (reset)
-       load_req_in_prog_reg <= #1 1'b0;
+       load_req_in_prog_reg <= 1'b0;
      else if (load_req & clken)
-       load_req_in_prog_reg <= #1 1'b1;
+       load_req_in_prog_reg <= 1'b1;
      else if (load_cmd & clken)
-       load_req_in_prog_reg <= #1 1'b0;
+       load_req_in_prog_reg <= 1'b0;
 
    assign load_in_prog     = load_in_prog_reg;
    assign load_req_in_prog = load_req_in_prog_reg;
@@ -658,11 +660,11 @@ module dma_axi32_core0_ch_reg(clk,clken,pclken,reset,psel,penable,paddr,pwrite,p
 
    always @(posedge clk or posedge reset)
      if (reset)
-       ch_update <= #1 1'b0;
+       ch_update <= 1'b0;
      else if (ch_update_pre)
-       ch_update <= #1 1'b1;
+       ch_update <= 1'b1;
      else if (clken)
-       ch_update <= #1 1'b0;
+       ch_update <= 1'b0;
    
    prgen_delay #(1) delay_ch_update (.clk(clk), .reset(reset), .din(ch_update), .dout(ch_update_d));
 
@@ -715,9 +717,9 @@ module dma_axi32_core0_ch_reg(clk,clken,pclken,reset,psel,penable,paddr,pwrite,p
    
    always @(posedge clk or posedge reset)
      if (reset)
-       int_enable <= #1 {INT_NUM{1'b1}};
+       int_enable <= {INT_NUM{1'b1}};
      else if (wr_int_enable)
-       int_enable <= #1 pwdata[INT_NUM-1:0];
+       int_enable <= pwdata[INT_NUM-1:0];
 
    assign int_status = int_rawstat & int_enable;
 
@@ -935,22 +937,24 @@ module dma_axi32_core0_ch_reg(clk,clken,pclken,reset,psel,penable,paddr,pwrite,p
 
    always @(posedge clk or posedge reset)
      if (reset)
-       prdata <= #1 {32{1'b0}};
+       prdata <= {32{1'b0}};
      else if (gpread & pclken)
-       prdata <= #1 prdata_pre;
+       prdata <= prdata_pre;
      else if (pclken)
-       prdata <= #1 {32{1'b0}};
+       prdata <= {32{1'b0}};
    
    always @(posedge clk or posedge reset)
      if (reset)
-       pslverr <= #1 1'b0;
+       pslverr <= 1'b0;
      else if ((gpread | gpwrite) & pclken)
-       pslverr <= #1 pslverr_pre;
+       pslverr <= pslverr_pre;
      else if (pclken)
-       pslverr <= #1 1'b0;
+       pslverr <= 1'b0;
 
 
    
 endmodule
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -106,15 +108,15 @@ module dma_axi32_core0_axim_rdata(clk,reset,joint_stall,ch_fifo_wr,ch_fifo_wdata
    
    always @(posedge clk or posedge reset)
      if (reset)
-       ch_fifo_wr_num_d <= #1 3'b000;
+       ch_fifo_wr_num_d <= 3'b000;
      else if (rd_clr_line_pre)
-       ch_fifo_wr_num_d <= #1 ch_fifo_wr_num;
+       ch_fifo_wr_num_d <= ch_fifo_wr_num;
 
    always @(posedge clk or posedge reset)
      if (reset)
-       rd_clr_line_num <= #1 3'b000;
+       rd_clr_line_num <= 3'b000;
      else if (rd_clr_line_pre_d)
-       rd_clr_line_num <= #1 ch_fifo_wr_num_d;
+       rd_clr_line_num <= ch_fifo_wr_num_d;
    
    assign               load_wr         = RVALID & RREADY & load_cmd_id;
 
@@ -125,11 +127,11 @@ module dma_axi32_core0_axim_rdata(clk,reset,joint_stall,ch_fifo_wr,ch_fifo_wdata
    
    always @(posedge clk or posedge reset)
      if (reset)
-       load_wr_cycle <= #1 2'b00;
+       load_wr_cycle <= 2'b00;
      else if (load_wr & load_wr_cycle[0] & 1'b0)
-       load_wr_cycle <= #1 2'b00;
+       load_wr_cycle <= 2'b00;
      else if (load_wr)
-       load_wr_cycle <= #1 load_wr_cycle + 1'b1;
+       load_wr_cycle <= load_wr_cycle + 1'b1;
 
 
    
@@ -140,3 +142,5 @@ endmodule
 
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

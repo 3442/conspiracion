@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -87,29 +89,29 @@ module dma_axi32_core0_ch_fifo_ptr(clk,reset,joint_in_prog,wr_outstanding,ch_upd
 
    always @(posedge clk or posedge reset)
      if (reset)
-       wr_ptr <= #1 {5{1'b0}};
+       wr_ptr <= {5{1'b0}};
      else if (ch_update)
-       wr_ptr <= #1 {5{1'b0}};
+       wr_ptr <= {5{1'b0}};
      else if (slice_wr)
-       wr_ptr <= #1 wr_ptr_pre;
+       wr_ptr <= wr_ptr_pre;
    
    always @(posedge clk or posedge reset)
      if (reset)
-       rd_ptr <= #1 {5{1'b0}};
+       rd_ptr <= {5{1'b0}};
      else if (ch_update)
-       rd_ptr <= #1 {5{1'b0}};
+       rd_ptr <= {5{1'b0}};
      else if (slice_rd)
-       rd_ptr <= #1 rd_ptr_pre;
+       rd_ptr <= rd_ptr_pre;
    
    always @(posedge clk or posedge reset)
      if (reset)
-       rd_line_remain <= #1 3'd4;
+       rd_line_remain <= 3'd4;
      else if (ch_update | wr_clr_line)
-       rd_line_remain <= #1 3'd4;
+       rd_line_remain <= 3'd4;
      else if (slice_rd & (rd_line_remain == slice_rsize))
-       rd_line_remain <= #1 3'd4;
+       rd_line_remain <= 3'd4;
      else if (slice_rd)
-       rd_line_remain <= #1 rd_line_remain - slice_rsize;
+       rd_line_remain <= rd_line_remain - slice_rsize;
        
      
    assign               fullness_pre = fullness + 
@@ -119,11 +121,11 @@ module dma_axi32_core0_ch_fifo_ptr(clk,reset,joint_in_prog,wr_outstanding,ch_upd
    
    always @(posedge clk or posedge reset)
      if (reset)
-       fullness <= #1 {5+2{1'b0}};
+       fullness <= {5+2{1'b0}};
      else if (ch_update)
-       fullness <= #1 {5+2{1'b0}};
+       fullness <= {5+2{1'b0}};
      else if (fifo_rd | slice_wr)
-       fullness <= #1 fullness_pre;
+       fullness <= fullness_pre;
 
    
    
@@ -131,21 +133,21 @@ module dma_axi32_core0_ch_fifo_ptr(clk,reset,joint_in_prog,wr_outstanding,ch_upd
    
    always @(posedge clk or posedge reset)
      if (reset)
-       joint_delay_reg <= #1 1'b0;
+       joint_delay_reg <= 1'b0;
      else if (joint_in_prog & (~joint_in_prog_d))
-       joint_delay_reg <= #1 fullness > 32 - 3'd4;
+       joint_delay_reg <= fullness > 32 - 3'd4;
      else if (~joint_in_prog)
-       joint_delay_reg <= #1 1'b0;
+       joint_delay_reg <= 1'b0;
 
    assign               joint_delay = joint_delay_reg;
    
    always @(posedge clk or posedge reset)
      if (reset)
-       fifo_wr_ready <= #1 1'b0;
+       fifo_wr_ready <= 1'b0;
      else if (joint_in_prog)
-       fifo_wr_ready <= #1 1'b0;
+       fifo_wr_ready <= 1'b0;
      else if (|wr_next_size)
-       fifo_wr_ready <= #1 fullness_pre >= wr_next_size;
+       fifo_wr_ready <= fullness_pre >= wr_next_size;
 
    assign               fifo_underflow_pre = 
                               fullness[5+1];
@@ -155,18 +157,18 @@ module dma_axi32_core0_ch_fifo_ptr(clk,reset,joint_in_prog,wr_outstanding,ch_upd
    always @(posedge clk or posedge reset)
      if (reset)
        begin
-      fifo_overflow  <= #1 1'b0;
-      fifo_underflow <= #1 1'b0;
+      fifo_overflow  <= 1'b0;
+      fifo_underflow <= 1'b0;
        end
      else if (ch_update)
        begin
-      fifo_overflow  <= #1 1'b0;
-      fifo_underflow <= #1 1'b0;
+      fifo_overflow  <= 1'b0;
+      fifo_underflow <= 1'b0;
        end
      else if ((!fifo_overflow) & (!fifo_underflow))
        begin
-      fifo_overflow  <= #1 fifo_overflow_pre;
-      fifo_underflow <= #1 fifo_underflow_pre;
+      fifo_overflow  <= fifo_overflow_pre;
+      fifo_underflow <= fifo_underflow_pre;
        end
 
           
@@ -178,3 +180,5 @@ endmodule
 
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

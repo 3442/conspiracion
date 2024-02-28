@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -120,14 +122,15 @@ module dma_axi32_core0_axim_wr(clk,reset,wr_cmd_port,wr_last_cmd,wr_line_cmd,wr_
    always @(posedge clk or posedge reset)
      if (reset)
        begin
-      BRESP_d <= #1 2'b00;
+      BRESP_d <= 2'b00;
        end
      else if (BVALID)
        begin
-      BRESP_d <= #1 BRESP;
+      BRESP_d <= BRESP;
        end
 
    
+   // verilator lint_off PINMISSING
    dma_axi32_core0_axim_cmd
    dma_axi32_axim_wcmd (
              .clk(clk),
@@ -158,6 +161,7 @@ module dma_axi32_core0_axim_wr(clk,reset,wr_cmd_port,wr_last_cmd,wr_line_cmd,wr_
              .axim_timeout_num(axim_timeout_num_aw),
              .axim_timeout(axim_timeout_aw)
              );
+   // verilator lint_on PINMISSING
 
    
    dma_axi32_core0_axim_wdata
@@ -225,3 +229,5 @@ endmodule
 
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

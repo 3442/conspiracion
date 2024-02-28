@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -180,15 +182,15 @@ dma_axi32_reg_core0 dma_axi32_reg_core0(
    
    always @(posedge clk or posedge reset)
      if (reset)
-       periph_rx_req_reg <= #1 {31{1'b0}};
+       periph_rx_req_reg <= {31{1'b0}};
      else if (wr_periph_rx | (|periph_rx_clr))
-       periph_rx_req_reg <= #1 ({31{wr_periph_rx}} & pwdata[31:1]) & (~periph_rx_clr);
+       periph_rx_req_reg <= ({31{wr_periph_rx}} & pwdata[31:1]) & (~periph_rx_clr);
    
    always @(posedge clk or posedge reset)
      if (reset)
-       periph_tx_req_reg <= #1 {31{1'b0}};
+       periph_tx_req_reg <= {31{1'b0}};
      else if (wr_periph_tx | (|periph_tx_clr))
-       periph_tx_req_reg <= #1 ({31{wr_periph_tx}} & pwdata[31:1]) & (~periph_tx_clr);
+       periph_tx_req_reg <= ({31{wr_periph_tx}} & pwdata[31:1]) & (~periph_tx_clr);
 
    assign                   proc0_int_stat = {proc0_int_stat0};
 
@@ -198,9 +200,9 @@ dma_axi32_reg_core0 dma_axi32_reg_core0(
    
    always @(posedge clk or posedge reset)
      if (reset)
-       int_all_proc <= #1 {1{1'b0}};
+       int_all_proc <= {1{1'b0}};
      else
-       int_all_proc <= #1 int_all_proc_pre;
+       int_all_proc <= int_all_proc_pre;
 
    
    always @(*)
@@ -263,19 +265,19 @@ dma_axi32_reg_core0 dma_axi32_reg_core0(
    
    always @(posedge clk or posedge reset)
      if (reset)
-       prdata <= #1 {32{1'b0}};
+       prdata <= {32{1'b0}};
      else if (gpread & pclken)
-       prdata <= #1 prdata_pre; 
+       prdata <= prdata_pre; 
      else if (pclken) //zero to allow or in apb_mux
-       prdata <= #1 {32{1'b0}};
+       prdata <= {32{1'b0}};
 
    always @(posedge clk or posedge reset)
      if (reset)
-       pslverr <= #1 1'b0;
+       pslverr <= 1'b0;
      else if ((gpread | gpwrite) & pclken)
-       pslverr <= #1 pslverr_pre;
+       pslverr <= pslverr_pre;
      else if (pclken)
-       pslverr <= #1 1'b0;
+       pslverr <= 1'b0;
    
    
 endmodule
@@ -284,3 +286,5 @@ endmodule
 
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

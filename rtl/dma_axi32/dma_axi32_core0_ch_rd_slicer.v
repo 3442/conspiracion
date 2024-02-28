@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -96,13 +98,13 @@ module  dma_axi32_core0_ch_rd_slicer (clk,reset,fifo_rd,fifo_rdata,fifo_rsize,rd
    always @(posedge clk or posedge reset)
      if (reset)
        begin
-      rd_align_valid <= #1 {2{1'b0}};
-      rd_align_d     <= #1 {2{1'b0}};
+      rd_align_valid <= {2{1'b0}};
+      rd_align_d     <= {2{1'b0}};
        end
      else
        begin
-      rd_align_valid <= #1 rd_align_valid_pre;
-      rd_align_d     <= #1 rd_align_valid;
+      rd_align_valid <= rd_align_valid_pre;
+      rd_align_d     <= rd_align_valid;
        end
    
    always @(/*AUTOSENSE*/fifo_rdata or next_rdata or rd_align_d)
@@ -130,9 +132,9 @@ module  dma_axi32_core0_ch_rd_slicer (clk,reset,fifo_rd,fifo_rdata,fifo_rsize,rd
    
    always @(posedge clk or posedge reset)
      if (reset)
-       next_rdata <= #1 {32{1'b0}};
+       next_rdata <= {32{1'b0}};
      else if (slice_rd_d)
-       next_rdata <= #1 next_rdata_pre;
+       next_rdata <= next_rdata_pre;
    
    
    //RSIZE
@@ -140,9 +142,9 @@ module  dma_axi32_core0_ch_rd_slicer (clk,reset,fifo_rd,fifo_rdata,fifo_rsize,rd
 
    always @(posedge clk or posedge reset)
      if (reset)
-       actual_rsize <= #1 {3{1'b0}};
+       actual_rsize <= {3{1'b0}};
      else if (fifo_rd | (|next_rsize))
-       actual_rsize <= #1 actual_rsize_pre;
+       actual_rsize <= actual_rsize_pre;
    
    prgen_min2 #(3) min_rsize(
                    .a(rd_line_remain),
@@ -153,11 +155,11 @@ module  dma_axi32_core0_ch_rd_slicer (clk,reset,fifo_rd,fifo_rdata,fifo_rsize,rd
 
    always @(posedge clk or posedge reset)
      if (reset)
-       next_rsize_reg <= #1 {3{1'b0}};
+       next_rsize_reg <= {3{1'b0}};
      else if (next_rd)
-       next_rsize_reg <= #1 {3{1'b0}};
+       next_rsize_reg <= {3{1'b0}};
      else if (fifo_rd | slice_rd)
-       next_rsize_reg <= #1 next_rsize + ({3{fifo_rd}} & fifo_rsize);
+       next_rsize_reg <= next_rsize + ({3{fifo_rd}} & fifo_rsize);
 
    assign next_rsize = next_rsize_reg - ({3{fifo_rd_d}} & slice_rsize);
    
@@ -176,3 +178,5 @@ endmodule
    
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -82,12 +84,14 @@ module  dma_axi32_apb_mux (clk,reset,pclken,psel,penable,pwrite,paddr,prdata,psl
 
    always @(posedge clk or posedge reset)
      if (reset)
-       pready <= #1 1'b0;
+       pready <= 1'b0;
      else if (pclken)
-       pready <= #1 psel & (~penable);
+       pready <= psel & (~penable);
        
    
 endmodule
 
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

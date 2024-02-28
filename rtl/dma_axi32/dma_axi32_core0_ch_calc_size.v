@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -144,31 +146,31 @@ module  dma_axi32_core0_ch_calc_size (clk,reset,ch_update,ch_update_d,ch_update_
   
    always @(posedge clk or posedge reset)
      if (reset)
-       burst_ready <= #1 1'b0;
+       burst_ready <= 1'b0;
      else if (ch_update | ch_update_d | ch_update_d2 | ch_update_d3)
-       burst_ready <= #1 1'b0;
+       burst_ready <= 1'b0;
      else if (load_req_in_prog)
-       burst_ready <= #1 1'b1;
+       burst_ready <= 1'b1;
      else if (|joint_burst_req)
-       burst_ready <= #1 1'b1;
+       burst_ready <= 1'b1;
      else if (joint_line_req & (~joint_buffer_small))
-       burst_ready <= #1 1'b1;
+       burst_ready <= 1'b1;
      else if (load_in_prog | fifo_not_ready_pre | joint_wait | (page_cross & (burst_size != burst_size_pre2)))
-       burst_ready <= #1 1'b0;
+       burst_ready <= 1'b0;
      else
-       burst_ready <= #1 |burst_size_pre2;
+       burst_ready <= |burst_size_pre2;
 
    always @(posedge clk or posedge reset)
      if (reset)
-       burst_size  <= #1 {7{1'b0}};
+       burst_size  <= {7{1'b0}};
      else if (load_req_in_prog)
-       burst_size  <= #1 CMD_SIZE;
+       burst_size  <= CMD_SIZE;
      else if (|joint_burst_req)
-       burst_size  <= #1 joint_burst_req_size;
+       burst_size  <= joint_burst_req_size;
      else if (joint_line_req & (~joint_buffer_small))
-       burst_size  <= #1 joint_line_req_size;
+       burst_size  <= joint_line_req_size;
      else
-       burst_size  <= #1 burst_size_pre2;
+       burst_size  <= burst_size_pre2;
 
    
 
@@ -176,25 +178,25 @@ module  dma_axi32_core0_ch_calc_size (clk,reset,ch_update,ch_update_d,ch_update_
    
    always @(posedge clk or posedge reset)
      if (reset)
-       joint_burst_req_reg <= #1 2'b00;
+       joint_burst_req_reg <= 2'b00;
      else if (joint_update | joint_flush | joint_flush_in)
-       joint_burst_req_reg <= #1 2'b00;
+       joint_burst_req_reg <= 2'b00;
      else if (joint_burst_req_reg & burst_start)
-       joint_burst_req_reg <= #1 2'b00;
+       joint_burst_req_reg <= 2'b00;
      else if (joint_burst_req_in)
-       joint_burst_req_reg <= #1 joint_burst_req_reg[0] ? 2'b11 : 2'b01;
+       joint_burst_req_reg <= joint_burst_req_reg[0] ? 2'b11 : 2'b01;
 
    assign            joint_burst_req = joint_burst_req_reg;
    
    always @(posedge clk or posedge reset)
      if (reset)
-       joint_line_req_reg <= #1 1'b0;
+       joint_line_req_reg <= 1'b0;
      else if (joint_update | joint_flush | joint_flush_in)
-       joint_line_req_reg <= #1 1'b0;
+       joint_line_req_reg <= 1'b0;
      else if (joint_line_req_reg & burst_start)
-       joint_line_req_reg <= #1 1'b0;
+       joint_line_req_reg <= 1'b0;
      else if (joint_line_req_in)
-       joint_line_req_reg <= #1 1'b1;
+       joint_line_req_reg <= 1'b1;
 
    assign            joint_line_req = joint_line_req_reg;
    
@@ -246,3 +248,5 @@ module  dma_axi32_core0_ch_calc_size (clk,reset,ch_update,ch_update_d,ch_update_
 endmodule
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

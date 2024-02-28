@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -429,6 +431,7 @@ module dma_axi32_core0_channels(clk,reset,scan_en,pclk,clken,pclken,psel,penable
 
 
    
+   // verilator lint_off PINMISSING
 dma_axi32_core0_ch dma_axi32_core0_ch0 (
             .clk(clk),
             .reset(reset),
@@ -1348,6 +1351,7 @@ dma_axi32_core0_ch_empty dma_axi32_core0_ch_empty7 (
             //INT
             .int_all_proc(ch_int_all_proc[1-1+(1*7):1*7])
             );
+   // verilator lint_on PINMISSING
           
 
    
@@ -1355,3 +1359,5 @@ endmodule
    
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

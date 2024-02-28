@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -60,11 +62,11 @@ module  dma_axi32_core0_channels_apb_mux (clk,reset,pclken,psel,penable,paddr,pr
    
    always @(posedge clk or posedge reset)
      if (reset)
-       paddr_sel_d <= #1 3'b000;
+       paddr_sel_d <= 3'b000;
      else if (psel & (~penable))
-       paddr_sel_d <= #1 paddr_sel;
+       paddr_sel_d <= paddr_sel;
      else if ((~psel) & pclken) //release for empty channels after error
-       paddr_sel_d <= #1 3'b000;
+       paddr_sel_d <= 3'b000;
    
    
    
@@ -98,3 +100,5 @@ endmodule
    
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

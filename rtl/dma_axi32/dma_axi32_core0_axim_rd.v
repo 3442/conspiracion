@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -127,15 +129,15 @@ module dma_axi32_core0_axim_rd(clk,reset,load_wr,load_wr_num,load_wr_cycle,load_
    always @(posedge clk or posedge reset)
      if (reset)
        begin
-      RRESP_d <= #1 2'b00;
-      RDATA_d <= #1 {32{1'b0}};
-      RLAST_d <= #1 1'b0;
+      RRESP_d <= 2'b00;
+      RDATA_d <= {32{1'b0}};
+      RLAST_d <= 1'b0;
        end
      else if (RVALID)
        begin
-      RRESP_d <= #1 RRESP;
-      RDATA_d <= #1 RDATA;
-      RLAST_d <= #1 RLAST;
+      RRESP_d <= RRESP;
+      RDATA_d <= RDATA;
+      RLAST_d <= RLAST;
        end
    
    always @(/*AUTOSENSE*/RID)
@@ -149,6 +151,7 @@ module dma_axi32_core0_axim_rd(clk,reset,load_wr,load_wr_num,load_wr_cycle,load_
      end
    
    
+   // verilator lint_off PINMISSING
    dma_axi32_core0_axim_cmd
    dma_axi32_axim_rcmd (
              .clk(clk),
@@ -179,6 +182,7 @@ module dma_axi32_core0_axim_rd(clk,reset,load_wr,load_wr_num,load_wr_cycle,load_
              .axim_timeout_num(axim_timeout_num_ar),
              .axim_timeout(axim_timeout_ar)
              );
+   // verilator lint_on PINMISSING
    
    
    dma_axi32_core0_axim_rdata
@@ -239,3 +243,5 @@ endmodule
 
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

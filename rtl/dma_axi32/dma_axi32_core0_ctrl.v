@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -106,11 +108,11 @@ module dma_axi32_core0_ctrl(clk,reset,ch_go,cmd_full,cmd_pending,joint_req,ch_nu
 
    always @(posedge clk or posedge reset)
      if (reset)
-       joint_ctrl_reg <= #1 1'b0;
+       joint_ctrl_reg <= 1'b0;
      else if (finish)
-       joint_ctrl_reg <= #1 1'b0;
+       joint_ctrl_reg <= 1'b0;
      else if (ch_go)
-       joint_ctrl_reg <= #1 joint_req;
+       joint_ctrl_reg <= joint_req;
 
    assign             joint_ctrl = joint_ctrl_reg;
    
@@ -120,19 +122,19 @@ module dma_axi32_core0_ctrl(clk,reset,ch_go,cmd_full,cmd_pending,joint_req,ch_nu
    
    always @(posedge clk or posedge reset)
      if (reset)
-       tokens_counter <= #1 {`TOKEN_BITS{1'b0}};
+       tokens_counter <= {`TOKEN_BITS{1'b0}};
      else if (ch_go)
-       tokens_counter <= #1 tokens;
+       tokens_counter <= tokens;
      else if (burst_start & (|tokens_counter))
-       tokens_counter <= #1 tokens_counter - 1'b1;
+       tokens_counter <= tokens_counter - 1'b1;
    
    always @(posedge clk or posedge reset)
      if (reset)
-       delay_counter <= #1 {`DELAY_BITS{1'b0}};
+       delay_counter <= {`DELAY_BITS{1'b0}};
      else if (periph_clr_ch)
-       delay_counter <= #1 periph_delay;
+       delay_counter <= periph_delay;
      else if (|delay_counter)
-       delay_counter <= #1 delay_counter - 1'b1;
+       delay_counter <= delay_counter - 1'b1;
 
    
    assign             stall  = cmd_pending | cmd_full | go_next_line_d;
@@ -257,9 +259,9 @@ module dma_axi32_core0_ctrl(clk,reset,ch_go,cmd_full,cmd_pending,joint_req,ch_nu
    
    always @(posedge clk or posedge reset)
      if (reset)
-       ps <= #1 IDLE;
+       ps <= IDLE;
      else
-       ps <= #1 ns;
+       ps <= ns;
    
 
 endmodule
@@ -268,3 +270,5 @@ endmodule
 
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

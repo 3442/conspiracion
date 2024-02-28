@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -96,13 +98,13 @@ module  dma_axi32_core0_ch_wr_slicer (clk,reset,ch_update,rd_clr_line,fifo_wr,fi
 
    always @(posedge clk or posedge reset)
      if (reset)
-       line_remain <= #1 3'd4;
+       line_remain <= 3'd4;
      else if (ch_update |  rd_clr_line)
-       line_remain <= #1 3'd4;
+       line_remain <= 3'd4;
      else if (slice_wr_pre & (line_remain == slice_wsize_pre))
-       line_remain <= #1 3'd4;
+       line_remain <= 3'd4;
      else if (slice_wr_pre)
-       line_remain <= #1 line_remain - slice_wsize_pre;
+       line_remain <= line_remain - slice_wsize_pre;
    
    assign               join_wsize = next_size + fifo_wsize;
 
@@ -121,32 +123,32 @@ module  dma_axi32_core0_ch_wr_slicer (clk,reset,ch_update,rd_clr_line,fifo_wr,fi
    
    always @(posedge clk or posedge reset)
      if (reset)
-       append  <= #1 1'b0;
+       append  <= 1'b0;
      else if (next_wr)
-       append  <= #1 1'b0;
+       append  <= 1'b0;
      else if (fifo_wr & (slice_wsize_pre == join_wsize))
-       append  <= #1 1'b0;
+       append  <= 1'b0;
      else if (fifo_wr)
-       append  <= #1 1'b1;
+       append  <= 1'b1;
 
    
    always @(posedge clk or posedge reset)
      if (reset)
-       next_size  <= #1 {3{1'b0}};
+       next_size  <= {3{1'b0}};
      else if (next_wr)
-       next_size  <= #1 {3{1'b0}};
+       next_size  <= {3{1'b0}};
      else if (fifo_wr & append)
-       next_size  <= #1 join_wsize - append_wsize;
+       next_size  <= join_wsize - append_wsize;
      else if (fifo_wr)
-       next_size  <= #1 join_wsize - direct_wsize;
+       next_size  <= join_wsize - direct_wsize;
 
    
    //WDATA
    always @(posedge clk or posedge reset)
      if (reset)
-       align_wdata_d <= #1 {32{1'b0}};
+       align_wdata_d <= {32{1'b0}};
      else if (fifo_wr)
-       align_wdata_d <= #1 align_wdata;
+       align_wdata_d <= align_wdata;
 
    
    assign               wr_align_valid = 
@@ -219,13 +221,13 @@ module  dma_axi32_core0_ch_wr_slicer (clk,reset,ch_update,rd_clr_line,fifo_wr,fi
    always @(posedge clk or posedge reset)
      if (reset)
        begin
-      slice_wsize       <= #1 {3{1'b0}};
-      slice_wdata_pre_d <= #1 {32{1'b0}};
+      slice_wsize       <= {3{1'b0}};
+      slice_wdata_pre_d <= {32{1'b0}};
        end
      else if (slice_wr_pre)
        begin
-      slice_wsize       <= #1 slice_wsize_pre;
-      slice_wdata_pre_d <= #1 slice_wdata_pre;
+      slice_wsize       <= slice_wsize_pre;
+      slice_wdata_pre_d <= slice_wdata_pre;
        end
 
    
@@ -240,15 +242,15 @@ module  dma_axi32_core0_ch_wr_slicer (clk,reset,ch_update,rd_clr_line,fifo_wr,fi
    always @(posedge clk or posedge reset)
      if (reset)
        begin
-      slice_wdata   <= #1 {32{1'b0}};
-      slice_wr_ptr  <= #1 {5{1'b0}};
-      slice_bsel    <= #1 {4{1'b0}};
+      slice_wdata   <= {32{1'b0}};
+      slice_wr_ptr  <= {5{1'b0}};
+      slice_bsel    <= {4{1'b0}};
        end
      else if (slice_wr)
        begin
-      slice_wdata   <= #1 slice_wdata_swap;
-      slice_wr_ptr  <= #1 slice_wr_ptr_pre;
-      slice_bsel    <= #1 slice_bsel_swap;
+      slice_wdata   <= slice_wdata_swap;
+      slice_wr_ptr  <= slice_wr_ptr_pre;
+      slice_bsel    <= slice_bsel_swap;
        end
    
 endmodule
@@ -258,3 +260,5 @@ endmodule
    
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

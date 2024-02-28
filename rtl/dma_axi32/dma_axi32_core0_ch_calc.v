@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -109,9 +111,9 @@ module dma_axi32_core0_ch_calc(clk,reset,load_in_prog,load_req_in_prog,load_addr
    
    always @(posedge clk or posedge reset)
      if (reset)
-       single <= #1 1'b0;
+       single <= 1'b0;
      else if (burst_start)
-       single <= #1 (burst_size <= SINGLE_SIZE);
+       single <= (burst_size <= SINGLE_SIZE);
 
            
    dma_axi32_core0_ch_calc_addr
@@ -179,3 +181,5 @@ endmodule
 
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -62,14 +64,16 @@ module dma_axi32_core0_ch_fifo (CLK,WR,RD,WR_ADDR,RD_ADDR,DIN,BSEL,DOUT);
    
    always @(posedge CLK)
      if (WR)
-       Mem[WR_ADDR] <= #1 DIN_BitSEL;
+       Mem[WR_ADDR] <= DIN_BitSEL;
 
    
    always @(posedge CLK)
      if (RD)
-       DOUT <= #1 Mem[RD_ADDR];
+       DOUT <= Mem[RD_ADDR];
 
    
 endmodule
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

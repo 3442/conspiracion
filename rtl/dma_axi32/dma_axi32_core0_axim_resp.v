@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -99,9 +101,9 @@ module dma_axi32_core0_axim_resp(clk,reset,slverr,decerr,clr,clr_last,ch_num_res
    
    always @(posedge clk or posedge reset)
      if (reset)
-       ch_num_resp <= #1 3'b000;
+       ch_num_resp <= 3'b000;
      else if (clr_pre)
-       ch_num_resp <= #1 ch_num_resp_pre;
+       ch_num_resp <= ch_num_resp_pre;
    
 
 
@@ -124,3 +126,5 @@ endmodule
 
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC

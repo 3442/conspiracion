@@ -1,3 +1,5 @@
+// verilator lint_off WIDTHEXPAND
+// verilator lint_off WIDTHTRUNC
 /////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
@@ -84,19 +86,19 @@ module dma_axi32_core0_ch_remain(clk,reset,ch_update,wr_outstanding,rd_outstandi
    
    always @(posedge clk or posedge reset)
      if (reset)
-       rd_burst_size_valid <= #1 {7{1'b0}};
+       rd_burst_size_valid <= {7{1'b0}};
      else if (rd_burst_qual)
-       rd_burst_size_valid <= #1 rd_burst_size;
+       rd_burst_size_valid <= rd_burst_size;
      else
-       rd_burst_size_valid <= #1 {7{1'b0}};
+       rd_burst_size_valid <= {7{1'b0}};
    
    always @(posedge clk or posedge reset)
      if (reset)
-       wr_burst_size_valid <= #1 {7{1'b0}};
+       wr_burst_size_valid <= {7{1'b0}};
      else if (wr_burst_qual)
-       wr_burst_size_valid <= #1 wr_burst_size;
+       wr_burst_size_valid <= wr_burst_size;
      else
-       wr_burst_size_valid <= #1 {7{1'b0}};
+       wr_burst_size_valid <= {7{1'b0}};
    
    assign             rd_transfer_size_valid = {3{rd_transfer}} & rd_transfer_size;
    assign             wr_transfer_size_valid = {3{wr_transfer}} & wr_transfer_size;
@@ -105,11 +107,11 @@ module dma_axi32_core0_ch_remain(clk,reset,ch_update,wr_outstanding,rd_outstandi
    //for rd bursts
    always @(posedge clk or posedge reset)
      if (reset)
-       rd_gap_reg <= #1 {1'b0, 1'b1, {5{1'b0}}};
+       rd_gap_reg <= {1'b0, 1'b1, {5{1'b0}}};
      else if (ch_update)
-       rd_gap_reg <= #1 {1'b0, 1'b1, {5{1'b0}}};
+       rd_gap_reg <= {1'b0, 1'b1, {5{1'b0}}};
      else
-       rd_gap_reg <= #1 rd_gap_reg - 
+       rd_gap_reg <= rd_gap_reg - 
              rd_burst_size_valid +
              wr_transfer_size_valid;
    
@@ -120,11 +122,11 @@ module dma_axi32_core0_ch_remain(clk,reset,ch_update,wr_outstanding,rd_outstandi
    //for wr bursts
    always @(posedge clk or posedge reset)
      if (reset)
-       wr_fullness_reg <= #1 {5+1{1'b0}};
+       wr_fullness_reg <= {5+1{1'b0}};
      else if (ch_update)
-       wr_fullness_reg <= #1 {5+1{1'b0}};
+       wr_fullness_reg <= {5+1{1'b0}};
      else
-       wr_fullness_reg <= #1 wr_fullness_reg -
+       wr_fullness_reg <= wr_fullness_reg -
               wr_burst_size_valid +
               rd_transfer_size_valid; 
 
@@ -137,3 +139,5 @@ endmodule
 
 
 
+// verilator lint_on WIDTHEXPAND
+// verilator lint_on WIDTHTRUNC
