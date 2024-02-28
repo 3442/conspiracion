@@ -27,6 +27,8 @@ require_core_var = \
     $(let val,$(core_info/$(1)/$(2)), \
       $(if $(val),$(val),$(error core '$(1)' must define '$(2)'))))
 
+core_shell = $(call shell_checked,cd $(here); $(1))
+
 define add_core
   this := core_info/$(1)
 

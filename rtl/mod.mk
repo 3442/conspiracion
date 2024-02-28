@@ -1,5 +1,5 @@
 cores   := config debounce intc
-subdirs := cache core gfx perf picorv32 smp top
+subdirs := cache core dma_axi32 gfx perf picorv32 smp top
 
 define core/config
   $(this)/rtl_include_dirs := .
