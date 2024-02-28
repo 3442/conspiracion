@@ -1,5 +1,5 @@
 top := conspiracion
-core_dirs := rtl tb
+core_dirs := platform rtl tb
 
 .PHONY: all
 
