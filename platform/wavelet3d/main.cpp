@@ -1,3 +1,4 @@
+#include <iostream>
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
@@ -21,6 +22,24 @@ int main(int argc, char **argv)
 #endif
 
 	Py_Initialize();
+
+	float a, b;
+	std::cin >> a >> b;
+
+	top.a = *reinterpret_cast<unsigned*>(&a);
+	top.b = *reinterpret_cast<unsigned*>(&b);
+
+	for (int i = 0; i < 1000; ++i) {
+		top.clk = 0;
+		top.eval();
+
+		top.clk = 1;
+		top.eval();
+	}
+
+	unsigned q = top.q;
+	std::cout << a << " * " << b << " = " << *reinterpret_cast<float*>(&q) << '\n';
+
 	bool failed = Py_FinalizeEx() < 0;
 
 #if VM_TRACE
