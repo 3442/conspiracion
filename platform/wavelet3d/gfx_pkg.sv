@@ -46,4 +46,8 @@ package gfx;
 		      mant_zero;
 	} float_special;
 
+	/* -> 4,4,4,4,4,4,4,4 -> 8,8,8,8 -> 16,16 -> 32
+	 */
+	localparam FADD_CLZ_STAGES = 4;
+
 endpackage

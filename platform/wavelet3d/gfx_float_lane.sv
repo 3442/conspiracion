@@ -25,7 +25,7 @@ module gfx_float_lane
 		is_special = in.exp_max | (in.exp_min & ~in.mant_zero);
 	endfunction
 
-	gfx_fmul_lane fmul
+	gfx_fadd_lane fmul
 	(
 		.clk(clk),
 		.a(a_special),
