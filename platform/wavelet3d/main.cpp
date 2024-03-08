@@ -23,8 +23,29 @@ int main(int argc, char **argv)
 
 	Py_Initialize();
 
-	float a, b;
+	float q;
+	int a, b;
+	const char *op = "int->fp";
+
 	std::cin >> a >> b;
+
+	// int->fp
+	top.mul_float_m1 = 0;
+	top.unit_b_m1 = 1;
+	top.float_a_1 = 0;
+	top.int_hi_a_1 = 0;
+	top.int_lo_a_1 = 1;
+	top.zero_flags_1 = 1;
+	top.zero_b_1 = 1;
+	top.copy_flags_2 = 0;
+	top.int_signed_4 = 1;
+	top.int_operand_5 = 1;
+	top.copy_flags_5 = 1;
+	top.enable_norm_6 = 1;
+	top.copy_flags_10 = 0;
+	top.copy_flags_11 = 0;
+	top.enable_round_11 = 1;
+	top.encode_special_13 = 1;
 
 	// mul int
 	//top.mul_float_m1 = 0;
@@ -32,9 +53,11 @@ int main(int argc, char **argv)
 	//top.float_a_1 = 0;
 	//top.int_hi_a_1 = 0;
 	//top.int_lo_a_1 = 1;
-	//top.zero_flags_a_1 = 1;
+	//top.zero_flags_1 = 1;
 	//top.zero_b_1 = 1;
 	//top.copy_flags_2 = 1;
+	//top.int_signed_4 = 0;
+	//top.int_operand_5 = 0;
 	//top.copy_flags_5 = 1;
 	//top.enable_norm_6 = 0;
 	//top.copy_flags_10 = 1;
@@ -48,10 +71,12 @@ int main(int argc, char **argv)
 	//top.float_a_1 = 1;
 	//top.int_hi_a_1 = 0;
 	//top.int_lo_a_1 = 0;
-	//top.zero_flags_a_1 = 0;
+	//top.zero_flags_1 = 0;
 	//top.zero_b_1 = 1;
 	//top.copy_flags_2 = 1;
 	//top.copy_flags_5 = 1;
+	//top.int_signed_4 = 0;
+	//top.int_operand_5 = 0;
 	//top.enable_norm_6 = 1;
 	//top.copy_flags_10 = 1;
 	//top.copy_flags_11 = 1;
@@ -59,20 +84,22 @@ int main(int argc, char **argv)
 	//top.encode_special_13 = 1;
 
 	// suma/resta
-	top.mul_float_m1 = 0;
-	top.unit_b_m1 = 1;
-	top.float_a_1 = 0;
-	top.int_hi_a_1 = 0;
-	top.int_lo_a_1 = 1;
-	top.zero_flags_a_1 = 0;
-	top.zero_b_1 = 0;
-	top.copy_flags_2 = 0;
-	top.copy_flags_5 = 0;
-	top.enable_norm_6 = 1;
-	top.copy_flags_10 = 0;
-	top.copy_flags_11 = 0;
-	top.enable_round_11 = 1;
-	top.encode_special_13 = 1;
+	//top.mul_float_m1 = 0;
+	//top.unit_b_m1 = 1;
+	//top.float_a_1 = 0;
+	//top.int_hi_a_1 = 0;
+	//top.int_lo_a_1 = 1;
+	//top.zero_flags_1 = 0;
+	//top.zero_b_1 = 0;
+	//top.copy_flags_2 = 0;
+	//top.copy_flags_5 = 0;
+	//top.int_signed_4 = 0;
+	//top.int_operand_5 = 0;
+	//top.enable_norm_6 = 1;
+	//top.copy_flags_10 = 0;
+	//top.copy_flags_11 = 0;
+	//top.enable_round_11 = 1;
+	//top.encode_special_13 = 1;
 
 	top.a = *reinterpret_cast<unsigned*>(&a);
 	top.b = *reinterpret_cast<unsigned*>(&b);
@@ -85,8 +112,10 @@ int main(int argc, char **argv)
 		top.eval();
 	}
 
-	unsigned q = top.q;
-	std::cout << a << " * " << b << " = " << *reinterpret_cast<decltype(a)*>(&q) << '\n';
+	unsigned q_bits = top.q;
+	q = *reinterpret_cast<decltype(q)*>(&q_bits);
+
+	std::cout << a << ' ' << op << ' ' << b << " = " << q << '\n';
 
 	bool failed = Py_FinalizeEx() < 0;
 
