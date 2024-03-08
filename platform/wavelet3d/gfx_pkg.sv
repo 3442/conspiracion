@@ -5,7 +5,8 @@ package gfx;
 	typedef logic[7:0]  float_exp;
 
 	typedef logic[$bits(word) - $bits(float_exp) - 2:0] float_mant;
-	typedef logic[$bits(float_mant):0] float_mant_full; // Incluye '1.' explícito
+	typedef logic[$bits(float_mant):0]                  float_mant_full; // Incluye '1.' explícito
+	typedef logic[$bits(float_mant_full) + 1:0]         float_mant_ext;  // Considera overflow
 
 	localparam float_exp FLOAT_EXP_BIAS = (1 << ($bits(float_exp) - 1)) - 1;
 	localparam float_exp FLOAT_EXP_MAX  = {($bits(float_exp)){1'b1}};
@@ -56,14 +57,163 @@ package gfx;
 		is_float_special = in.exp_max | (in.exp_min & ~in.mant_zero);
 	endfunction
 
-	/* -> 4,4,4,4,4,4,4,4 -> 8,8,8,8 -> 16,16 -> 32
-	 */
-	localparam FADD_CLZ_STAGES = 4;
+	function float_mant_ext float_prepare_round(float in, float_class in_class);
+		float_prepare_round = {~in_class.exp_min, in.mant, 2'b00};
+	endfunction
+
+	// -> 4,4,4,4,4,4,4,4 -> 8,8,8,8 -> 16,16 -> 32
+	localparam int FPINT_CLZ_STAGES = 4;
+	localparam int FPINT_STAGES     = 7 + FPINT_CLZ_STAGES + 4;
+
+	localparam bit[$clog2($bits(float_mant_ext)):0] FPINT_MAX_SHIFT
+		= 1 << $clog2($bits(float_mant_ext));
+
+	typedef logic[$clog2(FPINT_MAX_SHIFT):0] fpint_shift;
 
 	typedef struct packed
 	{
-		logic fadd,
-		      fmul;
-	} arith_op;
+		logic setup_mul_float,
+		      setup_unit_b,
+		      mnorm_put_hi,
+		      mnorm_put_lo,
+		      mnorm_put_mul,
+		      mnorm_zero_b,
+		      mnorm_zero_flags,
+		      minmax_copy_flags,
+		      shiftr_int_signed,
+		      addsub_copy_flags,
+		      addsub_int_operand,
+		      clz_force_nop,
+		      shiftl_copy_flags,
+		      round_copy_flags,
+		      round_enable,
+		      encode_enable;
+	} fpint_op;
+
+	typedef struct packed
+	{
+		float a,
+		      b,
+		      a_mul,
+		      b_mul;
+	} fpint_setup_mulclass;
+
+	typedef struct packed
+	{
+		float       b;
+		float_exp   exp;
+		float_class a_class,
+		            b_class;
+		dword       product;
+		logic       sign,
+		            overflow;
+	} fpint_mulclass_mnorm;
+
+	typedef struct packed
+	{
+		float       a,
+		            b;
+		float_class a_class,
+		            b_class;
+		logic       slow,
+		            zero,
+		            guard,
+		            round,
+		            sticky,
+		            slow_in,
+		            overflow;
+	} fpint_mnorm_minmax;
+
+	typedef struct packed
+	{
+		float       max,
+		            min;
+		float_class max_class,
+		            min_class;
+		logic       slow,
+		            zero,
+		            guard,
+		            round,
+		            sticky;
+	} fpint_minmax_expdiff;
+
+	typedef struct packed
+	{
+		float       max,
+		            min;
+		float_class max_class,
+		            min_class;
+		fpint_shift exp_shift;
+		logic       slow,
+		            zero,
+		            guard,
+		            round,
+		            sticky;
+	} fpint_expdiff_shiftr;
+
+	typedef struct packed
+	{
+		float          max,
+		               min;
+		float_class    max_class,
+		               min_class;
+		float_mant_ext max_mant,
+		               min_mant,
+		               sticky_mask;
+		logic          slow,
+		               zero,
+		               guard,
+		               round,
+		               sticky,
+		               int_sign;
+	} fpint_shiftr_addsub;
+
+	typedef struct packed
+	{
+		float max;
+		word  add_sub;
+		logic slow,
+		      zero,
+		      guard,
+		      round,
+		      sticky;
+	} fpint_clz_hold;
+
+	typedef fpint_clz_hold fpint_addsub_clz;
+
+	typedef struct packed
+	{
+		fpint_clz_hold hold;
+		fpint_shift    shift;
+	} fpint_clz_shiftl;
+
+	typedef struct packed
+	{
+		float val;
+		logic slow,
+		      zero,
+		      guard,
+		      round,
+		      sticky,
+		      overflow,
+		      sticky_last;
+	} fpint_shiftl_round;
+
+	typedef struct packed
+	{
+		float val;
+		logic slow,
+		      zero,
+		      exp_step,
+		      overflow;
+	} fpint_round_rnorm;
+
+	typedef struct packed
+	{
+		float val;
+		logic slow,
+		      zero,
+		      overflow;
+	} fpint_rnorm_encode;
 
 endpackage

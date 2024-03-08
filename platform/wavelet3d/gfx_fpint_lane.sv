@@ -1,28 +1,41 @@
+/* Las 15 etapas son:
+ * - setup
+ * - mulclass
+ * - mnorm
+ * - minmax
+ * - expdiff
+ * - shiftr
+ * - addsub
+ * - clz0-clz3
+ * - shiftl
+ * - round
+ * - rnorm
+ * - encode
+ */
 module gfx_fpint_lane
 (
-	input  logic      clk,
+	input  logic         clk,
 
-	input  gfx::float a,
-	                  b,
+	input  gfx::word     a,
+	                     b,
+	input logic          mul_float_0,
+	                     unit_b_0,
+	                     put_hi_2,
+	                     put_lo_2,
+	                     put_mul_2,
+	                     zero_b_2,
+	                     zero_flags_2,
+	                     copy_flags_3,
+	                     int_signed_5,
+	                     copy_flags_6,
+	                     int_operand_6,
+	                     force_nop_7,
+	                     copy_flags_11,
+	                     copy_flags_12,
+	                     enable_12,
+	                     enable_14,
 
-	input  logic      mul_float_m1,
-	                  unit_b_m1,
-	                  float_a_1,
-	                  int_hi_a_1,
-	                  int_lo_a_1,
-	                  zero_flags_1,
-	                  zero_b_1,
-	                  copy_flags_2,
-	                  int_signed_4,
-	                  copy_flags_5,
-	                  int_operand_5,
-	                  enable_norm_6,
-	                  copy_flags_10,
-	                  copy_flags_11,
-	                  enable_round_11,
-	                  encode_special_13,
-
-	output gfx::float q
+	output gfx::word     q
 );
 
 	import gfx::*;
@@ -69,169 +82,284 @@ module gfx_fpint_lane
 	 * el exponente.
 	 */
 
-	logic exp_step, guard_0, guard_1, guard_2, guard_3, guard_4, guard_5, guard_10,
-	      int_sign, lo_msb, lo_reduce, overflow_0, overflow_1, overflow_10, overflow_12,
-	      round_0, round_1, round_2, round_3, round_4, round_5, round_10, sign_0,
-	      sign_10, sign_11, sign_12, slow_1, slow_2, slow_3, slow_4, slow_5, slow_10,
-	      slow_11, slow_12, slow_in_1, slow_in_next, slow_out, sticky_1, sticky_2,
-	      sticky_3, sticky_4, sticky_5, sticky_10, sticky_last, zero_1, zero_2, zero_3,
-	      zero_4, zero_5, zero_10, zero_11, zero_12;
+	fpint_setup_mulclass setup_mulclass;
+	fpint_mulclass_mnorm mulclass_mnorm;
+	fpint_mnorm_minmax   mnorm_minmax;
+	fpint_minmax_expdiff minmax_expdiff;
+	fpint_expdiff_shiftr expdiff_shiftr;
+	fpint_shiftr_addsub  shiftr_addsub;
+	fpint_addsub_clz     addsub_clz;
+	fpint_clz_shiftl     clz_shiftl;
+	fpint_shiftl_round   shiftl_round;
+	fpint_round_rnorm    round_rnorm;
+	fpint_rnorm_encode   rnorm_encode;
 
-	float a_add, a_m1, a_mul, b_add, b_0, b_m1, b_mul,
-	      max_2, max_3, max_4, max_5, min_2, min_3, min_4;
-
-	float_class a_class_0, a_class_1, b_class_0, b_class_1,
-	            max_class_2, max_class_3, min_class_2, min_class_3, min_class_4;
-
-	word add_sub, clz_in, normalized, product_hi, product_lo;
-	dword product;
-	float_exp exp, exp_11, exp_10, exp_12, exp_delta;
-	float_mant mant_10, mant_11, mant_12;
-	float_mant_full hi;
-	logic[$bits(float_mant_full) - 3:0] lo;
-
-	typedef logic[$bits(float_mant_full) + 1:0] extended_mant;
-	localparam bit[$clog2($bits(extended_mant)):0] MAX_SHIFT = 1 << $clog2($bits(extended_mant));
-
-	extended_mant max_mant, min_mant, sticky_mask;
-	logic[$clog2(MAX_SHIFT):0] clz_shift, exp_shift;
-
-	localparam int INT_SHIFT_REF   = $bits(word) - 2;
-	localparam int SHIFT_WIDTH     = {{($bits(int) - $bits(MAX_SHIFT)){1'b0}}, MAX_SHIFT};
-	localparam int CLZ_EXTEND_BITS = $bits(float_exp) - $bits(clz_shift) + 1;
-
-	struct packed
-	{
-		float    max;
-		logic    guard,
-		         round,
-		         slow,
-		         sticky,
-		         zero;
-		word     add_sub;
-	} clz_hold[FADD_CLZ_STAGES], clz_hold_out;
-
-	gfx_clz #($bits(word)) clz
+	gfx_fpint_lane_setup stage_0
 	(
 		.clk(clk),
-		.clz(clz_shift),
-		.value(clz_in)
+		.a(a),
+		.b(b),
+		.out(setup_mulclass),
+		.unit_b(unit_b_0),
+		.mul_float(mul_float_0)
 	);
 
-	function extended_mant extend_min_max(float in, float_class in_class);
-		extend_min_max = {~in_class.exp_min, in.mant, 2'b00};
-	endfunction
+	gfx_fpint_lane_mulclass stage_1
+	(
+		.clk(clk),
+		.in(setup_mulclass),
+		.out(mulclass_mnorm)
+	);
 
-	function word fp_add_sub_arg(extended_mant arg);
-		fp_add_sub_arg = {1'b0, arg, {($bits(fp_add_sub_arg) - $bits(arg) - 1){1'b0}}};
-	endfunction
+	gfx_fpint_lane_mnorm stage_2
+	(
+		.clk(clk),
+		.in(mulclass_mnorm),
+		.out(mnorm_minmax),
+		.put_hi(put_hi_2),
+		.put_lo(put_lo_2),
+		.put_mul(put_mul_2),
+		.zero_b(zero_b_2),
+		.zero_flags(zero_flags_2)
+	);
 
-	assign lo_msb = lo[$bits(lo) - 1];
-	assign slow_out = &exp_12 || slow_12 || overflow_12;
-	assign exp_delta = max_2.exp - min_2.exp;
-	assign lo_reduce = |lo[$bits(lo) - 2:0];
-	assign normalized = clz_hold_out.add_sub << clz_shift;
-	assign clz_hold_out = clz_hold[FADD_CLZ_STAGES - 1];
-	assign slow_in_next = is_float_special(a_class_0) | is_float_special(b_class_0);
-	assign {product_hi, product_lo} = product;
-	assign {hi, guard_0, round_0, lo} = product[2 * $bits(float_mant_full) - 1:0];
+	gfx_fpint_lane_minmax stage_3
+	(
+		.clk(clk),
+		.in(mnorm_minmax),
+		.out(minmax_expdiff),
+		.copy_flags(copy_flags_3)
+	);
 
-	always_comb begin
-		clz_in = add_sub;
-		if (~enable_norm_6)
-			clz_in[$bits(clz_in) - 1:$bits(clz_in) - 2] = 2'b01;
-	end
+	gfx_fpint_lane_expdiff stage_4
+	(
+		.clk(clk),
+		.in(minmax_expdiff),
+		.out(expdiff_shiftr)
+	);
+
+	gfx_fpint_lane_shiftr stage_5
+	(
+		.clk(clk),
+		.in(expdiff_shiftr),
+		.out(shiftr_addsub),
+		.int_signed(int_signed_5)
+	);
+
+	gfx_fpint_lane_addsub stage_6
+	(
+		.clk(clk),
+		.in(shiftr_addsub),
+		.out(addsub_clz),
+		.copy_flags(copy_flags_6),
+		.int_operand(int_operand_6)
+	);
+
+	gfx_fpint_lane_clz stage_7_8_9_10
+	(
+		.clk(clk),
+		.in(addsub_clz),
+		.out(clz_shiftl),
+		.force_nop(force_nop_7)
+	);
+
+	gfx_fpint_lane_shiftl stage_11
+	(
+		.clk(clk),
+		.in(clz_shiftl),
+		.out(shiftl_round),
+		.copy_flags(copy_flags_11)
+	);
+
+	gfx_fpint_lane_round stage_12
+	(
+		.clk(clk),
+		.in(shiftl_round),
+		.out(round_rnorm),
+		.enable(enable_12),
+		.copy_flags(copy_flags_12)
+	);
+
+	gfx_fpint_lane_rnorm stage_13
+	(
+		.clk(clk),
+		.in(round_rnorm),
+		.out(rnorm_encode)
+	);
+
+	gfx_fpint_lane_encode stage_14
+	(
+		.clk(clk),
+		.q(q),
+		.in(rnorm_encode),
+		.enable(enable_14)
+	);
+
+endmodule
+
+// Stage 0: argumentos de mul
+module gfx_fpint_lane_setup
+(
+	input  logic                     clk,
+
+	input  gfx::word                 a,
+	                                 b,
+	input  logic                     mul_float,
+	                                 unit_b,
+
+	output gfx::fpint_setup_mulclass out
+);
 
 	always_ff @(posedge clk) begin
-		// Stage -1: 
-
-		a_m1 <= a;
-		b_m1 <= b;
-		a_mul <= a;
-		b_mul <= b;
+		out.a <= a;
+		out.b <= b;
+		out.a_mul <= a;
+		out.b_mul <= b;
 
 		/* Nótese que el orden es sign-exp-mant. Esto coloca el '1.' implícito
 		 * en la posición correcta para multiplicar las mantisas.
 		 */
-		if (mul_float_m1) begin
-			a_mul.exp <= 1;
-			b_mul.exp <= 1;
-			a_mul.sign <= 0;
-			b_mul.sign <= 0;
+		if (mul_float) begin
+			out.a_mul.exp <= 1;
+			out.b_mul.exp <= 1;
+			out.a_mul.sign <= 0;
+			out.b_mul.sign <= 0;
 		end
 
-		if (unit_b_m1) begin
-			b_mul.exp <= 0;
-			b_mul.mant <= 1;
-			b_mul.sign <= 0;
+		if (unit_b) begin
+			out.b_mul.exp <= 0;
+			out.b_mul.mant <= 1;
+			out.b_mul.sign <= 0;
 		end
+	end
 
-		// Stage 0: multiplicación de fp o enteros
+endmodule
 
-		b_0 <= b_m1;
-		sign_0 <= a_m1.sign ^ b_m1.sign;
-		product <= a_mul * b_mul;
-		a_class_0 <= classify_float(a_m1);
-		b_class_0 <= classify_float(b_m1);
-		{overflow_0, exp} <= {1'b0, a_m1.exp} + {1'b0, b_m1.exp} - {1'b0, FLOAT_EXP_BIAS};
+// Stage 1: multiplicación de fp o enteros
+module gfx_fpint_lane_mulclass
+(
+	input  logic                     clk,
 
-		// Stage 1: normalización
+	input  gfx::fpint_setup_mulclass in,
 
-		if (float_a_1) begin
-			slow_1 <= slow_in_next | (overflow_0 & ~a_class_0.exp_min & ~a_class_1.exp_min);
-			zero_1 <= a_class_0.exp_min | b_class_0.exp_min;
+	output gfx::fpint_mulclass_mnorm out
+);
+
+	import gfx::*;
+
+	always_ff @(posedge clk) begin
+		out.b <= in.b;
+		out.sign <= in.a.sign ^ in.b.sign;
+		out.a_class <= classify_float(in.a);
+		out.b_class <= classify_float(in.b);
+		out.product <= in.a_mul * in.b_mul;
+		{out.overflow, out.exp} <= {1'b0, in.a.exp} + {1'b0, in.b.exp} - {1'b0, FLOAT_EXP_BIAS};
+	end
+
+endmodule
+
+// Stage 2: normalización
+module gfx_fpint_lane_mnorm
+(
+	input  logic                     clk,
+
+	input  gfx::fpint_mulclass_mnorm in,
+	input  logic                     put_hi,
+	                                 put_lo,
+	                                 put_mul,
+	                                 zero_b,
+	                                 zero_flags,
+
+	output gfx::fpint_mnorm_minmax   out
+);
+
+	import gfx::*;
+
+	word product_hi, product_lo;
+	logic guard, lo_msb, lo_reduce, round, slow_in_next;
+	float_mant_full hi;
+	logic[$bits(float_mant_full) - 3:0] lo;
+
+	assign lo_msb = lo[$bits(lo) - 1];
+	assign lo_reduce = |lo[$bits(lo) - 2:0];
+	assign slow_in_next = is_float_special(in.a_class) | is_float_special(in.b_class);
+	assign {product_hi, product_lo} = in.product;
+	assign {hi, guard, round, lo} = in.product[2 * $bits(float_mant_full) - 1:0];
+
+	always_ff @(posedge clk) begin
+		if (put_mul) begin
+			out.slow <= slow_in_next | (in.overflow & ~in.a_class.exp_min & ~in.a_class.exp_min);
+			out.zero <= in.a_class.exp_min | in.b_class.exp_min;
 		end else begin
-			slow_1 <= 0;
-			zero_1 <= 0;
+			out.slow <= 0;
+			out.zero <= 0;
 		end
 
-		overflow_1 <= 0;
-		a_add.sign <= sign_0;
+		out.a.sign <= in.sign;
+		out.overflow <= 0;
 
 		if (hi[$bits(hi) - 1]) begin
-			guard_1 <= guard_0;
-			round_1 <= round_0;
-			sticky_1 <= lo_msb | lo_reduce;
-			a_add.mant <= implicit_mant(hi);
-			{overflow_1, a_add.exp} <= {1'b0, exp} + 1;
+			out.guard <= guard;
+			out.round <= round;
+			out.sticky <= lo_msb | lo_reduce;
+			out.a.mant <= implicit_mant(hi);
+			{out.overflow, out.a.exp} <= {1'b0, in.exp} + 1;
 		end else begin
 			/* Bit antes de msb es necesariamente 1, ya que los msb de
 			 * ambos multiplicandos son 1. Ver assert en implicit_mant().
 			 */
-			guard_1 <= round_0;
-			round_1 <= lo[$bits(lo) - 1];
-			sticky_1 <= lo_reduce;
-			a_add.exp <= exp;
-			a_add.mant <= implicit_mant({hi[$bits(hi) - 2:0], guard_0});
+			out.guard <= round;
+			out.round <= lo_msb;
+			out.sticky <= lo_reduce;
+
+			out.a.exp <= in.exp;
+			out.a.mant <= implicit_mant({hi[$bits(hi) - 2:0], guard});
 		end
 
 		unique case (1'b1)
-			float_a_1: ;
+			put_mul: ;
 
-			int_hi_a_1:
-				a_add <= product_hi;
+			put_hi:
+				out.a <= product_hi;
 
-			int_lo_a_1:
-				a_add <= product_lo;
+			put_lo:
+				out.a <= product_lo;
 		endcase
 
-		a_class_1 <= a_class_0;
-		slow_in_1 <= slow_in_next;
+		out.a_class <= in.a_class;
+		out.slow_in <= slow_in_next;
 
-		if (zero_flags_1) begin
-			a_class_1 <= classify_float(0);
-			slow_in_1 <= 0;
+		if (zero_flags) begin
+			out.a_class <= classify_float(0);
+			out.slow_in <= 0;
 		end
 
-		if (zero_b_1) begin
-			b_add <= 0;
-			b_class_1 <= classify_float(0);
+		if (zero_b) begin
+			out.b <= 0;
+			out.b_class <= classify_float(0);
 		end else begin
-			b_add <= b_0;
-			b_class_1 <= b_class_0;
+			out.b <= in.b;
+			out.b_class <= in.b_class;
 		end
+	end
 
-		/* Stage 2: ordenar tal que abs(max) >= abs(min). Wiki dice:
+endmodule
+
+// Stage 3: ordenar tal que abs(max) >= abs(min)
+module gfx_fpint_lane_minmax
+(
+	input  logic                     clk,
+
+	input  gfx::fpint_mnorm_minmax   in,
+	input  logic                     copy_flags,
+
+	output gfx::fpint_minmax_expdiff out
+);
+
+	import gfx::*;
+
+	always_ff @(posedge clk) begin
+		/* Wiki dice:
 		 *
 		 * A property of the single- and double-precision formats is that
 		 * their encoding allows one to easily sort them without using
@@ -241,164 +369,308 @@ module gfx_fpint_lane
 		 * floating-point representation also had this property for normalized
 		 * numbers).
 		 */
-		if ({b_add.exp, b_add.mant} > {a_add.exp, a_add.mant}) begin
-			max_2 <= b_add;
-			min_2 <= a_add;
-			max_class_2 <= b_class_1;
-			min_class_2 <= a_class_1;
+		if ({in.b.exp, in.b.mant} > {in.a.exp, in.a.mant}) begin
+			out.max <= in.b;
+			out.min <= in.a;
+			out.max_class <= in.b_class;
+			out.min_class <= in.a_class;
 		end else begin
-			max_2 <= a_add;
-			min_2 <= b_add;
-			max_class_2 <= a_class_1;
-			min_class_2 <= b_class_1;
+			out.max <= in.a;
+			out.min <= in.b;
+			out.max_class <= in.a_class;
+			out.min_class <= in.b_class;
 		end
 
-		guard_2 <= guard_1;
-		round_2 <= round_1;
-		sticky_2 <= sticky_1;
+		out.guard <= in.guard;
+		out.round <= in.round;
+		out.sticky <= in.sticky;
 
-		if (copy_flags_2) begin
-			slow_2 <= slow_1 | overflow_1;
-			zero_2 <= zero_1;
+		if (copy_flags) begin
+			out.slow <= in.slow | in.overflow;
+			out.zero <= in.zero;
 		end else begin
-			slow_2 <= slow_in_1;
-			zero_2 <= 0;
+			out.slow <= in.slow_in;
+			out.zero <= 0;
+		end
+	end
+
+endmodule
+
+// Stage 4: exp_shift amount
+module gfx_fpint_lane_expdiff
+(
+	input  logic                     clk,
+
+	input  gfx::fpint_minmax_expdiff in,
+
+	output gfx::fpint_expdiff_shiftr out
+);
+
+	import gfx::*;
+
+	float_exp exp_delta;
+
+	assign exp_delta = in.max.exp - in.min.exp;
+
+	always_ff @(posedge clk) begin
+		out.max <= in.max;
+		out.min <= in.min;
+		out.slow <= in.slow;
+		out.zero <= in.zero;
+		out.guard <= in.guard;
+		out.round <= in.round;
+		out.sticky <= in.sticky;
+		out.max_class <= in.max_class;
+		out.min_class <= in.min_class;
+
+		out.exp_shift <= exp_delta[$bits(out.exp_shift) - 1:0];
+		if (exp_delta > {{($bits(exp_delta) - $bits(FPINT_MAX_SHIFT)){1'b0}}, FPINT_MAX_SHIFT})
+			out.exp_shift <= FPINT_MAX_SHIFT;
+	end
+
+endmodule
+
+// Stage 5: shifts y abs(max) para enteros con signo
+module gfx_fpint_lane_shiftr
+(
+	input  logic                     clk,
+
+	input  gfx::fpint_expdiff_shiftr in,
+	input  logic                     int_signed,
+
+	output gfx::fpint_shiftr_addsub  out
+);
+
+	import gfx::*;
+
+	always_ff @(posedge clk) begin
+		out.min <= in.min;
+		out.slow <= in.slow;
+		out.zero <= in.zero;
+		out.guard <= in.guard;
+		out.round <= in.round;
+		out.sticky <= in.sticky;
+		out.min_class <= in.min_class;
+
+		out.max_mant <= float_prepare_round(in.max, in.max_class);
+		out.min_mant <= float_prepare_round(in.min, in.min_class) >> in.exp_shift;
+		out.sticky_mask <= {($bits(out.min_mant)){1'b1}} << in.exp_shift;
+
+		out.max <= in.max;
+		out.int_sign <= in.max[$bits(in.max) - 1];
+
+		if (int_signed & in.max[$bits(in.max) - 1])
+			out.max <= -in.max;
+	end
+
+endmodule
+
+// Stage 6: suma de mantisas
+module gfx_fpint_lane_addsub
+(
+	input  logic                    clk,
+
+	input  gfx::fpint_shiftr_addsub in,
+	input  logic                    copy_flags,
+	                                int_operand,
+
+	output gfx::fpint_addsub_clz    out
+);
+
+	import gfx::*;
+
+	localparam int INT_SHIFT_REF = $bits(word) - 2;
+
+	function word fp_add_sub_arg(float_mant_ext arg);
+		fp_add_sub_arg = {1'b0, arg, {($bits(fp_add_sub_arg) - $bits(arg) - 1){1'b0}}};
+	endfunction
+
+	always_ff @(posedge clk) begin
+		out.max <= in.max;
+		out.slow <= in.slow;
+		out.zero <= in.zero;
+		out.guard <= in.guard;
+		out.round <= in.round;
+
+		if (int_operand) begin
+			out.max.exp <= FLOAT_EXP_BIAS + INT_SHIFT_REF[$bits(float_exp) - 1:0];
+			out.max.sign <= in.int_sign;
 		end
 
-		// Stage 3: exp_shift amount
-
-		max_3 <= max_2;
-		min_3 <= min_2;
-		slow_3 <= slow_2;
-		zero_3 <= zero_2;
-		guard_3 <= guard_2;
-		round_3 <= round_2;
-		sticky_3 <= sticky_2;
-		max_class_3 <= max_class_2;
-		min_class_3 <= min_class_2;
-
-		exp_shift <= exp_delta[$bits(exp_shift) - 1:0];
-		if (exp_delta > {{($bits(exp_delta) - $bits(MAX_SHIFT)){1'b0}}, MAX_SHIFT})
-			exp_shift <= MAX_SHIFT;
-
-		// Stage 4: shifts y abs(max) para enteros con signo
-
-		min_4 <= min_3;
-		slow_4 <= slow_3;
-		zero_4 <= zero_3;
-		guard_4 <= guard_3;
-		round_4 <= round_3;
-		sticky_4 <= sticky_3;
-		min_class_4 <= min_class_3;
-
-		max_mant <= extend_min_max(max_3, max_class_3);
-		min_mant <= extend_min_max(min_3, min_class_3) >> exp_shift;
-		sticky_mask <= {($bits(min_mant)){1'b1}} << exp_shift;
-
-		max_4 <= max_3;
-		int_sign <= max_3[$bits(max_3) - 1];
-
-		if (int_signed_4 & max_3[$bits(max_3) - 1])
-			max_4 <= -max_3;
-
-		// Stage 5: suma de mantisas
-
-		max_5 <= max_4;
-		slow_5 <= slow_4;
-		zero_5 <= zero_4;
-		guard_5 <= guard_4;
-		round_5 <= round_4;
-
-		if (int_operand_5) begin
-			max_5.exp <= FLOAT_EXP_BIAS + INT_SHIFT_REF[$bits(float_exp) - 1:0];
-			max_5.sign <= int_sign;
-		end
-
-		if (copy_flags_5)
-			sticky_5 <= sticky_4;
+		if (copy_flags)
+			out.sticky <= in.sticky;
 		else
-			sticky_5 <= |(extend_min_max(min_4, min_class_4) & ~sticky_mask);
+			out.sticky <= |(float_prepare_round(in.min, in.min_class) & ~in.sticky_mask);
 
-		if (int_operand_5)
-			add_sub <= max_4;
-		else if (max_4.sign ^ min_4.sign)
-			add_sub <= fp_add_sub_arg(max_mant) - fp_add_sub_arg(min_mant);
+		if (int_operand)
+			out.add_sub <= in.max;
+		else if (in.max.sign ^ in.min.sign)
+			out.add_sub <= fp_add_sub_arg(in.max_mant) - fp_add_sub_arg(in.min_mant);
 		else
-			add_sub <= fp_add_sub_arg(max_mant) + fp_add_sub_arg(min_mant);
+			out.add_sub <= fp_add_sub_arg(in.max_mant) + fp_add_sub_arg(in.min_mant);
+	end
 
-		// Stages 6-9: clz
+endmodule
 
-		clz_hold[0].max <= max_5;
-		clz_hold[0].slow <= slow_5;
-		clz_hold[0].zero <= zero_5;
-		clz_hold[0].guard <= guard_5;
-		clz_hold[0].round <= round_5;
-		clz_hold[0].sticky <= sticky_5;
-		clz_hold[0].add_sub <= add_sub;
+// Stages 7-10: encontrar el 1 más significativo
+module gfx_fpint_lane_clz
+(
+	input  logic                 clk,
 
-		for (int i = 1; i < FADD_CLZ_STAGES; ++i)
-			clz_hold[i] <= clz_hold[i - 1];
+	input  gfx::fpint_addsub_clz in,
+	input  logic                 force_nop,
 
-		// Stage 10: normalización
+	output gfx::fpint_clz_shiftl out
+);
 
-		sign_10 <= clz_hold_out.max.sign;
-		slow_10 <= clz_hold_out.slow;
-		zero_10 <= clz_hold_out.zero;
-		sticky_10 <= clz_hold_out.sticky;
+	import gfx::*;
 
-		{mant_10, guard_10, round_10, sticky_last} <=
+	word clz_in;
+	fpint_clz_hold hold[FPINT_CLZ_STAGES];
+
+	assign out.hold = hold[FPINT_CLZ_STAGES - 1];
+
+	gfx_clz #($bits(word)) clz
+	(
+		.clk(clk),
+		.clz(out.shift),
+		.value(clz_in)
+	);
+
+	always_comb begin
+		clz_in = in.add_sub;
+		if (force_nop)
+			clz_in[$bits(clz_in) - 1:$bits(clz_in) - 2] = 2'b01;
+	end
+
+	always_ff @(posedge clk) begin
+		hold[0] <= in;
+
+		for (int i = 1; i < FPINT_CLZ_STAGES; ++i)
+			hold[i] <= hold[i - 1];
+	end
+
+endmodule
+
+// Stage 11: normalización
+module gfx_fpint_lane_shiftl
+(
+	input  logic                   clk,
+
+	input  gfx::fpint_clz_shiftl   in,
+	input  logic                   copy_flags,
+
+	output gfx::fpint_shiftl_round out
+);
+
+	import gfx::*;
+
+	localparam int CLZ_EXTEND_BITS = $bits(float_exp) - $bits(in.shift) + 1;
+
+	word normalized;
+
+	assign normalized = in.hold.add_sub << in.shift;
+
+	always_ff @(posedge clk) begin
+		out.slow <= in.hold.slow;
+		out.zero <= in.hold.zero;
+		out.sticky <= in.hold.sticky;
+		out.val.sign <= in.hold.max.sign;
+
+		{out.val.mant, out.guard, out.round, out.sticky_last} <=
 			normalized[$bits(normalized) - 2:$bits(normalized) - $bits(float_mant) - 4];
 
-		{overflow_10, exp_10} <=
-			{1'b0, clz_hold_out.max.exp} - {{CLZ_EXTEND_BITS{1'b0}}, clz_shift} + 1;
+		{out.overflow, out.val.exp} <=
+			{1'b0, in.hold.max.exp} - {{CLZ_EXTEND_BITS{1'b0}}, in.shift} + 1;
 
-		if (clz_shift[$bits(clz_shift) - 1])
-			zero_10 <= 1;
+		if (in.shift[$bits(in.shift) - 1])
+			out.zero <= 1;
 
-		if (copy_flags_10) begin
-			guard_10 <= clz_hold_out.guard;
-			round_10 <= clz_hold_out.round;
-			sticky_last <= 0;
-			overflow_10 <= 0;
+		if (copy_flags) begin
+			out.guard <= in.hold.guard;
+			out.round <= in.hold.round;
+			out.overflow <= 0;
+			out.sticky_last <= 0;
 		end
+	end
 
-		// Stage 11: redondeo
+endmodule
 
-		exp_11 <= exp_10;
-		mant_11 <= mant_10;
-		sign_11 <= sign_10;
-		slow_11 <= slow_10 | (~copy_flags_11 & overflow_10 & ~zero_10);
-		zero_11 <= zero_10;
-		exp_step <= 0;
+// Stage 12: redondeo
+module gfx_fpint_lane_round
+(
+	input  logic                   clk,
 
-		// Este es el modo más común: round to nearest, ties to even
-		if (enable_round_11 & guard_10 & (round_10 | sticky_10 | sticky_last | mant_10[0]))
-			{exp_step, mant_11} <= {1'b0, mant_10} + 1;
+	input  gfx::fpint_shiftl_round in,
+	input  logic                   copy_flags,
+	                               enable,
 
-		// Stage 12: ajuste de exponente por redondeo
+	output gfx::fpint_round_rnorm  out
+);
 
-		sign_12 <= sign_11;
-		slow_12 <= slow_11;
-		zero_12 <= zero_11;
-		mant_12 <= mant_11;
-		overflow_12 <= 0;
+	import gfx::*;
 
-		if (exp_step)
-			{overflow_12, exp_12} <= {1'b0, exp_11} + 1;
+	always_ff @(posedge clk) begin
+		out.val <= in.val;
+		out.slow <= in.slow | (~copy_flags & in.overflow & ~in.zero);
+		out.zero <= in.zero;
+		out.exp_step <= 0;
+
+		// Este es el modo de redondeo más usual: round to nearest, ties to even
+		if (enable & in.guard & (in.round | in.sticky | in.sticky_last | in.val.mant[0]))
+			{out.exp_step, out.val.mant} <= {1'b0, out.val.mant} + 1;
+	end
+
+endmodule
+
+// Stage 13: ajuste de exponente por redondeo
+module gfx_fpint_lane_rnorm
+(
+	input  logic                   clk,
+
+	input  gfx::fpint_round_rnorm  in,
+
+	output gfx::fpint_rnorm_encode out
+);
+
+	import gfx::*;
+
+	always_ff @(posedge clk) begin
+		out.slow <= in.slow;
+		out.zero <= in.zero;
+		out.overflow <= 0;
+		out.val.mant <= in.val.mant;
+		out.val.sign <= in.val.sign;
+
+		if (in.exp_step)
+			{out.overflow, out.val.exp} <= {1'b0, in.val.exp} + 1;
 		else
-			exp_12 <= exp_11;
+			out.val.exp <= in.val.exp;
+	end
 
-		// Stage 13: ceros y NaNs
+endmodule
 
-		q.exp <= exp_12;
-		q.mant <= mant_12;
-		q.sign <= sign_12;
+// Stage 14: salida y codificación de ceros y NaNs
+module gfx_fpint_lane_encode
+(
+	input  logic                   clk,
 
-		if (encode_special_13) begin
-			if (slow_out) begin
+	input  gfx::fpint_rnorm_encode in,
+	input  logic                   enable,
+
+	output gfx::float              q
+);
+
+	import gfx::*;
+
+	always_ff @(posedge clk) begin
+		q <= in.val;
+
+		if (enable) begin
+			if (&in.val.exp | in.slow | in.overflow) begin
 				q.exp <= FLOAT_EXP_MAX;
 				q.mant <= 1;
-			end else if (zero_12) begin
+			end else if (in.zero) begin
 				q.exp <= 0;
 				q.mant <= 0;
 			end
