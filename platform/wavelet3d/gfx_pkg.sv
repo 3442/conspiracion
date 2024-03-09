@@ -4,8 +4,11 @@ package gfx;
 
 	typedef logic[31:0] word;
 	typedef logic[63:0] dword;
-	typedef logic[7:0]  float_exp;
 
+	localparam int SUBWORD_BITS   = $clog2($bits(word)) - $clog2($bits(byte));
+	localparam int BYTES_PER_WORD = 1 << SUBWORD_BITS;
+
+	typedef logic[7:0]                                  float_exp;
 	typedef logic[$bits(word) - $bits(float_exp) - 2:0] float_mant;
 	typedef logic[$bits(float_mant):0]                  float_mant_full; // Incluye '1.' explícito
 	typedef logic[$bits(float_mant_full) + 1:0]         float_mant_ext;  // Considera overflow
@@ -217,5 +220,9 @@ package gfx;
 		      zero,
 		      overflow;
 	} fpint_rnorm_encode;
+
+	localparam int SCHED_BRAM_WORDS = 2048; // 8KiB
+
+	typedef word irq_lines;
 
 endpackage
