@@ -41,7 +41,7 @@ int main(int argc, char **argv)
 	{
 		std::printf
 		(
-			"[%03d] %s %s %s\n",
+			"[%03d] <= %s %s %s\n",
 			time, std::to_string(a).c_str(), op, std::to_string(b).c_str()
 		);
 
@@ -64,6 +64,9 @@ int main(int argc, char **argv)
 		top.mnorm_put_mul = 0;
 		top.mnorm_zero_flags = 1;
 		top.mnorm_zero_b = 1;
+		top.minmax_abs = 1;
+		top.minmax_swap = 0;
+		top.minmax_zero_min = 0;
 		top.minmax_copy_flags = 0;
 		top.shiftr_int_signed = 1;
 		top.addsub_int_operand = 1;
@@ -86,6 +89,9 @@ int main(int argc, char **argv)
 		top.mnorm_put_mul = 0;
 		top.mnorm_zero_flags = 1;
 		top.mnorm_zero_b = 1;
+		top.minmax_abs = 1;
+		top.minmax_swap = 0;
+		top.minmax_zero_min = 0;
 		top.minmax_copy_flags = 1;
 		top.shiftr_int_signed = 0;
 		top.addsub_int_operand = 0;
@@ -109,6 +115,9 @@ int main(int argc, char **argv)
 		top.mnorm_put_mul = 1;
 		top.mnorm_zero_flags = 0;
 		top.mnorm_zero_b = 1;
+		top.minmax_abs = 1;
+		top.minmax_swap = 0;
+		top.minmax_zero_min = 0;
 		top.minmax_copy_flags = 1;
 		top.shiftr_int_signed = 0;
 		top.addsub_int_operand = 0;
@@ -131,6 +140,9 @@ int main(int argc, char **argv)
 		top.mnorm_put_mul = 0;
 		top.mnorm_zero_flags = 0;
 		top.mnorm_zero_b = 0;
+		top.minmax_abs = 1;
+		top.minmax_swap = 0;
+		top.minmax_zero_min = 0;
 		top.minmax_copy_flags = 0;
 		top.shiftr_int_signed = 0;
 		top.addsub_int_operand = 0;
@@ -142,6 +154,31 @@ int main(int argc, char **argv)
 		top.encode_enable = 1;
 
 		send_op(a, "+", b);
+	};
+
+	auto min_max_fp = [&](float a, float b, bool min = false)
+	{
+		top.setup_mul_float = 0;
+		top.setup_unit_b = 1;
+		top.mnorm_put_hi = 0;
+		top.mnorm_put_lo = 1;
+		top.mnorm_put_mul = 0;
+		top.mnorm_zero_flags = 0;
+		top.mnorm_zero_b = 0;
+		top.minmax_abs = 0;
+		top.minmax_swap = min;
+		top.minmax_zero_min = 1;
+		top.minmax_copy_flags = 1;
+		top.shiftr_int_signed = 0;
+		top.addsub_int_operand = 0;
+		top.addsub_copy_flags = 1;
+		top.clz_force_nop = 1;
+		top.shiftl_copy_flags = 1;
+		top.round_copy_flags = 1;
+		top.round_enable = 0;
+		top.encode_enable = 0;
+
+		send_op(a, min ? "min" : "max", b);
 	};
 
 	top.rst_n = 0;
@@ -167,8 +204,10 @@ int main(int argc, char **argv)
 	mul_int(a, b);
 	mul_fp(a_flt, b_flt);
 	add_fp(a_flt, b_flt);
+	min_max_fp(a_flt, b_flt);
+	min_max_fp(a_flt, b_flt, true);
 
-	while (time < 20) {
+	while (time < 50) {
 		cycle();
 
 		if (!top.out_valid)
@@ -180,7 +219,7 @@ int main(int argc, char **argv)
 
 		std::printf
 		(
-			"[%03d] q=0x%08x, q_flt=%g, q_int=%d, q_uint=%u\n",
+			"[%03d] => q=0x%08x, q_flt=%g, q_int=%d, q_uint=%u\n",
 			time, q_bits, q_flt, q_int, q_bits
 		);
 	}

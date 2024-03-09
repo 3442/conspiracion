@@ -25,6 +25,9 @@ module gfx_fpint_lane
 	                     put_mul_2,
 	                     zero_b_2,
 	                     zero_flags_2,
+	                     abs_3,
+	                     swap_3,
+	                     zero_min_3,
 	                     copy_flags_3,
 	                     int_signed_5,
 	                     copy_flags_6,
@@ -128,6 +131,9 @@ module gfx_fpint_lane
 		.clk(clk),
 		.in(mnorm_minmax),
 		.out(minmax_expdiff),
+		.abs(abs_3),
+		.swap(swap_3),
+		.zero_min(zero_min_3),
 		.copy_flags(copy_flags_3)
 	);
 
@@ -351,25 +357,44 @@ module gfx_fpint_lane_minmax
 	input  logic                     clk,
 
 	input  gfx::fpint_mnorm_minmax   in,
-	input  logic                     copy_flags,
+	input  logic                     abs,
+	                                 swap,
+	                                 zero_min,
+	                                 copy_flags,
 
 	output gfx::fpint_minmax_expdiff out
 );
 
 	import gfx::*;
 
+	logic abs_b_gt_abs_a, b_gt_a;
+
+	/* Wiki dice:
+	 *
+	 * A property of the single- and double-precision formats is that
+	 * their encoding allows one to easily sort them without using
+	 * floating-point hardware, as if the bits represented sign-magnitude
+	 * integers, although it is unclear whether this was a design
+	 * consideration (it seems noteworthy that the earlier IBM hexadecimal
+	 * floating-point representation also had this property for normalized
+	 * numbers).
+	 */
+	assign abs_b_gt_abs_a = {in.b.exp, in.b.mant} > {in.a.exp, in.a.mant};
+
+	always_comb begin
+		unique case ({in.b.sign, in.a.sign})
+			2'b00: b_gt_a = abs_b_gt_abs_a;
+			2'b01: b_gt_a = 1;
+			2'b10: b_gt_a = 0;
+			2'b11: b_gt_a = abs_b_gt_abs_a;
+		endcase
+
+		if (abs)
+			b_gt_a = abs_b_gt_abs_a;
+	end
+
 	always_ff @(posedge clk) begin
-		/* Wiki dice:
-		 *
-		 * A property of the single- and double-precision formats is that
-		 * their encoding allows one to easily sort them without using
-		 * floating-point hardware, as if the bits represented sign-magnitude
-		 * integers, although it is unclear whether this was a design
-		 * consideration (it seems noteworthy that the earlier IBM hexadecimal
-		 * floating-point representation also had this property for normalized
-		 * numbers).
-		 */
-		if ({in.b.exp, in.b.mant} > {in.a.exp, in.a.mant}) begin
+		if (b_gt_a ^ swap) begin
 			out.max <= in.b;
 			out.min <= in.a;
 			out.max_class <= in.b_class;
@@ -379,6 +404,11 @@ module gfx_fpint_lane_minmax
 			out.min <= in.b;
 			out.max_class <= in.a_class;
 			out.min_class <= in.b_class;
+		end
+
+		if (zero_min) begin
+			out.min <= 0;
+			out.min_class <= classify_float(0);
 		end
 
 		out.guard <= in.guard;

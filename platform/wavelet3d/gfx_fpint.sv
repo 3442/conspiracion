@@ -13,6 +13,9 @@ module gfx_fpint
 	                 mnorm_put_mul,
 	                 mnorm_zero_b,
 	                 mnorm_zero_flags,
+	                 minmax_abs,
+	                 minmax_swap,
+	                 minmax_zero_min,
 	                 minmax_copy_flags,
 	                 shiftr_int_signed,
 	                 addsub_copy_flags,
@@ -42,6 +45,9 @@ module gfx_fpint
 	assign op.mnorm_put_mul = mnorm_put_mul;
 	assign op.mnorm_zero_b = mnorm_zero_b;
 	assign op.mnorm_zero_flags = mnorm_zero_flags;
+	assign op.minmax_abs = minmax_abs;
+	assign op.minmax_swap = minmax_swap;
+	assign op.minmax_zero_min = minmax_zero_min;
 	assign op.minmax_copy_flags = minmax_copy_flags;
 	assign op.shiftr_int_signed = shiftr_int_signed;
 	assign op.addsub_copy_flags = addsub_copy_flags;
@@ -68,6 +74,9 @@ module gfx_fpint
 				.put_mul_2(stage_op[2].mnorm_put_mul),
 				.zero_b_2(stage_op[2].mnorm_zero_b),
 				.zero_flags_2(stage_op[2].mnorm_zero_flags),
+				.abs_3(stage_op[3].minmax_abs),
+				.swap_3(stage_op[3].minmax_swap),
+				.zero_min_3(stage_op[3].minmax_zero_min),
 				.copy_flags_3(stage_op[3].minmax_copy_flags),
 				.int_signed_5(stage_op[5].shiftr_int_signed),
 				.copy_flags_6(stage_op[6].addsub_copy_flags),
