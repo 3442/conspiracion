@@ -26,7 +26,9 @@ define target/sim/rules
   .PHONY: $$(rule_top_path)/sim
 
   $$(rule_top_path)/sim: $$(vtop_exe)
-	$$<
+	$$(call run,RUN) $$<
+
+  $(call target_entrypoint,$$(rule_top_path)/sim)
 endef
 
 define prepare_verilator_target
