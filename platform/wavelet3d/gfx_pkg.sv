@@ -1,5 +1,7 @@
 package gfx;
 
+	localparam int SHADER_LANES = 4;
+
 	typedef logic[31:0] word;
 	typedef logic[63:0] dword;
 	typedef logic[7:0]  float_exp;
