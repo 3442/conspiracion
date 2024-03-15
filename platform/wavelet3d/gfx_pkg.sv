@@ -3,10 +3,16 @@ package gfx;
 	localparam int SHADER_LANES = 4;
 
 	typedef logic[31:0] word;
-	typedef logic[63:0] dword;
 
 	localparam int SUBWORD_BITS   = $clog2($bits(word)) - $clog2($bits(byte));
 	localparam int BYTES_PER_WORD = 1 << SUBWORD_BITS;
+
+	typedef word                                uword;
+	typedef logic signed[$bits(word) - 1:0]     sword;
+	typedef logic[$bits(word) / 2 - 1:0]        uhword;
+	typedef logic signed[$bits(word) / 2 - 1:0] shword;
+	typedef logic[2 * $bits(word) - 1:0]        udword;
+	typedef logic signed[2 * $bits(word) - 1:0] sdword;
 
 	typedef logic[7:0]                                  float_exp;
 	typedef logic[$bits(word) - $bits(float_exp) - 2:0] float_mant;
@@ -112,7 +118,7 @@ package gfx;
 		float_exp   exp;
 		float_class a_class,
 		            b_class;
-		dword       product;
+		udword      product;
 		logic       sign,
 		            overflow;
 	} fpint_mulclass_mnorm;
@@ -223,6 +229,19 @@ package gfx;
 		      zero,
 		      overflow;
 	} fpint_rnorm_encode;
+
+	// Q22.10
+	typedef logic[9:0]                                   fixed_frac;
+	typedef logic[$bits(word) - $bits(fixed_frac) - 1:0] fixed_int;
+
+	typedef struct packed signed
+	{
+		fixed_int  fint; // 'int' es una keyword
+		fixed_frac frac;
+	} fixed;
+
+	localparam int FIXED_MULADD_DEPTH = 5;
+	localparam int FIXED_DOTADD_DEPTH = 2 * FIXED_MULADD_DEPTH;
 
 	localparam int SCHED_BRAM_WORDS = 2048; // 8KiB
 
