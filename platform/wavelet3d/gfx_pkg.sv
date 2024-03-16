@@ -1,7 +1,5 @@
 package gfx;
 
-	localparam int SHADER_LANES = 4;
-
 	typedef logic[31:0] word;
 
 	localparam int SUBWORD_BITS   = $clog2($bits(word)) - $clog2($bits(byte));
@@ -239,6 +237,113 @@ package gfx;
 		fixed_int  fint; // 'int' es una keyword
 		fixed_frac frac;
 	} fixed;
+
+	typedef struct packed
+	{
+		fixed x,
+		      y;
+	} fixed_xy;
+
+	typedef struct packed
+	{
+		fixed a,
+		      b,
+		      c;
+	} vtx_fixed;
+
+	typedef struct packed
+	{
+		fixed_xy a,
+		         b,
+		         c;
+	} vtx_xy;
+
+	localparam int RASTER_BITS         = 2;
+	localparam int RASTER_SUB_BITS     = 4;
+	localparam int RASTER_SIZE         = 1 << RASTER_BITS;
+	localparam int RASTER_COARSE_FRAGS = RASTER_SIZE * RASTER_SIZE;
+
+	typedef logic[RASTER_BITS - 1:0] raster_index;
+
+	// Caso RASTER_BITS = 2: -> 4,4,4,4 -> 8,8-> 16
+	localparam int RASTER_OUT_CLZ_DEPTH = 3;
+
+	// Asume RASTER_BITS == 2, hay que ajustarlo si cambia
+	typedef struct packed
+	{
+		// Esto ahorra muchos flops
+		//
+		// offsets[0] = inc * 0 = 0
+		// offsets[1] = inc * 1 = raster2_times1
+		// offsets[2] = inc * 2 = raster2_times1 << 1
+		// offsets[3] = inc * 3 = raster2_times3
+		fixed raster2_times1,
+		      raster2_times3;
+	} raster_offsets;
+
+	function fixed raster_idx(raster_offsets offsets, raster_index idx);
+		unique case (idx)
+			RASTER_BITS'(0):
+				return '0;
+
+			RASTER_BITS'(1):
+				return offsets.raster2_times1;
+
+			RASTER_BITS'(2):
+				return offsets.raster2_times1 << 1;
+
+			RASTER_BITS'(3):
+				return offsets.raster2_times3;
+		endcase
+	endfunction
+
+	function raster_offsets make_raster_offsets(fixed inc);
+		make_raster_offsets.raster2_times1 = inc;
+		make_raster_offsets.raster2_times3 = inc + (inc << 1);
+	endfunction
+
+	typedef struct packed
+	{
+		raster_offsets x,
+		               y;
+	} raster_offsets_xy;
+
+	typedef struct packed
+	{
+		logic[RASTER_SUB_BITS - 1:0]                     num;
+		logic[$bits(fixed_frac) - RASTER_SUB_BITS - 1:0] prec;
+	} raster_sub;
+
+	localparam int RASTER_COARSE_DIM_BITS = $bits(fixed) - $bits(raster_index) - $bits(raster_sub);
+
+	typedef logic signed[RASTER_COARSE_DIM_BITS - 1:0] raster_coarse_dim;
+
+	typedef struct packed
+	{
+		raster_coarse_dim x,
+		                  y;
+	} raster_coarse_xy;
+
+	typedef struct packed signed
+	{
+		raster_coarse_dim coarse;
+		raster_index      fine;
+		raster_sub        sub;
+	} raster_prec;
+
+	typedef struct packed
+	{
+		raster_prec x,
+		            y;
+	} raster_prec_xy;
+
+	// Definir el número de lanes a partir de las dimensiones del
+	// rasterizer es una decisión crucial, el diseño entero depende de esto
+
+	localparam int SHADER_LANES = RASTER_COARSE_FRAGS;
+
+	typedef logic[RASTER_SIZE - 1:0]  lane_no;
+	typedef logic[SHADER_LANES - 1:0] lane_mask;
 
 	localparam int FIXED_MULADD_DEPTH = 5;
 	localparam int FIXED_DOTADD_DEPTH = 2 * FIXED_MULADD_DEPTH;
