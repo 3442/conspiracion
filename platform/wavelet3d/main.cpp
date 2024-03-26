@@ -1,7 +1,8 @@
-#include <iostream>
+#include <cmath>
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
+#include <iostream>
 #include <string>
 
 #include <Python.h>
@@ -183,6 +184,8 @@ int main(int argc, char **argv)
 
 	top.rst_n = 0;
 	top.in_valid = 0;
+	top.geom_tvalid = 0;
+	top.raster_tready = 0;
 	cycle();
 
 	top.rst_n = 1;
@@ -207,21 +210,69 @@ int main(int argc, char **argv)
 	min_max_fp(a_flt, b_flt);
 	min_max_fp(a_flt, b_flt, true);
 
-	while (time < 50) {
+	float a_x, a_y, b_x, b_y, c_x, c_y;
+	std::cout << "a_x: ";
+	std::cin >> a_x;
+	std::cout << "a_y: ";
+	std::cin >> a_y;
+	std::cout << "b_x: ";
+	std::cin >> b_x;
+	std::cout << "b_y: ";
+	std::cin >> b_y;
+	std::cout << "c_x: ";
+	std::cin >> c_y;
+	std::cout << "c_y: ";
+	std::cin >> c_y;
+
+	constexpr int FIXED_FRAC = 10;
+
+	int geom[] = {
+		42,
+		static_cast<int>(::ldexpf(a_x, FIXED_FRAC)),
+		static_cast<int>(::ldexpf(b_x, FIXED_FRAC)),
+		static_cast<int>(::ldexpf(c_x, FIXED_FRAC)),
+		static_cast<int>(::ldexpf(a_y, FIXED_FRAC)),
+		static_cast<int>(::ldexpf(b_y, FIXED_FRAC)),
+		static_cast<int>(::ldexpf(c_y, FIXED_FRAC)),
+	};
+
+	unsigned geom_idx = 0;
+
+	top.raster_tready = 1;
+	while (time < 1000) {
 		cycle();
 
-		if (!top.out_valid)
-			continue;
+		if (top.out_valid) {
+			unsigned q_bits = top.q[0];
+			int q_int = *reinterpret_cast<int*>(&q_bits);
+			float q_flt = *reinterpret_cast<float*>(&q_bits);
 
-		unsigned q_bits = top.q[0];
-		int q_int = *reinterpret_cast<int*>(&q_bits);
-		float q_flt = *reinterpret_cast<float*>(&q_bits);
+			std::printf
+			(
+				"[%03d] => q=0x%08x, q_flt=%g, q_int=%d, q_uint=%u\n",
+				time, q_bits, q_flt, q_int, q_bits
+			);
+		}
 
-		std::printf
-		(
-			"[%03d] => q=0x%08x, q_flt=%g, q_int=%d, q_uint=%u\n",
-			time, q_bits, q_flt, q_int, q_bits
-		);
+		if (geom_idx < sizeof geom / sizeof geom[0]) {
+			top.geom_tdata = geom[geom_idx];
+			top.geom_tlast = geom_idx == sizeof geom / sizeof geom[0] - 1;
+			top.geom_tvalid = 1;
+
+			top.eval();
+			if (top.geom_tready)
+				geom_idx++;
+		} else {
+			top.geom_tlast = 0;
+			top.geom_tvalid = 0;
+		}
+
+		if (top.raster_tvalid) {
+			unsigned data = top.raster_tdata;
+			auto fixed = ::ldexpf(static_cast<float>(static_cast<int>(data)), -FIXED_FRAC);
+
+			std::printf("[%03d] raster d=0x%08x, d_fix=%g\n", time, data, fixed);
+		}
 	}
 
 	bool failed = Py_FinalizeEx() < 0;
