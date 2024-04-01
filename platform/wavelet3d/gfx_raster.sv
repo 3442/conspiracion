@@ -288,11 +288,11 @@ module gfx_raster_bounds
 		{min.fine, min.sub} <= '0;
 		{max.fine, max.sub} <= '0;
 
-		edges_ref.y <= min;
-		edges_span.y <= max - min;
-
 		if (end_new_dim) begin
+			edges_ref.y <= min;
 			edges_ref.x <= edges_ref.y;
+
+			edges_span.y <= max - min;
 			edges_span.x <= edges_span.y;
 		end
 	end
@@ -322,18 +322,29 @@ module gfx_raster_edges
 
 	import gfx::*;
 
-	logic coarse_handshake, coarse_stall, offsets_flow;
-	fixed_xy delta, inc, p, q;
-
-	// - 3 porque empieza antes que offsets y porque coarse valid va al final
-	logic[FIXED_DOTADD_DEPTH - 3:0] dotadd_valid;
-
 	enum int unsigned
 	{
 		EDGE_AB,
 		EDGE_BC,
-		EDGE_CA
+		EDGE_CA,
+		// EDGE_CA cumple doble función como OFFSETS_AB
+		OFFSETS_BC,
+		OFFSETS_CA,
+		OUT
 	} state;
+
+	struct
+	{
+		fixed_xy cur,
+		         delay1,
+		         delay2;
+	} inc;
+
+	logic coarse_handshake, coarse_stall, offsets_flow;
+	fixed_xy delta, p, q;
+
+	// - 2 porque coarse valid va al final
+	logic[FIXED_DOTADD_DEPTH - 2:0] dotadd_valid;
 
 	assign coarse_stall = coarse_valid & ~coarse_ready;
 	assign coarse_handshake = coarse_valid & coarse_ready;
@@ -344,11 +355,17 @@ module gfx_raster_edges
 		.c(0),
 		.q(coarse_base),
 		.a0(delta.x),
-		.b0(inc.x),
+		.b0(inc.cur.x),
 		.a1(delta.y),
-		.b1(inc.y),
+		.b1(inc.cur.y),
 		.stall(coarse_stall)
 	);
+
+	always_comb
+		unique case (state)
+			OUT:     offsets_flow = coarse_handshake;
+			default: offsets_flow = 1;
+		endcase
 
 	always_ff @(posedge clk or negedge rst_n)
 		if (~rst_n) begin
@@ -361,12 +378,10 @@ module gfx_raster_edges
 
 			bounds_ready <= 0;
 			coarse_valid <= 0;
-			offsets_flow <= 1;
 
 			for (int i = 0; i < $bits(dotadd_valid) - 1; ++i)
 				dotadd_valid[i] <= 0;
 		end else begin
-			dotadd_valid[0] <= 0;
 			for (int i = 1; i < $bits(dotadd_valid); ++i)
 				dotadd_valid[i] <= dotadd_valid[i - 1];
 
@@ -374,6 +389,7 @@ module gfx_raster_edges
 				coarse_valid <= dotadd_valid[$bits(dotadd_valid) - 1];
 
 			bounds_ready <= 0;
+			dotadd_valid[0] <= 0;
 
 			unique case (state)
 				EDGE_AB: begin
@@ -397,35 +413,42 @@ module gfx_raster_edges
 				end
 
 				EDGE_CA: begin
+					state <= OFFSETS_BC;
+
 					p <= bounds_vtx.c;
 					q <= bounds_vtx.a;
 
 					// Esto ocurre justamente en un momento en que ab, bc, ca
 					// quedan todos en sus lugares correctos en la pipeline
-					if (offsets_flow) begin
-						offsets_flow <= 0;
-						dotadd_valid[0] <= 1;
-					end else begin
-						offsets_flow <= coarse_handshake;
-
-						if (coarse_handshake)
-							state <= EDGE_AB;
-					end
+					dotadd_valid[0] <= 1;
 				end
+
+				OFFSETS_BC:
+					state <= OFFSETS_CA;
+
+				OFFSETS_CA:
+					state <= OUT;
+
+				OUT:
+					if (coarse_handshake)
+						state <= EDGE_AB;
 			endcase
 		end
 
 	always_ff @(posedge clk) begin
-		//TODO: top-left rule
 		delta.x <= coarse_ref.x - q.x;
 		delta.y <= coarse_ref.y - q.y;
 
-		if (offsets_flow) begin
-			inc.x <= p.y - q.y;
-			inc.y <= q.x - p.x;
+		inc.cur.x <= p.y - q.y;
+		inc.cur.y <= q.x - p.x;
 
-			coarse_offsets.x <= make_raster_offsets(inc.x);
-			coarse_offsets.y <= make_raster_offsets(inc.y);
+		//TODO: top-left rule
+		if (offsets_flow) begin
+			inc.delay1 <= inc.cur;
+			inc.delay2 <= inc.delay1;
+
+			coarse_offsets.x <= make_raster_offsets(inc.delay2.x);
+			coarse_offsets.y <= make_raster_offsets(inc.delay2.y);
 		end
 	end
 
@@ -477,8 +500,10 @@ module gfx_raster_coarse
 		                  prev;
 	} offsets;
 
+	logic edges_recv, end_block, end_x, end_y, first_run,
+	      mask, mask_reset, new_geom, test_flow, out_flow;
+
 	fixed edge_test, reference_x, vertical_inc;
-	logic edges_recv, end_x, end_y, mask, mask_reset, new_geom, test_flow, out_flow;
 	fixed_xy max_offset, min_offset, test_offset;
 	raster_coarse_xy stride;
 	raster_coarse_dim width;
@@ -490,6 +515,7 @@ module gfx_raster_coarse
 
 	assign end_x = stride.x == '0;
 	assign end_y = stride.y == '0;
+	assign end_block = end_x & end_y;
 
 	assign edge_test = edge_fn.cur + test_offset.x + test_offset.y;
 	assign vertical_inc = vertical.cur + coarse_offset(offsets.cur.y);
@@ -515,13 +541,16 @@ module gfx_raster_coarse
 		endcase
 
 		unique case (state)
-			TEST_BC: edges_ready = 1;
+			SETUP:   edges_ready = 1;
 			default: edges_ready = 0;
 		endcase
 
 		unique case (state)
-			SETUP, TEST_AB, TEST_BC:
+			SETUP:
 				edges_recv = 1;
+
+			TEST_AB, TEST_BC:
+				edges_recv = first_run;
 
 			default:
 				edges_recv = 0;
@@ -546,9 +575,10 @@ module gfx_raster_coarse
 	end
 
 	always_ff @(posedge clk or negedge rst_n)
-		if (~rst_n)
+		if (~rst_n) begin
 			state <= SETUP;
-		else
+			first_run <= 1;
+		end else
 			unique case (state)
 				SETUP:
 					if (edges_valid)
@@ -563,9 +593,11 @@ module gfx_raster_coarse
 				TEST_CA:
 					state <= OUT;
 
-				OUT:
+				OUT: begin
+					first_run <= end_block;
 					if (out_flow)
-						state <= end_x & end_y ? SETUP : TEST_AB;
+						state <= end_block ? SETUP : TEST_AB;
+				end
 			endcase
 
 	always_ff @(posedge clk) begin
@@ -624,7 +656,7 @@ module gfx_raster_coarse
 			else
 				test_offset.y <= min_offset.y;
 
-			mask <= (mask | mask_reset) & (edge_test >= 0);
+			mask <= (mask | mask_reset) & 1/*(edge_test >= 'sd0)*/;
 		end
 
 		if (edges_recv) begin
@@ -732,8 +764,11 @@ module gfx_raster_fine
 		endcase
 
 		unique case (out_state)
-			OUT_MASK: begin_bary = coverage.tvalid;
-			default:  begin_bary = 0;
+			OUT_MASK, OUT_BARY_B:
+				begin_bary = coverage.tready;
+
+			default:
+				begin_bary = 0;
 		endcase
 
 		unique case (out_state)

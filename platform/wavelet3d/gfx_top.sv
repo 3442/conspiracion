@@ -43,15 +43,15 @@ module gfx_top
 	gfx_axil sched_axi();
 	gfx_pkts geometry(), coverage();
 
-	assign geometry.tdata = geom_tdata;
-	assign geometry.tlast = geom_tlast;
-	assign geometry.tvalid = geom_tvalid;
-	assign geom_tready = geometry.tready;
+	assign geometry.tx.tdata = geom_tdata;
+	assign geometry.tx.tlast = geom_tlast;
+	assign geometry.tx.tvalid = geom_tvalid;
+	assign geom_tready = geometry.tx.tready;
 
-	assign raster_tdata = coverage.tdata;
-	assign raster_tlast = coverage.tlast;
-	assign raster_tvalid = coverage.tvalid;
-	assign coverage.tready = raster_tready;
+	assign raster_tdata = coverage.rx.tdata;
+	assign raster_tlast = coverage.rx.tlast;
+	assign raster_tvalid = coverage.rx.tvalid;
+	assign coverage.rx.tready = raster_tready;
 
 	gfx_fpint fpint
 	(
@@ -70,7 +70,7 @@ module gfx_top
 	(
 		.clk,
 		.rst_n,
-		.geometry(coverage.rx),
+		.geometry(geometry.rx),
 		.coverage(coverage.tx)
 	);
 
