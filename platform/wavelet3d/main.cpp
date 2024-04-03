@@ -4,8 +4,9 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <strings.h>
 
-#include <Python.h>
+#include <SDL2/SDL.h>
 #include <verilated.h>
 
 #if VM_TRACE
@@ -20,22 +21,28 @@ int main(int argc, char **argv)
 	Vtop top;
 
 #if VM_TRACE
-	VerilatedFstC trace;
-#endif
+	Verilated::traceEverOn(true);
 
-	Py_Initialize();
+	VerilatedFstC trace;
+	top.trace(&trace, 0);
+	trace.open("dump.fst");
+#endif
 
 	int time = 0;
 
 	auto cycle = [&]()
 	{
-		top.clk = 0;
 		top.eval();
-
+#if VM_TRACE
+		trace.dump(time++);
+#endif
 		top.clk = 1;
-		top.eval();
 
-		++time;
+		top.eval();
+#if VM_TRACE
+		trace.dump(time++);
+#endif
+		top.clk = 0;
 	};
 
 	auto send_op = [&](auto a, const char *op, auto b)
@@ -182,6 +189,7 @@ int main(int argc, char **argv)
 		send_op(a, min ? "min" : "max", b);
 	};
 
+	top.clk = 0;
 	top.rst_n = 0;
 	top.in_valid = 0;
 	top.geom_tvalid = 0;
@@ -220,9 +228,13 @@ int main(int argc, char **argv)
 	std::cout << "b_y: ";
 	std::cin >> b_y;
 	std::cout << "c_x: ";
-	std::cin >> c_y;
+	std::cin >> c_x;
 	std::cout << "c_y: ";
 	std::cin >> c_y;
+
+	unsigned cycles;
+	std::cout << "cycles: ";
+	std::cin >> cycles;
 
 	constexpr int FIXED_FRAC = 10;
 
@@ -236,10 +248,27 @@ int main(int argc, char **argv)
 		static_cast<int>(::ldexpf(c_y, FIXED_FRAC)),
 	};
 
+    ::SDL_Event event;
+    ::SDL_Renderer *renderer;
+	::SDL_Window *window;
+
+	//FIXME: errores
+	::SDL_Init(SDL_INIT_VIDEO);
+	::SDL_CreateWindowAndRenderer(640, 480, 0, &window, &renderer);
+    ::SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+	::SDL_RenderClear(renderer);
+
+    ::SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
+
+	int bary_idx = 0, x_coarse, y_coarse, x_fine, y_fine;
+	int geom_state = 0;
+	int bit;
+	float barys[3];
+	unsigned mask;
 	unsigned geom_idx = 0;
 
 	top.raster_tready = 1;
-	while (time < 1000) {
+	while (time < 2 * cycles) {
 		cycle();
 
 		if (top.out_valid) {
@@ -271,16 +300,70 @@ int main(int argc, char **argv)
 			unsigned data = top.raster_tdata;
 			auto fixed = ::ldexpf(static_cast<float>(static_cast<int>(data)), -FIXED_FRAC);
 
-			std::printf("[%03d] raster d=0x%08x, d_fix=%g\n", time, data, fixed);
+			//std::printf("[%03d] raster[%c] d=0x%08x, d_fix=%g\n",
+			//	time, top.raster_tlast ? 'l' : '-', data, fixed);
+
+			switch (geom_state) {
+				case 0:
+					geom_state = 1;
+					break;
+
+				case 1:
+					y_coarse = (static_cast<int>(data) >> 16 << 2) + 480/2;
+					x_coarse = (static_cast<short>(data & 0xffff) << 2) + 640/2;
+					geom_state = 2;
+    				::SDL_SetRenderDrawColor(renderer, 255, 0, 0, 0);
+					for (int dy = 0; dy < 4; ++dy)
+						for (int dx = 0; dx < 4; ++dx)
+							::SDL_RenderDrawPoint(renderer, x_coarse + dx, y_coarse + dy);
+					break;
+
+				case 2:
+					mask = data;
+					geom_state = 3;
+					break;
+
+				case 3:
+					bit = ::ffs(mask) - 1;
+					barys[bary_idx] = fixed;
+					switch (bary_idx) {
+						case 0:
+							bary_idx = 1;
+							break;
+						case 1:
+							bary_idx = 2;
+							break;
+						case 2:
+							bary_idx = 0;
+							mask = mask & ~(1 << bit);
+							y_fine = y_coarse + (bit >> 2);
+							x_fine = x_coarse + (bit & 0b11);
+
+    						::SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
+							::SDL_RenderDrawPoint(renderer, x_fine, y_fine);
+
+							break;
+					}
+					if (top.raster_tlast)
+						geom_state = 0;
+					break;
+			}
 		}
 	}
-
-	bool failed = Py_FinalizeEx() < 0;
 
 #if VM_TRACE
 	trace.close();
 #endif
 
 	top.final();
-	return failed ? EXIT_FAILURE : EXIT_SUCCESS;
+
+	::SDL_RenderPresent(renderer);
+    while (!::SDL_PollEvent(&event) || event.type != SDL_QUIT)
+		continue;
+
+	::SDL_DestroyRenderer(renderer);
+	::SDL_DestroyWindow(window);
+	::SDL_Quit();
+
+	return EXIT_SUCCESS;
 }

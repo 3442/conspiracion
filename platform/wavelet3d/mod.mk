@@ -6,5 +6,5 @@ define core
   $(this)/rtl_files := gfx_pkg.sv gfx_top.sv
 
   $(this)/vl_main := main.cpp
-  $(this)/vl_pkgconfig := python3-embed
+  $(this)/vl_pkgconfig := sdl2
 endef
