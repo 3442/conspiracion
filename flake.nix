@@ -146,6 +146,7 @@
               numpy
               pillow
               pytest # Para cocotb
+              (py.callPackage ./nix/pyuvm.nix { })
             ]))
             (quartus-prime-lite.override { supportedDevices = [ "Cyclone V" ]; })
             verilator
