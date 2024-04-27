@@ -146,6 +146,8 @@
               numpy
               pillow
               pytest # Para cocotb
+              (py.callPackage ./nix/peakrdl.nix { })
+              (py.callPackage ./nix/peakrdl-regblock.nix { })
               (py.callPackage ./nix/pyuvm.nix { })
             ]))
             (quartus-prime-lite.override { supportedDevices = [ "Cyclone V" ]; })

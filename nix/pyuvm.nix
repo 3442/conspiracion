@@ -5,10 +5,12 @@
 , pylint
 , pytest
 , sphinx
-}: let
+}:
+let
   pname = "pyuvm";
   version = "2.9.1";
-in buildPythonPackage {
+in
+buildPythonPackage {
   inherit pname version;
 
   src = fetchPypi {
