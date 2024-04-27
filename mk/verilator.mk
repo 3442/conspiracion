@@ -92,13 +92,16 @@ define verilator_target_rules
   $$(vtop_mk_file):
 	@rm -f $$@
 
-  $$(vtop_mk_stamp): $$(top_stamp) $$(vtop_mk_file)
+  $$(vtop_mk_stamp): $$(top_stamp) $$(vtop_mk_file) $$(verilator_hard_deps)
 	$$(eval $$(final_vflags))
 	$$(call run,VERILATE) $$(VERILATOR) $$(vl_flags) $$(verilator_src_args)
 	@touch $$@
 
   $(call target_entrypoint,$$(vtop_exe))
 endef
+
+verilator_hard_deps = \
+  $(foreach dep,$(dep_tree/$(rule_top)),$(call core_paths_dyn,$(dep),rtl_files))
 
 define final_vflags
   $(call find_with_pkgconfig, \

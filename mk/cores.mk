@@ -10,17 +10,29 @@ all_stamps :=
 top_stamp = $(call core_stamp,$(rule_top))
 core_stamp = $(obj)/deps/$(core_info/$(1)/path)/stamp
 
-core_paths = \
+core_paths_no_dyn = \
   $(patsubst /%,%, \
     $(patsubst /,., \
       $(abspath \
         $(let prefix,$(core_info/$(1)/workdir), \
-          $(addprefix /$(if $(prefix),$(prefix)/),$(core_info/$(1)/$(2)))))))
+          $(foreach path_elem,$(core_info/$(1)/$(2)), \
+            $(if $(patsubst /%,,$(path_elem)), \
+              $(addprefix /$(if $(prefix),$(prefix)/),$(path_elem)), \
+              $(path_elem)))))))
+
+core_paths = \
+  $(call core_paths_no_dyn,$(1),$(2)) $(call core_paths_no_dyn,$(1),$(call target_var,$(2)))
 
 require_core_paths = \
   $(strip \
     $(let val,$(strip $(call core_paths,$(1),$(2))), \
       $(if $(val),$(val),$(error core '$(1)' must define '$(2)'))))
+
+core_paths_dyn = $(call core_paths,$(1),$(call target_var,$(2)))
+
+define add_core_dyn
+  core_info/$(1)/$(call target_var,$(2)) := $(core_info/$(1)/$(call target_var,$(2))) $(3)
+endef
 
 require_core_var = \
   $(strip \

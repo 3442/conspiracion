@@ -31,6 +31,7 @@ include mk/cocotb.mk
 include mk/cores.mk
 include mk/cov.mk
 include mk/output.mk
+include mk/peakrdl.mk
 include mk/quartus.mk
 include mk/target.mk
 include mk/tools.mk
@@ -43,7 +44,7 @@ ifneq (,$(target))
   $(eval $(target/$(target)/prepare))
 endif
 
-$(foreach top_dir,$(core_dirs), \
+$(foreach top_dir,mk/builtin $(core_dirs), \
   $(eval $(call add_core_subdir,$(top_dir))))
 
 top_path := $(core_info/$(top)/path)
@@ -63,6 +64,10 @@ define build_target_top
 
     $$(eval $$(setup_obj))
     $$(eval $$(setup_stamp_rules))
+
+    $$(foreach core,$$(all_cores), \
+     $$(foreach hook,$$(core_info/$$(core)/hooks), \
+        $$(eval $$(call hooks/$$(hook),$$(core)))))
 
     $$(eval $$(target/$$(rule_target)/rules))
 
