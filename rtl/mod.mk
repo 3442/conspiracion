@@ -1,5 +1,5 @@
 cores   := config debounce intc
-subdirs := cache core dma_axi32 fpu gfx perf picorv32 smp top wb2axip
+subdirs := axi_timer cache core dma_axi32 fpu gfx perf picorv32 smp top wb2axip
 
 define core/config
   $(this)/rtl_include_dirs := .
