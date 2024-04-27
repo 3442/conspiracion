@@ -12,14 +12,11 @@ define core/conspiracion
 
   $(this)/altera_device := 5CSEMA5F31C6
   $(this)/altera_family := Cyclone V
-  $(this)/qsys_platform := ../../platform.qsys
-
-  $(this)/sdc_files := ../../conspiracion.sdc
-  $(this)/qip_files := $(patsubst %,../../ip/%.qip,dsp_mul ip_fp_add ip_fp_mul ip_fp_fix)
-  $(this)/qsf_files := ../../pins.tcl
 
   ifeq (sim,$(flow/type))
     $(this)/deps += conspiracion/tb
+  else ifeq (syn,$(flow/type))
+    $(this)/deps += de1soc
   endif
 endef
 

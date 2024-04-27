@@ -1,0 +1,1 @@
+subdirs := de1soc
