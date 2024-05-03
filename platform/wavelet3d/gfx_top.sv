@@ -41,13 +41,13 @@ import gfx::*;
 	output word  raster_tdata
 );
 
+	logic srst_n;
+
 	gfx_wb fpint_wb();
 	gfx_axib insn_mem();
-	gfx_axil sched_axi();
 	gfx_pkts geometry(), coverage();
 	gfx_regfile_io fpint_io();
-
-	axi4lite_intf #(.ADDR_WIDTH(4)) core_sched();
+	gfx_axil bootrom_axi(), sched_axi(), shader_0_axi();
 
 	assign q = fpint_wb.rx.lanes;
 	assign out_valid = fpint_wb.rx.valid;
@@ -87,6 +87,13 @@ import gfx::*;
 	assign fpint_io.regs.a = a;
 	assign fpint_io.regs.b = b;
 
+	gfx_rst_sync rst_sync
+	(
+		.clk,
+		.rst_n,
+		.srst_n
+	);
+
 	gfx_fpint fpint
 	(
 		.clk,
@@ -102,8 +109,33 @@ import gfx::*;
 	(
 		.clk,
 		.rst_n,
+		.srst_n,
 		.irq(0),
 		.axim(sched_axi.m)
+	);
+
+	gfx_bootrom bootrom
+	(
+		.clk,
+		.rst_n,
+		.axis(bootrom_axi.s)
+	);
+
+	gfx_shader shader_0
+	(
+		.clk,
+		.rst_n,
+		.sched(shader_0_axi.s),
+		.insn_mem(insn_mem.m)
+	);
+
+	gfx_xbar_sched xbar
+	(
+		.clk,
+		.srst_n,
+		.sched(sched_axi.s),
+		.bootrom(bootrom_axi.m),
+		.shader_0(shader_0_axi.m)
 	);
 
 	gfx_raster raster
@@ -112,14 +144,6 @@ import gfx::*;
 		.rst_n,
 		.geometry(geometry.rx),
 		.coverage(coverage.tx)
-	);
-
-	gfx_shader shader
-	(
-		.clk,
-		.rst_n,
-		.sched(core_sched.slave),
-		.insn_mem(insn_mem.m)
 	);
 
 endmodule

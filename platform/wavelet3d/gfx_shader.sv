@@ -2,13 +2,21 @@ module gfx_shader
 import gfx::*;
 import gfx_shader_schedif_pkg::*;
 (
-	input  logic               clk,
-	                           rst_n,
+	input  logic      clk,
+	                  rst_n,
 
-	       gfx_axib.m          insn_mem,
+	       gfx_axib.m insn_mem,
 
-	       axi4lite_intf.slave sched
+	       gfx_axil.s sched
 );
+
+	axi4lite_intf #(.ADDR_WIDTH(4)) regblock();
+
+	gfx_axil2regblock axil2regblock
+	(
+		.axis(sched),
+		.axim(regblock.master)
+	);
 
 	gfx_shader_schedif__in_t schedif_in;
 	gfx_shader_schedif__out_t schedif_out;
@@ -46,7 +54,7 @@ import gfx_shader_schedif_pkg::*;
 	(
 		.clk,
 		.arst_n(rst_n),
-		.s_axil(sched),
+		.s_axil(regblock.slave),
 		.hwif_in(schedif_in),
 		.hwif_out(schedif_out)
 	);
