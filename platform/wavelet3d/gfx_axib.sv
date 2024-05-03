@@ -1,11 +1,15 @@
-// AXI4-Lite, sin wstrb ni axprot
-interface gfx_axil;
-	import gfx::*;
+// AXI4 con burst
+interface gfx_axib;
 
-	logic awvalid;
-	logic awready;
-	word  awaddr;
+	import gfx::word;
 
+	logic      awvalid,
+	           awready;
+	logic[7:0] awlen;
+	logic[1:0] awburst;
+	word       awaddr;
+
+	logic wlast;
 	logic wvalid;
 	logic wready;
 	word  wdata;
@@ -13,10 +17,13 @@ interface gfx_axil;
 	logic bvalid;
 	logic bready;
 
-	logic arvalid;
-	logic arready;
-	word  araddr;
+	logic      arvalid,
+	           arready;
+	logic[7:0] arlen;
+	logic[1:0] arburst;
+	word       araddr;
 
+	logic rlast;
 	logic rvalid;
 	logic rready;
 	word  rdata;
@@ -27,14 +34,20 @@ interface gfx_axil;
 		       wready,
 		       bvalid,
 		       arready,
+		       rlast,
 		       rvalid,
 		       rdata,
 
-		output awvalid,
+		output awlen,
+		       awburst,
+		       awvalid,
 		       awaddr,
+		       wlast,
 		       wvalid,
 		       wdata,
 		       bready,
+		       arlen,
+		       arburst,
 		       arvalid,
 		       araddr,
 		       rready
@@ -42,11 +55,16 @@ interface gfx_axil;
 
 	modport s
 	(
-		input  awvalid,
+		input  awlen,
+		       awburst,
+		       awvalid,
 		       awaddr,
+		       wlast,
 		       wvalid,
 		       wdata,
 		       bready,
+		       arlen,
+		       arburst,
 		       arvalid,
 		       araddr,
 		       rready,
@@ -55,7 +73,9 @@ interface gfx_axil;
 		       wready,
 		       bvalid,
 		       arready,
+		       rlast,
 		       rvalid,
 		       rdata
 	);
+
 endinterface

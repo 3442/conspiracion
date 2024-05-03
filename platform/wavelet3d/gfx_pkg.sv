@@ -2,15 +2,22 @@ package gfx;
 
 	typedef logic[31:0] word;
 
-	localparam int SUBWORD_BITS   = $clog2($bits(word)) - $clog2($bits(byte));
-	localparam int BYTES_PER_WORD = 1 << SUBWORD_BITS;
-
 	typedef word                                uword;
 	typedef logic signed[$bits(word) - 1:0]     sword;
 	typedef logic[$bits(word) / 2 - 1:0]        uhword;
 	typedef logic signed[$bits(word) / 2 - 1:0] shword;
 	typedef logic[2 * $bits(word) - 1:0]        udword;
 	typedef logic signed[2 * $bits(word) - 1:0] sdword;
+	typedef logic signed[4 * $bits(word) - 1:0] qword;
+	typedef logic signed[8 * $bits(word) - 1:0] oword;
+
+	localparam int SUBWORD_BITS   = $clog2($bits(word)) - $clog2($bits(byte));
+	localparam int BYTES_PER_WORD = 1 << SUBWORD_BITS;
+
+	typedef logic[$bits(word) - SUBWORD_BITS - 1:0] word_ptr;
+	typedef logic[$bits(word_ptr) - 1 - 1:0]        dword_ptr;
+	typedef logic[$bits(word_ptr) - 2 - 1:0]        qword_ptr;
+	typedef logic[$bits(word_ptr) - 3 - 1:0]        oword_ptr;
 
 	typedef logic[7:0]                                  float_exp;
 	typedef logic[$bits(word) - $bits(float_exp) - 2:0] float_mant;
@@ -99,7 +106,8 @@ package gfx;
 		      shiftl_copy_flags,
 		      round_copy_flags,
 		      round_enable,
-		      encode_enable;
+		      encode_enable,
+		      writeback;
 	} fpint_op;
 
 	typedef struct packed
@@ -228,6 +236,21 @@ package gfx;
 		      overflow;
 	} fpint_rnorm_encode;
 
+	typedef struct packed
+	{
+		logic todo;
+	} mem_op;
+
+	typedef struct packed
+	{
+		logic todo;
+	} sfu_op;
+
+	typedef struct packed
+	{
+		logic todo;
+	} group_op;
+
 	// Q22.10
 	typedef logic[9:0]                                   fixed_frac;
 	typedef logic[$bits(word) - $bits(fixed_frac) - 1:0] fixed_int;
@@ -344,6 +367,24 @@ package gfx;
 
 	typedef logic[RASTER_SIZE - 1:0]  lane_no;
 	typedef logic[SHADER_LANES - 1:0] lane_mask;
+
+	typedef logic[5:0] group_id;
+
+	localparam int REGFILE_STAGES  = 3;
+	localparam int REG_READ_STAGES = 2 + REGFILE_STAGES + 1;
+
+	typedef gfx_isa::sgpr_num sgpr_num;
+	typedef gfx_isa::vgpr_num vgpr_num;
+	typedef gfx_isa::xgpr_num xgpr_num;
+
+	typedef struct packed
+	{
+		// No incluye p0 porque p0 no tiene señal ready
+		logic p1,
+		      p2,
+		      p3,
+		      valid;
+	} shader_dispatch;
 
 	localparam int FIXED_MULADD_DEPTH = 5;
 	localparam int FIXED_DOTADD_DEPTH = 2 * FIXED_MULADD_DEPTH;

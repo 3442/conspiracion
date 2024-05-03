@@ -1,0 +1,74 @@
+addrmap gfx_shader_schedif {
+    name = "Scheduler<->core interface";
+
+    default hw = r;
+    default sw = w;
+    default regwidth = 32;
+
+    reg {
+        name = "Shader core control register";
+
+        field {
+            desc = "Set this field to flush the instruction cache";
+
+            singlepulse;
+        } IFLUSH[0:0] = 0;
+    } CORE @ 0x0;
+
+    reg {
+        name = "Wavefront setup control register";
+
+        default hw = w;
+        default sw = r;
+        default precedence = hw;
+
+        field {
+            desc = "Wavefront group number";
+
+            hw = r;
+            sw = rw;
+        } GROUP[5:0];
+
+        field {
+            desc = "Destination SGPR number";
+
+            hw = r;
+            sw = rw;
+        } XGPR[11:8];
+
+        field {
+            desc = "PC table update done, group submitted";
+
+            rclr;
+            hwset;
+        } SUBMIT_DONE[16:16] = 0;
+
+        field {
+            desc = "General-purpose register update done";
+
+            rclr;
+            hwset;
+        } GPR_DONE[17:17] = 0;
+    } SETUP_CTRL @ 0x4;
+
+    reg {
+        name = "SGPR/VGPR write register";
+
+        field {
+            desc = "Value to write";
+
+            swmod;
+        } VALUE[31:0];
+    } SETUP_GPR @ 0x8;
+
+    reg {
+        name = "Group submit register";
+
+        field {
+            desc = "Initial group program counter, submits group on write";
+
+            swmod;
+        } PC[31:2];
+    } SETUP_SUBMIT @ 0xc;
+};
+

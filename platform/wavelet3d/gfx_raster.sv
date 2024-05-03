@@ -261,7 +261,7 @@ module gfx_raster_bounds
 			endcase
 
 			if (in_state == IN_DIM_Y & next_dim)
-				assert(geometry.tlast);
+				assert (geometry.tlast);
 		end
 
 	always_ff @(posedge clk) begin

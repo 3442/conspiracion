@@ -1,62 +1,23 @@
 module gfx_fpint
+import gfx::*;
 (
-	input  logic     clk,
-	                 rst_n,
+	input  logic             clk,
+	                         rst_n,
 
-	input  gfx::word a[gfx::SHADER_LANES],
-	                 b[gfx::SHADER_LANES],
-	input logic      in_valid,
-	                 setup_mul_float,
-	                 setup_unit_b,
-	                 mnorm_put_hi,
-	                 mnorm_put_lo,
-	                 mnorm_put_mul,
-	                 mnorm_zero_b,
-	                 mnorm_zero_flags,
-	                 minmax_abs,
-	                 minmax_swap,
-	                 minmax_zero_min,
-	                 minmax_copy_flags,
-	                 shiftr_int_signed,
-	                 addsub_copy_flags,
-	                 addsub_int_operand,
-	                 clz_force_nop,
-	                 shiftl_copy_flags,
-	                 round_copy_flags,
-	                 round_enable,
-	                 encode_enable,
+	input  fpint_op          op,
+	input  logic             abort,
+	                         in_valid,
 
-	output logic     out_valid,
-	output gfx::word q[gfx::SHADER_LANES]
+	       gfx_regfile_io.ab read_data,
+
+	       gfx_wb.tx         wb
 );
 
-	import gfx::*;
-
 	logic stage_valid[FPINT_STAGES];
-	fpint_op op, stage_op[FPINT_STAGES];
+	fpint_op stage_op[FPINT_STAGES];
 
 	assign stage_op[0] = op;
 	assign stage_valid[0] = in_valid;
-
-	assign op.setup_mul_float = setup_mul_float;
-	assign op.setup_unit_b = setup_unit_b;
-	assign op.mnorm_put_hi = mnorm_put_hi;
-	assign op.mnorm_put_lo = mnorm_put_lo;
-	assign op.mnorm_put_mul = mnorm_put_mul;
-	assign op.mnorm_zero_b = mnorm_zero_b;
-	assign op.mnorm_zero_flags = mnorm_zero_flags;
-	assign op.minmax_abs = minmax_abs;
-	assign op.minmax_swap = minmax_swap;
-	assign op.minmax_zero_min = minmax_zero_min;
-	assign op.minmax_copy_flags = minmax_copy_flags;
-	assign op.shiftr_int_signed = shiftr_int_signed;
-	assign op.addsub_copy_flags = addsub_copy_flags;
-	assign op.addsub_int_operand = addsub_int_operand;
-	assign op.clz_force_nop = clz_force_nop;
-	assign op.shiftl_copy_flags = shiftl_copy_flags;
-	assign op.round_copy_flags = round_copy_flags;
-	assign op.round_enable = round_enable;
-	assign op.encode_enable = encode_enable;
 
 	genvar lane;
 	generate
@@ -64,9 +25,9 @@ module gfx_fpint
 			gfx_fpint_lane unit
 			(
 				.clk(clk),
-				.a(a[lane]),
-				.b(b[lane]),
-				.q(q[lane]),
+				.a(read_data.a[lane]),
+				.b(read_data.b[lane]),
+				.q(wb.lanes[lane]),
 				.mul_float_0(stage_op[0].setup_mul_float),
 				.unit_b_0(stage_op[0].setup_unit_b),
 				.put_hi_2(stage_op[2].mnorm_put_hi),
@@ -94,11 +55,21 @@ module gfx_fpint
 		for (int i = 1; i < FPINT_STAGES; ++i)
 			stage_op[i] <= stage_op[i - 1];
 
-	always_ff @(posedge clk or negedge rst_n) begin
-		for (int i = 1; i < FPINT_STAGES; ++i)
-			stage_valid[i] <= !rst_n ? 0 : stage_valid[i - 1];
+	always_ff @(posedge clk or negedge rst_n)
+		if (~rst_n) begin
+			for (int i = 1; i < FPINT_STAGES; ++i)
+				stage_valid[i] <= 0;
 
-		out_valid <= !rst_n ? 0 : stage_valid[FPINT_STAGES - 1];
-	end
+			wb.valid <= 0;
+		end else begin
+			for (int i = 1; i < FPINT_STAGES; ++i)
+				stage_valid[i] <= stage_valid[i - 1];
+
+			// Se levanta 1 ciclo luego que in_valid
+			if (abort)
+				stage_valid[2] <= 0;
+
+			wb.valid <= stage_valid[FPINT_STAGES - 1];
+		end
 
 endmodule
