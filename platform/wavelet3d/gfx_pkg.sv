@@ -389,6 +389,8 @@ package gfx;
 	localparam int FIXED_MULADD_DEPTH = 5;
 	localparam int FIXED_DOTADD_DEPTH = 2 * FIXED_MULADD_DEPTH;
 
+	localparam word BOOTROM_BASE  = 32'h0010_0000;
+
 	localparam int SCHED_BRAM_WORDS = 2048; // 8KiB
 
 	typedef word irq_lines;

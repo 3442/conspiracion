@@ -47,7 +47,7 @@ import gfx::*;
 	gfx_axib insn_mem();
 	gfx_pkts geometry(), coverage();
 	gfx_regfile_io fpint_io();
-	gfx_axil bootrom_axi(), sched_axi(), shader_0_axi();
+	gfx_axil bootrom_axi(), debug_axi(), sched_axi(), shader_0_axi();
 
 	assign q = fpint_wb.rx.lanes;
 	assign out_valid = fpint_wb.rx.valid;
@@ -121,6 +121,13 @@ import gfx::*;
 		.axis(bootrom_axi.s)
 	);
 
+	gfx_sim_debug debug
+	(
+		.clk,
+		.rst_n,
+		.axis(debug_axi.s)
+	);
+
 	gfx_shader shader_0
 	(
 		.clk,
@@ -133,7 +140,10 @@ import gfx::*;
 	(
 		.clk,
 		.srst_n,
+
 		.sched(sched_axi.s),
+
+		.debug(debug_axi.m),
 		.bootrom(bootrom_axi.m),
 		.shader_0(shader_0_axi.m)
 	);

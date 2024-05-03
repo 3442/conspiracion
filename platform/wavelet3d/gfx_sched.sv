@@ -36,6 +36,7 @@ import gfx::*;
 	defparam core.ENABLE_IRQ        = 1;
 	defparam core.ENABLE_IRQ_QREGS  = 0;
 	defparam core.ENABLE_IRQ_TIMER  = 0;
+	defparam core.PROGADDR_RESET    = BOOTROM_BASE;
 
 	picorv32 core
 	(
