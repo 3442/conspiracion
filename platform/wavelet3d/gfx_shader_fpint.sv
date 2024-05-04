@@ -1,3 +1,11 @@
+// -> 4,4,4,4,4,4,4,4 -> 8,8,8,8 -> 16,16 -> 32
+localparam int FPINT_CLZ_STAGES = 4;
+
+localparam bit[$clog2($bits(gfx::float_mant_ext)):0] FPINT_MAX_SHIFT
+	= 1 << $clog2($bits(gfx::float_mant_ext));
+
+typedef logic[$clog2(FPINT_MAX_SHIFT):0] fpint_shift;
+
 /* Las 15 etapas son:
  * - setup
  * - mulclass
@@ -12,36 +20,241 @@
  * - rnorm
  * - encode
  */
-module gfx_fpint_lane
+
+typedef struct
+{
+	gfx::float a,
+	           b,
+	           a_mul,
+	           b_mul;
+} fpint_setup_mulclass;
+
+typedef struct
+{
+	gfx::float       b;
+	gfx::float_exp   exp;
+	gfx::float_class a_class,
+	                 b_class;
+	gfx::udword      product;
+	logic            sign,
+	                 overflow;
+} fpint_mulclass_mnorm;
+
+typedef struct
+{
+	gfx::float       a,
+	                 b;
+	gfx::float_class a_class,
+	                 b_class;
+	logic            slow,
+	                 zero,
+	                 guard,
+	                 round,
+	                 sticky,
+	                 slow_in,
+	                 overflow;
+} fpint_mnorm_minmax;
+
+typedef struct
+{
+	gfx::float       max,
+	                 min;
+	gfx::float_class max_class,
+	                 min_class;
+	logic            slow,
+	                 zero,
+	                 guard,
+	                 round,
+	                 sticky;
+} fpint_minmax_expdiff;
+
+typedef struct
+{
+	gfx::float       max,
+	                 min;
+	gfx::float_class max_class,
+	                 min_class;
+	fpint_shift      exp_shift;
+	logic            slow,
+	                 zero,
+	                 guard,
+	                 round,
+	                 sticky;
+} fpint_expdiff_shiftr;
+
+typedef struct
+{
+	gfx::float          max,
+	                    min;
+	gfx::float_class    max_class,
+	                    min_class;
+	gfx::float_mant_ext max_mant,
+	                    min_mant,
+	                    sticky_mask;
+	logic               slow,
+	                    zero,
+	                    guard,
+	                    round,
+	                    sticky,
+	                    int_sign;
+} fpint_shiftr_addsub;
+
+typedef struct
+{
+	gfx::float max;
+	gfx::word  add_sub;
+	logic      slow,
+	           zero,
+	           guard,
+	           round,
+	           sticky;
+} fpint_clz_hold;
+
+typedef fpint_clz_hold fpint_addsub_clz;
+
+typedef struct
+{
+	fpint_clz_hold hold;
+	fpint_shift    shift;
+} fpint_clz_shiftl;
+
+typedef struct
+{
+	gfx::float val;
+	logic      slow,
+	           zero,
+	           guard,
+	           round,
+	           sticky,
+	           overflow,
+	           sticky_last;
+} fpint_shiftl_round;
+
+typedef struct
+{
+	gfx::float val;
+	logic      slow,
+	           zero,
+	           exp_step,
+	           overflow;
+} fpint_round_rnorm;
+
+typedef struct
+{
+	gfx::float val;
+	logic      slow,
+	           zero,
+	           overflow;
+} fpint_rnorm_encode;
+
+module gfx_shader_fpint
+import gfx::*;
 (
-	input  logic         clk,
+	input  logic             clk,
+	                         rst_n,
 
-	input  gfx::word     a,
-	                     b,
-	input logic          mul_float_0,
-	                     unit_b_0,
-	                     put_hi_2,
-	                     put_lo_2,
-	                     put_mul_2,
-	                     zero_b_2,
-	                     zero_flags_2,
-	                     abs_3,
-	                     swap_3,
-	                     zero_min_3,
-	                     copy_flags_3,
-	                     int_signed_5,
-	                     copy_flags_6,
-	                     int_operand_6,
-	                     force_nop_7,
-	                     copy_flags_11,
-	                     copy_flags_12,
-	                     enable_12,
-	                     enable_14,
+	input  fpint_op          op,
+	input  logic             abort,
+	                         in_valid,
 
-	output gfx::word     q
+	       gfx_regfile_io.ab read_data,
+
+	       gfx_wb.tx         wb
 );
 
-	import gfx::*;
+	localparam int FPINT_STAGES = 7 + FPINT_CLZ_STAGES + 4;
+
+	logic stage_valid[FPINT_STAGES];
+	fpint_op stage_op[FPINT_STAGES];
+
+	assign stage_op[0] = op;
+	assign stage_valid[0] = in_valid;
+
+	genvar lane;
+	generate
+		for (lane = 0; lane < SHADER_LANES; ++lane) begin: lanes
+			gfx_shader_fpint_lane unit
+			(
+				.clk(clk),
+				.a(read_data.a[lane]),
+				.b(read_data.b[lane]),
+				.q(wb.lanes[lane]),
+				.mul_float_0(stage_op[0].setup_mul_float),
+				.unit_b_0(stage_op[0].setup_unit_b),
+				.put_hi_2(stage_op[2].mnorm_put_hi),
+				.put_lo_2(stage_op[2].mnorm_put_lo),
+				.put_mul_2(stage_op[2].mnorm_put_mul),
+				.zero_b_2(stage_op[2].mnorm_zero_b),
+				.zero_flags_2(stage_op[2].mnorm_zero_flags),
+				.abs_3(stage_op[3].minmax_abs),
+				.swap_3(stage_op[3].minmax_swap),
+				.zero_min_3(stage_op[3].minmax_zero_min),
+				.copy_flags_3(stage_op[3].minmax_copy_flags),
+				.int_signed_5(stage_op[5].shiftr_int_signed),
+				.copy_flags_6(stage_op[6].addsub_copy_flags),
+				.int_operand_6(stage_op[6].addsub_int_operand),
+				.force_nop_7(stage_op[7].clz_force_nop),
+				.copy_flags_11(stage_op[11].shiftl_copy_flags),
+				.copy_flags_12(stage_op[12].round_copy_flags),
+				.enable_12(stage_op[12].round_enable),
+				.enable_14(stage_op[14].encode_enable)
+			);
+		end
+	endgenerate
+
+	always_ff @(posedge clk)
+		for (int i = 1; i < FPINT_STAGES; ++i)
+			stage_op[i] <= stage_op[i - 1];
+
+	always_ff @(posedge clk or negedge rst_n)
+		if (~rst_n) begin
+			for (int i = 1; i < FPINT_STAGES; ++i)
+				stage_valid[i] <= 0;
+
+			wb.valid <= 0;
+		end else begin
+			for (int i = 1; i < FPINT_STAGES; ++i)
+				stage_valid[i] <= stage_valid[i - 1];
+
+			// Se levanta 1 ciclo luego que in_valid
+			if (abort)
+				stage_valid[2] <= 0;
+
+			wb.valid <= stage_valid[FPINT_STAGES - 1];
+		end
+
+endmodule
+
+module gfx_shader_fpint_lane
+import gfx::*;
+(
+	input  logic clk,
+
+	input  word  a,
+	             b,
+
+	input  logic mul_float_0,
+	             unit_b_0,
+	             put_hi_2,
+	             put_lo_2,
+	             put_mul_2,
+	             zero_b_2,
+	             zero_flags_2,
+	             abs_3,
+	             swap_3,
+	             zero_min_3,
+	             copy_flags_3,
+	             int_signed_5,
+	             copy_flags_6,
+	             int_operand_6,
+	             force_nop_7,
+	             copy_flags_11,
+	             copy_flags_12,
+	             enable_12,
+	             enable_14,
+
+	output word  q
+);
 
 	/* Notas de implementación para floating-point
 	*
@@ -97,7 +310,7 @@ module gfx_fpint_lane
 	fpint_round_rnorm    round_rnorm;
 	fpint_rnorm_encode   rnorm_encode;
 
-	gfx_fpint_lane_setup stage_0
+	gfx_shader_fpint_setup stage_0
 	(
 		.clk(clk),
 		.a(a),
@@ -107,14 +320,14 @@ module gfx_fpint_lane
 		.mul_float(mul_float_0)
 	);
 
-	gfx_fpint_lane_mulclass stage_1
+	gfx_shader_fpint_mulclass stage_1
 	(
 		.clk(clk),
 		.in(setup_mulclass),
 		.out(mulclass_mnorm)
 	);
 
-	gfx_fpint_lane_mnorm stage_2
+	gfx_shader_fpint_mnorm stage_2
 	(
 		.clk(clk),
 		.in(mulclass_mnorm),
@@ -126,7 +339,7 @@ module gfx_fpint_lane
 		.zero_flags(zero_flags_2)
 	);
 
-	gfx_fpint_lane_minmax stage_3
+	gfx_shader_fpint_minmax stage_3
 	(
 		.clk(clk),
 		.in(mnorm_minmax),
@@ -137,14 +350,14 @@ module gfx_fpint_lane
 		.copy_flags(copy_flags_3)
 	);
 
-	gfx_fpint_lane_expdiff stage_4
+	gfx_shader_fpint_expdiff stage_4
 	(
 		.clk(clk),
 		.in(minmax_expdiff),
 		.out(expdiff_shiftr)
 	);
 
-	gfx_fpint_lane_shiftr stage_5
+	gfx_shader_fpint_shiftr stage_5
 	(
 		.clk(clk),
 		.in(expdiff_shiftr),
@@ -152,7 +365,7 @@ module gfx_fpint_lane
 		.int_signed(int_signed_5)
 	);
 
-	gfx_fpint_lane_addsub stage_6
+	gfx_shader_fpint_addsub stage_6
 	(
 		.clk(clk),
 		.in(shiftr_addsub),
@@ -161,7 +374,7 @@ module gfx_fpint_lane
 		.int_operand(int_operand_6)
 	);
 
-	gfx_fpint_lane_clz stage_7_8_9_10
+	gfx_shader_fpint_clz stage_7_8_9_10
 	(
 		.clk(clk),
 		.in(addsub_clz),
@@ -169,7 +382,7 @@ module gfx_fpint_lane
 		.force_nop(force_nop_7)
 	);
 
-	gfx_fpint_lane_shiftl stage_11
+	gfx_shader_fpint_shiftl stage_11
 	(
 		.clk(clk),
 		.in(clz_shiftl),
@@ -177,7 +390,7 @@ module gfx_fpint_lane
 		.copy_flags(copy_flags_11)
 	);
 
-	gfx_fpint_lane_round stage_12
+	gfx_shader_fpint_round stage_12
 	(
 		.clk(clk),
 		.in(shiftl_round),
@@ -186,14 +399,14 @@ module gfx_fpint_lane
 		.copy_flags(copy_flags_12)
 	);
 
-	gfx_fpint_lane_rnorm stage_13
+	gfx_shader_fpint_rnorm stage_13
 	(
 		.clk(clk),
 		.in(round_rnorm),
 		.out(rnorm_encode)
 	);
 
-	gfx_fpint_lane_encode stage_14
+	gfx_shader_fpint_encode stage_14
 	(
 		.clk(clk),
 		.q(q),
@@ -204,16 +417,17 @@ module gfx_fpint_lane
 endmodule
 
 // Stage 0: argumentos de mul
-module gfx_fpint_lane_setup
+module gfx_shader_fpint_setup
+import gfx::*;
 (
-	input  logic                     clk,
+	input  logic                clk,
 
-	input  gfx::word                 a,
-	                                 b,
-	input  logic                     mul_float,
-	                                 unit_b,
+	input  word                 a,
+	                            b,
+	input  logic                mul_float,
+	                            unit_b,
 
-	output gfx::fpint_setup_mulclass out
+	output fpint_setup_mulclass out
 );
 
 	always_ff @(posedge clk) begin
@@ -242,16 +456,15 @@ module gfx_fpint_lane_setup
 endmodule
 
 // Stage 1: multiplicación de fp o enteros
-module gfx_fpint_lane_mulclass
+module gfx_shader_fpint_mulclass
+import gfx::*;
 (
-	input  logic                     clk,
+	input  logic                clk,
 
-	input  gfx::fpint_setup_mulclass in,
+	input  fpint_setup_mulclass in,
 
-	output gfx::fpint_mulclass_mnorm out
+	output fpint_mulclass_mnorm out
 );
-
-	import gfx::*;
 
 	always_ff @(posedge clk) begin
 		out.b <= in.b;
@@ -265,21 +478,20 @@ module gfx_fpint_lane_mulclass
 endmodule
 
 // Stage 2: normalización
-module gfx_fpint_lane_mnorm
+module gfx_shader_fpint_mnorm
+import gfx::*;
 (
-	input  logic                     clk,
+	input  logic                clk,
 
-	input  gfx::fpint_mulclass_mnorm in,
-	input  logic                     put_hi,
-	                                 put_lo,
-	                                 put_mul,
-	                                 zero_b,
-	                                 zero_flags,
+	input  fpint_mulclass_mnorm in,
+	input  logic                put_hi,
+	                            put_lo,
+	                            put_mul,
+	                            zero_b,
+	                            zero_flags,
 
-	output gfx::fpint_mnorm_minmax   out
+	output fpint_mnorm_minmax   out
 );
-
-	import gfx::*;
 
 	word product_hi, product_lo;
 	logic guard, lo_msb, lo_reduce, round, slow_in_next;
@@ -352,20 +564,19 @@ module gfx_fpint_lane_mnorm
 endmodule
 
 // Stage 3: ordenar tal que abs(max) >= abs(min)
-module gfx_fpint_lane_minmax
+module gfx_shader_fpint_minmax
+import gfx::*;
 (
-	input  logic                     clk,
+	input  logic                clk,
 
-	input  gfx::fpint_mnorm_minmax   in,
-	input  logic                     abs,
-	                                 swap,
-	                                 zero_min,
-	                                 copy_flags,
+	input  fpint_mnorm_minmax   in,
+	input  logic                abs,
+	                            swap,
+	                            zero_min,
+	                            copy_flags,
 
-	output gfx::fpint_minmax_expdiff out
+	output fpint_minmax_expdiff out
 );
-
-	import gfx::*;
 
 	logic abs_b_gt_abs_a, b_gt_a;
 
@@ -427,16 +638,15 @@ module gfx_fpint_lane_minmax
 endmodule
 
 // Stage 4: exp_shift amount
-module gfx_fpint_lane_expdiff
+module gfx_shader_fpint_expdiff
+import gfx::*;
 (
-	input  logic                     clk,
+	input  logic                clk,
 
-	input  gfx::fpint_minmax_expdiff in,
+	input  fpint_minmax_expdiff in,
 
-	output gfx::fpint_expdiff_shiftr out
+	output fpint_expdiff_shiftr out
 );
-
-	import gfx::*;
 
 	float_exp exp_delta;
 
@@ -461,17 +671,16 @@ module gfx_fpint_lane_expdiff
 endmodule
 
 // Stage 5: shifts y abs(max) para enteros con signo
-module gfx_fpint_lane_shiftr
+module gfx_shader_fpint_shiftr
+import gfx::*;
 (
-	input  logic                     clk,
+	input  logic                clk,
 
-	input  gfx::fpint_expdiff_shiftr in,
-	input  logic                     int_signed,
+	input  fpint_expdiff_shiftr in,
+	input  logic                int_signed,
 
-	output gfx::fpint_shiftr_addsub  out
+	output fpint_shiftr_addsub  out
 );
-
-	import gfx::*;
 
 	always_ff @(posedge clk) begin
 		out.min <= in.min;
@@ -496,18 +705,17 @@ module gfx_fpint_lane_shiftr
 endmodule
 
 // Stage 6: suma de mantisas
-module gfx_fpint_lane_addsub
+module gfx_shader_fpint_addsub
+import gfx::*;
 (
-	input  logic                    clk,
+	input  logic               clk,
 
-	input  gfx::fpint_shiftr_addsub in,
-	input  logic                    copy_flags,
-	                                int_operand,
+	input  fpint_shiftr_addsub in,
+	input  logic               copy_flags,
+	                           int_operand,
 
-	output gfx::fpint_addsub_clz    out
+	output fpint_addsub_clz    out
 );
-
-	import gfx::*;
 
 	localparam int INT_SHIFT_REF = $bits(word) - 2;
 
@@ -543,17 +751,16 @@ module gfx_fpint_lane_addsub
 endmodule
 
 // Stages 7-10: encontrar el 1 más significativo
-module gfx_fpint_lane_clz
+module gfx_shader_fpint_clz
+import gfx::*;
 (
-	input  logic                 clk,
+	input  logic            clk,
 
-	input  gfx::fpint_addsub_clz in,
-	input  logic                 force_nop,
+	input  fpint_addsub_clz in,
+	input  logic            force_nop,
 
-	output gfx::fpint_clz_shiftl out
+	output fpint_clz_shiftl out
 );
-
-	import gfx::*;
 
 	word clz_in;
 	fpint_clz_hold hold[FPINT_CLZ_STAGES];
@@ -583,17 +790,16 @@ module gfx_fpint_lane_clz
 endmodule
 
 // Stage 11: normalización
-module gfx_fpint_lane_shiftl
+module gfx_shader_fpint_shiftl
+import gfx::*;
 (
-	input  logic                   clk,
+	input  logic              clk,
 
-	input  gfx::fpint_clz_shiftl   in,
-	input  logic                   copy_flags,
+	input  fpint_clz_shiftl   in,
+	input  logic              copy_flags,
 
-	output gfx::fpint_shiftl_round out
+	output fpint_shiftl_round out
 );
-
-	import gfx::*;
 
 	localparam int CLZ_EXTEND_BITS = $bits(float_exp) - $bits(in.shift) + 1;
 
@@ -627,18 +833,17 @@ module gfx_fpint_lane_shiftl
 endmodule
 
 // Stage 12: redondeo
-module gfx_fpint_lane_round
+module gfx_shader_fpint_round
+import gfx::*;
 (
-	input  logic                   clk,
+	input  logic              clk,
 
-	input  gfx::fpint_shiftl_round in,
-	input  logic                   copy_flags,
-	                               enable,
+	input  fpint_shiftl_round in,
+	input  logic              copy_flags,
+	                          enable,
 
-	output gfx::fpint_round_rnorm  out
+	output fpint_round_rnorm  out
 );
-
-	import gfx::*;
 
 	always_ff @(posedge clk) begin
 		out.val <= in.val;
@@ -654,16 +859,15 @@ module gfx_fpint_lane_round
 endmodule
 
 // Stage 13: ajuste de exponente por redondeo
-module gfx_fpint_lane_rnorm
+module gfx_shader_fpint_rnorm
+import gfx::*;
 (
-	input  logic                   clk,
+	input  logic              clk,
 
-	input  gfx::fpint_round_rnorm  in,
+	input  fpint_round_rnorm  in,
 
-	output gfx::fpint_rnorm_encode out
+	output fpint_rnorm_encode out
 );
-
-	import gfx::*;
 
 	always_ff @(posedge clk) begin
 		out.slow <= in.slow;
@@ -681,17 +885,16 @@ module gfx_fpint_lane_rnorm
 endmodule
 
 // Stage 14: salida y codificación de ceros y NaNs
-module gfx_fpint_lane_encode
+module gfx_shader_fpint_encode
+import gfx::*;
 (
-	input  logic                   clk,
+	input  logic              clk,
 
-	input  gfx::fpint_rnorm_encode in,
-	input  logic                   enable,
+	input  fpint_rnorm_encode in,
+	input  logic              enable,
 
-	output gfx::float              q
+	output float              q
 );
-
-	import gfx::*;
 
 	always_ff @(posedge clk) begin
 		q <= in.val;

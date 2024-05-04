@@ -24,7 +24,7 @@ import gfx::*;
 		.abort
 	);
 
-	gfx_fpint p0
+	gfx_shader_fpint p0
 	(
 		.clk,
 		.rst_n,

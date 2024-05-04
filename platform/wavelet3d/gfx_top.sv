@@ -94,7 +94,7 @@ import gfx::*;
 		.srst_n
 	);
 
-	gfx_fpint fpint
+	gfx_shader_fpint fpint
 	(
 		.clk,
 		.rst_n,
