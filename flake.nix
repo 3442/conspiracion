@@ -50,6 +50,8 @@
           })
         ];
       };
+
+      rv32Pkgs = pkgs.pkgsCross.riscv32-embedded;
     in
     {
       formatter.${system} = pkgs.nixpkgs-fmt;
@@ -151,6 +153,8 @@
               (py.callPackage ./nix/peakrdl-regblock.nix { })
               (py.callPackage ./nix/pyuvm.nix { })
             ]))
+            rv32Pkgs.stdenv.cc.cc
+            rv32Pkgs.stdenv.cc.bintools
             (quartus-prime-lite.override { supportedDevices = [ "Cyclone V" ]; })
             verilator
           ];

@@ -17,7 +17,7 @@ buildPythonPackage {
     hash = "sha256-CsCvWb6XrKSOuFKBdEKxXWQvDrSQX7qPvZ7j2mpANlw=";
   };
 
-  propagatedNativeBuildInputs = [
+  propagatedBuildInputs = [
     cocotb
     python-constraint
     pyyaml
