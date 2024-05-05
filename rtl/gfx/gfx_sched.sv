@@ -10,6 +10,8 @@ import gfx::*;
 	input  irq_lines  irq
 );
 
+	// verilator tracing_off
+
 	logic axi_ready, axi_valid, bram_ready, bram_read, bram_write, bram_write_next,
 	      mem_instr, mem_la_read, mem_la_write, mem_ready, mem_valid, select_bram;
 

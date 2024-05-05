@@ -1,4 +1,4 @@
-module gfx_top
+module w3d_top
 import gfx::*;
 (
 	input  logic clk,
