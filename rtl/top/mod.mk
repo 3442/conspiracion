@@ -22,7 +22,7 @@ endef
 
 define core/test_fb
   $(this)/targets        := test
-  $(this)/deps           := gfx
+  $(this)/deps           := legacy_gfx
   $(this)/rtl_files      := test_fb.sv
   $(this)/rtl_top        := test_fb
   $(this)/cocotb_paths   := ../../..
@@ -31,7 +31,7 @@ endef
 
 define core/test_fifo
   $(this)/targets        := test
-  $(this)/deps           := gfx
+  $(this)/deps           := legacy_gfx
   $(this)/rtl_files      := test_fifo.sv
   $(this)/rtl_top        := test_fifo
   $(this)/cocotb_paths   := ../../..
