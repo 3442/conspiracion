@@ -3,9 +3,11 @@ interface gfx_wb;
 	import gfx::*;
 
 	word lanes[SHADER_LANES];
-	logic ready, scalar, valid, writeback;
+	logic mask_update, pc_inc, pc_update, ready, scalar, valid, writeback;
 	group_id group;
 	xgpr_num dest;
+	lane_mask mask;
+	pc_offset pc_add;
 
 	modport tx
 	(
@@ -16,7 +18,14 @@ interface gfx_wb;
 		       lanes,
 		       valid,
 		       scalar,
-		       writeback
+		       writeback,
+
+		       mask,
+		       mask_update,
+
+		       pc_add,
+		       pc_inc,
+		       pc_update
 	);
 
 	modport rx
@@ -27,6 +36,13 @@ interface gfx_wb;
 		       valid,
 		       scalar,
 		       writeback,
+
+		       mask,
+		       mask_update,
+
+		       pc_add,
+		       pc_inc,
+		       pc_update,
 
 		output ready
 	);

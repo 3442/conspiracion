@@ -241,6 +241,7 @@ package gfx;
 	typedef gfx_isa::sgpr_num sgpr_num;
 	typedef gfx_isa::vgpr_num vgpr_num;
 	typedef gfx_isa::xgpr_num xgpr_num;
+	typedef gfx_isa::pc_offset pc_offset;
 
 	typedef struct packed
 	{
@@ -250,6 +251,13 @@ package gfx;
 		      p3,
 		      valid;
 	} shader_dispatch;
+
+	typedef struct
+	{
+		group_id group;
+		xgpr_num dest;
+		logic    dest_scalar;
+	} wave_exec;
 
 	localparam int FIXED_MULADD_DEPTH = 5;
 	localparam int FIXED_DOTADD_DEPTH = 2 * FIXED_MULADD_DEPTH;

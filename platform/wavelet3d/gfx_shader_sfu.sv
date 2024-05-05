@@ -5,6 +5,7 @@ import gfx::*;
 	                         rst_n,
 
 	input  sfu_op            op,
+	input  wave_exec         wave,
 
 	       gfx_regfile_io.ab read_data,
 

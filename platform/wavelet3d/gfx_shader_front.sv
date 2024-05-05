@@ -4,7 +4,13 @@ typedef struct
 	                   retry;
 	gfx::group_id      group;
 	gfx_isa::insn_word insn;
-} shader_front_wave;
+} front_wave;
+
+typedef struct
+{
+	gfx::xgpr_num dest;
+	logic         dest_scalar;
+} front_reg_passthru;
 
 typedef logic[4:0] icache_line_num;
 
@@ -40,7 +46,11 @@ import gfx::*;
 
 	word fetch_insn, port_insn;
 	logic fetch_hit, p0_writeback;
-	shader_front_wave bind_wave, dec_wave, port_dec_wave;
+	front_wave bind_wave, dec_wave, port_dec_wave;
+	front_reg_passthru reg_passthru;
+
+	assign front.execute.wave.dest = reg_passthru.dest;
+	assign front.execute.wave.dest_scalar = reg_passthru.dest_scalar;
 
 	gfx_shader_bind bind_
 	(
@@ -60,7 +70,8 @@ import gfx::*;
 		.rst_n,
 		.in(bind_wave),
 		.out(dec_wave),
-		.read(reg_read)
+		.read(reg_read),
+		.passthru(reg_passthru)
 	);
 
 	gfx_shader_decode_class class_dec
@@ -68,7 +79,7 @@ import gfx::*;
 		.clk,
 		.rst_n,
 		.wave(dec_wave),
-		.out_group(front.execute.group),
+		.out_group(front.execute.wave.group),
 		.port_wave(port_dec_wave),
 		.dispatch(front.dispatch),
 		.p0_writeback
@@ -99,7 +110,7 @@ import gfx::*;
 
 	       gfx_regfile_io.bind_ regs,
 
-	output shader_front_wave    wave
+	output front_wave           wave
 );
 
 	localparam int ICACHE_STAGES = 6;
@@ -419,31 +430,48 @@ import gfx_isa::*;
 	input  logic               clk,
 	                           rst_n,
 
-	input  shader_front_wave   in,
+	input  front_wave          in,
 
 	       gfx_regfile_io.read read,
 
-	output shader_front_wave   out
+	output front_wave          out,
+	output front_reg_passthru  passthru
 );
 
-	localparam int HOLD_DEPTH = REG_READ_STAGES + 1 - 2;
+	// + 1 por next-cycle de read.op
+	localparam int PASSTHRU_DEPTH = REG_READ_STAGES + 1 - 2;
+	localparam int HOLD_DEPTH     = PASSTHRU_DEPTH - 2;
 
 	logic reg_rev;
-	logic hold_valid[HOLD_DEPTH];
-	shader_front_wave hold[HOLD_DEPTH];
+	logic valid[HOLD_DEPTH];
+	front_wave out_hold[HOLD_DEPTH];
+	front_reg_passthru passthru_hold[PASSTHRU_DEPTH];
+
+	assign passthru = passthru_hold[$size(passthru_hold) - 1];
 
 	assign reg_rev = in.insn.reg_rev;
 
 	always_comb begin
-		out = hold[$size(hold) - 1];
-		out.valid = hold_valid[$size(hold_valid) - 1];
+		out = out_hold[$size(out_hold) - 1];
+		out.valid = valid[$size(valid) - 1];
 	end
 
 	always_ff @(posedge clk) begin
-		hold[0] <= in;
+		out_hold[0] <= in;
+		for (int i = 1; i < $size(out_hold); ++i)
+			out_hold[i] <= out_hold[i - 1];
 
-		for (int i = 1; i < HOLD_DEPTH; ++i)
-			hold[i] <= hold[i - 1];
+		passthru_hold[0].dest <= in.insn.dst_src.rr.rd;
+		unique case (in.insn.reg_mode)
+			REGS_SVS, REGS_SSS:
+				passthru_hold[0].dest_scalar <= 1;
+
+			REGS_VVS, REGS_VVV:
+				passthru_hold[0].dest_scalar <= 0;
+		endcase
+
+		for (int i = 1; i < $size(passthru_hold); ++i)
+			passthru_hold[i] <= passthru_hold[i - 1];
 
 		read.op.group <= in.group;
 
@@ -476,13 +504,13 @@ import gfx_isa::*;
 
 	always_ff @(posedge clk or negedge rst_n)
 		if (~rst_n)
-			for (int i = 1; i < HOLD_DEPTH; ++i)
-				hold_valid[i] <= 0;
+			for (int i = 0; i < HOLD_DEPTH; ++i)
+				valid[i] <= 0;
 		else begin
-			hold_valid[0] <= in.valid;
+			valid[0] <= in.valid;
 
 			for (int i = 1; i < HOLD_DEPTH; ++i)
-				hold_valid[i] <= hold_valid[i - 1];
+				valid[i] <= valid[i - 1];
 		end
 
 endmodule
@@ -491,19 +519,19 @@ module gfx_shader_decode_class
 import gfx::*;
 import gfx_isa::*;
 (
-	input  logic             clk,
-	                         rst_n,
+	input  logic           clk,
+	                       rst_n,
 
-	input  shader_front_wave wave,
-	output shader_front_wave port_wave,
-	output group_id          out_group,
+	input  front_wave      wave,
+	output front_wave      port_wave,
+	output group_id        out_group,
 
-	output shader_dispatch   dispatch,
-	output logic             p0_writeback
+	output shader_dispatch dispatch,
+	output logic           p0_writeback
 );
 
 	logic is_fsu, is_mem, is_group, hold_valid, retry;
-	shader_front_wave hold_wave;
+	front_wave hold_wave;
 
 	assign p0_writeback = ~(is_mem | is_fsu | is_group | retry);
 

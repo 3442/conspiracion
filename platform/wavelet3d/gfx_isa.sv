@@ -3,6 +3,8 @@ package gfx_isa;
 	typedef logic[3:0] sgpr_num;
 	typedef logic[2:0] vgpr_num;
 
+	typedef logic signed[7:0] pc_offset;
+
 	typedef union packed
 	{
 		sgpr_num sgpr;

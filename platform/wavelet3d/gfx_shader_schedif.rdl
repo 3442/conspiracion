@@ -13,12 +13,12 @@ addrmap gfx_shader_schedif {
 
             singlepulse;
         } IFLUSH[0:0] = 0;
-    } CORE @ 0x0;
+    } CORE @ 0x00;
 
     reg {
         name = "Wavefront setup control register";
 
-        default hw = w;
+        default hw = na;
         default sw = r;
         default precedence = hw;
 
@@ -49,7 +49,14 @@ addrmap gfx_shader_schedif {
             rclr;
             hwset;
         } GPR_DONE[17:17] = 0;
-    } SETUP_CTRL @ 0x4;
+
+        field {
+            desc = "Lane mask update done";
+
+            rclr;
+            hwset;
+        } MASK_DONE[18:18] = 0;
+    } SETUP_CTRL @ 0x04;
 
     reg {
         name = "SGPR/VGPR write register";
@@ -59,7 +66,17 @@ addrmap gfx_shader_schedif {
 
             swmod;
         } VALUE[31:0];
-    } SETUP_GPR @ 0x8;
+    } SETUP_GPR @ 0x08;
+
+    reg {
+        name = "Lane mask write register";
+
+        field {
+            desc = "Mask value to write";
+
+            swmod;
+        } MASK[15:0];
+    } SETUP_MASK @ 0x0c;
 
     reg {
         name = "Group submit register";
@@ -69,6 +86,6 @@ addrmap gfx_shader_schedif {
 
             swmod;
         } PC[31:2];
-    } SETUP_SUBMIT @ 0xc;
+    } SETUP_SUBMIT @ 0x10;
 };
 

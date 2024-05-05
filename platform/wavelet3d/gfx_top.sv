@@ -100,6 +100,7 @@ import gfx::*;
 		.rst_n,
 		.op,
 		.wb(fpint_wb.tx),
+		.wave(),
 		.abort(0),
 		.in_valid,
 		.read_data(fpint_io.ab)

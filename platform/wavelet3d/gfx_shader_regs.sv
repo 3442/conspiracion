@@ -8,9 +8,16 @@ import gfx::*;
 
 	// verilator tracing_off
 
+	localparam PC_TABLE_PORTS   = 2;
+	localparam MASK_TABLE_PORTS = 1;
+
 	word hold_imm[REGFILE_STAGES], imm_out, read_a_data_sgpr, read_b_data_scalar,
 	     read_b_data_sgpr, read_const, read_a_data_vgpr[SHADER_LANES],
 	     read_b_data_vgpr[SHADER_LANES], sgpr_out_a, sgpr_out_b;
+
+	group_id mask_read_groups[MASK_TABLE_PORTS], pc_read_groups[PC_TABLE_PORTS];
+	word_ptr pc_read[PC_TABLE_PORTS];
+	lane_mask mask_read[MASK_TABLE_PORTS];
 
 	logic a_scalar_out, b_is_const_out, b_is_imm_out, b_scalar_out, scalar_rev_out;
 	group_id hold_read_group_1, hold_read_group_2;
@@ -20,6 +27,14 @@ import gfx::*;
 	logic[REGFILE_STAGES + 1 - 1:0] hold_scalar_rev;
 	logic[REGFILE_STAGES + 2 - 1:0] hold_a_scalar, hold_b_scalar;
 
+	assign io.pc_back = pc_read[0];
+	assign io.pc_front = pc_read[1];
+	assign pc_read_groups[0] = io.pc_back_group;
+	assign pc_read_groups[1] = io.pc_front_group;
+
+	assign io.mask_back = mask_read[0];
+	assign pc_read_groups[0] = io.mask_back_group;
+
 	assign imm_out = hold_imm[$size(hold_imm) - 1];
 	assign a_scalar_out = hold_a_scalar[$bits(hold_a_scalar) - 1];
 	assign b_scalar_out = hold_b_scalar[$bits(hold_b_scalar) - 1];
@@ -27,11 +42,24 @@ import gfx::*;
 	assign b_is_const_out = hold_b_is_const[$bits(hold_b_is_const) - 1];
 	assign scalar_rev_out = hold_scalar_rev[$bits(hold_scalar_rev) - 1];
 
-	gfx_shader_pc_table pcs
+	gfx_shader_table #(.DATA_WIDTH($bits(word_ptr)), .READ_PORTS(PC_TABLE_PORTS)) pc_table
 	(
 		.clk,
-		.read(io.pc_front),
-		.read_group(io.pc_front_group)
+		.read(pc_read),
+		.write(io.pc_wb),
+		.read_groups(pc_read_groups),
+		.write_group(io.pc_wb_group),
+		.write_enable(io.pc_wb_write)
+	);
+
+	gfx_shader_table #(.DATA_WIDTH($bits(lane_mask)), .READ_PORTS(MASK_TABLE_PORTS)) mask_table
+	(
+		.clk,
+		.read(mask_read),
+		.write(io.mask_wb),
+		.read_groups(mask_read_groups),
+		.write_group(io.mask_wb_group),
+		.write_enable(io.mask_wb_write)
 	);
 
 	gfx_shader_consts consts
@@ -231,23 +259,44 @@ import gfx::*;
 
 endmodule
 
-module gfx_shader_pc_table
+module gfx_shader_table
 import gfx::*;
+#(int DATA_WIDTH = 0,
+  int READ_PORTS = 0)
 (
-	input  logic    clk,
+	input  logic                   clk,
 
-	input  group_id read_group,
+	input  group_id                write_group,
+	                               read_groups[READ_PORTS],
 
-	output word_ptr read
+	input  logic[DATA_WIDTH - 1:0] write,
+	input  logic                   write_enable,
+
+	output logic[DATA_WIDTH - 1:0] read[READ_PORTS]
 );
 
-	group_id read_group_hold;
-	word_ptr pcs[1 << $bits(group_id)], read_hold;
+	genvar i;
 
-	always_ff @(posedge clk) begin
-		read <= read_hold;
-		read_hold <= pcs[read_group_hold];
-		read_group_hold <= read_group;
-	end
+	generate
+		for (i = 0; i < READ_PORTS; ++i) begin: ports
+			logic write_enable_hold;
+			group_id read_group_hold, write_group_hold;
+			logic[DATA_WIDTH - 1:0] data[1 << $bits(group_id)], read_hold, write_hold;
+
+			always_ff @(posedge clk) begin
+				write_hold <= write;
+				read_group_hold <= read_groups[i];
+				write_group_hold <= write_group;
+				write_enable_hold <= write_enable;
+
+				read_hold <= data[read_group_hold];
+
+				if (write_enable_hold)
+					data[write_group_hold] <= write_hold;
+
+				read[i] <= read_hold;
+			end
+		end
+	endgenerate
 
 endmodule

@@ -3,11 +3,11 @@ import gfx::*;;
 
 	struct
 	{
-		group_id group;
-		fpint_op p0;
-		mem_op   p1;
-		sfu_op   p2;
-		group_op p3;
+		wave_exec wave;
+		fpint_op  p0;
+		mem_op    p1;
+		sfu_op    p2;
+		group_op  p3;
 	} execute;
 
 	struct

@@ -34,8 +34,10 @@ interface gfx_regfile_io;
 	} vgpr_write;
 
 	word a[SHADER_LANES], b[SHADER_LANES], sgpr_write_data, vgpr_write_data[SHADER_LANES];
-	word_ptr pc_front;
-	group_id pc_front_group;
+	logic mask_wb_write, pc_wb_write;
+	word_ptr pc_back, pc_front, pc_wb;
+	group_id mask_back_group, mask_wb_group, pc_back_group, pc_front_group, pc_wb_group;
+	lane_mask mask_back, mask_wb;
 
 	modport ab
 	(
@@ -57,8 +59,22 @@ interface gfx_regfile_io;
 
 	modport wb
 	(
+		input  pc_back,
+		       mask_back,
+
 		output sgpr_write,
-		       vgpr_write
+		       vgpr_write,
+
+		       pc_back_group,
+		       mask_back_group,
+
+		       pc_wb,
+		       pc_wb_group,
+		       pc_wb_write,
+
+		       mask_wb,
+		       mask_wb_group,
+		       mask_wb_write
 	);
 
 	modport regs
@@ -66,11 +82,25 @@ interface gfx_regfile_io;
 		input  op,
 		       sgpr_write,
 		       vgpr_write,
+
+		       pc_back_group,
 		       pc_front_group,
+		       mask_back_group,
+
+		       pc_wb,
+		       pc_wb_group,
+		       pc_wb_write,
+
+		       mask_wb,
+		       mask_wb_group,
+		       mask_wb_write,
 
 		output a,
 		       b,
-		       pc_front
+
+		       pc_back,
+		       pc_front,
+		       mask_back
 	);
 
 endinterface
