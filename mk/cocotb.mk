@@ -33,7 +33,7 @@ define target/test/rules
 		LIBPYTHON_LOC=$$(cocotb_libpython) COCOTB_RESULTS_FILE=results.xml \
 		PYTHONPATH="$$(subst $$(space),:,$$(strip $$(cocotb_pythonpath) $$$$PYTHONPATH))" \
 		MODULE=$$(subst $$(space),$$(comma),$$(cocotb_modules)) \
-		$$(src)/$$< >log.txt
+		$$(src)/$$< $$(if $$(V),| tee,>) log.txt
 
   $(call target_entrypoint,$$(cocotb_outs))
 endef
