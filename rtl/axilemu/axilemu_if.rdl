@@ -1,0 +1,130 @@
+addrmap axilemu_if {
+    name = "AXI-Lite agent emulation interface";
+
+	default hw = w;
+    default sw = r;
+    default regwidth = 32;
+    default precedence = hw;
+
+    reg {
+        name = "Agent control register";
+
+        field {
+            desc = "Enable interrupt on pending read";
+
+            hw = r;
+            sw = rw;
+        } ARINT[0:0] = 0;
+
+        field {
+            desc = "Enable interrupt on pending write";
+
+            hw = r;
+            sw = rw;
+        } AWINT[1:1] = 0;
+
+        field {
+            desc = "Read command is pending";
+        } ARVALID[8:8] = 0;
+
+        field {
+            desc = "Write command is pending";
+        } AWVALID[9:9] = 0;
+
+        field {
+            desc = "Last read data acknowledged";
+
+            hw = na;
+
+            rclr;
+            hwset;
+        } RDONE[10:10] = 0;
+
+        field {
+            desc = "Write data is pending";
+        } WVALID[11:11] = 0;
+
+        field {
+            desc = "Last write response acknowledged";
+
+            hw = na;
+
+            rclr;
+            hwset;
+        } BDONE[12:12] = 0;
+    } CTRL @ 0x00;
+
+    reg {
+        name = "Read command channel";
+
+        field {
+            desc = "Read is pending";
+
+            hw = r;
+
+            rclr;
+            hwset;
+            swmod;
+        } VALID[0:0] = 0;
+
+        field {
+            desc = "Read address";
+        } ADDR[31:2];
+    } AR @ 0x04;
+
+    reg {
+        name = "Write command channel";
+
+        field {
+            desc = "Write is pending";
+
+            hw = r;
+
+            rclr;
+            hwset;
+            swmod;
+        } VALID[0:0] = 0;
+
+        field {
+            desc = "Write address";
+        } ADDR[31:2];
+    } AW @ 0x08;
+
+    reg {
+        name = "Read data channel";
+
+        field {
+            desc = "Read data";
+
+            hw = r;
+            sw = rw;
+
+            swmod;
+        } DATA[31:0];
+    } R @ 0x0c;
+
+    reg {
+        name = "Write data channel";
+
+        field {
+            desc = "Write data";
+
+            swacc;
+        } DATA[31:0];
+    } W @ 0x10;
+
+    reg {
+        name = "Write response channel";
+
+        field {
+            desc = "Valid response";
+
+            hw = r;
+            sw = rw;
+
+            hwclr;
+            woset;
+        } VALID[0:0];
+    } B @ 0x14;
+};
+
