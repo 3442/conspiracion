@@ -149,8 +149,8 @@
               pillow
               pytest # Para cocotb
               (py.callPackage ./nix/cocotb-coverage.nix { })
-              (py.callPackage ./nix/peakrdl.nix { })
-              (py.callPackage ./nix/peakrdl-regblock.nix { })
+              (py.callPackage ./nix/peakrdl/peakrdl.nix { })
+              (py.callPackage ./nix/peakrdl/peakrdl-regblock.nix { })
               (py.callPackage ./nix/pyuvm.nix { })
             ]))
             rv32Pkgs.stdenv.cc.cc

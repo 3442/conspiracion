@@ -19,6 +19,10 @@ buildPythonPackage {
     sha256 = "sha256-N+YZSuHdSSMCmgko5YZpa7wDj3vMy2J7prPdfjj53GA=";
   };
 
+  patches = [
+    ./0001-Add-verilator-MULTIDRIVEN-hack.patch
+  ];
+
   propagatedBuildInputs = [
     jinja2
     (callPackage ./systemrdl-compiler.nix { })

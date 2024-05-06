@@ -1,0 +1,24 @@
+From aef302875ec38e6f91e04f9368ba0ed84cc73b69 Mon Sep 17 00:00:00 2001
+From: Alejandro Soto <alejandro@34project.org>
+Date: Sun, 5 May 2024 18:17:10 -0600
+Subject: [PATCH] Add verilator MULTIDRIVEN hack
+
+---
+ src/peakrdl_regblock/module_tmpl.sv | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/peakrdl_regblock/module_tmpl.sv b/src/peakrdl_regblock/module_tmpl.sv
+index bcb8566..92183b5 100644
+--- a/src/peakrdl_regblock/module_tmpl.sv
++++ b/src/peakrdl_regblock/module_tmpl.sv
+@@ -27,6 +27,7 @@ module {{ds.module_name}}
+         {{hwif.port_declaration|indent(8)}}
+     );
+ 
++    // verilator lint_off MULTIDRIVEN
+     //--------------------------------------------------------------------------
+     // CPU Bus interface logic
+     //--------------------------------------------------------------------------
+-- 
+2.42.0
+
