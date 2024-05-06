@@ -34,7 +34,7 @@ import gfx::*;
 	input  logic                clk,
 	                            rst_n,
 
-	       gfx_axib.m           fetch_mem,
+	       if_axib.m            fetch_mem,
 
 	input  logic                icache_flush,
 
@@ -101,7 +101,7 @@ import gfx::*;
 	input  logic                clk,
 	                            rst_n,
 
-	       gfx_axib.m           mem,
+	       if_axib.m            mem,
 
 	input  logic                icache_flush,
 
@@ -116,7 +116,7 @@ import gfx::*;
 	localparam int ICACHE_STAGES = 6;
 	localparam int BIND_STAGES = REGFILE_STAGES + ICACHE_STAGES;
 
-	gfx_beats #($bits(group_id)) runnable_in(), runnable_out();
+	if_beats #($bits(group_id)) runnable_in(), runnable_out();
 
 	logic ar_stall, request_ready, request_valid, valids[BIND_STAGES];
 	group_id groups[BIND_STAGES];
@@ -251,7 +251,7 @@ import gfx::*;
 		oword      data;
 	} cache[1 << $bits(icache_line_num)], read, read_hold;
 
-	gfx_beats #($bits(icache_line_tag)) pending_in(), pending_out();
+	if_beats #($bits(icache_line_tag)) pending_in(), pending_out();
 
 	logic accessed_write, accessed_write_enable, burst, fetch_done, hit_write,
 	      in_flush, hit_commit, hit_write_enable, retry_4, retry_5, rollback,

@@ -1,7 +1,7 @@
 cores := gfx_shader_schedif
 
 define core
-  $(this)/deps := axixbar gfx_shader_schedif picorv32
+  $(this)/deps := axixbar gfx_shader_schedif if_common picorv32
 
   $(this)/rtl_top := gfx_top
   $(this)/rtl_dirs := .

@@ -1,10 +1,10 @@
 module gfx_bootrom
 import gfx::*;
 (
-	input  logic      clk,
-	                  rst_n,
+	input  logic     clk,
+	                 rst_n,
 
-	       gfx_axil.s axis
+	       if_axil.s axis
 );
 
 	localparam ROM_WORDS_LOG = 8;

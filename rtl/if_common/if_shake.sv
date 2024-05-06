@@ -1,4 +1,4 @@
-interface gfx_shake;
+interface if_shake;
 
 	logic ready;
 	logic valid;

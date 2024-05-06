@@ -1,32 +1,31 @@
 // AXI4 con burst
-interface gfx_axib;
+interface if_axib
+#(int WIDTH = 32);
 
-	import gfx::word;
+	logic              awvalid,
+	                   awready;
+	logic[7:0]         awlen;
+	logic[1:0]         awburst;
+	logic[WIDTH - 1:0] awaddr;
 
-	logic      awvalid,
-	           awready;
-	logic[7:0] awlen;
-	logic[1:0] awburst;
-	word       awaddr;
-
-	logic wlast;
-	logic wvalid;
-	logic wready;
-	word  wdata;
+	logic              wlast;
+	logic              wvalid;
+	logic              wready;
+	logic[WIDTH - 1:0] wdata;
 
 	logic bvalid;
 	logic bready;
 
-	logic      arvalid,
-	           arready;
-	logic[7:0] arlen;
-	logic[1:0] arburst;
-	word       araddr;
+	logic              arvalid,
+	                   arready;
+	logic[7:0]         arlen;
+	logic[1:0]         arburst;
+	logic[WIDTH - 1:0] araddr;
 
-	logic rlast;
-	logic rvalid;
-	logic rready;
-	word  rdata;
+	logic              rlast;
+	logic              rvalid;
+	logic              rready;
+	logic[WIDTH - 1:0] rdata;
 
 	modport m
 	(

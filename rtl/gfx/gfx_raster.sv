@@ -1,14 +1,13 @@
 module gfx_raster
+import gfx::*;
 (
-	input  logic       clk,
-	                   rst_n,
+	input  logic      clk,
+	                  rst_n,
 
-	       gfx_pkts.rx geometry,
+	       if_pkts.rx geometry,
 
-	       gfx_pkts.tx coverage
+	       if_pkts.tx coverage
 );
-
-	import gfx::*;
 
 	gfx_raster_bounds setup_bounds
 	(
@@ -104,21 +103,20 @@ module gfx_raster
 endmodule
 
 module gfx_raster_bounds
+import gfx::*;
 (
-	input  logic               clk,
-	                           rst_n,
+	input  logic          clk,
+	                      rst_n,
 
-	       gfx_pkts.rx         geometry,
+	       if_pkts.rx     geometry,
 
-	input  logic               edges_ready,
-	output logic               edges_valid,
-	output gfx::word           edges_geom_id,
-	output gfx::fixed_xy       edges_ref,
-	output gfx::raster_prec_xy edges_span,
-	output gfx::vtx_xy         edges_vtx
+	input  logic          edges_ready,
+	output logic          edges_valid,
+	output word           edges_geom_id,
+	output fixed_xy       edges_ref,
+	output raster_prec_xy edges_span,
+	output vtx_xy         edges_vtx
 );
-
-	import gfx::*;
 
 	enum int unsigned
 	{
@@ -300,27 +298,26 @@ module gfx_raster_bounds
 endmodule
 
 module gfx_raster_edges
+import gfx::*;
 (
-	input  logic                  clk,
-	                              rst_n,
+	input  logic             clk,
+	                         rst_n,
 
-	input  logic                  bounds_valid,
-	input  gfx::word              bounds_geom_id,
-	input  gfx::fixed_xy          bounds_ref,
-	input  gfx::raster_prec_xy    bounds_span,
-	input  gfx::vtx_xy            bounds_vtx,
-	output logic                  bounds_ready,
+	input  logic             bounds_valid,
+	input  word              bounds_geom_id,
+	input  fixed_xy          bounds_ref,
+	input  raster_prec_xy    bounds_span,
+	input  vtx_xy            bounds_vtx,
+	output logic             bounds_ready,
 
-	input  logic                  coarse_ready,
-	output logic                  coarse_valid,
-	output gfx::word              coarse_geom_id,
-	output gfx::fixed_xy          coarse_ref,
-	output gfx::raster_prec_xy    coarse_span,
-	output gfx::fixed             coarse_base,
-	output gfx::raster_offsets_xy coarse_offsets
+	input  logic             coarse_ready,
+	output logic             coarse_valid,
+	output word              coarse_geom_id,
+	output fixed_xy          coarse_ref,
+	output raster_prec_xy    coarse_span,
+	output fixed             coarse_base,
+	output raster_offsets_xy coarse_offsets
 );
-
-	import gfx::*;
 
 	enum int unsigned
 	{
@@ -455,27 +452,26 @@ module gfx_raster_edges
 endmodule
 
 module gfx_raster_coarse
+import gfx::*;
 (
-	input  logic                  clk,
-	                              rst_n,
+	input  logic             clk,
+	                         rst_n,
 
-	input  logic                  edges_valid,
-	input  gfx::word              edges_geom_id,
-	input  gfx::fixed_xy          edges_ref,
-	input  gfx::raster_prec_xy    edges_span,
-	input  gfx::fixed             edges_base,
-	input  gfx::raster_offsets_xy edges_offsets,
-	output logic                  edges_ready,
+	input  logic             edges_valid,
+	input  word              edges_geom_id,
+	input  fixed_xy          edges_ref,
+	input  raster_prec_xy    edges_span,
+	input  fixed             edges_base,
+	input  raster_offsets_xy edges_offsets,
+	output logic             edges_ready,
 
-	input  logic                  fine_ready,
-	output logic                  fine_valid,
-	output gfx::word              fine_geom_id,
-	output gfx::fixed_xy          fine_ref,
-	output gfx::fixed             fine_corner,
-	output gfx::raster_offsets_xy fine_offsets
+	input  logic             fine_ready,
+	output logic             fine_valid,
+	output word              fine_geom_id,
+	output fixed_xy          fine_ref,
+	output fixed             fine_corner,
+	output raster_offsets_xy fine_offsets
 );
-
-	import gfx::*;
 
 	enum int unsigned
 	{
@@ -668,21 +664,20 @@ module gfx_raster_coarse
 endmodule
 
 module gfx_raster_fine
+import gfx::*;
 (
-	input  logic                  clk,
-	                              rst_n,
+	input  logic             clk,
+	                         rst_n,
 
-	input  logic                  coarse_valid,
-	input  gfx::word              coarse_geom_id,
-	input  gfx::fixed_xy          coarse_ref,
-	input  gfx::fixed             coarse_corner,
-	input  gfx::raster_offsets_xy coarse_offsets,
-	output logic                  coarse_ready,
+	input  logic             coarse_valid,
+	input  word              coarse_geom_id,
+	input  fixed_xy          coarse_ref,
+	input  fixed             coarse_corner,
+	input  raster_offsets_xy coarse_offsets,
+	output logic             coarse_ready,
 
-	       gfx_pkts.tx            coverage
+	       if_pkts.tx        coverage
 );
-
-	import gfx::*;
 
 	enum int unsigned
 	{

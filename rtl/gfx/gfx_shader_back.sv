@@ -15,7 +15,7 @@ import gfx::*;
 	logic abort;
 
 	gfx_wb out_wb(), p0_wb(), p1_wb(), p2_wb(), p3_wb();
-	gfx_shake p1_shake(), p2_shake(), p3_shake();
+	if_shake p1_shake(), p2_shake(), p3_shake();
 
 	gfx_shader_abort p0_abort
 	(
@@ -97,13 +97,13 @@ endmodule
 
 module gfx_shader_abort
 (
-	input  logic          clk,
+	input  logic         clk,
 
-	       gfx_shake.peek p1,
-	                      p2,
-	                      p3,
+	       if_shake.peek p1,
+	                     p2,
+	                     p3,
 
-	output logic          abort
+	output logic         abort
 );
 
 	always_ff @(posedge clk)

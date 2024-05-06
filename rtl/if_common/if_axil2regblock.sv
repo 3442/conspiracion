@@ -1,6 +1,6 @@
-module gfx_axil2regblock
+module if_axil2regblock
 (
-	gfx_axil.s           axis,
+	if_axil.s            axis,
 	axi4lite_intf.master axim
 );
 

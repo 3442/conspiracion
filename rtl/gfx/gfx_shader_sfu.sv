@@ -9,7 +9,7 @@ import gfx::*;
 
 	       gfx_regfile_io.ab read_data,
 
-	       gfx_shake.rx      in_shake,
+	       if_shake.rx       in_shake,
 
 	       gfx_wb.tx         wb
 );

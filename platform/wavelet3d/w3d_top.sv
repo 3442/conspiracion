@@ -44,10 +44,10 @@ import gfx::*;
 	logic srst_n;
 
 	gfx_wb fpint_wb();
-	gfx_axib insn_mem();
-	gfx_pkts geometry(), coverage();
+	if_axib insn_mem();
+	if_axil bootrom_axi(), debug_axi(), sched_axi(), shader_0_axi();
+	if_pkts geometry(), coverage();
 	gfx_regfile_io fpint_io();
-	gfx_axil bootrom_axi(), debug_axi(), sched_axi(), shader_0_axi();
 
 	assign q = fpint_wb.rx.lanes;
 	assign out_valid = fpint_wb.rx.valid;

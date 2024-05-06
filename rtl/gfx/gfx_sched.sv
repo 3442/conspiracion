@@ -1,13 +1,13 @@
 module gfx_sched
 import gfx::*;
 (
-	input  logic      clk,
-	                  rst_n,
-	                  srst_n,
+	input  logic     clk,
+	                 rst_n,
+	                 srst_n,
 
-	       gfx_axil.m axim,
+	       if_axil.m axim,
 
-	input  irq_lines  irq
+	input  irq_lines irq
 );
 
 	// verilator tracing_off

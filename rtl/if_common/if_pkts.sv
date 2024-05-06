@@ -1,11 +1,9 @@
-interface gfx_pkts
-#(parameter int WIDTH = $bits(gfx::word));
+interface if_pkts
+#(int WIDTH = 32);
 
-	import gfx::*;
-
-	logic tlast;
-	logic tready;
-	logic tvalid;
+	logic              tlast;
+	logic              tready;
+	logic              tvalid;
 	logic[WIDTH - 1:0] tdata;
 
 	modport tx

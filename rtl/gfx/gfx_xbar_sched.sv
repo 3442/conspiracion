@@ -1,14 +1,14 @@
 module gfx_xbar_sched
 import gfx::*;
 (
-	input  logic      clk,
-	                  srst_n,
+	input  logic     clk,
+	                 srst_n,
 
-	       gfx_axil.s sched,
+	       if_axil.s sched,
 
-	       gfx_axil.m debug,
-	       gfx_axil.m bootrom,
-	       gfx_axil.m shader_0
+	       if_axil.m debug,
+	       if_axil.m bootrom,
+	       if_axil.m shader_0
 );
 
 	localparam word BOOTROM_MASK  = 32'hfff0_0000;

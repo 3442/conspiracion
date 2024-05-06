@@ -2,17 +2,17 @@ module gfx_shader
 import gfx::*;
 import gfx_shader_schedif_pkg::*;
 (
-	input  logic      clk,
-	                  rst_n,
+	input  logic     clk,
+	                 rst_n,
 
-	       gfx_axib.m insn_mem,
+	       if_axib.m insn_mem,
 
-	       gfx_axil.s sched
+	       if_axil.s sched
 );
 
 	axi4lite_intf #(.ADDR_WIDTH(GFX_SHADER_SCHEDIF_MIN_ADDR_WIDTH)) regblock();
 
-	gfx_axil2regblock axil2regblock
+	if_axil2regblock axil2regblock
 	(
 		.axis(sched),
 		.axim(regblock.master)

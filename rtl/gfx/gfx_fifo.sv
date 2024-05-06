@@ -2,11 +2,11 @@ module gfx_fifo
 #(int WIDTH = 0,
   int DEPTH = 0)
 (
-	input  logic        clk,
-	                    rst_n,
+	input  logic       clk,
+	                   rst_n,
 
-	       gfx_beats.rx in,
-	       gfx_beats.tx out
+	       if_beats.rx in,
+	       if_beats.tx out
 );
 
 	logic do_read, do_write, full_if_eq, in_stall, out_stall,

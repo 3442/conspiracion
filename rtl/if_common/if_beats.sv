@@ -1,5 +1,5 @@
-interface gfx_beats
-#(int WIDTH = $bits(gfx::word));
+interface if_beats
+#(int WIDTH = 32);
 
 	logic[WIDTH - 1:0] data;
 	logic              ready;
