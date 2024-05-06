@@ -1,11 +1,11 @@
 cores := gfx_shader_schedif
 
 define core
-  $(this)/deps := axixbar gfx_shader_schedif if_common picorv32
+  $(this)/deps := axilemu axixbar gfx_shader_schedif if_common picorv32
 
   $(this)/rtl_top := gfx_top
   $(this)/rtl_dirs := .
-  $(this)/rtl_files := gfx_isa.sv gfx_pkg.sv
+  $(this)/rtl_files := gfx_isa.sv gfx_pkg.sv gfx_top.sv
 endef
 
 define core/gfx_shader_schedif

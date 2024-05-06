@@ -1,14 +1,19 @@
 module gfx_top
 import gfx::*;
 (
-	input  logic clk,
-	             rst_n
+	input  logic     clk,
+	                 rst_n,
+	
+	       if_axil.s host_ctrl
 );
 
 	logic srst_n;
 
 	if_axib insn_mem();
-	if_axil bootrom_axi(), debug_axi(), sched_axi(), shader_0_axi();
+	if_axil bootrom_axi(), debug_axi(), host_ctrl_axi(), sched_axi(), shader_0_axi();
+
+	logic irq_host_ctrl;
+	irq_lines irq;
 
 	gfx_rst_sync rst_sync
 	(
@@ -22,8 +27,17 @@ import gfx::*;
 		.clk,
 		.rst_n,
 		.srst_n,
-		.irq(0),
+		.irq,
 		.axim(sched_axi.m)
+	);
+
+	axilemu host_ctrl_bridge
+	(
+		.clk,
+		.rst_n,
+		.irq(irq_host_ctrl),
+		.agent(host_ctrl),
+		.driver(host_ctrl_axi.s)
 	);
 
 	gfx_bootrom bootrom
@@ -69,5 +83,13 @@ import gfx::*;
 		.coverage(TODO)
 	);
 	*/
+
+	always_ff @(posedge clk or negedge rst_n)
+		if (~rst_n)
+			irq <= '0;
+		else begin
+			irq <= '0;
+			irq[0] <= irq_host_ctrl;
+		end
 
 endmodule

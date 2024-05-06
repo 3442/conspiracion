@@ -42,6 +42,7 @@ import gfx::*;
 );
 
 	gfx_wb fpint_wb();
+	if_axil host_ctrl();
 	if_pkts coverage(), geometry();
 	gfx_regfile_io fpint_io();
 
@@ -106,7 +107,8 @@ import gfx::*;
 	gfx_top gfx
 	(
 		.clk,
-		.rst_n
+		.rst_n,
+		.host_ctrl(host_ctrl.s)
 	);
 
 endmodule
