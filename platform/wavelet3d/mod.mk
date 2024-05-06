@@ -1,5 +1,5 @@
 define core
-  $(this)/deps := gfx
+  $(this)/deps := gfx if_common
 
   $(this)/rtl_top := w3d_top
   $(this)/rtl_dirs := .

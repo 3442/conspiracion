@@ -42,6 +42,7 @@ import gfx::*;
 );
 
 	gfx_wb fpint_wb();
+	if_axib host_dbus(), host_ibus();
 	if_axil host_ctrl();
 	if_pkts coverage(), geometry();
 	gfx_regfile_io fpint_io();
@@ -109,6 +110,14 @@ import gfx::*;
 		.clk,
 		.rst_n,
 		.host_ctrl(host_ctrl.s)
+	);
+
+	w3d_host host
+	(
+		.clk,
+		.rst_n,
+		.dbus(host_dbus.m),
+		.ibus(host_ibus.m)
 	);
 
 endmodule
