@@ -122,13 +122,22 @@ import gfx::*;
 	group_id groups[BIND_STAGES];
 	icache_line_tag araddr, request_addr;
 
-	assign mem.bready = 0;
-	assign mem.wvalid = 0;
-	assign mem.awvalid = 0;
-
+	assign mem.arid = '0;
 	assign mem.arlen = ($bits(mem.arlen))'($bits(oword) / $bits(word) - 1);
+	assign mem.arsize = 3'b101; // 32 bits/beat
 	assign mem.araddr = {araddr, ($clog2($bits(oword)) - $clog2($bits(word)) + SUBWORD_BITS)'('0)};
 	assign mem.arburst = 2'b01; // Incremental mode
+
+	assign mem.awid = '0;
+	assign mem.awlen = mem.arlen;
+	assign mem.awsize = mem.arsize;
+	assign mem.awburst = mem.arburst;
+	assign mem.awvalid = 0;
+
+	assign mem.wstrb = '0;
+	assign mem.wvalid = 0;
+
+	assign mem.bready = 0;
 
 	assign runnable_in.tx.data = loop_group;
 	assign runnable_in.tx.valid = loop_valid;
