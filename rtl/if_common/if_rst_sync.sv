@@ -1,5 +1,5 @@
 //FIXME: peligro
-module gfx_rst_sync
+module if_rst_sync
 (
 	input  logic clk,
 	             rst_n,

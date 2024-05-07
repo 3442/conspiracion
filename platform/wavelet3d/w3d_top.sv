@@ -42,10 +42,12 @@ import gfx::*;
 );
 
 	gfx_wb fpint_wb();
-	if_axib host_dbus(), host_ibus();
-	if_axil host_ctrl();
+	if_axib dram(), host_dbus(), host_ibus();
+	if_axil external_io(), gfx_ctrl();
 	if_pkts coverage(), geometry();
 	gfx_regfile_io fpint_io();
+
+	logic srst_n;
 
 	assign q = fpint_wb.rx.lanes;
 	assign out_valid = fpint_wb.rx.valid;
@@ -85,6 +87,13 @@ import gfx::*;
 	assign fpint_io.regs.a = a;
 	assign fpint_io.regs.b = b;
 
+	if_rst_sync rst_sync
+	(
+		.clk,
+		.rst_n,
+		.srst_n
+	);
+
 	gfx_shader_fpint fpint
 	(
 		.clk,
@@ -109,7 +118,8 @@ import gfx::*;
 	(
 		.clk,
 		.rst_n,
-		.host_ctrl(host_ctrl.s)
+		.srst_n,
+		.host_ctrl(gfx_ctrl.s)
 	);
 
 	w3d_host host
@@ -118,6 +128,17 @@ import gfx::*;
 		.rst_n,
 		.dbus(host_dbus.m),
 		.ibus(host_ibus.m)
+	);
+
+	w3d_interconnect inter
+	(
+		.clk,
+		.srst_n,
+		.dram(dram.m),
+		.gfx_ctrl(gfx_ctrl.m),
+		.host_dbus(host_dbus.s),
+		.host_ibus(host_ibus.s),
+		.external_io(external_io.m)
 	);
 
 endmodule

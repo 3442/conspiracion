@@ -3,24 +3,16 @@ import gfx::*;
 (
 	input  logic     clk,
 	                 rst_n,
+	                 srst_n,
 	
 	       if_axil.s host_ctrl
 );
-
-	logic srst_n;
 
 	if_axib insn_mem();
 	if_axil bootrom_axi(), debug_axi(), host_ctrl_axi(), sched_axi(), shader_0_axi();
 
 	logic irq_host_ctrl;
 	irq_lines irq;
-
-	gfx_rst_sync rst_sync
-	(
-		.clk,
-		.rst_n,
-		.srst_n
-	);
 
 	gfx_sched sched
 	(
