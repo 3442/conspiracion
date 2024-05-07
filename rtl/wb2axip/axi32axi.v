@@ -170,6 +170,8 @@ module	axi32axi #(
 		// }}}
 	);
 
+	// verilator tracing_off
+
 	// Register/net declarations
 	// {{{
 	// localparam	ADDRLSB= $clog2(C_AXI_DATA_WIDTH)-3;

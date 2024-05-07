@@ -155,6 +155,8 @@ module axi2axilite #(
 		// }}}
 	);
 
+	// verilator tracing_off
+
 	// Local parameters, register, and net declarations
 	// {{{
 	localparam [1:0]	SLVERR = 2'b10;

@@ -193,6 +193,9 @@ module	axilxbar #(
 		// }}}
 		// }}}
 	);
+
+	// verilator tracing_off
+
 	//
 	// Local parameters, derived from those above
 	// {{{

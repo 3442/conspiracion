@@ -304,6 +304,8 @@ module	axixbar #(
 		// }}}
 	);
 
+	// verilator tracing_off
+
 	////////////////////////////////////////////////////////////////////////
 	//
 	// Internal signal declarations and definitions
