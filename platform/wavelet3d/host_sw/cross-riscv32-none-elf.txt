@@ -1,0 +1,25 @@
+[binaries]
+# Meson 0.53.2 doesn't use any cflags when doing basic compiler tests,
+# so we have to add -nostdlib to the compiler configuration itself or
+# early compiler tests will fail. This can be removed when picolibc
+# requires at least version 0.54.2 of meson.
+c = ['riscv32-none-elf-gcc', '-nostdlib']
+ar = 'riscv32-none-elf-ar'
+as = 'riscv32-none-elf-as'
+strip = 'riscv32-none-elf-strip'
+nm = 'riscv32-none-elf-nm'
+
+[host_machine]
+system = 'unknown'
+cpu_family = 'riscv32'
+cpu = 'riscv'
+endian = 'little'
+
+[properties]
+# default multilib is 64 bit
+c_args = [ '-march=rv32imfc', '-mabi=ilp32f', '-mcmodel=medlow', '-fno-common' ]
+skip_sanity_check = true
+default_flash_addr = '0x00000000'
+default_flash_size = '0x04000000'
+default_ram_addr   = '0x04000000'
+default_ram_size   = '0x1c000000'

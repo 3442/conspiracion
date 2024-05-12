@@ -1,0 +1,3 @@
+[submodule "platform/wavelet3d/host_sw/picolibc"]
+	path = platform/wavelet3d/host_sw/picolibc
+	url = https://github.com/picolibc/picolibc

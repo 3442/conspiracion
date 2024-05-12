@@ -138,6 +138,8 @@
             gnumake
             gtkwave
             kermit
+            meson
+            ninja
             lcov
             pkg-config
             (python3.withPackages (py: with py; [
