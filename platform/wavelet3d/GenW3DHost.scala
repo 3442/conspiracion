@@ -1,15 +1,17 @@
 // $ sbt "runMain vexriscv.demo.GenW3DHost"             :((git)-[master]  03:59:49
 // Agregar a mano: verilator tracing_off
 // Quitar `timescale
-// TODO: FPU? Quitar excesos?
+// TODO: Quitar excesos?
 
 package vexriscv.demo
 
 import spinal.core._
 import spinal.lib._
 import spinal.lib.bus.amba4.axi.Axi4ReadOnly
+import spinal.lib.cpu.riscv.debug.DebugTransportModuleParameter
 import spinal.lib.eda.altera.{InterruptReceiverTag, QSysify, ResetEmitterTag}
 import vexriscv.ip.{DataCacheConfig, InstructionCacheConfig}
+import vexriscv.ip.fpu.FpuParameter
 import vexriscv.plugin._
 import vexriscv.{VexRiscv, VexRiscvConfig, plugin}
 
@@ -22,13 +24,13 @@ object GenW3DHost extends App{
   ).generateVerilog({
     val cpuConfig = VexRiscvConfig(
       plugins = List(
-        new PcManagerSimplePlugin(
-          resetVector = 0x80000000l,
-          relaxedPcCalculation = false
-        ),
         new IBusCachedPlugin(
           prediction = DYNAMIC_TARGET,
+          resetVector = 0x00000000l,
           historyRamSizeLog2 = 8,
+          compressedGen = true,
+          injectorStage = true,
+          relaxedPcCalculation = true,
           config = InstructionCacheConfig(
             cacheSize = 4096*2,
             bytePerLine =32,
@@ -67,6 +69,14 @@ object GenW3DHost extends App{
           zeroBoot = false
         ),
         new IntAluPlugin,
+        new FpuPlugin(
+          p = new FpuParameter(
+            withDouble = false,
+            asyncRegFile = false,
+            mulWidthA = 17,
+            mulWidthB = 17
+          )
+        ),
         new SrcPlugin(
           separatedAddSub = false,
           executeInsertion = true
@@ -83,8 +93,20 @@ object GenW3DHost extends App{
         ),
         new MulPlugin,
         new DivPlugin,
-        new CsrPlugin(CsrPluginConfig.small),
-        //new DebugPlugin(ClockDomain.current.clone(reset = Bool().setName("debugReset"))),
+        new CsrPlugin(CsrPluginConfig.small(0x00000000l).copy(
+          ebreakGen = true,
+          withPrivilegedDebug = true
+        )),
+        new EmbeddedRiscvJtag(
+          p = DebugTransportModuleParameter(
+            addressWidth = 7,
+            version      = 1,
+            idle         = 7
+          ),
+          debugCd = ClockDomain.current,
+          withTunneling = false,
+          withTap = true
+        ),
         new BranchPlugin(
           earlyBranch = false,
           catchAddressMisaligned = true

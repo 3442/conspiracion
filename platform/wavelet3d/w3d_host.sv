@@ -4,7 +4,9 @@ module w3d_host
 	                 rst_n,
 
 	       if_axib.m dbus,
-	                 ibus
+	                 ibus,
+
+	       if_tap.s  jtag
 );
 
 	assign dbus.arid = '0;
@@ -19,6 +21,14 @@ module w3d_host
 		.timerInterrupt(0),
 		.externalInterrupt(0),
 		.softwareInterrupt(0),
+
+		.ndmreset(),
+		.stoptime(),
+
+		.jtag_tck(jtag.tck),
+		.jtag_tms(jtag.tms),
+		.jtag_tdi(jtag.tdi),
+		.jtag_tdo(jtag.tdo),
 
 		.iBusAxi_ar_valid(ibus.arvalid),
 		.iBusAxi_ar_ready(ibus.arready),

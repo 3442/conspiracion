@@ -42,6 +42,7 @@ import gfx::*;
 );
 
 	gfx_wb fpint_wb();
+	if_tap host_jtag();
 	if_axib dram(), host_dbus(), host_ibus();
 	if_axil external_io(), gfx_ctrl();
 	if_pkts coverage(), geometry();
@@ -127,7 +128,8 @@ import gfx::*;
 		.clk,
 		.rst_n,
 		.dbus(host_dbus.m),
-		.ibus(host_ibus.m)
+		.ibus(host_ibus.m),
+		.jtag(host_jtag.s)
 	);
 
 	w3d_interconnect inter
