@@ -5,6 +5,6 @@ define core
   $(this)/rtl_dirs := .
   $(this)/rtl_files := w3d_top.sv
 
-  $(this)/vl_main := main.cpp
+  $(this)/vl_main := main.cpp remote_bitbang.cpp
   $(this)/vl_pkgconfig := sdl2
 endef

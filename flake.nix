@@ -141,6 +141,7 @@
             meson
             ninja
             lcov
+            openocd
             pkg-config
             (python3.withPackages (py: with py; [
               cocotb
