@@ -7,7 +7,7 @@ import gfx::*;
 	       if_axil.s axis
 );
 
-	localparam ROM_WORDS_LOG = 8;
+	localparam ROM_WORDS_LOG = 7;
 
 	enum int unsigned
 	{

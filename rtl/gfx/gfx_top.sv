@@ -63,7 +63,8 @@ import gfx::*;
 
 		.debug(debug_axi.m),
 		.bootrom(bootrom_axi.m),
-		.shader_0(shader_0_axi.m)
+		.shader_0(shader_0_axi.m),
+		.host_ctrl(host_ctrl_axi.m)
 	);
 
 	/*TODO
