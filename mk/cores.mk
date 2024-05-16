@@ -2,7 +2,7 @@ here = $(if $(mod_path),$(mod_path)/)
 mod_path :=
 subdir_stack :=
 
-unknown_core = $(error unknown core '$(1)')
+unknown_core = $(error $(if $(2),in core '$(2)': ,)unknown core '$(1)')
 
 all_cores :=
 all_stamps :=
@@ -108,7 +108,7 @@ define get_core_deps
   dep_tree/$(1) :=
 
   $$(foreach dep,$$(core_info/$(1)/deps), \
-    $$(if $$(core_info/$$(dep)/path),,$$(call unknown_core,$$(dep))) \
+    $$(if $$(core_info/$$(dep)/path),,$$(call unknown_core,$$(dep),$(1))) \
     $$(eval dep_tree/$(1) := \
       $$(dep_tree/$$(dep)) $$(filter-out $$(dep_tree/$$(dep)),$$(dep_tree/$(1)))))
 
