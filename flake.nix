@@ -51,7 +51,18 @@
         ];
       };
 
-      rv32Pkgs = pkgs.pkgsCross.riscv32-embedded;
+      rv32Pkgs = import nixpkgs {
+        inherit system;
+        config.allowUnsupportedSystem = true;
+
+        crossSystem = {
+          config = "riscv32-none-elf";
+          gcc = {
+            arch = "rv32imafc";
+            abi = "ilp32f";
+          };
+        };
+      };
     in
     {
       formatter.${system} = pkgs.nixpkgs-fmt;
