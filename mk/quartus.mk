@@ -36,8 +36,13 @@ endef
 define target/syn/rules
   deps := $$(dep_tree/$$(rule_top))
 
+  explicit_rtl := $$(foreach dep,$$(deps),$$(call core_paths,$$(dep),rtl_files))
+
   $(call target_var,quartus_rtl) := \
-    $$(foreach dep,$$(deps),$$(call core_paths,$$(dep),rtl_files))
+    $$(explicit_rtl) \
+    $$(filter-out $$(explicit_rtl), \
+      $$(foreach rtl_dir,$$(foreach dep,$$(deps),$$(call core_paths,$$(dep),rtl_dirs)), \
+        $$(filter %.v %.sv %.vhd,$$(wildcard $$(rtl_dir)/*))))
 
   $(call target_var,quartus_rtl_include) := \
     $$(foreach dep,$$(deps),$$(call core_paths,$$(dep),rtl_include_dirs))
