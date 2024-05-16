@@ -23,19 +23,16 @@ endef
 define target/test/rules
   $(verilator_target_rules)
 
-  cocotb_outs := $$(addprefix $$(obj)/,results.xml log.txt)
-
   .PHONY: $$(rule_top_path)/test
-  $$(rule_top_path)/test: $$(obj)/results.xml
 
-  $$(cocotb_outs) &: $$(vtop_exe) | $$(obj)
-	$$(call run_no_err,COCOTB) cd $$(obj) && \
+  $$(rule_top_path)/test &: $$(vtop_exe) | $$(obj)
+	$$(call run_no_err,COCOTB) cd $$(obj) && rm -f log.txt results.xml && \
 		LIBPYTHON_LOC=$$(cocotb_libpython) COCOTB_RESULTS_FILE=results.xml \
 		PYTHONPATH="$$(subst $$(space),:,$$(strip $$(cocotb_pythonpath) $$$$PYTHONPATH))" \
 		MODULE=$$(subst $$(space),$$(comma),$$(cocotb_modules)) \
-		$$(src)/$$< $$(if $$(V),| tee,>) log.txt
+		$$(src)/$$< | tee log.txt
 
-  $(call target_entrypoint,$$(cocotb_outs))
+  $(call target_entrypoint,$$(rule_top_path)/test)
 endef
 
 cocotb_pythonpath = \
