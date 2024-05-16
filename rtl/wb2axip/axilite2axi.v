@@ -30,7 +30,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 //
-`default_nettype none
+//`default_nettype none
 // }}}
 module axilite2axi #(
 		// {{{
@@ -370,5 +370,5 @@ module axilite2axi #(
 `endif
 endmodule
 `ifndef	YOSYS
-`default_nettype wire
+//`default_nettype wire
 `endif

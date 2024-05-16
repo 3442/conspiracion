@@ -71,7 +71,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
 //
-`default_nettype	none
+//`default_nettype	none
 // `define			AXI3
 // }}}
 module	axisgfsm #(
@@ -80,8 +80,8 @@ module	axisgfsm #(
 		// Verilator lint_off UNUSED
 		parameter	C_AXI_DATA_WIDTH = 32,
 		// Verilator lint_on  UNUSED
-		localparam DMAC_ADDR_WIDTH = 5,
-		localparam DMAC_DATA_WIDTH = 32,
+		/*local*/parameter DMAC_ADDR_WIDTH = 5,
+		/*local*/parameter DMAC_DATA_WIDTH = 32,
 		//
 		// The "ABORT_KEY" is a byte that, if written to the control
 		// word while the core is running, will cause the data transfer

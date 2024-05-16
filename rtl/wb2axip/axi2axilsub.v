@@ -49,7 +49,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 //
-`default_nettype	none
+//`default_nettype	none
 //
 `ifdef	FORMAL
 `ifdef	BMC
@@ -645,7 +645,7 @@ module axi2axilsub #(
 
 		// m_awvalid
 		// {{{
-		initial	m_axi_awvalid = 0;
+		//initial	m_axi_awvalid = 0;
 		always @(posedge S_AXI_ACLK)
 		if (!S_AXI_ARESETN)
 			m_awvalid <= 0;

@@ -1,6 +1,5 @@
 module gfx_shader
-import gfx::*;
-import gfx_shader_schedif_pkg::*;
+import gfx::*, gfx_shader_schedif_pkg::*;
 (
 	input  logic     clk,
 	                 rst_n,

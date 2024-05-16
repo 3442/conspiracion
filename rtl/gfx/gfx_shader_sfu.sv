@@ -14,4 +14,6 @@ import gfx::*;
 	       gfx_wb.tx         wb
 );
 
+	word foo;
+
 endmodule

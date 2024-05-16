@@ -48,7 +48,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
 //
-`default_nettype none
+//`default_nettype none
 // }}}
 //
 module	axi2axi3 #(
@@ -63,17 +63,17 @@ module	axi2axi3 #(
 		input	wire				S_AXI_ARESETN,
 		//
 		// The AXI4 incoming/slave interface
-		input	reg				S_AXI_AWVALID,
+		input	wire				S_AXI_AWVALID,
 		output	wire				S_AXI_AWREADY,
-		input	reg	[C_AXI_ID_WIDTH-1:0]	S_AXI_AWID,
-		input	reg	[C_AXI_ADDR_WIDTH-1:0]	S_AXI_AWADDR,
-		input	reg	[7:0]			S_AXI_AWLEN,
-		input	reg	[2:0]			S_AXI_AWSIZE,
-		input	reg	[1:0]			S_AXI_AWBURST,
-		input	reg				S_AXI_AWLOCK,
-		input	reg	[3:0]			S_AXI_AWCACHE,
-		input	reg	[2:0]			S_AXI_AWPROT,
-		input	reg	[3:0]			S_AXI_AWQOS,
+		input	wire	[C_AXI_ID_WIDTH-1:0]	S_AXI_AWID,
+		input	wire	[C_AXI_ADDR_WIDTH-1:0]	S_AXI_AWADDR,
+		input	wire	[7:0]			S_AXI_AWLEN,
+		input	wire	[2:0]			S_AXI_AWSIZE,
+		input	wire	[1:0]			S_AXI_AWBURST,
+		input	wire				S_AXI_AWLOCK,
+		input	wire	[3:0]			S_AXI_AWCACHE,
+		input	wire	[2:0]			S_AXI_AWPROT,
+		input	wire	[3:0]			S_AXI_AWQOS,
 		//
 		//
 		input	wire				S_AXI_WVALID,
@@ -297,7 +297,7 @@ module	axi2axi3 #(
 	end
 
 
-	initial	M_AXI_AWSIZE = ADDRLSB[2:0];
+	//initial	M_AXI_AWSIZE = ADDRLSB[2:0];
 	always @(posedge S_AXI_ACLK)
 	begin
 		if (awskd_valid && awskd_ready)
@@ -673,7 +673,7 @@ module	axi2axi3 #(
 		axi_arvalid <= 1'b0;
 
 	initial	r_arlen = 0;
-	initial	M_AXI_ARLEN = 0;
+	//initial	M_AXI_ARLEN = 0;
 	always @(posedge S_AXI_ACLK)
 	if (!S_AXI_ARESETN)
 	begin

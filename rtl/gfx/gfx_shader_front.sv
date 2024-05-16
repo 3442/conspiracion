@@ -1,9 +1,9 @@
 typedef struct
 {
-	logic              valid,
-	                   retry;
-	gfx::group_id      group;
-	gfx_isa::insn_word insn;
+	logic             valid,
+	                  retry;
+	gfx::group_id     group;
+	gfx_isa::insn_any insn;
 } front_wave;
 
 typedef struct
@@ -124,7 +124,7 @@ import gfx::*;
 
 	assign mem.arid = '0;
 	assign mem.arlen = ($bits(mem.arlen))'($bits(oword) / $bits(word) - 1);
-	assign mem.arsize = 3'b101; // 32 bits/beat
+	assign mem.arsize = 3'b010; // 4 bytes/beat
 	assign mem.araddr = {araddr, ($clog2($bits(oword)) - $clog2($bits(word)) + SUBWORD_BITS)'('0)};
 	assign mem.arburst = 2'b01; // Incremental mode
 
@@ -424,17 +424,16 @@ import gfx::*;
 		insn_valid <= valid_5;
 
 		if (fetch_ready & fetch_valid) begin
-			fetch_shift[0] <= fetch_data;
-			for (int i = 1; i < $size(fetch_shift); ++i)
-				fetch_shift[i] <= fetch_shift[i - 1];
+			fetch_shift[$size(fetch_shift) - 1] <= fetch_data;
+			for (int i = 0; i < $size(fetch_shift) - 1; ++i)
+				fetch_shift[i] <= fetch_shift[i + 1];
 		end
 	end
 
 endmodule
 
 module gfx_shader_read_regs
-import gfx::*;
-import gfx_isa::*;
+import gfx::*, gfx_isa::*;
 (
 	input  logic               clk,
 	                           rst_n,
@@ -470,7 +469,7 @@ import gfx_isa::*;
 		for (int i = 1; i < $size(out_hold); ++i)
 			out_hold[i] <= out_hold[i - 1];
 
-		passthru_hold[0].dest <= in.insn.dst_src.rr.rd;
+		passthru_hold[0].dest <= in.insn.dst_src.rd;
 		unique case (in.insn.reg_mode)
 			REGS_SVS, REGS_SSS:
 				passthru_hold[0].dest_scalar <= 1;
@@ -484,13 +483,13 @@ import gfx_isa::*;
 
 		read.op.group <= in.group;
 
-		read.op.b_imm <= in.insn.dst_src.rr.b.imm;
-		read.op.a_sgpr <= in.insn.dst_src.rr.ra.sgpr;
-		read.op.b_sgpr <= in.insn.dst_src.rr.b.read.r.sgpr;
-		read.op.a_vgpr <= in.insn.dst_src.rr.ra.vgpr.num;
-		read.op.b_vgpr <= in.insn.dst_src.rr.b.read.r.vgpr.num;
-		read.op.b_is_imm <= in.insn.dst_src.rr.b_is_imm;
-		read.op.b_is_const <= in.insn.dst_src.rr.b.read.from_consts;
+		read.op.b_imm <= in.insn.dst_src.b;
+		read.op.a_sgpr <= in.insn.dst_src.ra;
+		read.op.b_sgpr <= in.insn.dst_src.b.r;
+		read.op.a_vgpr <= in.insn.dst_src.ra.vgpr;
+		read.op.b_vgpr <= in.insn.dst_src.b.r.vgpr;
+		read.op.b_is_imm <= in.insn.dst_src.b_is_imm;
+		read.op.b_is_const <= in.insn.dst_src.b.from_consts;
 		read.op.scalar_rev <= reg_rev;
 
 		unique case (in.insn.reg_mode)
@@ -525,8 +524,7 @@ import gfx_isa::*;
 endmodule
 
 module gfx_shader_decode_class
-import gfx::*;
-import gfx_isa::*;
+import gfx::*, gfx_isa::*;
 (
 	input  logic           clk,
 	                       rst_n,
@@ -573,7 +571,7 @@ import gfx_isa::*;
 			retry <= wave.retry;
 			hold_valid <= wave.valid;
 
-			unique case (wave.insn.insn_class)
+			unique case (wave.insn.op_class)
 				INSN_FPINT: ; // p0 no tiene ready
 				INSN_MEM:   is_mem   <= 1;
 				INSN_SFU:   is_fsu   <= 1;
@@ -599,19 +597,22 @@ import gfx_isa::*;
 endmodule
 
 module gfx_shader_decode_fpint
-import gfx::*;
-import gfx_isa::*;
+import gfx::*, gfx_isa::*;
 (
-	input  logic     clk,
+	input  logic    clk,
 
-	input  insn_word insn,
-	input  logic     writeback,
+	input  insn_any insn,
+	input  logic    writeback,
 
-	output fpint_op  op
+	output fpint_op op
 );
 
+	insn_fpint as_fpint;
+
+	assign as_fpint = insn;
+
 	always_ff @(posedge clk) begin
-		unique case (insn.by_class.fpint.op)
+		unique case (as_fpint.op)
 			INSN_FPINT_MOV: begin
 				op.setup_mul_float    <= 0;
 				op.setup_unit_b       <= 1;
@@ -709,7 +710,7 @@ import gfx_isa::*;
 				op.mnorm_zero_flags   <= 0;
 				op.mnorm_zero_b       <= 0;
 				op.minmax_abs         <= 0;
-				op.minmax_swap        <= insn.by_class.fpint.op == INSN_FPINT_FMIN;
+				op.minmax_swap        <= as_fpint.op == INSN_FPINT_FMIN;
 				op.minmax_zero_min    <= 1;
 				op.minmax_copy_flags  <= 1;
 				op.shiftr_int_signed  <= 0;

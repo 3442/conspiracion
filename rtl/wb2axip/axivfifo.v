@@ -46,7 +46,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 //
-`default_nettype	none
+//`default_nettype	none
 //
 // `define			AXI3
 // }}}
@@ -60,7 +60,7 @@ module	axivfifo #(
 		// to the bus data width.  Use an upstream core if you need to
 		// pack a smaller width into your bus's width, or a downstream
 		// core if you need to unpack it.
-		localparam	C_AXIS_DATA_WIDTH = C_AXI_DATA_WIDTH,
+		/*local*/parameter	C_AXIS_DATA_WIDTH = C_AXI_DATA_WIDTH,
 		//
 		// LGMAXBURST determines the size of the maximum AXI burst.
 		// In AXI4, the maximum burst size is 256 beats the log_2()
@@ -100,7 +100,7 @@ module	axivfifo #(
 		parameter	[C_AXI_ID_WIDTH-1:0]	AXI_READ_ID = 0,
 		parameter	[C_AXI_ID_WIDTH-1:0]	AXI_WRITE_ID = 0,
 		//
-		localparam	ADDRLSB= $clog2(C_AXI_DATA_WIDTH)-3
+		/*local*/parameter	ADDRLSB= $clog2(C_AXI_DATA_WIDTH)-3
 		// }}}
 	) (
 		// {{{

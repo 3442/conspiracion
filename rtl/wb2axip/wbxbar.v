@@ -71,7 +71,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 //
-`default_nettype none
+//`default_nettype none
 // }}}
 module	wbxbar #(
 		// {{{
@@ -1786,5 +1786,5 @@ module	wbxbar #(
 // }}}
 endmodule
 `ifndef	YOSYS
-`default_nettype wire
+//`default_nettype wire
 `endif

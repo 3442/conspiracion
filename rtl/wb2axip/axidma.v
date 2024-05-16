@@ -60,7 +60,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
 //
-`default_nettype	none
+//`default_nettype	none
 // `define			AXI3
 // }}}
 module	axidma #(
@@ -75,8 +75,8 @@ module	axidma #(
 		// The registers are configured wide enough to support 64-bit
 		// AXI addressing.  Similarly, the AXI-lite data width is fixed
 		// at 32-bits.
-		localparam	C_AXIL_ADDR_WIDTH = 5,
-		localparam	C_AXIL_DATA_WIDTH = 32,
+		/*local*/parameter	C_AXIL_ADDR_WIDTH = 5,
+		/*local*/parameter	C_AXIL_DATA_WIDTH = 32,
 		//
 		// OPT_UNALIGNED turns on support for unaligned addresses,
 		// whether source, destination, or length parameters.
@@ -135,9 +135,9 @@ module	axidma #(
 		// to be aborted.
 		parameter	[7:0]			ABORT_KEY  = 8'h6d,
 		//
-		localparam	ADDRLSB= $clog2(C_AXI_DATA_WIDTH)-3,
-		localparam	AXILLSB= $clog2(C_AXIL_DATA_WIDTH)-3,
-		localparam	LGLENW= LGLEN-ADDRLSB
+		/*local*/parameter	ADDRLSB= $clog2(C_AXI_DATA_WIDTH)-3,
+		/*local*/parameter	AXILLSB= $clog2(C_AXIL_DATA_WIDTH)-3,
+		/*local*/parameter	LGLENW= LGLEN-ADDRLSB
 		// }}}
 	) (
 		// {{{
@@ -199,7 +199,7 @@ module	axidma #(
 `ifdef	AXI3
 		output	reg	[C_AXI_ID_WIDTH-1:0]	M_AXI_WID,
 `endif
-		output	reg	[C_AXI_DATA_WIDTH-1:0]	M_AXI_WDATA,
+		output	wire	[C_AXI_DATA_WIDTH-1:0]	M_AXI_WDATA,
 		output	reg [C_AXI_DATA_WIDTH/8-1:0]	M_AXI_WSTRB,
 		output	reg				M_AXI_WLAST,
 		//
@@ -1088,8 +1088,8 @@ module	axidma #(
 				r_outword <= r_partial_outword;
 		end
 
-		always @(*)
-			M_AXI_WDATA = r_outword;
+		/*always @(*)*/
+			assign M_AXI_WDATA = r_outword;
 
 		always @(*)
 		begin

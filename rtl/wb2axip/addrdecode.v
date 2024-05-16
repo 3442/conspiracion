@@ -62,7 +62,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
 //
-`default_nettype	none
+//`default_nettype	none
 // }}}
 module	addrdecode #(
 		// {{{
@@ -457,5 +457,5 @@ module	addrdecode #(
 // }}}
 endmodule
 `ifndef	YOSYS
-`default_nettype wire
+//`default_nettype wire
 `endif

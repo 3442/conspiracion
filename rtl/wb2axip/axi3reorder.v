@@ -80,7 +80,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
 //
-`default_nettype	none
+//`default_nettype	none
 // }}}
 module	axi3reorder #(
 		// {{{
@@ -293,7 +293,7 @@ module	axi3reorder #(
 		//
 
 		for (gk = 0; gk<NSREG; gk=gk+1)
-		begin
+		begin: genblock_a
 
 			// sr_advance
 			// {{{
@@ -510,7 +510,7 @@ module	axi3reorder #(
 		// Every write beat goes into a separate FIFO based on its ID
 		//
 		for (gk=0; gk < NUM_FIFOS; gk=gk+1)
-		begin
+		begin: genblock_b
 		// {{{
 			wire	[LGWFIFO:0]	wbfifo_fill;
 

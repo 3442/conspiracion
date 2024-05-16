@@ -36,7 +36,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 //
-`default_nettype none
+//`default_nettype none
 // }}}
 module	axilempty #(
 		// {{{
@@ -47,7 +47,7 @@ module	axilempty #(
 		// Verilator lint_off UNUSED
 		parameter	C_AXI_ADDR_WIDTH = 4,
 		// Verilator lint_on  UNUSED
-		localparam	C_AXI_DATA_WIDTH = 32,
+		/*local*/parameter	C_AXI_DATA_WIDTH = 32,
 		parameter [0:0]	OPT_SKIDBUFFER = 1'b0,
 		parameter [0:0]	OPT_LOWPOWER = 0
 		// }}}

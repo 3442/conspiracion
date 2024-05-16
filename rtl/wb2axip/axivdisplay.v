@@ -115,7 +115,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
 //
-`default_nettype none
+//`default_nettype none
 // }}}
 module	axivdisplay #(
 		// {{{
@@ -125,12 +125,12 @@ module	axivdisplay #(
 		//
 		// We support five 32-bit AXI-lite registers, requiring 5-bits
 		// of AXI-lite addressing
-		localparam	C_AXIL_ADDR_WIDTH = 4,
-		localparam	C_AXIL_DATA_WIDTH = 32,
+		/*local*/parameter	C_AXIL_ADDR_WIDTH = 4,
+		/*local*/parameter	C_AXIL_DATA_WIDTH = 32,
 		//
 		// The bottom ADDRLSB bits of any AXI address are subword bits
-		localparam	ADDRLSB = $clog2(C_AXI_DATA_WIDTH)-3,
-		localparam	AXILLSB = $clog2(C_AXIL_DATA_WIDTH)-3,
+		/*local*/parameter	ADDRLSB = $clog2(C_AXI_DATA_WIDTH)-3,
+		/*local*/parameter	AXILLSB = $clog2(C_AXIL_DATA_WIDTH)-3,
 		//
 		// OPT_UNALIGNED: Allow unaligned accesses, address requests
 		// and sizes which may or may not match the underlying data

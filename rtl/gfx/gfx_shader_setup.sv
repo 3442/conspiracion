@@ -1,5 +1,6 @@
-interface gfx_shader_setup
-import gfx::*;;
+interface gfx_shader_setup;
+
+	import gfx::*;
 
 	struct
 	{

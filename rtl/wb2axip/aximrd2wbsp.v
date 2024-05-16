@@ -44,7 +44,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
 //
-`default_nettype	none
+//`default_nettype	none
 // }}}
 module	aximrd2wbsp #(
 		// {{{
@@ -52,8 +52,8 @@ module	aximrd2wbsp #(
 	                                             // This is an int between 1-16
 		parameter C_AXI_DATA_WIDTH	= 32,// Width of the AXI R&W data
 		parameter C_AXI_ADDR_WIDTH	= 28,	// AXI Address width
-		localparam AXI_LSBS		= $clog2(C_AXI_DATA_WIDTH/8),
-		localparam AW			= C_AXI_ADDR_WIDTH - AXI_LSBS,
+		/*local*/parameter AXI_LSBS		= $clog2(C_AXI_DATA_WIDTH/8),
+		/*local*/parameter AW			= C_AXI_ADDR_WIDTH - AXI_LSBS,
 		parameter LGFIFO                =  3,
 		parameter [0:0] OPT_SWAP_ENDIANNESS = 1'b0,
 		parameter [0:0] OPT_SIZESEL	= 1

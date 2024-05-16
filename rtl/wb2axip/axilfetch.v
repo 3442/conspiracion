@@ -31,7 +31,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 //
-`default_nettype	none
+//`default_nettype	none
 // }}}
 module	axilfetch #(
 		// {{{
@@ -40,7 +40,7 @@ module	axilfetch #(
 		parameter	INSN_WIDTH=32,
 		parameter	FETCH_LIMIT=16,
 		parameter [0:0]	SWAP_ENDIANNESS = 1'b1,
-		localparam	AW=C_AXI_ADDR_WIDTH
+		/*local*/parameter	AW=C_AXI_ADDR_WIDTH
 		// }}}
 	) (
 		// {{{
@@ -293,11 +293,15 @@ module	axilfetch #(
 		genvar	gw, gb;	// Word count, byte count
 
 		for(gw=0; gw<C_AXI_DATA_WIDTH/INSN_WIDTH; gw=gw+1) // For each bus word
+		begin: gwblock
 		for(gb=0; gb<(INSN_WIDTH/8); gb=gb+1) // For each bus byte
+		begin: gbblock
 		always @(*)
 			endian_swapped_rdata[gw*INSN_WIDTH
 					+ ((INSN_WIDTH/8)-1-gb)*8 +: 8]
 				= M_AXI_RDATA[gw*INSN_WIDTH+gb*8 +: 8];
+		end
+		end
 		// }}}
 	end else begin : NO_ENDIAN_SWAP
 		// {{{

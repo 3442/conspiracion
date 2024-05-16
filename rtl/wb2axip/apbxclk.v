@@ -31,15 +31,15 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
 // }}}
-`default_nettype	none
+//`default_nettype	none
 //
 module	apbxclk #(
 		// {{{
 		parameter	C_APB_ADDR_WIDTH = 12,
 		parameter	C_APB_DATA_WIDTH = 32,
 		parameter [0:0]	OPT_REGISTERED = 1'b0,
-		localparam	AW = C_APB_ADDR_WIDTH,
-		localparam	DW = C_APB_DATA_WIDTH
+		/*local*/parameter	AW = C_APB_ADDR_WIDTH,
+		/*local*/parameter	DW = C_APB_DATA_WIDTH
 		// }}}
 	) (
 		// {{{

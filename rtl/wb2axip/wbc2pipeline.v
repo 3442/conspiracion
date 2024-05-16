@@ -35,7 +35,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
 //
-`default_nettype	none
+//`default_nettype	none
 // }}}
 module	wbc2pipeline #(
 		// {{{
@@ -184,5 +184,5 @@ module	wbc2pipeline #(
 // }}}
 endmodule
 `ifndef	YOSYS
-`default_nettype wire
+//`default_nettype wire
 `endif

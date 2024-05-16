@@ -1,5 +1,6 @@
-interface gfx_front_back
-import gfx::*;;
+interface gfx_front_back;
+
+	import gfx::*;
 
 	struct
 	{

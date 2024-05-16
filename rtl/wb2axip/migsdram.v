@@ -42,7 +42,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
 //
-`default_nettype	none
+//`default_nettype	none
 // }}}
 module	migsdram(i_clk, i_clk_200mhz, o_sys_clk, i_rst, o_sys_reset,
 	// Wishbone components
@@ -309,5 +309,5 @@ module	migsdram(i_clk, i_clk_200mhz, o_sys_clk, i_rst, o_sys_reset,
 
 endmodule
 `ifndef	YOSYS
-`default_nettype wire
+//`default_nettype wire
 `endif

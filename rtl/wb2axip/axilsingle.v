@@ -101,7 +101,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
 //
-`default_nettype none
+//`default_nettype none
 // `ifdef	VERILATOR
 // `define	FORMAL
 // `endif
@@ -112,7 +112,7 @@ module	axilsingle #(
 		parameter	NS = 16,
 		//
 		parameter integer C_AXI_DATA_WIDTH = 32,
-		localparam integer C_AXI_ADDR_WIDTH = $clog2(NS)+$clog2(C_AXI_DATA_WIDTH)-3,
+		/*local*/parameter integer C_AXI_ADDR_WIDTH = $clog2(NS)+$clog2(C_AXI_DATA_WIDTH)-3,
 		//
 		// LGFLEN specifies the log (based two) of the number of
 		// transactions that may need to be held outstanding internally.
@@ -710,5 +710,5 @@ module	axilsingle #(
 `endif
 endmodule
 // `ifndef	YOSYS
-// `default_nettype wire
+// //`default_nettype wire
 // `endif

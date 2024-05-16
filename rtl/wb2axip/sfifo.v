@@ -21,7 +21,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 //
-`default_nettype	none
+//`default_nettype	none
 // }}}
 module sfifo #(
 		// {{{
@@ -478,5 +478,5 @@ module sfifo #(
 // }}}
 endmodule
 `ifndef	YOSYS
-`default_nettype wire
+//`default_nettype wire
 `endif

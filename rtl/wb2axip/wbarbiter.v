@@ -54,7 +54,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
 //
-`default_nettype	none
+//`default_nettype	none
 //
 `define	WBA_ALTERNATING
 // }}}
@@ -400,5 +400,5 @@ module	wbarbiter #(
 `endif
 endmodule
 `ifndef	YOSYS
-`default_nettype wire
+//`default_nettype wire
 `endif

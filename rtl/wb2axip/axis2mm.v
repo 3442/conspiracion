@@ -208,7 +208,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
 //
-`default_nettype none
+//`default_nettype none
 // }}}
 module	axis2mm #(
 		// {{{
@@ -272,7 +272,7 @@ module	axis2mm #(
 		// addresses.  Only applies to non fixed addresses and
 		// (possibly) non-continuous bursts.  (THIS IS A PLACEHOLDER.
 		// UNALIGNED ADDRESSING IS NOT CURRENTLY SUPPORTED.)
-		localparam [0:0]	OPT_UNALIGNED = 0,
+		/*local*/parameter [0:0]	OPT_UNALIGNED = 0,
 		//
 		parameter	[0:0]	OPT_LOWPOWER  = 1'b0,
 		parameter	[0:0]	OPT_CLKGATE   = OPT_LOWPOWER,
@@ -288,8 +288,8 @@ module	axis2mm #(
 		// Size of the AXI-lite bus.  These are fixed, since 1) AXI-lite
 		// is fixed at a width of 32-bits by Xilinx def'n, and 2) since
 		// we only ever have 4 configuration words.
-		localparam	C_AXIL_ADDR_WIDTH = 5,
-		localparam	C_AXIL_DATA_WIDTH = 32
+		/*local*/parameter	C_AXIL_ADDR_WIDTH = 5,
+		/*local*/parameter	C_AXIL_DATA_WIDTH = 32
 		// }}}
 	) (
 		// {{{
@@ -2230,5 +2230,5 @@ module	axis2mm #(
 	// }}}
 endmodule
 `ifndef	YOSYS
-`default_nettype wire
+//`default_nettype wire
 `endif

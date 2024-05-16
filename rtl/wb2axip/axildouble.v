@@ -97,7 +97,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
 //
-`default_nettype none
+//`default_nettype none
 // `ifdef	VERILATOR
 // `define	FORMAL
 // `endif
@@ -730,5 +730,5 @@ module	axildouble #(
 `endif
 endmodule
 // `ifndef	YOSYS
-// `default_nettype wire
+// //`default_nettype wire
 // `endif

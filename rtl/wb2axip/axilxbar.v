@@ -76,7 +76,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 //
-`default_nettype none
+//`default_nettype none
 // }}}
 module	axilxbar #(
 		// {{{
@@ -90,8 +90,8 @@ module	axilxbar #(
 		parameter	NS = 8,
 		//
 		// AW, and DW, are short-hand abbreviations used locally.
-		localparam	AW = C_AXI_ADDR_WIDTH,
-		localparam	DW = C_AXI_DATA_WIDTH,
+		/*local*/parameter	AW = C_AXI_ADDR_WIDTH,
+		/*local*/parameter	DW = C_AXI_DATA_WIDTH,
 		// SLAVE_ADDR is a bit vector containing AW bits for each of the
 		// slaves indicating the base address of the slave.  This
 		// goes with SLAVE_MASK below.
@@ -2420,5 +2420,5 @@ module	axilxbar #(
 // }}}
 endmodule
 `ifndef	YOSYS
-`default_nettype wire
+//`default_nettype wire
 `endif

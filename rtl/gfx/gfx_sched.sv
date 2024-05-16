@@ -15,7 +15,6 @@ import gfx::*;
 	logic axi_ready, axi_valid, bram_ready, bram_read, bram_write, bram_write_next,
 	      mem_instr, mem_la_read, mem_la_write, mem_ready, mem_valid, select_bram;
 
-	word bram[SCHED_BRAM_WORDS];
 	word axi_rdata, bram_rdata, mem_addr, mem_la_addr, mem_rdata, mem_wdata;
 	logic[$bits(word) / $bits(byte) - 1:0] mem_wstrb;
 
@@ -113,17 +112,18 @@ import gfx::*;
 		.mem_rdata(axi_rdata)
 	);
 
-	always_ff @(posedge clk) begin
-		if (bram_write) begin
-			for (int i = 0; i < $bits(mem_wstrb); ++i)
-				if (mem_wstrb[i])
-					bram[bram_addr][i] <= mem_wdata[i];
+	genvar i;
+	generate
+		for (i = 0; i < BYTES_PER_WORD; ++i) begin: byte_lanes
+			logic[7:0] bram[SCHED_BRAM_WORDS];
 
-			bram_rdata <= 'x;
-		end else
-			bram_rdata <= bram[bram_addr];
-	end
-
+			always_ff @(posedge clk) begin
+				bram_rdata[8 * i +: 8] <= bram[bram_addr];
+				if (bram_write & mem_wstrb[i])
+					bram[bram_addr] <= mem_wdata[8 * i +: 8];
+			end
+		end
+	endgenerate
 
 	always_ff @(posedge clk or negedge rst_n)
 		if (~rst_n) begin

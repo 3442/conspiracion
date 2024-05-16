@@ -33,14 +33,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
 //
-`default_nettype	none
+//`default_nettype	none
 // }}}
 module wbm2axilite #(
 		// {{{
 		parameter C_AXI_ADDR_WIDTH	=  28,// AXI Address width
-		localparam C_AXI_DATA_WIDTH	=  32,// Width of the AXI R&W data
-		localparam DW			=  C_AXI_DATA_WIDTH,// Wishbone data width
-		localparam AW			=  C_AXI_ADDR_WIDTH-2// WB addr width (log wordsize)
+		/*local*/parameter C_AXI_DATA_WIDTH	=  32,// Width of the AXI R&W data
+		/*local*/parameter DW			=  C_AXI_DATA_WIDTH,// Wishbone data width
+		/*local*/parameter AW			=  C_AXI_ADDR_WIDTH-2// WB addr width (log wordsize)
 		// }}}
 	) (
 		// {{{
@@ -681,5 +681,5 @@ module wbm2axilite #(
 // }}}
 endmodule
 `ifndef	YOSYS
-`default_nettype wire
+//`default_nettype wire
 `endif

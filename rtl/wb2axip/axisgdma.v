@@ -67,7 +67,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
 //
-`default_nettype	none
+//`default_nettype	none
 // `define			AXI3
 // }}}
 module	axisgdma #(
@@ -76,8 +76,8 @@ module	axisgdma #(
 		parameter	C_AXI_ADDR_WIDTH = 32,
 		parameter	C_AXI_DATA_WIDTH = 64,
 		//
-		localparam	C_AXIL_ADDR_WIDTH = 4,
-		localparam	C_AXIL_DATA_WIDTH = 32,
+		/*local*/parameter	C_AXIL_ADDR_WIDTH = 4,
+		/*local*/parameter	C_AXIL_DATA_WIDTH = 32,
 		//
 		// OPT_UNALIGNED turns on support for unaligned addresses,
 		// whether source, destination, or length parameters.
@@ -199,7 +199,7 @@ module	axisgdma #(
 		//
 		//
 		input	wire				M_AXI_BVALID,
-		output	reg				M_AXI_BREADY,
+		output	wire				M_AXI_BREADY,
 		input	wire	[C_AXI_ID_WIDTH-1:0]	M_AXI_BID,
 		input	wire	[1:0]			M_AXI_BRESP,
 		//
@@ -279,7 +279,8 @@ module	axisgdma #(
 	// {{{
 	reg				axil_write_ready, axil_read_ready;
 	reg	[2*C_AXIL_DATA_WIDTH-1:0] wide_tbl, new_widetbl;
-	reg	[C_AXI_ADDR_WIDTH-1:0]	tbl_addr, r_tbl_addr;
+	wire	[C_AXI_ADDR_WIDTH-1:0]	tbl_addr;
+	reg	[C_AXI_ADDR_WIDTH-1:0]	r_tbl_addr;
 	reg				r_int_enable, r_int, r_err, r_abort;
 	wire				w_int, fsm_err;
 
@@ -319,12 +320,12 @@ module	axisgdma #(
 	// DMA control registers/AXI-lite interface
 	// {{{
 	wire		dmac_awready_ignored;
-	reg	[4:0]	dmac_waddr;
+	wire	[4:0]	dmac_waddr;
 	//
-	reg		dmac_wvalid;
+	wire		dmac_wvalid;
 	wire		dmac_wready;
-	reg	[31:0]	dmac_wdata;
-	reg	[3:0]	dmac_wstrb;
+	wire	[31:0]	dmac_wdata;
+	wire	[3:0]	dmac_wstrb;
 	//
 	wire		dmac_bvalid;
 	wire	[1:0]	dmac_bresp;

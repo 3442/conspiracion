@@ -40,7 +40,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 //
-`default_nettype	none
+//`default_nettype	none
 // }}}
 module demofull #(
 		// {{{
@@ -51,7 +51,7 @@ module demofull #(
 		parameter	[0:0]	OPT_LOCKID   = 1'b1,
 		parameter	[0:0]	OPT_LOWPOWER = 1'b0,
 		// Some useful short-hand definitions
-		localparam	LSB = $clog2(C_S_AXI_DATA_WIDTH)-3
+		/*local*/parameter	LSB = $clog2(C_S_AXI_DATA_WIDTH)-3
 		// }}}
 	) (
 		// {{{
@@ -1281,5 +1281,5 @@ module demofull #(
 // }}}
 endmodule
 `ifndef	YOSYS
-`default_nettype wire
+//`default_nettype wire
 `endif

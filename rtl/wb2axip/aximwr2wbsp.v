@@ -32,7 +32,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
 //
-`default_nettype	none
+//`default_nettype	none
 // }}}
 module aximwr2wbsp #(
 		// {{{
@@ -40,8 +40,8 @@ module aximwr2wbsp #(
 		parameter C_AXI_DATA_WIDTH	= 32,
 		parameter C_AXI_ADDR_WIDTH	= 28,
 		parameter [0:0] OPT_SWAP_ENDIANNESS = 1'b0,
-		localparam AXI_LSBS		= $clog2(C_AXI_DATA_WIDTH)-3,
-		localparam AW			= C_AXI_ADDR_WIDTH-AXI_LSBS,
+		/*local*/parameter AXI_LSBS		= $clog2(C_AXI_DATA_WIDTH)-3,
+		/*local*/parameter AW			= C_AXI_ADDR_WIDTH-AXI_LSBS,
 
 		parameter LGFIFO                =  5
 		// }}}

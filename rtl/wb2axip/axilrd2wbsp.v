@@ -32,15 +32,15 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
 //
-`default_nettype	none
+//`default_nettype	none
 // }}}
 module	axilrd2wbsp #(
 		// {{{
 		parameter C_AXI_DATA_WIDTH	= 32,
 		parameter C_AXI_ADDR_WIDTH	= 28,
 		parameter AXILLSB		= $clog2(C_AXI_DATA_WIDTH/8),
-		localparam	AW		= C_AXI_ADDR_WIDTH-AXILLSB,
-		localparam	DW		= C_AXI_DATA_WIDTH,
+		/*local*/parameter	AW		= C_AXI_ADDR_WIDTH-AXILLSB,
+		/*local*/parameter	DW		= C_AXI_DATA_WIDTH,
 		parameter LGFIFO                =  3
 		// }}}
 	) (
@@ -597,5 +597,5 @@ module	axilrd2wbsp #(
 // }}}
 endmodule
 `ifndef	YOSYS
-`default_nettype wire
+//`default_nettype wire
 `endif

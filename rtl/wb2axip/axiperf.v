@@ -334,7 +334,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 //
-`default_nettype none
+//`default_nettype none
 // }}}
 module	axiperf #(
 		// {{{
@@ -343,7 +343,7 @@ module	axiperf #(
 		// is fixed at a width of 32-bits by Xilinx def'n, and 2) since
 		// we only ever have 4 configuration words.
 		parameter	C_AXIL_ADDR_WIDTH = 7,
-		localparam	C_AXIL_DATA_WIDTH = 32,
+		/*local*/parameter	C_AXIL_DATA_WIDTH = 32,
 		parameter	C_AXI_DATA_WIDTH = 32,
 		parameter	C_AXI_ADDR_WIDTH = 32,
 		parameter	C_AXI_ID_WIDTH = 4,

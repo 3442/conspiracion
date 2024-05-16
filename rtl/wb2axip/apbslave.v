@@ -31,15 +31,15 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
 // }}}
-`default_nettype	none
+//`default_nettype	none
 //
 module	apbslave #(
 		// {{{
 		parameter	C_APB_ADDR_WIDTH = 12,
 		parameter	C_APB_DATA_WIDTH = 32,
-		localparam	AW = C_APB_ADDR_WIDTH,
-		localparam	DW = C_APB_DATA_WIDTH,
-		localparam	APBLSB = $clog2(C_APB_DATA_WIDTH)-3
+		/*local*/parameter	AW = C_APB_ADDR_WIDTH,
+		/*local*/parameter	DW = C_APB_DATA_WIDTH,
+		/*local*/parameter	APBLSB = $clog2(C_APB_DATA_WIDTH)-3
 		// }}}
 	) (
 		// {{{

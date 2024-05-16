@@ -32,11 +32,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 // }}}
 //
-`default_nettype none
+//`default_nettype none
 //
 module	axisrandom #(
 		// {{{
-		localparam	C_AXIS_DATA_WIDTH = 32
+		/*local*/parameter	C_AXIS_DATA_WIDTH = 32
 		// }}}
 	) (
 		// {{{

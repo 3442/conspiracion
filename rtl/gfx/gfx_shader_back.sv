@@ -159,7 +159,7 @@ module gfx_shader_writeback_arbiter4
 		.clk,
 		.rst_n,
 		.a(p0_p1.rx),
-		.b(p2_p3.tx),
+		.b(p2_p3.rx),
 		.out
 	);
 
@@ -267,12 +267,12 @@ import gfx::*;
 		end
 
 		regs.sgpr_write.data = setup.write.gpr_value;
-		regs.sgpr_write.sgpr = setup.write.gpr.sgpr;
+		regs.sgpr_write.sgpr = setup.write.gpr;
 		regs.sgpr_write.group = setup.write.group;
 
 		if (scalar_wb) begin
 			regs.sgpr_write.data = wb.lanes[0];
-			regs.sgpr_write.sgpr = wb.dest.sgpr;
+			regs.sgpr_write.sgpr = wb.dest;
 			regs.sgpr_write.group = wb.group;
 		end
 
@@ -291,7 +291,7 @@ import gfx::*;
 			loop_hold[i] = loop_hold[i - 1];
 
 		loop_hold[0].mask = wb.mask;
-		loop_hold[0].vgpr = wb.dest.vgpr.num;
+		loop_hold[0].vgpr = wb.dest.vgpr;
 		loop_hold[0].group = wb.group;
 		loop_hold[0].pc_add = wb.pc_add;
 		loop_hold[0].pc_update = wb.pc_update;

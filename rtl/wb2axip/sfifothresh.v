@@ -34,7 +34,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
 //
-`default_nettype	none
+//`default_nettype	none
 // }}}
 module sfifothresh(i_clk, i_reset,
 		i_wr, i_data, o_full, o_fill,

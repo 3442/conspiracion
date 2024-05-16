@@ -32,7 +32,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
 //
-`default_nettype	none
+//`default_nettype	none
 // }}}
 module	wbp2classic #(
 		// {{{
@@ -201,5 +201,5 @@ module	wbp2classic #(
 // }}}
 endmodule
 `ifndef	YOSYS
-`default_nettype wire
+//`default_nettype wire
 `endif

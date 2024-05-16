@@ -112,7 +112,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 //
-`default_nettype none
+//`default_nettype none
 // }}}
 module	axivcamera #(
 		// {{{
@@ -122,12 +122,12 @@ module	axivcamera #(
 		//
 		// We support five 32-bit AXI-lite registers, requiring 5-bits
 		// of AXI-lite addressing
-		localparam	C_AXIL_ADDR_WIDTH = 4,
-		localparam	C_AXIL_DATA_WIDTH = 32,
+		/*local*/parameter	C_AXIL_ADDR_WIDTH = 4,
+		/*local*/parameter	C_AXIL_DATA_WIDTH = 32,
 		//
 		// The bottom ADDRLSB bits of any AXI address are subword bits
-		localparam	ADDRLSB = $clog2(C_AXI_DATA_WIDTH)-3,
-		localparam	AXILLSB = $clog2(C_AXIL_DATA_WIDTH)-3,
+		/*local*/parameter	ADDRLSB = $clog2(C_AXI_DATA_WIDTH)-3,
+		/*local*/parameter	AXILLSB = $clog2(C_AXIL_DATA_WIDTH)-3,
 		//
 		// OPT_LGMAXBURST
 		parameter	OPT_LGMAXBURST = 8,
@@ -146,7 +146,7 @@ module	axivcamera #(
 		// while one is being read out the second can be read in.  Can
 		// also be set larger if desired.
 		parameter	OPT_LGFIFO = OPT_LGMAXBURST+1,
-		localparam	LGFIFO = (OPT_LGFIFO < OPT_LGMAXBURST+1)
+		/*local*/parameter	LGFIFO = (OPT_LGFIFO < OPT_LGMAXBURST+1)
 						? OPT_LGMAXBURST+1 : OPT_LGFIFO,
 		//
 		// AXI_ID is the ID we will use for all of our AXI transactions

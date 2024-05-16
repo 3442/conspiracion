@@ -35,7 +35,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 //
-`default_nettype	none
+//`default_nettype	none
 // }}}
 module	axisbroadcast #(
 		parameter	C_AXIS_DATA_WIDTH = 16,

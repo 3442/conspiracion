@@ -39,7 +39,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 //
-`default_nettype	none
+//`default_nettype	none
 // }}}
 module	axispacker #(
 		parameter	C_AXIS_DATA_WIDTH = 32,

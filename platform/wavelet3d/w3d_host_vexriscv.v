@@ -2,6 +2,8 @@
 // Component : VexRiscv
 // Git hash  : 457ae5c7e5c8183f0ba7c51f7f0301d05eb8ced1
 
+`define SYNTHESIS
+
 module w3d_host_vexriscv (
   input  wire          timerInterrupt,
   input  wire          externalInterrupt,

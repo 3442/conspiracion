@@ -84,7 +84,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 //
-`default_nettype none
+//`default_nettype none
 // }}}
 module	axilgpio #(
 		// {{{
@@ -93,7 +93,7 @@ module	axilgpio #(
 		// is fixed at a width of 32-bits by Xilinx def'n, and 2) since
 		// we only ever have 4 configuration words.
 		parameter	C_AXI_ADDR_WIDTH = 5,
-		localparam	C_AXI_DATA_WIDTH = 32,
+		/*local*/parameter	C_AXI_DATA_WIDTH = 32,
 		// OPT_SKIDBUFFER will increase throughput to 100% from 50%
 		parameter [0:0]	OPT_SKIDBUFFER = 1'b1,
 		// OPT_LOWPOWER will force RDATA to zero if ever !RVALID

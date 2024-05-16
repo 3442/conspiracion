@@ -40,7 +40,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 //
-`default_nettype none
+//`default_nettype none
 // }}}
 module	easyaxil #(
 		// {{{
@@ -49,7 +49,7 @@ module	easyaxil #(
 		// is fixed at a width of 32-bits by Xilinx def'n, and 2) since
 		// we only ever have 4 configuration words.
 		parameter	C_AXI_ADDR_WIDTH = 4,
-		localparam	C_AXI_DATA_WIDTH = 32,
+		/*local*/parameter	C_AXI_DATA_WIDTH = 32,
 		parameter [0:0]	OPT_SKIDBUFFER = 1'b0,
 		parameter [0:0]	OPT_LOWPOWER = 0
 		// }}}

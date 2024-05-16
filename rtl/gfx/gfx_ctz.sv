@@ -8,11 +8,17 @@ module gfx_ctz
 	output logic[$clog2(WIDTH):0] ctz
 );
 
+	logic[WIDTH - 1:0] value_rev;
+
 	gfx_clz #(WIDTH) clz
 	(
 		.clk,
-		.value({<<{value}}),
+		.value(value_rev),
 		.clz(ctz)
 	);
+
+	always_comb
+		for (int i = 0; i < $bits(value); ++i)
+			value_rev[i] = value[$bits(value) - i - 1];
 
 endmodule

@@ -36,7 +36,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
 //
-`default_nettype	none
+//`default_nettype	none
 // }}}
 module axlite2wbsp #(
 		// {{{
@@ -49,7 +49,7 @@ module axlite2wbsp #(
 `endif
 		parameter	[0:0]	OPT_READONLY  = 1'b0,
 		parameter	[0:0]	OPT_WRITEONLY = 1'b0,
-		localparam		AXILLSB = $clog2(C_AXI_DATA_WIDTH/8)
+		/*local*/parameter		AXILLSB = $clog2(C_AXI_DATA_WIDTH/8)
 		// }}}
 	) (
 		// {{{
@@ -564,5 +564,5 @@ module axlite2wbsp #(
 // }}}
 endmodule
 `ifndef	YOSYS
-`default_nettype wire
+//`default_nettype wire
 `endif

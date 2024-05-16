@@ -47,7 +47,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
 //
-`default_nettype none
+//`default_nettype none
 //
 `timescale 1 ns / 1 ps
 // }}}
@@ -716,5 +716,5 @@ module	demoaxi #(
 `endif
 endmodule
 `ifndef	YOSYS
-`default_nettype wire
+//`default_nettype wire
 `endif

@@ -35,7 +35,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 //
-`default_nettype none
+//`default_nettype none
 // }}}
 module	axisswitch #(
 		// {{{
@@ -44,7 +44,7 @@ module	axisswitch #(
 		// is fixed at a width of 32-bits by Xilinx def'n, and 2) since
 		// we only ever have a single configuration words.
 		parameter	C_AXI_ADDR_WIDTH = 2,
-		localparam	C_AXI_DATA_WIDTH = 32,
+		/*local*/parameter	C_AXI_DATA_WIDTH = 32,
 		//
 		parameter	NUM_STREAMS = 4,
 		parameter	C_AXIS_DATA_WIDTH = 32,
@@ -284,7 +284,7 @@ module	axisswitch #(
 	// Place a skidbuffer on every incoming stream input
 	// {{{
 	generate for(gk=0; gk<NUM_STREAMS; gk=gk+1)
-	begin
+	begin: gkblock
 		skidbuffer #(
 			// {{{
 			.OPT_OUTREG(0),

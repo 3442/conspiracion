@@ -33,7 +33,7 @@ import gfx::*;
 	assign pc_read_groups[1] = io.pc_front_group;
 
 	assign io.mask_back = mask_read[0];
-	assign pc_read_groups[0] = io.mask_back_group;
+	assign mask_read_groups[0] = io.mask_back_group;
 
 	assign imm_out = hold_imm[$size(hold_imm) - 1];
 	assign a_scalar_out = hold_a_scalar[$bits(hold_a_scalar) - 1];
@@ -83,20 +83,21 @@ import gfx::*;
 		.write_data(io.sgpr_write.data)
 	);
 
+	genvar gi;
 	generate
-		for (genvar i = 0; i < SHADER_LANES; ++i) begin: vgprs
+		for (gi = 0; gi < SHADER_LANES; ++gi) begin: vgprs
 			gfx_shader_regfile #($bits(group_id) + $bits(vgpr_num)) vgprs
 			(
 				.clk,
 
 				.read_a_num({hold_read_group_2, hold_read_a_vgpr_2}),
 				.read_b_num({hold_read_group_2, hold_read_b_vgpr_2}),
-				.read_a_data(read_a_data_vgpr[i]),
-				.read_b_data(read_b_data_vgpr[i]),
+				.read_a_data(read_a_data_vgpr[gi]),
+				.read_b_data(read_b_data_vgpr[gi]),
 
-				.write(io.vgpr_write.mask[i]),
+				.write(io.vgpr_write.mask[gi]),
 				.write_num({io.vgpr_write.group, io.vgpr_write.vgpr}),
-				.write_data(io.vgpr_write.data[i])
+				.write_data(io.vgpr_write.data[gi])
 			);
 		end
 	endgenerate
