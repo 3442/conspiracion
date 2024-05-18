@@ -1,5 +1,5 @@
 cores := ip_mul interconnect
-subdirs := top/conspiracion
+subdirs := gfx_shader_bind top/conspiracion
 
 define core/ip_mul
   $(this)/rtl_files := dsp_mul.sv
