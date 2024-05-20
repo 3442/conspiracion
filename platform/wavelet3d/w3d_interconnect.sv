@@ -3,10 +3,11 @@ module w3d_interconnect
 	input  logic     clk,
 	                 srst_n,
 
-	       if_axib.m dram,
-
-	       if_axib.s host_dbus,
+	       if_axib.s gfx_vram,
+	                 host_dbus,
 	                 host_ibus,
+
+	       if_axib.m dram,
 
 	       if_axil.m gfx_ctrl,
 	                 external_io
@@ -20,6 +21,7 @@ module w3d_interconnect
 		.clk,
 		.srst_n,
 		.dram,
+		.gfx_vram,
 		.host_dbus(dram_host.s),
 		.host_ibus
 	);
@@ -49,13 +51,14 @@ module w3d_interconnect_dram
 	input  logic     clk,
 	                 srst_n,
 
-	       if_axib.s host_dbus,
+	       if_axib.s gfx_vram,
+	                 host_dbus,
 	                 host_ibus,
 
 	       if_axib.m dram
 );
 
-	defparam xbar.NM = 2;
+	defparam xbar.NM = 3;
 	defparam xbar.NS = 1;
 	defparam xbar.OPT_LOWPOWER = 0;
 
@@ -70,30 +73,37 @@ module w3d_interconnect_dram
 		.S_AXI_ARESETN(srst_n),
 
 		.S_AXI_AWVALID({
+			gfx_vram.awvalid,
 			host_dbus.awvalid,
 			host_ibus.awvalid
 		}),
 		.S_AXI_AWREADY({
+			gfx_vram.awready,
 			host_dbus.awready,
 			host_ibus.awready
 		}),
 		.S_AXI_AWID({
+			gfx_vram.awid,
 			host_dbus.awid,
 			host_ibus.awid
 		}),
 		.S_AXI_AWADDR({
+			gfx_vram.awaddr,
 			host_dbus.awaddr,
 			host_ibus.awaddr
 		}),
 		.S_AXI_AWLEN({
+			gfx_vram.awlen,
 			host_dbus.awlen,
 			host_ibus.awlen
 		}),
 		.S_AXI_AWSIZE({
+			gfx_vram.awsize,
 			host_dbus.awsize,
 			host_ibus.awsize
 		}),
 		.S_AXI_AWBURST({
+			gfx_vram.awburst,
 			host_dbus.awburst,
 			host_ibus.awburst
 		}),
@@ -103,68 +113,84 @@ module w3d_interconnect_dram
 		.S_AXI_AWQOS('0),
 
 		.S_AXI_WVALID({
+			gfx_vram.wvalid,
 			host_dbus.wvalid,
 			host_ibus.wvalid
 		}),
 		.S_AXI_WREADY({
+			gfx_vram.wready,
 			host_dbus.wready,
 			host_ibus.wready
 		}),
 		.S_AXI_WDATA({
+			gfx_vram.wdata,
 			host_dbus.wdata,
 			host_ibus.wdata
 		}),
 		.S_AXI_WSTRB({
+			gfx_vram.wstrb,
 			host_dbus.wstrb,
 			host_ibus.wstrb
 		}),
 		.S_AXI_WLAST({
+			gfx_vram.wlast,
 			host_dbus.wlast,
 			host_ibus.wlast
 		}),
 
 		.S_AXI_BVALID({
+			gfx_vram.bvalid,
 			host_dbus.bvalid,
 			host_ibus.bvalid
 		}),
 		.S_AXI_BREADY({
+			gfx_vram.bready,
 			host_dbus.bready,
 			host_ibus.bready
 		}),
 		.S_AXI_BID({
+			gfx_vram.bid,
 			host_dbus.bid,
 			host_ibus.bid
 		}),
 		.S_AXI_BRESP({
+			gfx_vram.bresp,
 			host_dbus.bresp,
 			host_ibus.bresp
 		}),
 
 		.S_AXI_ARVALID({
+			gfx_vram.arvalid,
 			host_dbus.arvalid,
 			host_ibus.arvalid
 		}),
 		.S_AXI_ARREADY({
+			gfx_vram.arready,
 			host_dbus.arready,
 			host_ibus.arready
 		}),
 		.S_AXI_ARID({
+			gfx_vram.arid,
 			host_dbus.arid,
 			host_ibus.arid
 		}),
 		.S_AXI_ARADDR({
+			gfx_vram.araddr,
 			host_dbus.araddr,
 			host_ibus.araddr
 		}),
 		.S_AXI_ARLEN({
+			gfx_vram.arlen,
 			host_dbus.arlen,
 			host_ibus.arlen
 		}),
 		.S_AXI_ARSIZE({
+			gfx_vram.arsize,
 			host_dbus.arsize,
 			host_ibus.arsize
 		}),
 		.S_AXI_ARBURST({
+			gfx_vram.arburst,
 			host_dbus.arburst,
 			host_ibus.arburst
 		}),
@@ -174,26 +200,32 @@ module w3d_interconnect_dram
 		.S_AXI_ARQOS('0),
 
 		.S_AXI_RVALID({
+			gfx_vram.rvalid,
 			host_dbus.rvalid,
 			host_ibus.rvalid
 		}),
 		.S_AXI_RREADY({
+			gfx_vram.rready,
 			host_dbus.rready,
 			host_ibus.rready
 		}),
 		.S_AXI_RID({
+			gfx_vram.rid,
 			host_dbus.rid,
 			host_ibus.rid
 		}),
 		.S_AXI_RDATA({
+			gfx_vram.rdata,
 			host_dbus.rdata,
 			host_ibus.rdata
 		}),
 		.S_AXI_RRESP({
+			gfx_vram.rresp,
 			host_dbus.rresp,
 			host_ibus.rresp
 		}),
 		.S_AXI_RLAST({
+			gfx_vram.rlast,
 			host_dbus.rlast,
 			host_ibus.rlast
 		}),

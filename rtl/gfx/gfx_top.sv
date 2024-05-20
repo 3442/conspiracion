@@ -5,6 +5,8 @@ import gfx::*;
 	                 rst_n,
 	                 srst_n,
 	
+	       if_axib.m vram,
+
 	       if_axil.s host_ctrl
 );
 
@@ -55,7 +57,7 @@ import gfx::*;
 		.insn_mem(insn_mem.m)
 	);
 
-	gfx_xbar_sched xbar
+	gfx_xbar_sched sched_xbar
 	(
 		.clk,
 		.srst_n,
@@ -66,6 +68,15 @@ import gfx::*;
 		.bootrom(bootrom_axi.m),
 		.shader_0(shader_0_axi.m),
 		.host_ctrl(host_ctrl_axi.m)
+	);
+
+	gfx_xbar_vram vram_xbar
+	(
+		.clk,
+		.srst_n,
+		.vram,
+		.shader_0_data(data_mem.s),
+		.shader_0_insn(insn_mem.s)
 	);
 
 	/*TODO

@@ -64,7 +64,7 @@ module w3d_top
 );
 
 	if_tap host_jtag();
-	if_axib dram(), host_dbus(), host_ibus();
+	if_axib dram(), host_dbus(), host_ibus(), gfx_vram();
 	if_axil mmio(), gfx_ctrl();
 
 	assign dram_awid = dram.s.awid;
@@ -137,6 +137,7 @@ module w3d_top
 		.clk,
 		.rst_n,
 		.srst_n,
+		.vram(gfx_vram.m),
 		.host_ctrl(gfx_ctrl.s)
 	);
 
@@ -155,6 +156,7 @@ module w3d_top
 		.srst_n,
 		.dram(dram.m),
 		.gfx_ctrl(gfx_ctrl.m),
+		.gfx_vram(gfx_vram.s),
 		.host_dbus(host_dbus.s),
 		.host_ibus(host_ibus.s),
 		.external_io(mmio.m)
