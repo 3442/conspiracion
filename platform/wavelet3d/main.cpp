@@ -17,7 +17,7 @@
 
 #include "Vtop.h"
 
-#include "remote_bitbang.h"
+#include "remote_jtag.hpp"
 
 int main(int argc, char **argv)
 {
@@ -60,16 +60,14 @@ int main(int argc, char **argv)
 	top->dram_arready = 0;
 	top->dram_awready = 0;
 
-	top->jtag_tck = 0;
-	top->jtag_tms = 0;
-	top->jtag_tdi = 0;
+	top->jtag_tck = 1;
+	top->jtag_tms = 1;
+	top->jtag_tdi = 1;
 
 	cycle();
 
 	top->rst_n = 1;
 	cycle();
-
-	rbs_init(1234);
 
 	struct a_req
 	{
@@ -121,7 +119,8 @@ int main(int argc, char **argv)
 
 	fclose(flash_img);
 
-	do {
+	auto sys_bus_cycle = [&]()
+	{
 		cycle();
 
 		//FIXME: para respetar AXI hay que top->eval()'ear luedo de levantar valid
@@ -219,18 +218,23 @@ int main(int argc, char **argv)
 				.data = top->dram_wdata,
 				.strb = top->dram_wstrb,
 			});
+	};
 
-		unsigned char tck = top->jtag_tck;
-		unsigned char tms = top->jtag_tms;
-		unsigned char tdi = top->jtag_tdi;
-		unsigned char trstn = 1;
+	remote_jtag jtag(1234);
 
-		rbs_tick(&tck, &tms, &tdi, &trstn, top->jtag_tdo);
+	do {
+		sys_bus_cycle();
 
-		top->jtag_tck = tck;
-		top->jtag_tms = tms;
-		top->jtag_tdi = tdi;
-	} while (!(client_fd < 0));
+		if (jtag.pending()) {
+			unsigned char trstn = 1;
+
+			jtag.process
+			(
+				&top->jtag_tck, &top->jtag_tms, &top->jtag_tdi, &trstn, &top->jtag_tdo,
+				[&]() { sys_bus_cycle(); }
+			);
+		}
+	} while (jtag.alive());
 
 #if VM_TRACE
 	trace->close();
