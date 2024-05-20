@@ -2,6 +2,7 @@ module w3d_top
 (
 	input  logic       clk,
 	                   rst_n,
+	output logic       srst_n,
 
 	output logic       dram_awvalid,
 	input  logic       dram_awready,
@@ -37,6 +38,25 @@ module w3d_top
 	input  logic[1:0]  dram_rresp,
 	input  logic       dram_rlast,
 
+	output logic       mmio_awvalid,
+	input  logic       mmio_awready,
+	output logic[31:0] mmio_awaddr,
+
+	output logic       mmio_wvalid,
+	input  logic       mmio_wready,
+	output logic[31:0] mmio_wdata,
+
+	input  logic       mmio_bvalid,
+	output logic       mmio_bready,
+
+	output logic       mmio_arvalid,
+	input  logic       mmio_arready,
+	output logic[31:0] mmio_araddr,
+
+	input  logic       mmio_rvalid,
+	output logic       mmio_rready,
+	input  logic[31:0] mmio_rdata,
+
 	input  logic       jtag_tck,
 	                   jtag_tms,
 	                   jtag_tdi,
@@ -45,9 +65,7 @@ module w3d_top
 
 	if_tap host_jtag();
 	if_axib dram(), host_dbus(), host_ibus();
-	if_axil external_io(), gfx_ctrl();
-
-	logic srst_n;
+	if_axil mmio(), gfx_ctrl();
 
 	assign dram_awid = dram.s.awid;
 	assign dram_awlen = dram.s.awlen;
@@ -82,6 +100,25 @@ module w3d_top
 	assign dram.s.rlast = dram_rlast;
 	assign dram.s.rresp = dram_rresp;
 	assign dram.s.rvalid = dram_rvalid;
+
+	assign mmio_awaddr = mmio.s.awaddr;
+	assign mmio_awvalid = mmio.s.awvalid;
+	assign mmio.s.awready = mmio_awready;
+
+	assign mmio_wdata = mmio.s.wdata;
+	assign mmio_wvalid = mmio.s.wvalid;
+	assign mmio.s.wready = mmio_wready;
+
+	assign mmio_bready = mmio.s.bready;
+	assign mmio.s.bvalid = mmio_bvalid;
+
+	assign mmio_araddr = mmio.s.araddr;
+	assign mmio_arvalid = mmio.s.arvalid;
+	assign mmio.s.arready = mmio_arready;
+
+	assign mmio_rready = mmio.s.rready;
+	assign mmio.s.rdata = mmio_rdata;
+	assign mmio.s.rvalid = mmio_rvalid;
 
 	assign jtag_tdo = host_jtag.m.tdo;
 	assign host_jtag.m.tck = jtag_tck;
@@ -120,7 +157,7 @@ module w3d_top
 		.gfx_ctrl(gfx_ctrl.m),
 		.host_dbus(host_dbus.s),
 		.host_ibus(host_ibus.s),
-		.external_io(external_io.m)
+		.external_io(mmio.m)
 	);
 
 endmodule
