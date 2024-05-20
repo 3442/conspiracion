@@ -66,7 +66,7 @@ define set_verilator_common
   common_vl_flags := $$(static_flags) $$(core_info/$$(rule_top)/vl_flags)
 
   common_vl_cflags := \
-    $$(if $$(enable_opt),-O3) \
+    $$(if $$(enable_opt),-march=native -O3) \
     $$(if $$(enable_lto),-flto)
 
   common_vl_ldflags := \
