@@ -81,11 +81,15 @@ define verilator_target_rules
   vtop_mk_stamp := $$(vtop_dir)/stamp
   vtop_dep_file := $$(vtop_dir)/Vtop__ver.d
 
+  vtop_cpp_deps := \
+    $$(foreach dep,$$(dep_tree/$$(rule_top)),$$(call core_paths,$$(dep),vl_files)) \
+    $$(vl_main)
+
   -include $$(vtop_dep_file)
   $$(vtop_dep_file):
 
   $$(vtop_exe): export VPATH := $$(src)
-  $$(vtop_exe): $$(vtop_mk_stamp)
+  $$(vtop_exe): $$(vtop_mk_stamp) $$(vtop_cpp_deps)
 	$$(call run_submake,BUILD) $$(if $$(V),,-s) -C $$(vtop_dir) -f Vtop.mk
 	@touch -c $$@
 
