@@ -80,6 +80,16 @@ package gfx_isa;
 
 	typedef struct packed
 	{
+		xgpr_mode  reg_mode;
+		dst_src_rr dst_src;
+		logic      reg_rev;
+		logic[3:0] reserved;
+		logic      load;
+		insn_class op_class;
+	} insn_mem;
+
+	typedef struct packed
+	{
 		xgpr_mode   reg_mode;
 		dst_src_rr  dst_src;
 		logic       reg_rev;

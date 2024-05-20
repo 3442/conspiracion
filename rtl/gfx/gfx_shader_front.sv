@@ -93,6 +93,13 @@ import gfx::*;
 		.writeback(p0_writeback)
 	);
 
+	gfx_shader_decode_mem p1_dec
+	(
+		.clk,
+		.op(front.execute.p1),
+		.insn(port_dec_wave.insn)
+	);
+
 endmodule
 
 module gfx_shader_bind
@@ -446,8 +453,8 @@ import gfx::*, gfx_isa::*;
 	output front_reg_passthru  passthru
 );
 
-	// + 1 por next-cycle de read.op
-	localparam int PASSTHRU_DEPTH = REG_READ_STAGES + 1 - 2;
+	// + 1 por next-cycle de read.op, - 2 por resto de decode
+	localparam int PASSTHRU_DEPTH = REG_READ_STAGES + 1;
 	localparam int HOLD_DEPTH     = PASSTHRU_DEPTH - 2;
 
 	logic reg_rev;
@@ -456,6 +463,7 @@ import gfx::*, gfx_isa::*;
 	front_reg_passthru passthru_hold[PASSTHRU_DEPTH];
 
 	assign passthru = passthru_hold[$size(passthru_hold) - 1];
+	assign read.mask_exec_group = out_hold[PASSTHRU_DEPTH - REGFILE_STAGES - 1].group;
 
 	assign reg_rev = in.insn.reg_rev;
 
@@ -599,20 +607,16 @@ endmodule
 module gfx_shader_decode_fpint
 import gfx::*, gfx_isa::*;
 (
-	input  logic    clk,
+	input  logic      clk,
 
-	input  insn_any insn,
-	input  logic    writeback,
+	input  insn_fpint insn,
+	input  logic      writeback,
 
-	output fpint_op op
+	output fpint_op   op
 );
 
-	insn_fpint as_fpint;
-
-	assign as_fpint = insn;
-
 	always_ff @(posedge clk) begin
-		unique case (as_fpint.op)
+		unique case (insn.op)
 			INSN_FPINT_MOV: begin
 				op.setup_mul_float    <= 0;
 				op.setup_unit_b       <= 1;
@@ -710,7 +714,7 @@ import gfx::*, gfx_isa::*;
 				op.mnorm_zero_flags   <= 0;
 				op.mnorm_zero_b       <= 0;
 				op.minmax_abs         <= 0;
-				op.minmax_swap        <= as_fpint.op == INSN_FPINT_FMIN;
+				op.minmax_swap        <= insn.op == INSN_FPINT_FMIN;
 				op.minmax_zero_min    <= 1;
 				op.minmax_copy_flags  <= 1;
 				op.shiftr_int_signed  <= 0;
@@ -752,5 +756,20 @@ import gfx::*, gfx_isa::*;
 
 		op.writeback <= writeback;
 	end
+
+endmodule
+
+module gfx_shader_decode_mem
+import gfx::*, gfx_isa::*;
+(
+	input  logic    clk,
+
+	input  insn_mem insn,
+
+	output mem_op   op
+);
+
+	always_ff @(posedge clk)
+		op.load <= insn.load;
 
 endmodule

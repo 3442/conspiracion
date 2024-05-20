@@ -103,7 +103,7 @@ package gfx;
 
 	typedef struct packed
 	{
-		logic todo;
+		logic load;
 	} mem_op;
 
 	typedef struct packed

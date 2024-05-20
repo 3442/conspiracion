@@ -4,7 +4,8 @@ import gfx::*, gfx_shader_schedif_pkg::*;
 	input  logic     clk,
 	                 rst_n,
 
-	       if_axib.m insn_mem,
+	       if_axib.m data_mem,
+	                 insn_mem,
 
 	       if_axil.s sched
 );
@@ -55,6 +56,7 @@ import gfx::*, gfx_shader_schedif_pkg::*;
 		.back(front_back.back),
 		.setup(setup.core),
 		.reg_wb(regfile.wb),
+		.data_mem,
 		.read_data(regfile.ab)
 	);
 

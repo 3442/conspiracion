@@ -9,7 +9,9 @@ import gfx::*;
 	       gfx_regfile_io.ab     read_data,
 	       gfx_regfile_io.wb     reg_wb,
 
-	       gfx_shader_setup.core setup
+	       gfx_shader_setup.core setup,
+
+	       if_axib.m             data_mem
 );
 
 	logic abort;
@@ -44,6 +46,7 @@ import gfx::*;
 		.rst_n,
 		.op(back.execute.p1),
 		.wb(p1_wb.tx),
+		.mem(data_mem),
 		.wave(back.execute.wave),
 		.in_shake(p1_shake.rx),
 		.read_data

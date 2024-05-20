@@ -8,7 +8,7 @@ import gfx::*;
 	       if_axil.s host_ctrl
 );
 
-	if_axib insn_mem();
+	if_axib data_mem(), insn_mem();
 	if_axil bootrom_axi(), debug_axi(), host_ctrl_axi(), sched_axi(), shader_0_axi();
 
 	logic irq_host_ctrl;
@@ -51,6 +51,7 @@ import gfx::*;
 		.clk,
 		.rst_n,
 		.sched(shader_0_axi.s),
+		.data_mem(data_mem.m),
 		.insn_mem(insn_mem.m)
 	);
 

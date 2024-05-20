@@ -9,7 +9,7 @@ import gfx::*;
 	// verilator tracing_off
 
 	localparam PC_TABLE_PORTS   = 2;
-	localparam MASK_TABLE_PORTS = 1;
+	localparam MASK_TABLE_PORTS = 2;
 
 	word hold_imm[REGFILE_STAGES], imm_out, read_a_data_sgpr, read_b_data_scalar,
 	     read_b_data_sgpr, read_const, read_a_data_vgpr[SHADER_LANES],
@@ -33,7 +33,9 @@ import gfx::*;
 	assign pc_read_groups[1] = io.pc_front_group;
 
 	assign io.mask_back = mask_read[0];
+	assign io.mask_exec = mask_read[1];
 	assign mask_read_groups[0] = io.mask_back_group;
+	assign mask_read_groups[1] = io.mask_exec_group;
 
 	assign imm_out = hold_imm[$size(hold_imm) - 1];
 	assign a_scalar_out = hold_a_scalar[$bits(hold_a_scalar) - 1];
