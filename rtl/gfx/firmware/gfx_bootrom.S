@@ -69,7 +69,7 @@ _start:
 	# Hardware major.minor.patch
 	.word 1 << 16 | 0 << 8 | 0 << 0
 	# Firmware yyyy.mm.dd.build
-	.word 2024 << 18 | 5 << 15 | 12 << 10 | 1 << 0
+	.word 2024 << 19 | 5 << 15 | 12 << 10 | 1 << 0
 	# Register map version, rev 0 means this is the bootrom firmware
 	.word 0
 
