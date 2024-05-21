@@ -58,11 +58,15 @@ module w3d_interconnect_dram
 	       if_axib.m dram
 );
 
-	defparam xbar.NM = 3;
-	defparam xbar.NS = 1;
-	defparam xbar.OPT_LOWPOWER = 0;
+	// VRAM es 0x1c000000..0x1fffffff
+	function logic[31:0] vram_addr(logic[31:0] addr);
+		return {6'b000111, addr[25:0]};
+	endfunction
 
 	defparam
+		xbar.NM             = 3,
+		xbar.NS             = 1,
+		xbar.OPT_LOWPOWER   = 0,
 		xbar.SLAVE_ADDR     = '0,
 		xbar.SLAVE_MASK     = '0,
 		xbar.C_AXI_ID_WIDTH = 8;
@@ -88,7 +92,7 @@ module w3d_interconnect_dram
 			host_ibus.awid
 		}),
 		.S_AXI_AWADDR({
-			gfx_vram.awaddr,
+			vram_addr(gfx_vram.awaddr),
 			host_dbus.awaddr,
 			host_ibus.awaddr
 		}),
@@ -175,7 +179,7 @@ module w3d_interconnect_dram
 			host_ibus.arid
 		}),
 		.S_AXI_ARADDR({
-			gfx_vram.araddr,
+			vram_addr(gfx_vram.araddr),
 			host_dbus.araddr,
 			host_ibus.araddr
 		}),

@@ -32,6 +32,11 @@ module w3d_de1soc
 	output wire [7:0]  vga_dac_b
 );
 
+	// Sistema ve 512MiB superior (0x20000000-0x3fffffff) de SDRAM de HPS
+	function logic[31:0] f2s_addr(logic[31:0] addr);
+		return {3'b001, addr[28:0]};
+	endfunction
+
 	logic button, reset_reset_n, sys_clk, sys_rst_n, sys_srst_n;
 
 	logic dram_arready, dram_arvalid, dram_awready, dram_awvalid, dram_bready, dram_bvalid,
@@ -61,20 +66,6 @@ module w3d_de1soc
 
 	logic[3:0] mmio_wstrb;
 	logic[31:0] mmio_araddr, mmio_awaddr, mmio_rdata, mmio_wdata;
-
-	/*logic dram_axi3_arready, dram_axi3_arvalid, dram_axi3_awready, dram_axi3_awvalid,
-	      dram_axi3_bready, dram_axi3_bvalid, dram_axi3_rlast, dram_axi3_rready,
-	      dram_axi3_rvalid, dram_axi3_wlast, dram_axi3_wready, dram_axi3_wvalid;
-
-	logic[1:0] dram_axi3_arburst, dram_axi3_arlock, dram_axi3_awburst, dram_axi3_awlock,
-	           dram_axi3_bresp, dram_axi3_rresp;
-
-	logic[3:0] dram_axi3_arcache, dram_axi3_arlen, ram_axi3_awcache, dram_axi3_awlen,
-	           dram_axi3_wstrb;
-
-	logic[2:0] dram_axi3_arprot, dram_axi3_arsize, dram_axi3_awprot, dram_axi3_awsize;
-	logic[7:0] dram_axi3_arid, dram_axi3_awid, dram_axi3_bid, dram_axi3_rid, dram_axi3_wid;
-	logic[31:0] dram_axi3_araddr, dram_axi3_awaddr, dram_axi3_rdata, dram_axi3_wdata;*/
 
 	logic mmio_full_arlock, mmio_full_awlock;
 	logic[2:0] mmio_full_arprot, mmio_full_awprot;
@@ -127,13 +118,13 @@ module w3d_de1soc
 		.vga_dac_R(vga_dac_r),
 		.vga_dac_G(vga_dac_g),
 		.vga_dac_B(vga_dac_b),
-		.dram_axi_bridge_s0_araddr(dram_araddr),
+		.dram_axi_bridge_s0_araddr(f2s_addr(dram_araddr)),
 		.dram_axi_bridge_s0_arlen(dram_arlen),
 		.dram_axi_bridge_s0_arid(dram_arid),
 		.dram_axi_bridge_s0_arsize(dram_arsize),
 		.dram_axi_bridge_s0_arburst(dram_arburst),
 		.dram_axi_bridge_s0_arvalid(dram_arvalid),
-		.dram_axi_bridge_s0_awaddr(dram_awaddr),
+		.dram_axi_bridge_s0_awaddr(f2s_addr(dram_awaddr)),
 		.dram_axi_bridge_s0_awlen(dram_awlen),
 		.dram_axi_bridge_s0_awid(dram_awid),
 		.dram_axi_bridge_s0_awsize(dram_awsize),
@@ -263,99 +254,6 @@ module w3d_de1soc
 		.jtag_tdi(0),
 		.jtag_tdo()
 	);
-
-	/*defparam
-		dram_bridge.C_AXI_ID_WIDTH   = 8,
-		dram_bridge.C_AXI_ADDR_WIDTH = 32,
-		dram_bridge.C_AXI_DATA_WIDTH = 32;
-
-	axi2axi3 dram_bridge
-	(
-		.S_AXI_ACLK(sys_clk),
-		.S_AXI_ARESETN(sys_srst_n),
-
-		.S_AXI_AWVALID(dram_awvalid),
-		.S_AXI_AWREADY(dram_awready),
-		.S_AXI_AWID(dram_awid),
-		.S_AXI_AWADDR(dram_awaddr),
-		.S_AXI_AWLEN(dram_awlen),
-		.S_AXI_AWSIZE(dram_awsize),
-		.S_AXI_AWBURST(dram_awburst),
-		.S_AXI_AWLOCK(0),
-		.S_AXI_AWCACHE(4'b0011), // Normal non-cacheable, non-bufferable
-		.S_AXI_AWPROT(3'b0),
-		.S_AXI_AWQOS(4'b0),
-
-		.S_AXI_WVALID(dram_wvalid),
-		.S_AXI_WREADY(dram_wready),
-		.S_AXI_WDATA(dram_wdata),
-		.S_AXI_WSTRB(dram_wstrb),
-		.S_AXI_WLAST(dram_wlast),
-
-		.S_AXI_BVALID(dram_bvalid),
-		.S_AXI_BREADY(dram_bready),
-		.S_AXI_BID(dram_bid),
-		.S_AXI_BRESP(dram_bresp),
-
-		.S_AXI_ARVALID(dram_arvalid),
-		.S_AXI_ARREADY(dram_arready),
-		.S_AXI_ARID(dram_arid),
-		.S_AXI_ARADDR(dram_araddr),
-		.S_AXI_ARLEN(dram_arlen),
-		.S_AXI_ARSIZE(dram_arsize),
-		.S_AXI_ARBURST(dram_arburst),
-		.S_AXI_ARLOCK(0),
-		.S_AXI_ARCACHE(4'b0011), // Normal non-cacheable, non-bufferable
-		.S_AXI_ARPROT(3'b0),
-		.S_AXI_ARQOS(4'b0),
-
-		.S_AXI_RVALID(dram_rvalid),
-		.S_AXI_RREADY(dram_rready),
-		.S_AXI_RID(dram_rid),
-		.S_AXI_RDATA(dram_rdata),
-		.S_AXI_RLAST(dram_rlast),
-		.S_AXI_RRESP(dram_rresp),
-
-		.M_AXI_AWVALID(dram_axi3_awvalid),
-		.M_AXI_AWREADY(dram_axi3_awready),
-		.M_AXI_AWID(dram_axi3_awid),
-		.M_AXI_AWADDR(dram_axi3_awaddr),
-		.M_AXI_AWLEN(dram_axi3_awlen),
-		.M_AXI_AWSIZE(dram_axi3_awsize),
-		.M_AXI_AWBURST(dram_axi3_awburst),
-		.M_AXI_AWLOCK(dram_axi3_awlock),
-		.M_AXI_AWCACHE(dram_axi3_awcache),
-		.M_AXI_AWPROT(dram_axi3_awprot),
-		.M_AXI_AWQOS(),
-
-		.M_AXI_WVALID(dram_axi3_wvalid),
-		.M_AXI_WREADY(dram_axi3_wready),
-		.M_AXI_WID(dram_axi3_wid),
-		.M_AXI_WDATA(dram_axi3_wdata),
-		.M_AXI_WSTRB(dram_axi3_wstrb),
-		.M_AXI_WLAST(dram_axi3_wlast),
-		.M_AXI_BVALID(dram_axi3_bvalid),
-		.M_AXI_BREADY(dram_axi3_bready),
-		.M_AXI_BID(dram_axi3_bid),
-		.M_AXI_BRESP(dram_axi3_bresp),
-		.M_AXI_ARVALID(dram_axi3_arvalid),
-		.M_AXI_ARREADY(dram_axi3_arready),
-		.M_AXI_ARID(dram_axi3_arid),
-		.M_AXI_ARADDR(dram_axi3_araddr),
-		.M_AXI_ARLEN(dram_axi3_arlen),
-		.M_AXI_ARSIZE(dram_axi3_arsize),
-		.M_AXI_ARBURST(dram_axi3_arburst),
-		.M_AXI_ARLOCK(dram_axi3_arlock),
-		.M_AXI_ARCACHE(dram_axi3_arcache),
-		.M_AXI_ARPROT(dram_axi3_arprot),
-		.M_AXI_ARQOS(),
-		.M_AXI_RVALID(dram_axi3_rvalid),
-		.M_AXI_RREADY(dram_axi3_rready),
-		.M_AXI_RID(dram_axi3_rid),
-		.M_AXI_RDATA(dram_axi3_rdata),
-		.M_AXI_RLAST(dram_axi3_rlast),
-		.M_AXI_RRESP(dram_axi3_rresp)
-	);*/
 
 	defparam
 		mmio_bridge.C_AXI_ID_WIDTH   = 8,

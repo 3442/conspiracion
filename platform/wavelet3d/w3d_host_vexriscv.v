@@ -5451,7 +5451,7 @@ module w3d_host_vexriscv (
   assign IBusCachedPlugin_mmuBus_rsp_allowRead = 1'b1;
   assign IBusCachedPlugin_mmuBus_rsp_allowWrite = 1'b1;
   assign IBusCachedPlugin_mmuBus_rsp_allowExecute = 1'b1;
-  assign IBusCachedPlugin_mmuBus_rsp_isIoAccess = (5'h00 < IBusCachedPlugin_mmuBus_rsp_physicalAddress[31 : 27]);
+  assign IBusCachedPlugin_mmuBus_rsp_isIoAccess = (6'h07 <= IBusCachedPlugin_mmuBus_rsp_physicalAddress[31 : 26]);
   assign IBusCachedPlugin_mmuBus_rsp_isPaging = 1'b0;
   assign IBusCachedPlugin_mmuBus_rsp_exception = 1'b0;
   assign IBusCachedPlugin_mmuBus_rsp_refilling = 1'b0;
@@ -5460,7 +5460,7 @@ module w3d_host_vexriscv (
   assign DBusCachedPlugin_mmuBus_rsp_allowRead = 1'b1;
   assign DBusCachedPlugin_mmuBus_rsp_allowWrite = 1'b1;
   assign DBusCachedPlugin_mmuBus_rsp_allowExecute = 1'b1;
-  assign DBusCachedPlugin_mmuBus_rsp_isIoAccess = (5'h00 < DBusCachedPlugin_mmuBus_rsp_physicalAddress[31 : 27]);
+  assign DBusCachedPlugin_mmuBus_rsp_isIoAccess = (6'h07 <= DBusCachedPlugin_mmuBus_rsp_physicalAddress[31 : 26]);
   assign DBusCachedPlugin_mmuBus_rsp_isPaging = 1'b0;
   assign DBusCachedPlugin_mmuBus_rsp_exception = 1'b0;
   assign DBusCachedPlugin_mmuBus_rsp_refilling = 1'b0;

@@ -59,7 +59,7 @@ object GenW3DHost extends App{
           )
         ),
         new StaticMemoryTranslatorPlugin(
-          ioRange      = _(31 downto 27) > 0x0
+          ioRange      = _(31 downto 26) >= 0x7 // Inicia en 0x1c000000 (0x3c000000 para HPS)
         ),
         new DecoderSimplePlugin(
           catchIllegalInstruction = true
