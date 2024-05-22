@@ -3,6 +3,7 @@ define find_tools_lazy
   $(call find_command_lazy,genhtml,GENHTML)
   $(call find_command_lazy,peakrdl,PEAKRDL)
   $(call find_command_lazy,pkg-config,PKG_CONFIG)
+  $(call find_command_lazy,python3,PYTHON3)
   $(call find_command_lazy,qsys-generate,QSYS_GENERATE)
   $(call find_command_lazy,quartus,QUARTUS)
   $(call find_command_lazy,verilator,VERILATOR)
