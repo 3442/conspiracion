@@ -25,8 +25,10 @@ endef
 define cc_unit_rule
   define obj_rules
     $(3): $(2) $$(obj_deps)
-		$$(call run,CC,$$<) $(core_info/$(1)/cross)gcc $(core_info/$(1)/cc_flags) -c $$< -o $$@
+		$$(call run,CC,$$<) $(core_info/$(1)/cross)gcc $(core_info/$(1)/cc_flags) -MMD -c $$< -o $$@
   endef
 
   $$(eval $$(call add_obj_rules,$(1)))
+
+  -include $$(patsubst %.o,%.d,$(3))
 endef
