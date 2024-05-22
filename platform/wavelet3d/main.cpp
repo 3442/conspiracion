@@ -89,7 +89,7 @@ int main(int argc, char **argv)
 
 	auto dram = std::make_unique<unsigned[]>(DRAM_SIZE);
 
-	constexpr const char *FLASH_IMG_FILE = "host_flash.bin";
+	constexpr const char *FLASH_IMG_FILE = "w3d_host_flash.bin";
 
 	FILE *flash_img = std::fopen(FLASH_IMG_FILE, "rb");
 	if (!flash_img) {
