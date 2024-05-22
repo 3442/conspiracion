@@ -1,6 +1,8 @@
 define find_tools_lazy
   $(call find_command_lazy,cocotb-config,COCOTB_CONFIG)
   $(call find_command_lazy,genhtml,GENHTML)
+  $(call find_command_lazy,meson,MESON)
+  $(call find_command_lazy,ninja,NINJA)
   $(call find_command_lazy,peakrdl,PEAKRDL)
   $(call find_command_lazy,pkg-config,PKG_CONFIG)
   $(call find_command_lazy,python3,PYTHON3)

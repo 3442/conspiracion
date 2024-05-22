@@ -32,6 +32,7 @@ include mk/cocotb.mk
 include mk/cores.mk
 include mk/cov.mk
 include mk/makehex.mk
+include mk/meson.mk
 include mk/obj.mk
 include mk/objcopy.mk
 include mk/output.mk
