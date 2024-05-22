@@ -152,7 +152,21 @@
             meson
             ninja
             lcov
-            openocd
+            (openocd.overrideAttrs (prev: {
+              pname = "openocd-vexriscv";
+              version = "0.11.0-master";
+
+              buildInputs = prev.buildInputs ++ [ pkgs.libyaml ];
+              nativeBuildInputs = [ pkgs.autoreconfHook ] ++ prev.nativeBuildInputs;
+
+              src = pkgs.fetchFromGitHub {
+                repo = "openocd_riscv";
+                owner = "SpinalHDL";
+
+                rev = "058dfa50d625893bee9fecf8d604141911fac125";
+                hash = "sha256-bv8hUlZXEexUy8tzrnibNYRNb2oLRfh1xCpmalPwdqc=";
+              };
+            }))
             pkg-config
             (python3.withPackages (py: with py; [
               cocotb
