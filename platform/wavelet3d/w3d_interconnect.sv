@@ -6,10 +6,12 @@ module w3d_interconnect
 	       if_axib.s gfx_vram,
 	                 host_dbus,
 	                 host_ibus,
+	                 sgdma_mem,
 
 	       if_axib.m dram,
 
 	       if_axil.m gfx_ctrl,
+	                 sgdma_ctrl,
 	                 external_io
 );
 
@@ -23,16 +25,17 @@ module w3d_interconnect
 		.dram,
 		.gfx_vram,
 		.host_dbus(dram_host.s),
-		.host_ibus
+		.host_ibus,
+		.sgdma_mem
 	);
 
 	w3d_interconnect_host_data data
 	(
 		.clk,
 		.srst_n,
+		.dram(dram_host.m),
 		.host(host_dbus),
-		.mmio(mmio_axi.m),
-		.dram(dram_host.m)
+		.mmio(mmio_axi.m)
 	);
 
 	w3d_interconnect_host_mmio mmio
@@ -41,6 +44,7 @@ module w3d_interconnect
 		.srst_n,
 		.host(mmio_axi.s),
 		.gfx_ctrl,
+		.sgdma_ctrl,
 		.external_io
 	);
 
@@ -54,6 +58,7 @@ module w3d_interconnect_dram
 	       if_axib.s gfx_vram,
 	                 host_dbus,
 	                 host_ibus,
+	                 sgdma_mem,
 
 	       if_axib.m dram
 );
@@ -64,7 +69,7 @@ module w3d_interconnect_dram
 	endfunction
 
 	defparam
-		xbar.NM             = 3,
+		xbar.NM             = 4,
 		xbar.NS             = 1,
 		xbar.OPT_LOWPOWER   = 0,
 		xbar.SLAVE_ADDR     = '0,
@@ -79,37 +84,44 @@ module w3d_interconnect_dram
 		.S_AXI_AWVALID({
 			gfx_vram.awvalid,
 			host_dbus.awvalid,
-			host_ibus.awvalid
+			host_ibus.awvalid,
+			sgdma_mem.awvalid
 		}),
 		.S_AXI_AWREADY({
 			gfx_vram.awready,
 			host_dbus.awready,
-			host_ibus.awready
+			host_ibus.awready,
+			sgdma_mem.awready
 		}),
 		.S_AXI_AWID({
 			gfx_vram.awid,
 			host_dbus.awid,
-			host_ibus.awid
+			host_ibus.awid,
+			sgdma_mem.awid
 		}),
 		.S_AXI_AWADDR({
 			vram_addr(gfx_vram.awaddr),
 			host_dbus.awaddr,
-			host_ibus.awaddr
+			host_ibus.awaddr,
+			sgdma_mem.awaddr
 		}),
 		.S_AXI_AWLEN({
 			gfx_vram.awlen,
 			host_dbus.awlen,
-			host_ibus.awlen
+			host_ibus.awlen,
+			sgdma_mem.awlen
 		}),
 		.S_AXI_AWSIZE({
 			gfx_vram.awsize,
 			host_dbus.awsize,
-			host_ibus.awsize
+			host_ibus.awsize,
+			sgdma_mem.awsize
 		}),
 		.S_AXI_AWBURST({
 			gfx_vram.awburst,
 			host_dbus.awburst,
-			host_ibus.awburst
+			host_ibus.awburst,
+			sgdma_mem.awburst
 		}),
 		.S_AXI_AWLOCK('0),
 		.S_AXI_AWCACHE('0),
@@ -119,84 +131,100 @@ module w3d_interconnect_dram
 		.S_AXI_WVALID({
 			gfx_vram.wvalid,
 			host_dbus.wvalid,
-			host_ibus.wvalid
+			host_ibus.wvalid,
+			sgdma_mem.wvalid
 		}),
 		.S_AXI_WREADY({
 			gfx_vram.wready,
 			host_dbus.wready,
-			host_ibus.wready
+			host_ibus.wready,
+			sgdma_mem.wready
 		}),
 		.S_AXI_WDATA({
 			gfx_vram.wdata,
 			host_dbus.wdata,
-			host_ibus.wdata
+			host_ibus.wdata,
+			sgdma_mem.wdata
 		}),
 		.S_AXI_WSTRB({
 			gfx_vram.wstrb,
 			host_dbus.wstrb,
-			host_ibus.wstrb
+			host_ibus.wstrb,
+			sgdma_mem.wstrb
 		}),
 		.S_AXI_WLAST({
 			gfx_vram.wlast,
 			host_dbus.wlast,
-			host_ibus.wlast
+			host_ibus.wlast,
+			sgdma_mem.wlast
 		}),
 
 		.S_AXI_BVALID({
 			gfx_vram.bvalid,
 			host_dbus.bvalid,
-			host_ibus.bvalid
+			host_ibus.bvalid,
+			sgdma_mem.bvalid
 		}),
 		.S_AXI_BREADY({
 			gfx_vram.bready,
 			host_dbus.bready,
-			host_ibus.bready
+			host_ibus.bready,
+			sgdma_mem.bready
 		}),
 		.S_AXI_BID({
 			gfx_vram.bid,
 			host_dbus.bid,
-			host_ibus.bid
+			host_ibus.bid,
+			sgdma_mem.bid
 		}),
 		.S_AXI_BRESP({
 			gfx_vram.bresp,
 			host_dbus.bresp,
-			host_ibus.bresp
+			host_ibus.bresp,
+			sgdma_mem.bresp
 		}),
 
 		.S_AXI_ARVALID({
 			gfx_vram.arvalid,
 			host_dbus.arvalid,
-			host_ibus.arvalid
+			host_ibus.arvalid,
+			sgdma_mem.arvalid
 		}),
 		.S_AXI_ARREADY({
 			gfx_vram.arready,
 			host_dbus.arready,
-			host_ibus.arready
+			host_ibus.arready,
+			sgdma_mem.arready
 		}),
 		.S_AXI_ARID({
 			gfx_vram.arid,
 			host_dbus.arid,
-			host_ibus.arid
+			host_ibus.arid,
+			sgdma_mem.arid
 		}),
 		.S_AXI_ARADDR({
 			vram_addr(gfx_vram.araddr),
 			host_dbus.araddr,
-			host_ibus.araddr
+			host_ibus.araddr,
+			sgdma_mem.araddr
 		}),
 		.S_AXI_ARLEN({
 			gfx_vram.arlen,
 			host_dbus.arlen,
-			host_ibus.arlen
+			host_ibus.arlen,
+			sgdma_mem.arlen
 		}),
 		.S_AXI_ARSIZE({
 			gfx_vram.arsize,
 			host_dbus.arsize,
-			host_ibus.arsize
+			host_ibus.arsize,
+			sgdma_mem.arsize
 		}),
 		.S_AXI_ARBURST({
 			gfx_vram.arburst,
 			host_dbus.arburst,
-			host_ibus.arburst
+			host_ibus.arburst,
+			sgdma_mem.arburst
 		}),
 		.S_AXI_ARLOCK('0),
 		.S_AXI_ARCACHE('0),
@@ -206,32 +234,38 @@ module w3d_interconnect_dram
 		.S_AXI_RVALID({
 			gfx_vram.rvalid,
 			host_dbus.rvalid,
-			host_ibus.rvalid
+			host_ibus.rvalid,
+			sgdma_mem.rvalid
 		}),
 		.S_AXI_RREADY({
 			gfx_vram.rready,
 			host_dbus.rready,
-			host_ibus.rready
+			host_ibus.rready,
+			sgdma_mem.rready
 		}),
 		.S_AXI_RID({
 			gfx_vram.rid,
 			host_dbus.rid,
-			host_ibus.rid
+			host_ibus.rid,
+			sgdma_mem.rid
 		}),
 		.S_AXI_RDATA({
 			gfx_vram.rdata,
 			host_dbus.rdata,
-			host_ibus.rdata
+			host_ibus.rdata,
+			sgdma_mem.rdata
 		}),
 		.S_AXI_RRESP({
 			gfx_vram.rresp,
 			host_dbus.rresp,
-			host_ibus.rresp
+			host_ibus.rresp,
+			sgdma_mem.rresp
 		}),
 		.S_AXI_RLAST({
 			gfx_vram.rlast,
 			host_dbus.rlast,
-			host_ibus.rlast
+			host_ibus.rlast,
+			sgdma_mem.rlast
 		}),
 
 		.M_AXI_AWVALID(dram.awvalid),
@@ -572,26 +606,31 @@ module w3d_interconnect_host_mmio
 	       if_axil.s host,
 
 	       if_axil.m gfx_ctrl,
+	                 sgdma_ctrl,
 	                 external_io
 );
 
 	localparam logic[31:0]
 		GFX_CTRL_BASE    = 32'h2000_0000,
-		GFX_CTRL_MASK    = 32'hf000_0000,
+		GFX_CTRL_MASK    = 32'hf800_0000,
+		SGDMA_CTRL_BASE  = 32'h2800_0000,
+		SGDMA_CTRL_MASK  = 32'hf800_0000,
 		EXTERNAL_IO_BASE = 32'h3000_0000,
 		EXTERNAL_IO_MASK = 32'hf000_0000;
 
 	defparam xbar.NM = 1;
-	defparam xbar.NS = 2;
+	defparam xbar.NS = 3;
 	defparam xbar.OPT_LOWPOWER = 0;
 
 	defparam xbar.SLAVE_ADDR = {
 		EXTERNAL_IO_BASE,
+		SGDMA_CTRL_BASE,
 		GFX_CTRL_BASE
 	};
 
 	defparam xbar.SLAVE_MASK = {
 		EXTERNAL_IO_MASK,
+		SGDMA_CTRL_MASK,
 		GFX_CTRL_MASK
 	};
 
@@ -626,67 +665,81 @@ module w3d_interconnect_host_mmio
 
 		.M_AXI_AWADDR({
 			external_io.awaddr,
+			sgdma_ctrl.awaddr,
 			gfx_ctrl.awaddr
 		}),
 		.M_AXI_AWPROT(),
 		.M_AXI_AWVALID({
 			external_io.awvalid,
+			sgdma_ctrl.awvalid,
 			gfx_ctrl.awvalid
 		}),
 		.M_AXI_AWREADY({
 			external_io.awready,
+			sgdma_ctrl.awready,
 			gfx_ctrl.awready
 		}),
 
 		.M_AXI_WDATA({
 			external_io.wdata,
+			sgdma_ctrl.wdata,
 			gfx_ctrl.wdata
 		}),
 		.M_AXI_WSTRB(),
 		.M_AXI_WVALID({
 			external_io.wvalid,
+			sgdma_ctrl.wvalid,
 			gfx_ctrl.wvalid
 		}),
 		.M_AXI_WREADY({
 			external_io.wready,
+			sgdma_ctrl.wready,
 			gfx_ctrl.wready
 		}),
 
 		.M_AXI_BRESP('0),
 		.M_AXI_BVALID({
 			external_io.bvalid,
+			sgdma_ctrl.bvalid,
 			gfx_ctrl.bvalid
 		}),
 		.M_AXI_BREADY({
 			external_io.bready,
+			sgdma_ctrl.bready,
 			gfx_ctrl.bready
 		}),
 
 		.M_AXI_ARADDR({
 			external_io.araddr,
+			sgdma_ctrl.araddr,
 			gfx_ctrl.araddr
 		}),
 		.M_AXI_ARPROT(),
 		.M_AXI_ARVALID({
 			external_io.arvalid,
+			sgdma_ctrl.arvalid,
 			gfx_ctrl.arvalid
 		}),
 		.M_AXI_ARREADY({
 			external_io.arready,
+			sgdma_ctrl.arready,
 			gfx_ctrl.arready
 		}),
 
 		.M_AXI_RDATA({
 			external_io.rdata,
+			sgdma_ctrl.rdata,
 			gfx_ctrl.rdata
 		}),
 		.M_AXI_RRESP('0),
 		.M_AXI_RVALID({
 			external_io.rvalid,
+			sgdma_ctrl.rvalid,
 			gfx_ctrl.rvalid
 		}),
 		.M_AXI_RREADY({
 			external_io.rready,
+			sgdma_ctrl.rready,
 			gfx_ctrl.rready
 		})
 	);

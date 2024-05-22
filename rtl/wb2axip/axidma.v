@@ -317,8 +317,7 @@ module	axidma #(
 	reg				r_partial_outvalid;
 	reg [C_AXI_DATA_WIDTH/8-1:0]	r_first_wstrb,
 					r_last_wstrb;
-	reg				extra_realignment_write,
-					extra_realignment_read;
+	reg				extra_realignment_write;
 	reg	[2*ADDRLSB+2:0]		write_realignment;
 	reg				last_read_beat;
 	reg				clear_read_pipeline;
@@ -924,6 +923,7 @@ module	axidma #(
 
 	generate if (OPT_UNALIGNED)
 	begin : REALIGNMENT_FIFO
+		reg extra_realignment_read;
 		// {{{
 		reg	[ADDRLSB-1:0]		inbyte_shift, outbyte_shift,
 						remaining_read_realignment;
@@ -1205,8 +1205,9 @@ module	axidma #(
 		else if (!M_AXI_WVALID || M_AXI_WREADY)
 			M_AXI_WSTRB <= (r_err || r_abort) ? 0 : -1;
 
-		always @(*)
-			extra_realignment_read <= 0;
+		wire extra_realignment_read;
+		//always @(*)
+			assign extra_realignment_read /*<*/= 0;
 		// }}}
 	end endgenerate
 
