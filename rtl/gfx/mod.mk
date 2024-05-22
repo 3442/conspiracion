@@ -1,7 +1,8 @@
 cores := gfx_shader_schedif
+subdirs := firmware
 
 define core
-  $(this)/deps := axilemu axixbar gfx_shader_schedif if_common picorv32
+  $(this)/deps := axilemu axixbar gfx_bootrom gfx_shader_schedif if_common picorv32
 
   $(this)/rtl_top := gfx_top
   $(this)/rtl_dirs := .
