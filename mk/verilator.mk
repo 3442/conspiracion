@@ -61,7 +61,7 @@ define set_verilator_common
     $$(if $$(enable_cov),--coverage) \
     $$(if $$(enable_opt),-O3) \
     $$(if $$(enable_prof),--prof-cfuncs) \
-    --cc --exe --prefix Vtop --MMD --MP
+    --cc --exe --prefix Vtop --MMD --MP --timescale 1ns/1ns
 
   common_vl_flags := $$(static_flags) $$(core_info/$$(rule_top)/vl_flags)
 
