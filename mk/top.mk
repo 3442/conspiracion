@@ -27,10 +27,13 @@ $(foreach flag,$(subst $(comma),$(space),$(enable)),$(eval override enable_$(fla
 $(foreach flag,$(subst $(comma),$(space),$(disable)),$(eval override enable_$(flag) :=))
 
 include mk/build.mk
+include mk/cc.mk
 include mk/cocotb.mk
 include mk/cores.mk
 include mk/cov.mk
+include mk/makehex.mk
 include mk/obj.mk
+include mk/objcopy.mk
 include mk/output.mk
 include mk/peakrdl.mk
 include mk/quartus.mk
