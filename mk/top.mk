@@ -30,6 +30,7 @@ include mk/build.mk
 include mk/cocotb.mk
 include mk/cores.mk
 include mk/cov.mk
+include mk/obj.mk
 include mk/output.mk
 include mk/peakrdl.mk
 include mk/quartus.mk

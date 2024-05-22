@@ -78,7 +78,7 @@ define target/syn/rules
 	$$(call run,FIT) $$(quartus_run)_fit --part=$$(quartus_device) $$(quartus_top)
 	@touch $$@
 
-  $$(obj)/map.stamp: $$(quartus_qpf)
+  $$(obj)/map.stamp: $$(quartus_qpf) $$(call core_objs,$$(rule_top),obj_deps)
 	$$(call run,MAP) $$(quartus_run)_map --family=$(quartus_family) $$(quartus_top)
 	@touch $$@
 

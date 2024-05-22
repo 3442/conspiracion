@@ -25,8 +25,8 @@ define target/sim/rules
 
   .PHONY: $$(rule_top_path)/sim
 
-  $$(rule_top_path)/sim: $$(vtop_exe)
-	$$(call run,RUN) $$<
+  $$(rule_top_path)/sim: $$(vtop_exe) $$(call core_objs,$$(rule_top),obj_deps)
+	$$(call run,RUN) cd $$(obj) && vl/Vtop
 
   $(call target_entrypoint,$$(rule_top_path)/sim)
 endef

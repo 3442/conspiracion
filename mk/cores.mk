@@ -17,16 +17,20 @@ core_paths_no_dyn = \
         $(let prefix,$(core_info/$(1)/workdir), \
           $(foreach path_elem,$(core_info/$(1)/$(2)), \
             $(if $(patsubst /%,,$(path_elem)), \
-              $(addprefix /$(if $(prefix),$(prefix)/),$(path_elem)), \
+              $(addprefix /$(if $(3),$(3)/,$(if $(prefix),$(prefix)/)),$(path_elem)), \
               $(path_elem)))))))
 
 core_paths = \
-  $(call core_paths_no_dyn,$(1),$(2)) $(call core_paths_no_dyn,$(1),$(call target_var,$(2)))
+  $(call core_paths_no_dyn,$(1),$(2),$(3)) $(call core_paths_no_dyn,$(1),$(call target_var,$(2)),$(3))
+
+core_objs = $(call core_paths,$(1),$(2),$(obj))
 
 require_core_paths = \
   $(strip \
-    $(let val,$(strip $(call core_paths,$(1),$(2))), \
+    $(let val,$(strip $(call core_paths,$(1),$(2),$(3))), \
       $(if $(val),$(val),$(error core '$(1)' must define '$(2)'))))
+
+require_core_objs = $(call require_core_paths,$(1),$(2),$(obj))
 
 core_paths_dyn = $(call core_paths,$(1),$(call target_var,$(2)))
 
