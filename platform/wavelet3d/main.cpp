@@ -131,12 +131,13 @@ int main(int argc, char **argv)
 
 			top->dram_rid = ar.id;
 			top->dram_rlast = ar.len == 0;
+			top->dram_rresp = 0b00;
 			top->dram_rvalid = 1;
 
 			auto index = ar.addr >> 2;
 			if (index >= DRAM_SIZE) [[unlikely]] {
 				fprintf(stderr, "Bad DRAM read address: %08x\n", ar.addr);
-				top->dram_rdata = 0;
+				top->dram_rresp = 0b11;
 			} else
 				top->dram_rdata = dram[index];
 
@@ -154,12 +155,16 @@ int main(int argc, char **argv)
 			auto &w = w_queue.front();
 			auto &aw = aw_queue.front();
 
+			top->dram_bresp = 0b00;
+
 			auto index = aw.addr >> 2;
-			if (index >= DRAM_SIZE) [[unlikely]]
+			if (index >= DRAM_SIZE) [[unlikely]] {
 				fprintf(stderr, "Bad DRAM write address: %08x\n", aw.addr);
-			else if (index < FLASH_BOUNDARY) [[unlikely]]
-				fprintf(stderr, "Attempt to write to flash: %08x\n", aw.addr);
-			else {
+				top->dram_bresp = 0b11;
+			} else {
+				if (index < FLASH_BOUNDARY) [[unlikely]]
+					fprintf(stderr, "Attempt to write to flash: %08x\n", aw.addr);
+
 				constexpr unsigned STRB_MASKS[16] = {
 					[0b0000] = 0x00000000,
 					[0b0001] = 0x000000ff,
