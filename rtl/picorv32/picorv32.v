@@ -158,6 +158,8 @@ module picorv32 #(
 	output reg        trace_valid,
 	output reg [35:0] trace_data
 );
+    // verilator tracing_off
+
 	localparam integer irq_timer = 0;
 	localparam integer irq_ebreak = 1;
 	localparam integer irq_buserror = 2;

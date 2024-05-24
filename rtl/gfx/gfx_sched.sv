@@ -10,8 +10,6 @@ import gfx::*;
 	input  irq_lines irq
 );
 
-	// verilator tracing_off
-
 	logic axi_ready, axi_valid, bram_ready, bram_read, bram_write, bram_write_next,
 	      mem_instr, mem_la_read, mem_la_write, mem_ready, mem_valid, select_bram;
 
@@ -132,7 +130,7 @@ import gfx::*;
 			bram_ready <= 0;
 			bram_write <= 0;
 		end else begin
-			axi_valid <= ~select_bram | (axi_valid & ~axi_ready);
+			axi_valid <= ~select_bram | (mem_valid & axi_valid & ~axi_ready);
 			bram_read <= mem_la_read & select_bram;
 			bram_write <= bram_write_next;
 			bram_ready <= bram_read | bram_write_next;
