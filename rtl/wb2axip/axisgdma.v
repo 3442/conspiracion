@@ -804,7 +804,8 @@ module	axisgdma #(
 		// {{{
 		.C_AXI_ADDR_WIDTH(C_AXI_ADDR_WIDTH),
 		.C_AXI_DATA_WIDTH(C_AXI_DATA_WIDTH),
-		.FETCH_LIMIT(4)
+		.FETCH_LIMIT(4),
+		.SWAP_ENDIANNESS(1'b0) // ???? Por qué estaba en 1 ???
 		// }}}
 	) pf (
 		// {{{
