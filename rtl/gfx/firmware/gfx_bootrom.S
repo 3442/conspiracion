@@ -52,7 +52,7 @@ _start:
 	and  t2, t2, a6
 	beq  t2, zero, .write_done
 
-	andi t0, t0, ~0b11
+	andi t0, t0, 0b111100 # Entendemos words 0-15
 	bne  t0, a3, .wait_axi
 	sw   zero, 0(a0)
 	# Pass magic & hardware version
