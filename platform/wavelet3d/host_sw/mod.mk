@@ -1,14 +1,15 @@
 cores := w3d_host_flash w3d_host_sw w3d_picolibc
 
 define core/w3d_host_sw
-  $(this)/deps := w3d_picolibc
+  $(this)/deps := gfx_firmware w3d_picolibc
   $(this)/cross := riscv32-none-elf-
   $(this)/hooks := cc objcopy obj
 
   $(this)/obj_deps := picolibc/picolibc.specs
 
-  $(this)/cc_files := main.c
+  $(this)/cc_files := main.c gfx_boot.c init.c sgdma.c
   $(this)/cc_flags  = -g -march=rv32imafc -mabi=ilp32f --specs=$$(obj)/picolibc/picolibc.specs
+  $(this)/ld_extra := gfx_fw_payload.o
   $(this)/ld_flags := --oslib=semihost
   $(this)/ld_binary := w3d_host_flash
 
