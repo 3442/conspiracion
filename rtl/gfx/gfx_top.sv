@@ -11,7 +11,7 @@ import gfx::*;
 );
 
 	if_axib data_mem(), insn_mem(), sched_vram();
-	if_axil bootrom_axi(), debug_axi(), host_ctrl_axi(), sched_axi(), shader_0_axi();
+	if_axil bootrom_axi(), host_ctrl_axi(), sched_axi(), shader_0_axi();
 
 	logic irq_host_ctrl;
 	irq_lines irq;
@@ -41,13 +41,6 @@ import gfx::*;
 		.axis(bootrom_axi.s)
 	);
 
-	gfx_sim_debug debug
-	(
-		.clk,
-		.rst_n,
-		.axis(debug_axi.s)
-	);
-
 	gfx_shader shader_0
 	(
 		.clk,
@@ -65,7 +58,6 @@ import gfx::*;
 		.sched(sched_axi.s),
 
 		.vram(sched_vram.m),
-		.debug(debug_axi.m),
 		.bootrom(bootrom_axi.m),
 		.shader_0(shader_0_axi.m),
 		.host_ctrl(host_ctrl_axi.m)

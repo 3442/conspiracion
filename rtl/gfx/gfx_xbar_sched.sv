@@ -8,8 +8,7 @@ import gfx::*;
 
 	       if_axib.m vram,
 
-	       if_axil.m debug,
-	                 bootrom,
+	       if_axil.m bootrom,
 	                 shader_0,
 	                 host_ctrl
 );
@@ -18,8 +17,6 @@ import gfx::*;
 
 	localparam word
 		BOOTROM_MASK   = 32'hfff0_0000,
-		DEBUG_BASE     = 32'h0020_0000,
-		DEBUG_MASK     = 32'hfff0_0000,
 		HOST_CTRL_BASE = 32'h0030_0000,
 		HOST_CTRL_MASK = 32'hfff0_0000,
 		SHADER_0_BASE  = 32'h0100_0000,
@@ -28,14 +25,13 @@ import gfx::*;
 		VRAM_MASK      = 32'hfc00_0000;
 
 	defparam xbar.NM = 1; 
-	defparam xbar.NS = 5;
+	defparam xbar.NS = 4;
 	defparam xbar.OPT_LOWPOWER = 0; 
 
 	defparam xbar.SLAVE_ADDR = {
 		VRAM_BASE,
 		SHADER_0_BASE,
 		HOST_CTRL_BASE,
-		DEBUG_BASE,
 		BOOTROM_BASE
 	};
 
@@ -43,7 +39,6 @@ import gfx::*;
 		VRAM_MASK,
 		SHADER_0_MASK,
 		HOST_CTRL_MASK,
-		DEBUG_MASK,
 		BOOTROM_MASK
 	};
 
@@ -80,7 +75,6 @@ import gfx::*;
 			vram_lite.m.awaddr,
 			shader_0.awaddr,
 			host_ctrl.awaddr,
-			debug.awaddr,
 			bootrom.awaddr
 		}),
 		.M_AXI_AWPROT(),
@@ -88,14 +82,12 @@ import gfx::*;
 			vram_lite.m.awvalid,
 			shader_0.awvalid,
 			host_ctrl.awvalid,
-			debug.awvalid,
 			bootrom.awvalid
 		}),
 		.M_AXI_AWREADY({
 			vram_lite.m.awready,
 			shader_0.awready,
 			host_ctrl.awready,
-			debug.awready,
 			bootrom.awready
 		}),
 
@@ -103,7 +95,6 @@ import gfx::*;
 			vram_lite.m.wdata,
 			shader_0.wdata,
 			host_ctrl.wdata,
-			debug.wdata,
 			bootrom.wdata
 		}),
 		.M_AXI_WSTRB(),
@@ -111,14 +102,12 @@ import gfx::*;
 			vram_lite.m.wvalid,
 			shader_0.wvalid,
 			host_ctrl.wvalid,
-			debug.wvalid,
 			bootrom.wvalid
 		}),
 		.M_AXI_WREADY({
 			vram_lite.m.wready,
 			shader_0.wready,
 			host_ctrl.wready,
-			debug.wready,
 			bootrom.wready
 		}),
 
@@ -127,14 +116,12 @@ import gfx::*;
 			vram_lite.m.bvalid,
 			shader_0.bvalid,
 			host_ctrl.bvalid,
-			debug.bvalid,
 			bootrom.bvalid
 		}),
 		.M_AXI_BREADY({
 			vram_lite.m.bready,
 			shader_0.bready,
 			host_ctrl.bready,
-			debug.bready,
 			bootrom.bready
 		}),
 
@@ -142,7 +129,6 @@ import gfx::*;
 			vram_lite.m.araddr,
 			shader_0.araddr,
 			host_ctrl.araddr,
-			debug.araddr,
 			bootrom.araddr
 		}),
 		.M_AXI_ARPROT(),
@@ -150,14 +136,12 @@ import gfx::*;
 			vram_lite.m.arvalid,
 			shader_0.arvalid,
 			host_ctrl.arvalid,
-			debug.arvalid,
 			bootrom.arvalid
 		}),
 		.M_AXI_ARREADY({
 			vram_lite.m.arready,
 			shader_0.arready,
 			host_ctrl.arready,
-			debug.arready,
 			bootrom.arready
 		}),
 
@@ -165,7 +149,6 @@ import gfx::*;
 			vram_lite.m.rdata,
 			shader_0.rdata,
 			host_ctrl.rdata,
-			debug.rdata,
 			bootrom.rdata
 		}),
 		.M_AXI_RRESP('0),
@@ -173,14 +156,12 @@ import gfx::*;
 			vram_lite.m.rvalid,
 			shader_0.rvalid,
 			host_ctrl.rvalid,
-			debug.rvalid,
 			bootrom.rvalid
 		}),
 		.M_AXI_RREADY({
 			vram_lite.m.rready,
 			shader_0.rready,
 			host_ctrl.rready,
-			debug.rready,
 			bootrom.rready
 		})
 	);
