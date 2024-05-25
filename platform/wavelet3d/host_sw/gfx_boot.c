@@ -33,7 +33,7 @@ enum gfx_probe_result gfx_probe(void)
 
 	log
 	(
-		"%s rev %u.%u.%02u #%02u",
+		"%s rev %04u.%02u.%02u #%u",
 		hostif_rev ? "firmware" : "bootloader",
 		fw_id.year, fw_id.month, fw_id.day, fw_id.build
 	);

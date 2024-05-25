@@ -1,78 +1,103 @@
-struct hostif_ctrl
-{
-	unsigned arint   : 1;
-	unsigned awint   : 1;
-	unsigned rsvd2   : 6;
-	unsigned arvalid : 1;
-	unsigned awvalid : 1;
-	unsigned rdone   : 1;
-	unsigned wvalid  : 1;
-	unsigned bdone   : 1;
-	unsigned rsvd13  : 19;
-};
+#include "ctrl_map.h"
+#include "hostif.h"
 
-struct hostif_ar
-{
-	unsigned valid : 1;
-	unsigned rsvd1 : 1;
-	unsigned addr  : 30;
-};
+unsigned boot_magic;
+unsigned boot_hw_rev;
 
-struct hostif_aw
+void host_read(struct hostif_ctrl *ctrl)
 {
-	unsigned valid : 1;
-	unsigned rsvd1 : 1;
-	unsigned addr  : 30;
-};
+	struct hostif_ar ar;
+	if (!(ar = HOSTIF_AR).valid)
+		return;
 
-struct hostif_r
+	union ctrl_rdata rdata;
+	rdata.word = 0xffffffff;
+
+	switch (ar.addr & 0xff) {
+		case CTRL_OFFSET_MAGIC:
+			rdata.magic.value = boot_magic;
+			break;
+
+		case CTRL_OFFSET_HW_ID:
+			rdata.word = boot_hw_rev;
+			break;
+
+		case CTRL_OFFSET_FW_ID: {
+			rdata.fw_id.year = 0;
+			for (unsigned i = 7; i <= 10; ++i) {
+				rdata.fw_id.year *= 10;
+				rdata.fw_id.year += (unsigned)(__DATE__[i] - '0');
+			}
+
+			rdata.fw_id.day = __DATE__[4] != ' ' ? (unsigned)(__DATE__[4] - '0') : 0;
+			rdata.fw_id.day += (unsigned)(__DATE__[5] - '0');
+
+			const char months[12][3] = {
+				"Jan",
+				"Feb",
+				"Mar",
+				"Apr",
+				"May",
+				"Jun",
+				"Jul",
+				"Aug",
+				"Sep",
+				"Oct",
+				"Nov",
+				"Dec",
+			};
+
+			rdata.fw_id.month = 0;
+			for (unsigned i = 0; i < sizeof months / sizeof months[0]; ++i)
+				if (__DATE__[0] == months[i][0]
+				 && __DATE__[1] == months[i][1]
+				 && __DATE__[2] == months[i][2]) {
+					rdata.fw_id.month = i + 1;
+					break;
+				}
+
+			rdata.fw_id.build = 1;
+			rdata.fw_id.rsvd31 = 0;
+			break;
+		}
+
+		case CTRL_OFFSET_HOSTIF_ID:
+			rdata.hostif_id.rev = HOSTIF_REV_V1;
+			break;
+	}
+
+	HOSTIF_R.data = rdata.word;
+	while (!(*ctrl = HOSTIF_CTRL).rdone);
+}
+
+void host_write(struct hostif_ctrl *ctrl)
 {
-	unsigned data : 32;
-};
+	struct hostif_aw aw;
+	if (!(aw = HOSTIF_AW).valid)
+		return;
 
-struct hostif_w
-{
-	unsigned data : 32;
-};
+	union ctrl_wdata wdata;
+	wdata.word = HOSTIF_W.data;
 
-struct hostif_b0
-{
-	unsigned valid : 1;
-	unsigned rsvd1 : 31;
-};
+	switch (aw.addr & 0xff) {
+	}
 
-#define HOSTIF_BASE 0x00300000
-#define HOSTIF_CTRL (*(volatile struct hostif_ctrl *)(HOSTIF_BASE + 0x00))
-#define HOSTIF_AR   (*(volatile struct hostif_ar *)  (HOSTIF_BASE + 0x04))
-#define HOSTIF_AW   (*(volatile struct hostif_aw *)  (HOSTIF_BASE + 0x08))
-#define HOSTIF_R    (*(volatile struct hostif_r *)   (HOSTIF_BASE + 0x0c))
-#define HOSTIF_W    (*(volatile struct hostif_w *)   (HOSTIF_BASE + 0x10))
-#define HOSTIF_B    (*(volatile struct hostif_b *)   (HOSTIF_BASE + 0x14))
+	HOSTIF_B = (struct hostif_b){ .valid = 1, .rsvd1 = 0 };
+	while (!(*ctrl = HOSTIF_CTRL).bdone);
+}
 
 int main(unsigned magic, unsigned hw_rev)
 {
+	boot_magic = magic;
+	boot_hw_rev = hw_rev;
+
 	while (1) {
-		struct hostif_ar ar;
-		while (!(ar = HOSTIF_AR).valid);
+		struct hostif_ctrl ctrl = HOSTIF_CTRL;
 
-		switch (ar.addr & 3) {
-			case 0b00:
-				HOSTIF_R.data = magic;
-				break;
+		if (ctrl.arvalid)
+			host_read(&ctrl);
 
-			case 0b01:
-				HOSTIF_R.data = hw_rev;
-				break;
-
-			case 0b10:
-				HOSTIF_R.data = hw_rev;
-				break;
-
-			case 0b11:
-				HOSTIF_R.data = 1;
-				break;
-		}
-
-		while (!HOSTIF_CTRL.rdone);
+		if (ctrl.awvalid && ctrl.wvalid)
+			host_write(&ctrl);
 	}
 }
