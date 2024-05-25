@@ -4,7 +4,7 @@ define core/gfx_bootrom
   $(this)/cross := riscv32-none-elf-
   $(this)/hooks := cc objcopy makehex obj
 
-  $(this)/cc_files := gfx_bootrom.S
+  $(this)/cc_files := bootrom.S
   $(this)/cc_flags  = -g -march=rv32imc -mabi=ilp32
   $(this)/ld_flags := -nostartfiles -nostdlib
   $(this)/ld_binary := gfx_bootrom
