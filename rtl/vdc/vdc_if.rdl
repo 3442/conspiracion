@@ -1,0 +1,85 @@
+addrmap vdc_if {
+    name = "Video display controller";
+
+    default hw = r;
+    default sw = rw;
+    default regwidth = 32;
+    default precedence = hw;
+
+    reg {
+        name = "Control and status register";
+
+        field {
+            desc = "Enable video DAC output";
+        } DACEN[0:0] = 0;
+
+        field {
+            desc = "Video DAC output is active";
+
+            hw = w;
+            sw = r;
+        } DACON[1:1] = 0;
+
+        field {
+            desc = "Enable double buffering";
+        } DOUBLEBUFF[2:2] = 0;
+    } CTRL @ 0x00;
+
+    reg {
+        name = "Output resolution geometry";
+
+        field {
+            desc = "Vertical lines minus one";
+        } LINES[15:0];
+
+        field {
+            desc = "Line length in words minus one";
+        } LENGTH[31:16];
+    } GEOMETRY @ 0x04;
+
+    reg {
+        name = "Buffer stream access and format";
+
+        field {
+            desc = "Horizontal stride";
+        } HSTRIDE[15:0];
+    } STREAM @ 0x08;
+
+    reg {
+        name = "Base address of the primary buffer";
+
+        field {
+            desc = "Base address in words";
+
+            hw = rw;
+            precedence = sw;
+
+            we;
+        } ADDR[31:2];
+    } FRONT @ 0x0c;
+
+    reg {
+        name = "Back buffer";
+
+        field {
+            desc = "Base address in words";
+
+            hw = rw;
+            precedence = sw;
+
+            we;
+            swmod;
+        } ADDR[31:2];
+    } BACK @ 0x10;
+
+    reg {
+        name = "Retired back buffer";
+
+        default hw = w;
+        default sw = r;
+
+        field {
+            desc = "Base address in words";
+        } ADDR[31:2];
+    } RETIRE @ 0x14;
+};
