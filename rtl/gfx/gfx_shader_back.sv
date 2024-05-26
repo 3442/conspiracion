@@ -179,23 +179,30 @@ module gfx_shader_writeback_arbiter2_prio
 	       gfx_wb.tx out
 );
 
-	//TODO
-	assign a.ready = out.ready;
-	assign b.ready = 0;
+	assign a.ready = out.ready | ~out.valid;
+	assign b.ready = (out.ready | ~out.valid) & ~a.valid;
 
-	assign out.dest = a.dest;
-	assign out.lanes = a.lanes;
-	assign out.group = a.group;
-	assign out.valid = a.valid;
-	assign out.scalar = a.scalar;
-	assign out.writeback = a.writeback;
+	always_ff @(posedge clk or negedge rst_n)
+		if (~rst_n)
+			out.valid <= 0;
+		else
+			out.valid <= (out.valid & ~out.ready) | a.valid | b.valid;
 
-	assign out.mask = a.mask;
-	assign out.mask_update = a.mask_update;
+	always_ff @(posedge clk)
+		if (out.ready | ~out.valid) begin
+			out.dest <= a.valid ? a.dest : b.dest;
+			out.lanes <= a.valid ? a.lanes : b.lanes;
+			out.group <= a.valid ? a.group : b.group;
+			out.scalar <= a.valid ? a.scalar : b.scalar;
+			out.writeback <= a.valid ? a.writeback : b.writeback;
 
-	assign out.pc_add = a.pc_add;
-	assign out.pc_inc = a.pc_inc;
-	assign out.pc_update = a.pc_update;
+			out.mask <= a.valid ? a.mask : b.mask;
+			out.mask_update <= a.valid ? a.mask_update : b.mask_update;
+
+			out.pc_add <= a.valid ? a.pc_add : b.pc_add;
+			out.pc_inc <= a.valid ? a.pc_inc : b.pc_inc;
+			out.pc_update <= a.valid ? a.pc_update : b.pc_update;
+		end
 
 endmodule
 
