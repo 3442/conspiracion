@@ -13,7 +13,7 @@
    {
       datum _sortIndex
       {
-         value = "11";
+         value = "8";
          type = "int";
       }
    }
@@ -29,7 +29,7 @@
    {
       datum _sortIndex
       {
-         value = "17";
+         value = "14";
          type = "int";
       }
    }
@@ -45,7 +45,7 @@
    {
       datum _sortIndex
       {
-         value = "12";
+         value = "9";
          type = "int";
       }
    }
@@ -53,23 +53,7 @@
    {
       datum _sortIndex
       {
-         value = "15";
-         type = "int";
-      }
-   }
-   element jtag_dbg
-   {
-      datum _sortIndex
-      {
-         value = "6";
-         type = "int";
-      }
-   }
-   element jtag_uart_0
-   {
-      datum _sortIndex
-      {
-         value = "3";
+         value = "12";
          type = "int";
       }
    }
@@ -77,7 +61,7 @@
    {
       datum _sortIndex
       {
-         value = "13";
+         value = "10";
          type = "int";
       }
    }
@@ -85,7 +69,7 @@
    {
       datum _sortIndex
       {
-         value = "5";
+         value = "3";
          type = "int";
       }
    }
@@ -93,7 +77,7 @@
    {
       datum _sortIndex
       {
-         value = "9";
+         value = "6";
          type = "int";
       }
    }
@@ -189,7 +173,7 @@
    {
       datum _sortIndex
       {
-         value = "10";
+         value = "7";
          type = "int";
       }
    }
@@ -197,7 +181,7 @@
    {
       datum _sortIndex
       {
-         value = "14";
+         value = "11";
          type = "int";
       }
    }
@@ -205,15 +189,7 @@
    {
       datum _sortIndex
       {
-         value = "16";
-         type = "int";
-      }
-   }
-   element timer_0
-   {
-      datum _sortIndex
-      {
-         value = "4";
+         value = "13";
          type = "int";
       }
    }
@@ -221,7 +197,7 @@
    {
       datum _sortIndex
       {
-         value = "8";
+         value = "5";
          type = "int";
       }
       datum sopceditor_expanded
@@ -234,7 +210,7 @@
    {
       datum _sortIndex
       {
-         value = "7";
+         value = "4";
          type = "int";
       }
    }
@@ -934,8 +910,8 @@
   <parameter name="use_default_mpu_clk" value="true" />
  </module>
  <module name="intc_0" kind="intc" version="1.0" enabled="1">
-  <parameter name="AUTO_INTERRUPT_JTAGUART_INTERRUPTS_USED" value="1" />
-  <parameter name="AUTO_INTERRUPT_TIMER_INTERRUPTS_USED" value="1" />
+  <parameter name="AUTO_INTERRUPT_JTAGUART_INTERRUPTS_USED" value="0" />
+  <parameter name="AUTO_INTERRUPT_TIMER_INTERRUPTS_USED" value="0" />
  </module>
  <module
    name="io_axi_bridge"
@@ -1005,39 +981,6 @@
   <parameter name="WRITE_DATA_USER_WIDTH" value="1" />
   <parameter name="WRITE_ISSUING_CAPABILITY" value="16" />
   <parameter name="WRITE_RESP_USER_WIDTH" value="1" />
- </module>
- <module
-   name="jtag_dbg"
-   kind="altera_jtag_avalon_master"
-   version="20.1"
-   enabled="1">
-  <parameter name="AUTO_DEVICE" value="5CSEMA5F31C6" />
-  <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
-  <parameter name="AUTO_DEVICE_SPEEDGRADE" value="6" />
-  <parameter name="COMPONENT_CLOCK" value="0" />
-  <parameter name="FAST_VER" value="0" />
-  <parameter name="FIFO_DEPTHS" value="2" />
-  <parameter name="PLI_PORT" value="50000" />
-  <parameter name="USE_PLI" value="0" />
- </module>
- <module
-   name="jtag_uart_0"
-   kind="altera_avalon_jtag_uart"
-   version="20.1"
-   enabled="1">
-  <parameter name="allowMultipleConnections" value="false" />
-  <parameter name="avalonSpec" value="2.0" />
-  <parameter name="clkFreq" value="120000000" />
-  <parameter name="hubInstanceID" value="0" />
-  <parameter name="readBufferDepth" value="64" />
-  <parameter name="readIRQThreshold" value="8" />
-  <parameter name="simInputCharacterStream" value="" />
-  <parameter name="simInteractiveOptions">NO_INTERACTIVE_WINDOWS</parameter>
-  <parameter name="useRegistersForReadBuffer" value="false" />
-  <parameter name="useRegistersForWriteBuffer" value="false" />
-  <parameter name="useRelativePathForSimFile" value="false" />
-  <parameter name="writeBufferDepth" value="64" />
-  <parameter name="writeIRQThreshold" value="8" />
  </module>
  <module
    name="mm_bridge"
@@ -1315,18 +1258,6 @@
   <parameter name="SYNCHRONOUS_EDGES" value="deassert" />
   <parameter name="USE_RESET_REQUEST" value="0" />
  </module>
- <module name="timer_0" kind="altera_avalon_timer" version="20.1" enabled="1">
-  <parameter name="alwaysRun" value="false" />
-  <parameter name="counterSize" value="32" />
-  <parameter name="fixedPeriod" value="false" />
-  <parameter name="period" value="1" />
-  <parameter name="periodUnits" value="MSEC" />
-  <parameter name="resetOutput" value="false" />
-  <parameter name="snapshot" value="true" />
-  <parameter name="systemFrequency" value="120000000" />
-  <parameter name="timeoutPulseOutput" value="false" />
-  <parameter name="watchdogPulse" value="2" />
- </module>
  <module
    name="vga"
    kind="altera_up_avalon_video_vga_controller"
@@ -1355,15 +1286,6 @@
   <parameter name="vga_clk_en" value="true" />
   <parameter name="video_in_clk_en" value="false" />
  </module>
- <connection
-   kind="avalon"
-   version="20.1"
-   start="mm_bridge.m0"
-   end="jtag_uart_0.avalon_jtag_slave">
-  <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x30000000" />
-  <parameter name="defaultConnection" value="false" />
- </connection>
  <connection
    kind="avalon"
    version="20.1"
@@ -1406,20 +1328,6 @@
   <parameter name="baseAddress" value="0x30060000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
- <connection kind="avalon" version="20.1" start="mm_bridge.m0" end="timer_0.s1">
-  <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x30020000" />
-  <parameter name="defaultConnection" value="false" />
- </connection>
- <connection
-   kind="avalon"
-   version="20.1"
-   start="jtag_dbg.master"
-   end="mm_bridge.s0">
-  <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x0000" />
-  <parameter name="defaultConnection" value="false" />
- </connection>
  <connection
    kind="avalon_streaming"
    version="20.1"
@@ -1446,22 +1354,7 @@
    version="20.1"
    start="sys_clock.out_clk"
    end="switches.clk" />
- <connection
-   kind="clock"
-   version="20.1"
-   start="sys_clock.out_clk"
-   end="jtag_dbg.clk" />
  <connection kind="clock" version="20.1" start="sys_clock.out_clk" end="pio_0.clk" />
- <connection
-   kind="clock"
-   version="20.1"
-   start="sys_clock.out_clk"
-   end="timer_0.clk" />
- <connection
-   kind="clock"
-   version="20.1"
-   start="sys_clock.out_clk"
-   end="jtag_uart_0.clk" />
  <connection
    kind="clock"
    version="20.1"
@@ -1504,20 +1397,6 @@
    start="video_pll_0.vga_clk"
    end="pixfifo.clock_stream_out" />
  <connection
-   kind="interrupt"
-   version="20.1"
-   start="intc_0.interrupt_jtaguart"
-   end="jtag_uart_0.irq">
-  <parameter name="irqNumber" value="0" />
- </connection>
- <connection
-   kind="interrupt"
-   version="20.1"
-   start="intc_0.interrupt_timer"
-   end="timer_0.irq">
-  <parameter name="irqNumber" value="0" />
- </connection>
- <connection
    kind="reset"
    version="20.1"
    start="clk_0.clk_reset"
@@ -1531,22 +1410,12 @@
    kind="reset"
    version="20.1"
    start="sys_rst.out_reset"
-   end="jtag_dbg.clk_reset" />
- <connection
-   kind="reset"
-   version="20.1"
-   start="sys_rst.out_reset"
    end="dram_axi_bridge.clk_reset" />
  <connection
    kind="reset"
    version="20.1"
    start="sys_rst.out_reset"
    end="video_pll_0.ref_reset" />
- <connection
-   kind="reset"
-   version="20.1"
-   start="sys_rst.out_reset"
-   end="jtag_uart_0.reset" />
  <connection
    kind="reset"
    version="20.1"
@@ -1562,11 +1431,6 @@
    version="20.1"
    start="sys_rst.out_reset"
    end="mm_bridge.reset" />
- <connection
-   kind="reset"
-   version="20.1"
-   start="sys_rst.out_reset"
-   end="timer_0.reset" />
  <connection
    kind="reset"
    version="20.1"
