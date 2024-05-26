@@ -64,6 +64,8 @@ int main(int argc, char **argv)
 	top->jtag_tms = 1;
 	top->jtag_tdi = 1;
 
+	top->dac_ready = 1;
+
 	cycle();
 
 	top->rst_n = 1;
@@ -118,6 +120,16 @@ int main(int argc, char **argv)
 	}
 
 	fclose(flash_img);
+
+	constexpr std::size_t FB_SIZE = 640 * 480;
+	auto fb = std::make_unique<unsigned[]>(FB_SIZE);
+	std::size_t fb_ptr = 0;
+
+	::SDL_Init(SDL_INIT_VIDEO);
+
+	::SDL_Window *window = nullptr;
+	::SDL_Renderer *renderer = nullptr;
+	::SDL_Texture *texture = nullptr;
 
 	auto sys_bus_cycle = [&]()
 	{
@@ -223,6 +235,37 @@ int main(int argc, char **argv)
 				.data = top->dram_wdata,
 				.strb = top->dram_wstrb,
 			});
+
+		if (top->dac_valid)  {
+			if (top->dac_first)
+				fb_ptr = 0;
+
+			fb[fb_ptr++]
+				= (unsigned)(top->dac_r >> 2) << 16
+				| (unsigned)(top->dac_g >> 2) << 8
+				| (unsigned)(top->dac_b >> 2) << 0;
+
+			if (top->dac_last) {
+				if (!window) {
+					window = ::SDL_CreateWindow
+					(
+						"w3d", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, 0
+					);
+
+					renderer = ::SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED); 
+
+					texture = ::SDL_CreateTexture
+					(
+						renderer, SDL_PIXELFORMAT_ARGB32, SDL_TEXTUREACCESS_STREAMING, 640, 480
+					);
+				}
+
+				::SDL_UpdateTexture(texture, nullptr, &fb[0], 640 * sizeof fb[0]);
+				::SDL_RenderClear(renderer);
+				::SDL_RenderCopy(renderer, texture, nullptr, nullptr);
+				::SDL_RenderPresent(renderer);
+			}
+		}
 	};
 
 	remote_jtag jtag(1234);
@@ -246,6 +289,11 @@ int main(int argc, char **argv)
 #endif
 
 	top->final();
+
+	::SDL_DestroyTexture(texture); 
+	::SDL_DestroyRenderer(renderer); 
+	::SDL_DestroyWindow(window);
+	::SDL_Quit();
 
 	return EXIT_SUCCESS;
 }
