@@ -65,6 +65,7 @@ define target/syn/rules
   .PHONY: $$(rule_top_path)/syn
 
   $$(rule_top_path)/syn: $$(obj)/asm.stamp
+	$$(if $$(enable_gui),$$(call run,GUI) $$(quartus_run) $$(quartus_top).qpf)
 
   $$(obj)/asm.stamp: $$(obj)/sta.stamp
 	$$(call run,ASM) $$(quartus_run)_asm $$(quartus_top)
