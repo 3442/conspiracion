@@ -73,14 +73,14 @@ module w3d_de1soc
 
 	debounce reset_debounce
 	(
-		.clk(clk_clk),
+		.clk(sys_clk),
 		.dirty(rst_n),
 		.clean(reset_reset_n)
 	);
 
 	debounce button_debounce
 	(
-		.clk(clk_clk),
+		.clk(sys_clk),
 		.dirty(pio_buttons),
 		.clean(button)
 	);
