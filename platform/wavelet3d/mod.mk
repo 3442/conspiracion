@@ -1,7 +1,7 @@
 subdirs := host_sw
 
 define core
-  $(this)/deps := axixbar if_common gfx w3d_host_sw
+  $(this)/deps := axixbar if_common gfx vdc w3d_host_sw
 
   $(this)/rtl_top := w3d_top
   $(this)/rtl_dirs := .

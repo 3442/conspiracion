@@ -71,6 +71,9 @@ module w3d_de1soc
 	logic[2:0] mmio_full_arprot, mmio_full_awprot;
 	logic[3:0] mmio_full_arcache, mmio_full_awcache;
 
+	logic dac_first, dac_last, dac_ready, dac_valid;
+	logic[9:0] dac_r, dac_g, dac_b;
+
 	debounce reset_debounce
 	(
 		.clk(sys_clk),
@@ -187,12 +190,11 @@ module w3d_de1soc
 		.io_axi_bridge_s0_rvalid(mmio_full_rvalid),
 		.io_axi_bridge_s0_rready(mmio_full_rready),
 		.intc_0_interrupt_sender_irq(), //TODO
-		//TODO TODO TODO
-		.pixfifo_avalon_dc_buffer_sink_ready(),
-		.pixfifo_avalon_dc_buffer_sink_startofpacket(1),
-		.pixfifo_avalon_dc_buffer_sink_endofpacket(0),
-		.pixfifo_avalon_dc_buffer_sink_valid(1),
-		.pixfifo_avalon_dc_buffer_sink_data({10'h3ff, 10'h000, 10'h000}),
+		.pixfifo_avalon_dc_buffer_sink_ready(dac_ready),
+		.pixfifo_avalon_dc_buffer_sink_startofpacket(dac_first),
+		.pixfifo_avalon_dc_buffer_sink_endofpacket(dac_last),
+		.pixfifo_avalon_dc_buffer_sink_valid(dac_valid),
+		.pixfifo_avalon_dc_buffer_sink_data({dac_r, dac_g, dac_b}),
 		.sys_clock_out_clk_1_clk(sys_clk),
 		.sys_rst_out_reset_1_reset_n(sys_rst_n)
 	);
@@ -247,6 +249,14 @@ module w3d_de1soc
 		.mmio_rvalid,
 		.mmio_rready,
 		.mmio_rdata,
+
+		.dac_b,
+		.dac_g,
+		.dac_r,
+		.dac_last,
+		.dac_first,
+		.dac_ready,
+		.dac_valid,
 
 		//TODO Altera Virtual JTAG
 		.jtag_tck(0),

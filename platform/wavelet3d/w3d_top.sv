@@ -57,6 +57,14 @@ module w3d_top
 	output logic       mmio_rready,
 	input  logic[31:0] mmio_rdata,
 
+	input  logic       dac_ready,
+	output logic       dac_last,
+	                   dac_first,
+	                   dac_valid,
+	output logic[9:0]  dac_b,
+	                   dac_g,
+	                   dac_r,
+
 	input  logic       jtag_tck,
 	                   jtag_tms,
 	                   jtag_tdi,
@@ -64,8 +72,9 @@ module w3d_top
 );
 
 	if_tap host_jtag();
-	if_axib dram(), gfx_vram(), host_dbus(), host_ibus(), sgdma_mem();
-	if_axil mmio(), gfx_ctrl(), sgdma_ctrl();
+	if_axib dram(), gfx_vram(), host_dbus(), host_ibus(), sgdma_mem(), vdc_stream();
+	if_axil mmio(), gfx_ctrl(), sgdma_ctrl(), vdc_ctrl();
+	vdc_dac dac();
 
 	assign dram_awid = dram.s.awid;
 	assign dram_awlen = dram.s.awlen;
@@ -125,6 +134,14 @@ module w3d_top
 	assign host_jtag.m.tms = jtag_tms;
 	assign host_jtag.m.tdi = jtag_tdi;
 
+	assign dac_b = dac.rx.pix.b;
+	assign dac_g = dac.rx.pix.g;
+	assign dac_r = dac.rx.pix.r;
+	assign dac_last = dac.rx.last;
+	assign dac_first = dac.rx.first;
+	assign dac_valid = dac.rx.valid;
+	assign dac.rx.ready = dac_ready;
+
 	if_rst_sync rst_sync
 	(
 		.clk,
@@ -139,6 +156,15 @@ module w3d_top
 		.srst_n,
 		.vram(gfx_vram.m),
 		.host_ctrl(gfx_ctrl.s)
+	);
+
+	vdc_top vdc
+	(
+		.clk,
+		.rst_n,
+		.dac(dac.tx),
+		.host(vdc_ctrl.s),
+		.stream(vdc_stream.m)
 	);
 
 	w3d_host host
@@ -165,11 +191,13 @@ module w3d_top
 		.srst_n,
 		.dram(dram.m),
 		.gfx_ctrl(gfx_ctrl.m),
+		.vdc_ctrl(vdc_ctrl.m),
 		.gfx_vram(gfx_vram.s),
 		.host_dbus(host_dbus.s),
 		.host_ibus(host_ibus.s),
 		.sgdma_mem(sgdma_mem.s),
 		.sgdma_ctrl(sgdma_ctrl.m),
+		.vdc_stream(vdc_stream.s),
 		.external_io(mmio.m)
 	);
 
