@@ -35,6 +35,12 @@ def edge_fn(p, q, sx, sy):
 def raster(p0, p1, p2, msaa=True):
     global fb
 
+    # https://math.stackexchange.com/questions/1324179/how-to-tell-if-3-connected-points-are-connected-clockwise-or-counter-clockwise
+    A = p1[0][0] * p0[0][1] + p2[0][0] * p1[0][1] + p0[0][0] * p2[0][1]
+    B = p0[0][0] * p1[0][1] + p1[0][0] * p2[0][1] + p2[0][0] * p0[0][1]
+    if A > B:
+        p1, p2 = p2, p1
+
     minx, miny, maxx, maxy = bounding(p0, p1, p2)
 
     sx, sy = minx // 16 * 16, miny // 16 * 16
