@@ -7,8 +7,9 @@ define core/w3d_host_sw
 
   $(this)/obj_deps := picolibc/picolibc.specs
 
-  $(this)/cc_files := main.c gfx_boot.c init.c sgdma.c
-  $(this)/cc_flags  = -g -march=rv32imafc -mabi=ilp32f --specs=$$(obj)/picolibc/picolibc.specs
+  $(this)/cc_files := demo.c main.c gfx_boot.c init.c sgdma.c vdc.c
+  $(this)/cc_flags  = $$(if $$(enable_opt),-O3 -ffast-math) -g -march=rv32imafc \
+                      -mabi=ilp32f --specs=$$(obj)/picolibc/picolibc.specs
   $(this)/ld_extra := gfx_fw_payload.o
   $(this)/ld_flags := --oslib=semihost
   $(this)/ld_binary := w3d_host_flash

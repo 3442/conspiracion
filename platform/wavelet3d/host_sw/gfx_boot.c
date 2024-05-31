@@ -40,7 +40,6 @@ enum gfx_probe_result gfx_probe(void)
 
 	switch (hostif_rev) {
 		case 0:
-			log("scheduler is in bootloader rom");
 			return GFX_PROBE_BOOTROM;
 
 		case 1:

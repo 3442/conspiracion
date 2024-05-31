@@ -256,7 +256,7 @@ int main(int argc, char **argv)
 
 					texture = ::SDL_CreateTexture
 					(
-						renderer, SDL_PIXELFORMAT_ARGB32, SDL_TEXTUREACCESS_STREAMING, 640, 480
+						renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STREAMING, 640, 480
 					);
 				}
 
