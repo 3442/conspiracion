@@ -3,6 +3,8 @@ from cocotb.triggers import RisingEdge, ReadOnly
 
 from cocotb_coverage.coverage import CoverCheck
 
+from .common import log
+
 class PipelineIntegrityChecker:
     def __init__(self, dut, name, clk):
         self._clk, self._dut = clk, dut
@@ -56,8 +58,8 @@ class PcChecker:
 
         @CoverCheck(
             f'{name}.pc_ok',
-            f_pass = lambda wave: wave.insn and self._pc_ok(wave),
-            f_fail = lambda wave: wave.insn and not self._pc_ok(wave),
+            f_pass = lambda wave: wave.insn is not None and self._pc_ok(wave),
+            f_fail = lambda wave: wave.insn is not None and not self._pc_ok(wave),
         )
         def sample_wave(wave):
             pass
@@ -65,4 +67,14 @@ class PcChecker:
         self.sample_wave = sample_wave
 
     def _pc_ok(self, wave):
-        return wave.insn == self._mem.read(self._pc_table[wave.group] * 4)
+        pc = self._pc_table[wave.group] * 4
+
+        expected = self._mem.read_cached(pc)
+        if type(expected) is int:
+            expected = (expected,)
+
+        if wave.insn not in expected:
+            log.error(f'group {wave.group} outputs insn {wave.insn}, but any of {expected} was expected')
+            return False
+
+        return True

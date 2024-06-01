@@ -31,7 +31,7 @@ class Memory:
             f'{word_size} is not a power of two'
 
         self._data = {}
-        self._dirty = set()
+        self._dirty = {}
         self._observed = set()
 
         self._start = start
@@ -83,15 +83,27 @@ class Memory:
         )
         def _write_word(word_num, data):
             if self._expect_in_range(word_num):
-                self._data[word_num] = data
                 if word_num in self._observed:
-                    self._dirty.add(word_num)
+                    dirty = self._dirty.setdefault(word_num, set())
+                    dirty.add(self._data.get(word_num, self._all_ones))
+                    dirty.add(data)
+
+                self._data[word_num] = data
 
         self._read_word = _read_word
         self._write_word = _write_word
 
     def read(self, addr):
         return self._data[addr >> 2]
+
+    def read_cached(self, addr):
+        addr = addr >> 2
+
+        data = self._data[addr]
+        if dirty := self._dirty.get(addr):
+            data = tuple(dirty.union({data}))
+
+        return data
 
     def randomize_line(self, addr):
         first_word = (addr >> 2) & ~15
