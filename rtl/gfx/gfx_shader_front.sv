@@ -269,7 +269,8 @@ import gfx::*;
 
 	if_beats #($bits(icache_line_tag)) pending_in(), pending_out();
 
-	logic accessed_write, accessed_write_enable, burst, fetch_done, hit_write,
+	logic access_lost_1, access_lost_2, access_lost_3, access_lost_4, accessed_4,
+	      accessed_write, accessed_write_enable, burst, fetch_done, hit_write,
 	      in_flush, hit_commit, hit_write_enable, retry_4, retry_5, rollback,
 	      tag_hit, valid_1, valid_2, valid_3, valid_4, valid_5, valid_write,
 	      valid_write_enable;
@@ -349,7 +350,7 @@ import gfx::*;
 			valid_4 <= valid_3;
 			valid_5 <= valid_4;
 
-			burst <= valid_3 & ~tag_hit & ~read.accessed & (~read.valid | read.hit);
+			burst <= valid_3 & ~read.accessed & ~access_lost_3 & (~read.valid | (read.hit & ~tag_hit));
 		end
 
 	always_ff @(posedge clk) begin
@@ -409,21 +410,26 @@ import gfx::*;
 			cache[hit_write_line].hit <= hit_write;
 
 		read_addr_1 <= read_addr;
+		access_lost_1 <= rollback | (fetch_done & ~hit_commit & pending_out.rx.valid);
 
 		read_hold <= cache[read_addr_1.line_tag.line];
 		read_addr_2 <= read_addr_1;
+		access_lost_2 <= access_lost_1;
 
 		read <= read_hold;
 		read_addr_3 <= read_addr_2;
+		access_lost_3 <= access_lost_2;
 
 		data_4 <= data_3[read_addr_3.word_num[2]];
 		retry_4 <= ~tag_hit | ~read.valid;
+		accessed_4 <= read.accessed;
 		hit_commit <= valid_3 & tag_hit & read.valid;
 		read_addr_4 <= read_addr_3;
+		access_lost_4 <= access_lost_3;
 
 		data_5 <= data_4[read_addr_4.word_num[1]];
 		retry_5 <= retry_4;
-		rollback <= burst & (~request_valid | ~pending_in.tx.valid);
+		rollback <= ~access_lost_4 & ~accessed_4 & (~request_valid | ~pending_in.tx.valid);
 		read_addr_5 <= read_addr_4;
 
 		insn <= data_5[read_addr_5.word_num[0]];
