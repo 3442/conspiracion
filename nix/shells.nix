@@ -42,6 +42,7 @@
         find-libpython # Para cocotb
         matplotlib
         numpy
+        pdoc3
         pillow
         pytest # Para cocotb
         (py.callPackage ./cocotb-coverage.nix { })

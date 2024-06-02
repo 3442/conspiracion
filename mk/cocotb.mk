@@ -1,9 +1,9 @@
-targets += pydoc test
+targets += pdoc test
 
 target/test/prepare = $(prepare_verilator_target)
 
 cocotb_modules = $(call per_target,cocotb_modules)
-pydoc_modules  = $(call per_target,pydoc_modules)
+pdoc_modules   = $(call per_target,pdoc_modules)
 
 cocotb_pythonpath_decl = PYTHONPATH="$(subst $(space),:,$(strip $(cocotb_pythonpath)) $$PYTHONPATH)"
 
@@ -20,13 +20,13 @@ define cocotb_setup_common
   endif
 endef
 
-define target/pydoc/setup
+define target/pdoc/setup
   $(cocotb_setup_common)
 
-  $$(call target_var,pydoc_modules) := $$(strip $$(core_info/$$(rule_top)/pydoc_modules))
+  $$(call target_var,pdoc_modules) := $$(strip $$(core_info/$$(rule_top)/pdoc_modules))
 
-  ifeq (,$$(pydoc_modules))
-    $$(error core '$$(rule_top)' has no modules for pydoc to cover)
+  ifeq (,$$(pdoc_modules))
+    $$(error core '$$(rule_top)' has no modules for pdoc to cover)
   endif
 endef
 
@@ -41,13 +41,13 @@ define target/test/setup
     -lcocotbvpi_verilator -lgpi -lcocotb -lgpilog -lcocotbutils $$(cocotb_libpython)
 endef
 
-define target/pydoc/rules
-  .PHONY: $$(rule_top_path)/pydoc
+define target/pdoc/rules
+  .PHONY: $$(rule_top_path)/pdoc
 
-  $$(rule_top_path)/pydoc: | $$(obj)
-	$$(call run,PYDOC) cd $$(obj) && $$(cocotb_pythonpath_decl) $$(PYDOC3) -w $$(pydoc_modules)
+  $$(rule_top_path)/pdoc: | $$(obj)
+	$$(call run,PDOC) cd $$(obj) && $$(cocotb_pythonpath_decl) $$(PDOC3) --html $$(pdoc_modules)
 
-  $(call target_entrypoint,$$(rule_top_path)/pydoc)
+  $(call target_entrypoint,$$(rule_top_path)/pdoc)
 endef
 
 define target/test/rules

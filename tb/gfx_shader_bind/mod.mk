@@ -8,5 +8,5 @@ define core
   $(this)/cocotb_paths := .
   $(this)/cocotb_modules := testbench.main
 
-  $(this)/pydoc_modules := testbench
+  $(this)/pdoc_modules := testbench
 endef
